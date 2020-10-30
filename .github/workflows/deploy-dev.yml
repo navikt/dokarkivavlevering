@@ -1,4 +1,4 @@
-name: Build and deploy - Dokarkivavlevering
+name: Test manual action run
 on:
   workflow_dispatch:
     inputs:
@@ -12,6 +12,7 @@ on:
       periodeSlutt:
         description: 'Slutt-dato (t.o.m) for avlevering'
         required: true
+
 env:
   IMAGE: docker.pkg.github.com/${{ github.repository }}/dokarkivavlevering:${{ github.sha }}
 
