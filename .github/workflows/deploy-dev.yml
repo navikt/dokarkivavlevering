@@ -47,6 +47,6 @@ jobs:
           PRINT_PAYLOAD: true
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-fss
-          RESOURCE: .nais/naiserator.yaml
+          RESOURCE: nais/naiserator.yaml
           VAR: startdato=${START_DATO}, sluttdato=${SLUTT_DATO}
 #          VARS: .nais/dev-config.json
