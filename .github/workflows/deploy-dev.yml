@@ -56,3 +56,4 @@ jobs:
           RESOURCE: .nais/naiserator.yaml
           VAR: startdato=${START_DATO}, sluttdato=${SLUTT_DATO}
           VARS: .nais/dev-config.json
+
