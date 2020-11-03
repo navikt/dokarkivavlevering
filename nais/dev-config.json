@@ -1,3 +1,6 @@
 {
-
+  "SRVDOKARKIVAVLEVERING": "/serviceuser/data/dev/srvdokarkivavlevering",
+  "SECURITY_TOKEN_SERVICE_TOKEN_URL": "https://security-token-service.nais.preprod.local/rest/v1/sts/token",
+  "VAULT": "kv/preprod/fss/dokarkivavlevering/default",
+  "VAULT_LOGIN_PATH": "auth/kubernetes/preprod/fss/login"
 }

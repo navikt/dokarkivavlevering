@@ -15,9 +15,11 @@ on:
 
 env:
   IMAGE: docker.pkg.github.com/${{ github.repository }}/dokarkivavlevering:${{ github.sha }}
+  START_DATO: ${periodeStart}
+  SLUTT_DATO: ${periodeSlutt}
 
 jobs:
-  test:
+  build:
     name: Run tests
     runs-on: ubuntu-latest
     steps:
@@ -26,39 +28,20 @@ jobs:
         with:
           java-version: '11.x'
       - name: Cache Maven packages
-        uses: actions/cache@v2
+        uses: actions/cache@v1
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2-
       - name: Build and run tests
         run: mvn -B package --file pom.xml
-  build:
-    name: Build and push Docker container
-    needs: test
-    if: (github.event_name != 'pull_request')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-java@v1
-        with:
-          java-version: '11.x'
-      - name: Cache Maven packages
-        uses: actions/cache@v2
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-m2-
-      - name: Build JAR
-        run: mvn -B clean -DskipTests
-      - name: Build and publish Docker image
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build Docker image
+        run: docker build . --pull --tag ${IMAGE}
+      - name: Push Docker image
         run: |
-          docker build . --pull --tag ${IMAGE}
-          echo "$GITHUB_TOKEN" | docker login --username "$GITHUB_REPOSITORY" --password-stdin https://docker.pkg.github.com
+          docker login --username "$GITHUB_REPOSITORY" -p ${{ secrets.GITHUB_TOKEN }} https://docker.pkg.github.com
           docker push ${IMAGE}
+
   deploy-dev:
     name: Deploy to NAIS dev-fss
     needs: build
@@ -71,4 +54,5 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-fss
           RESOURCE: .nais/naiserator.yaml
+          VAR: startdato=${START_DATO}, sluttdato=${SLUTT_DATO}
           VARS: .nais/dev-config.json
