@@ -38,9 +38,9 @@ spec:
 #            - name: NAV_TRUSTSTORE_PASSWORD
 #              value: changeme
             - name: STARTDATO
-              value: {{startdato}}
+              value: "{{startdato}}"
             - name: SLUTTDATO
-              value: {{sluttdato}}
+              value: "{{sluttdato}}"
 
 #      ---- VAULT OG CA-BUNDLE CONFIG ---
 #      initContainers:
