@@ -47,4 +47,4 @@ jobs:
           CLUSTER: dev-fss
           RESOURCE: nais/naiserator.yaml
           VAR: startdato=${{github.event.inputs.periodeStart}},sluttdato=${{github.event.inputs.periodeSlutt}}
-          VARS: .nais/dev-config.json
+          VARS: nais/dev-config.json
