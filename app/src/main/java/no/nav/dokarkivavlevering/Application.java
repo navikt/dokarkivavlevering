@@ -22,5 +22,8 @@ public class Application implements CommandLineRunner {
     @Override
     public void run(String... args) {
         log.info("Dokarkivavlevering kjører...");
+        for(String arg:args) {
+            log.info(arg);
+        }
     }
 }

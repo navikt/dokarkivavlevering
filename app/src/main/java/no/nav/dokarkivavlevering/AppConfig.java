@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
 
 @Configuration
-@EnableConfigurationProperties({ServiceuserAlias.class})
+//@EnableConfigurationProperties({ServiceuserAlias.class})
 @EnableRetry
 public class AppConfig {
 }
