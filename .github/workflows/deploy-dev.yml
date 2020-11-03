@@ -41,14 +41,8 @@ jobs:
         run: |
           docker login --username "$GITHUB_REPOSITORY" -p ${{ secrets.GITHUB_TOKEN }} https://docker.pkg.github.com
           docker push ${IMAGE}
-
-  deploy-dev:
-    name: Deploy to NAIS dev-fss
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - uses: nais/deploy/actions/deploy@v1
+      - name: Deploy to NAIS dev-fss
+        uses: nais/deploy/actions/deploy@v1
         env:
           PRINT_PAYLOAD: true
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
@@ -56,4 +50,3 @@ jobs:
           RESOURCE: .nais/naiserator.yaml
           VAR: startdato=${START_DATO}, sluttdato=${SLUTT_DATO}
 #          VARS: .nais/dev-config.json
-
