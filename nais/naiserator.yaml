@@ -37,9 +37,9 @@ spec:
 #              value: /etc/ssl/certs/java/cacerts
 #            - name: NAV_TRUSTSTORE_PASSWORD
 #              value: changeme
-            - name: START_DATO
+            - name: STARTDATO
               value: {{startdato}}
-            - name: SLUTT_DATO
+            - name: SLUTTDATO
               value: {{sluttdato}}
 
 #      ---- VAULT OG CA-BUNDLE CONFIG ---

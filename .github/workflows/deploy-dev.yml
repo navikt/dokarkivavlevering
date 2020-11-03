@@ -15,8 +15,8 @@ on:
 
 env:
   IMAGE: docker.pkg.github.com/${{ github.repository }}/dokarkivavlevering:${{ github.sha }}
-  START_DATO: ${periodeStart}
-  SLUTT_DATO: ${periodeSlutt}
+  START_DATO:
+  SLUTT_DATO:
 
 jobs:
   build:
@@ -48,5 +48,5 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-fss
           RESOURCE: nais/naiserator.yaml
-          VAR: startdato=${START_DATO}, sluttdato=${SLUTT_DATO}
+          VAR: startdato=${periodeStart},sluttdato=${periodeSlutt}
 #          VARS: .nais/dev-config.json
