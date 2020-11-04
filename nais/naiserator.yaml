@@ -7,7 +7,7 @@ metadata:
     team: teamdokumenthandtering
 spec:
   ttlSecondsAfterFinished: 200
-  backoffLimit: 3
+  backoffLimit: 1
   template:
     spec:
       imagePullSecrets:
@@ -31,6 +31,10 @@ spec:
           env:
             - name: VAULT_TOKEN_PATH
               value: /var/run/secrets/nais.io/vault/vault_token
+            - name: STARTDATO
+              value: "{{startdato}}"
+            - name: SLUTTDATO
+              value: "{{sluttdato}}"
       initContainers:
         - name: vks-init
           image: navikt/vault-sidekick:v0.3.10-d122b16
