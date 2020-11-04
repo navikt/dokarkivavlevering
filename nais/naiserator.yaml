@@ -14,7 +14,6 @@ spec:
         - name: gpr-credentials
       serviceAccountName: default
       restartPolicy: Never
-
       containers:
         - name: dokarkavleverjob
           image: {{image}}
@@ -32,16 +31,8 @@ spec:
           env:
             - name: VAULT_TOKEN_PATH
               value: /var/run/secrets/nais.io/vault/vault_token
-            - name: NAV_TRUSTSTORE_PATH
-              value: /etc/ssl/certs/java/cacerts
-            - name: NAV_TRUSTSTORE_PASSWORD
-              value: changeme
-            - name: STARTDATO
-              value: "{{startdato}}"
-            - name: SLUTTDATO
-              value: "{{sluttdato}}"
       initContainers:
-        - name: vault-init
+        - name: vks-init
           image: navikt/vault-sidekick:v0.3.10-d122b16
           resources:
             requests:
@@ -60,14 +51,14 @@ spec:
             - -vault=https://vault.adeo.no
             - -one-shot
             - -save-token=/var/run/secrets/nais.io/vault/vault_token
-            - -cn=secret:{{VAULT_KV_PATH}}:dir=/var/run/secrets/nais.io/vault,fmt=flatten,retries=1
+#            - -cn=secret:{{VAULT_KV_PATH}}:dir=/var/run/secrets/nais.io/vault,fmt=flatten,retries=1
           env:
             - name: VAULT_AUTH_METHOD
               value: kubernetes
             - name: VAULT_SIDEKICK_ROLE
               value: teamdokumenthandtering
             - name: VAULT_K8S_LOGIN_PATH
-              value: auth/kubernetes/preprod/fss/login
+              value: {{VAULT_LOGIN_PATH}}
       volumes:
         - name: vault-secrets
           emptyDir:
