@@ -27,7 +27,7 @@ spec:
           volumeMounts:
             - mountPath: /var/run/secrets/nais.io/vault
               name: vault-secrets
-              subPath: vault/var/run/secrets/nais.io/vault
+              subPath: subpath/var/run/secrets/nais.io/vault
           env:
             - name: VAULT_TOKEN_PATH
               value: /var/run/secrets/nais.io/vault/vault_token
@@ -46,7 +46,7 @@ spec:
           volumeMounts:
             - mountPath: /var/run/secrets/nais.io/vault
               name: vault-secrets
-              subPath: vault/var/run/secrets/nais.io/vault
+              subPath: subpath/var/run/secrets/nais.io/vault
           args:
             - -v=10
             - -logtostderr
