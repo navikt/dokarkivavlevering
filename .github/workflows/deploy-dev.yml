@@ -1,4 +1,4 @@
-name: Test manual action run
+name: Build and deploy job
 on:
   workflow_dispatch:
     inputs:

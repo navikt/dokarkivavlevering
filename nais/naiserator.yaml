@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: dokarkivavlevering
+  name: dokarkavleverjob
   namespace: teamdokumenthandtering
   labels:
     team: teamdokumenthandtering
@@ -16,7 +16,7 @@ spec:
       restartPolicy: Never
 
       containers:
-        - name: dokarkivavlevering
+        - name: dokarkavleverjob
           image: {{image}}
           resources:
             requests:
@@ -25,55 +25,54 @@ spec:
             limits:
               memory: 1024Mi
               cpu: 1000m
-#          ### VAULT OG CA-BUNDLE CONFIG ###
-#          volumeMounts:
-#            - mountPath: /var/run/secrets/nais.io/vault
-#              name: vault-secrets
-#              subPath: vault/var/run/secrets/nais.io/vault
+          volumeMounts:
+            - mountPath: /var/run/secrets/nais.io/vault
+              name: vault-secrets
+              subPath: vault/var/run/secrets/nais.io/vault
           env:
-#            - name: VAULT_TOKEN_PATH
-#              value: /var/run/secrets/nais.io/vault/vault_token
-#            - name: NAV_TRUSTSTORE_PATH
-#              value: /etc/ssl/certs/java/cacerts
-#            - name: NAV_TRUSTSTORE_PASSWORD
-#              value: changeme
+            - name: VAULT_TOKEN_PATH
+              value: /var/run/secrets/nais.io/vault/vault_token
+            - name: NAV_TRUSTSTORE_PATH
+              value: /etc/ssl/certs/java/cacerts
+            - name: NAV_TRUSTSTORE_PASSWORD
+              value: changeme
             - name: STARTDATO
               value: "{{startdato}}"
             - name: SLUTTDATO
               value: "{{sluttdato}}"
 
-#      ---- VAULT OG CA-BUNDLE CONFIG ---
-#      initContainers:
-#        - name: vault-init
-#          image: navikt/vault-sidekick:v0.3.10-d122b16
-#          resources:
-#            requests:
-#              memory: "64Mi"
-#              cpu: "100m"
-#            limits:
-#              memory: "128Mi"
-#              cpu: "1000m"
-#          volumeMounts:
-#            - mountPath: /var/run/secrets/nais.io/vault
-#              name: vault-secrets
-#              subPath: vault/var/run/secrets/nais.io/vault
-#          args:
-#            - -v=10
-#            - -logtostderr
-#            - -vault=https://vault.adeo.no
-#            - -one-shot
-#            - -save-token=/var/run/secrets/nais.io/vault/vault_token
-#            - -cn=secret:/serviceuser/data/dev/srvdokarkivavlevering:dir=/var/run/secrets/nais.io/vault,fmt=flatten,retries=1
-#          env:
-#            - name: VAULT_AUTH_METHOD
-#              value: kubernetes
-#            - name: VAULT_SIDEKICK_ROLE
-#              value: teamdokumenthandtering
-#            - name: VAULT_K8S_LOGIN_PATH
-#              value: auth/kubernetes/preprod/fss/login
-#
-#
-#      volumes:
-#        - name: vault-secrets
-#          emptyDir:
-#            medium: Memory
+      ---- VAULT OG CA-BUNDLE CONFIG ---
+      initContainers:
+        - name: vault-init
+          image: navikt/vault-sidekick:v0.3.10-d122b16
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "128Mi"
+              cpu: "1000m"
+          volumeMounts:
+            - mountPath: /var/run/secrets/nais.io/vault
+              name: vault-secrets
+              subPath: vault/var/run/secrets/nais.io/vault
+          args:
+            - -v=10
+            - -logtostderr
+            - -vault=https://vault.adeo.no
+            - -one-shot
+            - -save-token=/var/run/secrets/nais.io/vault/vault_token
+            - -cn=secret:{{vault_kv_path}}:dir=/var/run/secrets/nais.io/vault,fmt=flatten,retries=1
+          env:
+            - name: VAULT_AUTH_METHOD
+              value: kubernetes
+            - name: VAULT_SIDEKICK_ROLE
+              value: teamdokumenthandtering
+            - name: VAULT_K8S_LOGIN_PATH
+              value: auth/kubernetes/preprod/fss/login
+
+
+      volumes:
+        - name: vault-secrets
+          emptyDir:
+            medium: Memory
