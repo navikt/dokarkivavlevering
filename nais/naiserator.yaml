@@ -40,8 +40,6 @@ spec:
               value: "{{startdato}}"
             - name: SLUTTDATO
               value: "{{sluttdato}}"
-
-      ---- VAULT OG CA-BUNDLE CONFIG ---
       initContainers:
         - name: vault-init
           image: navikt/vault-sidekick:v0.3.10-d122b16
@@ -70,8 +68,6 @@ spec:
               value: teamdokumenthandtering
             - name: VAULT_K8S_LOGIN_PATH
               value: auth/kubernetes/preprod/fss/login
-
-
       volumes:
         - name: vault-secrets
           emptyDir:
