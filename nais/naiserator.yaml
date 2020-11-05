@@ -43,6 +43,8 @@ spec:
               memory: "64Mi"
               cpu: "100m"
             limits:
+              memory: "1024Mi"
+              cpu: "1000m"
           volumeMounts:
             - mountPath: /var/run/secrets/nais.io/vault
               name: vault-secrets
