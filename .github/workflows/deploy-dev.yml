@@ -1,4 +1,4 @@
-name: Build and deploy job
+name: Deploy dokarkivavlevering job [dev-fss]
 on:
   workflow_dispatch:
     inputs:
@@ -46,7 +46,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - uses: nais/deploy/actions/deploy@v1
+      - name: Deploy job to NAIS dev-fss
+        uses: nais/deploy/actions/deploy@v1
         env:
           PRINT_PAYLOAD: true
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
@@ -54,30 +55,3 @@ jobs:
           RESOURCE: nais/naiserator.yaml
           VAR: periodestart=${{github.event.inputs.periodeStart}},periodeslutt=${{github.event.inputs.periodeSlutt}}
           VARS: nais/dev-config.json
-#jobs:
-#  build:
-#    name: Run tests
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v1
-#      - uses: actions/setup-java@v1
-#        with:
-#          java-version: '11.x'
-#      - name: Cache Maven packages
-#        uses: actions/cache@v1
-#        with:
-#          path: ~/.m2
-#          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-#          restore-keys: ${{ runner.os }}-m2-
-#      - name: Build and run tests
-#        run: mvn -B package --file pom.xml
-#      - name: Build Docker image
-#        run: docker build . --pull --tag ${IMAGE}
-#      - name: Push Docker image
-#        run: |
-#          docker login --username "$GITHUB_REPOSITORY" -p ${{ secrets.GITHUB_TOKEN }} https://docker.pkg.github.com
-#          docker push ${IMAGE}
-#      - name: Deploy to NAIS dev-fss
-#        uses: nais/deploy/actions/deploy@v1
-#        env:
-#
