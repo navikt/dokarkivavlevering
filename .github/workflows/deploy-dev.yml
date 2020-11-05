@@ -1,4 +1,4 @@
-name: Deploy dokarkivavlevering job [dev-fss]
+name: Deploy dokarkivavlevering [dev-fss]
 on:
   workflow_dispatch:
     inputs:
