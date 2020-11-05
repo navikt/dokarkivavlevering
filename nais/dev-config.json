@@ -1,6 +1,5 @@
 {
-  "VAULT_KV_PATH": "kv/preprod/fss/dokarkavleverjob",
+  "VAULT_KV_PATH": "kv/preprod/fss/dokavlevering/teamdokumenthandtering",
   "SECURITY_TOKEN_SERVICE_TOKEN_URL": "https://security-token-service.nais.preprod.local/rest/v1/sts/token",
-  "VAULT": "kv/preprod/fss/dokarkavleverjob/teamdokumenthandtering",
   "VAULT_K8S_LOGIN_PATH": "auth/kubernetes/preprod/fss/login"
 }
