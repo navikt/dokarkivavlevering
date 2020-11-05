@@ -7,10 +7,10 @@ on:
         required: true
         default: 'warning'
       periodeStart:
-        description: 'Start-dato (f.o.m) for avlevering'
+        description: 'Periode start (f.o.m) for avlevering'
         required: true
       periodeSlutt:
-        description: 'Slutt-dato (t.o.m) for avlevering'
+        description: 'Periode slutt (t.o.m) for avlevering'
         required: true
 
 env:
@@ -46,5 +46,5 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-fss
           RESOURCE: nais/naiserator.yaml
-          VAR: startdato=${{github.event.inputs.periodeStart}},sluttdato=${{github.event.inputs.periodeSlutt}}
+          VAR: periodestart=${{github.event.inputs.periodeStart}},periodeslutt=${{github.event.inputs.periodeSlutt}}
           VARS: nais/dev-config.json

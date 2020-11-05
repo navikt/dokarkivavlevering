@@ -14,10 +14,10 @@ import org.springframework.context.annotation.Import;
 @SpringBootApplication
 public class Application implements CommandLineRunner {
 
-    @Value("${startdato}")
+    @Value("${periode.startdato}")
     private String startDato;
 
-    @Value("${sluttdato}")
+    @Value("${periode.sluttdato}")
     private String sluttDato;
 
     public static void main(String[] args) {

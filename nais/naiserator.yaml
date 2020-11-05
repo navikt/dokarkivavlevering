@@ -34,10 +34,10 @@ spec:
           env:
             - name: VAULT_TOKEN_PATH
               value: /var/run/secrets/nais.io/vault/vault_token
-            - name: STARTDATO
-              value: "{{startdato}}"
-            - name: SLUTTDATO
-              value: "{{sluttdato}}"
+            - name: PERIODE_STARTDATO
+              value: "{{periodestart}}"
+            - name: PERIODE_SLUTTDATO
+              value: "{{periodeslutt}}"
       initContainers:
         - name: vks-init
           image: navikt/vault-sidekick:v0.3.10-d122b16
