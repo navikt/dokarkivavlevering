@@ -27,14 +27,15 @@ public class Application implements CommandLineRunner {
 
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(Application.class, args);
+        log.info("Dokarkivavlevering avslutter...");
         context.close();
     }
 
     @Override
     public void run(String... args) {
+        // Test av at applikasjon tar inn inputvariabler og serviceuser
         log.info("Dokarkivavlevering starter...");
         log.info("Startdato: " + startDato + ", Sluttdato: " + sluttDato);
         log.info("serviceuser-test: " + serviceuserAlias.getUsername());
-        log.info("Dokarkivavlevering avslutter...");
     }
 }
