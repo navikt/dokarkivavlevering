@@ -34,9 +34,9 @@ spec:
           env:
             - name: VAULT_TOKEN_PATH
               value: /var/run/secrets/nais.io/vault/vault_token
-            - name: PERIODE_STARTDATO
+            - name: AVLEVERING_PERIODE_STARTDATO
               value: "{{periodestart}}"
-            - name: PERIODE_SLUTTDATO
+            - name: AVLEVERING_PERIODE_SLUTTDATO
               value: "{{periodeslutt}}"
       initContainers:
         - name: vks-init
