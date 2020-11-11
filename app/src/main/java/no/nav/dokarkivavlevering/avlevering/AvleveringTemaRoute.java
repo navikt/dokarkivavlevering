@@ -19,11 +19,14 @@ public class AvleveringTemaRoute extends RouteBuilder {
 	public static final String PROPERTY_TEMA_SIZE = "AvleveringTemaSize";
 	private final AvleveringProperties avleveringProperties;
 	private final AvleveringRepository avleveringRepository;
+	private final AvleveringSakService avleveringSakService;
 
 	@Autowired
-	public AvleveringTemaRoute(AvleveringProperties avleveringProperties, AvleveringRepository avleveringRepository) {
+	public AvleveringTemaRoute(AvleveringProperties avleveringProperties, AvleveringRepository avleveringRepository,
+							   AvleveringSakService avleveringSakService) {
 		this.avleveringProperties = avleveringProperties;
 		this.avleveringRepository = avleveringRepository;
+		this.avleveringSakService = avleveringSakService;
 	}
 
 	@Override
@@ -37,8 +40,10 @@ public class AvleveringTemaRoute extends RouteBuilder {
 				.bean(avleveringRepository, "findSakIdForTema")
 				.setProperty(PROPERTY_TEMA_SIZE, simple("${body.size}"))
 				.log(LoggingLevel.INFO, log, "Fant ${exchangeProperty.AvleveringTemaSize} sakId for tema=${exchangeProperty.AvleveringTema}.")
+				.bean(avleveringRepository, "findSaker")
+				.bean(avleveringSakService)
+				// skriv bolk til arbeidsmappe
 				.end()
-				.log(LoggingLevel.INFO, log, "Behandlet tema=${exchangeProperty.AvleveringTema}.")
-		;
+				.log(LoggingLevel.INFO, log, "Behandlet tema=${exchangeProperty.AvleveringTema}.");
 	}
 }

@@ -32,6 +32,13 @@ public class AvleveringRoute extends RouteBuilder {
 
 	@Override
 	public void configure() throws Exception {
+		errorHandler(defaultErrorHandler()
+				.log(log)
+				.loggingLevel(LoggingLevel.ERROR)
+				.logHandled(true)
+				.logExhausted(true)
+				.logExhaustedMessageHistory(false));
+
 		from("timer://runOnce?repeatCount=1&delay=1000")
 				.routeId("start_avlevering")
 				.log(LoggingLevel.INFO, log, "Dokarkivavlevering starter avlevering.")
