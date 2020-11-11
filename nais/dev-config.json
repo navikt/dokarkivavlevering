@@ -1,6 +1,6 @@
 {
   "SRVDOKAVLEVERING": "/serviceuser/data/dev/srvdokavlevering",
-  "VAULT_KV_PATH": "/kv/preprod/fss/dokavlevering/teamdokumenthandtering",
+  "VAULT_KV_PATH": "/kv/preprod/fss/dokarkivavlevering/teamdokumenthandtering",
   "VAULT_K8S_LOGIN_PATH": "auth/kubernetes/preprod/fss/login",
   "SECURITY_TOKEN_SERVICE_TOKEN_URL": "https://security-token-service.nais.preprod.local/rest/v1/sts/token"
 }

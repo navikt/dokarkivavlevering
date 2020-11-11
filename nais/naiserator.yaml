@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: dokavlevering
+  name: dokarkivavlevering
   namespace: teamdokumenthandtering
   labels:
     team: teamdokumenthandtering
@@ -15,7 +15,7 @@ spec:
       serviceAccountName: default
       restartPolicy: Never
       containers:
-        - name: dokavlevering
+        - name: dokarkivavlevering
           image: {{image}}
           resources:
             requests:
