@@ -1,6 +1,7 @@
 package no.nav.dokarkivavlevering.avlevering;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.Processor;
@@ -10,9 +11,15 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 @Slf4j
 @Component
 public class AvleveringRoute extends RouteBuilder {
+//	private static final Set<String> TEMA_AVLEVERES = Stream.of("ERS", "SAK", "KTR", "MED", "UFM", "RVE", "OPP", "SAP", "IAR").collect(Collectors.toSet());
+	private static final Set<String> TEMA_AVLEVERES = Stream.of("MED").collect(Collectors.toSet());
 	private final ApplicationContext springContext;
 	private final AvleveringProperties avleveringProperties;
 
@@ -29,9 +36,10 @@ public class AvleveringRoute extends RouteBuilder {
 				.routeId("start_avlevering")
 				.log(LoggingLevel.INFO, log, "Dokarkivavlevering starter avlevering.")
 				.log(LoggingLevel.INFO, log, "Konfigurasjon=" + avleveringProperties)
-				// Hent temaer
-				// Start å behandle ett og ett tema
+				.setBody(constant(TEMA_AVLEVERES))
+				.split(body())
 				.to("direct:behandle_tema")
+				.end()
 				.log(LoggingLevel.INFO, log, "Dokarkivavlevering er ferdig med avlevering.")
 				.to("direct:shutdown");
 
