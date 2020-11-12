@@ -52,5 +52,5 @@ public class SqlQueries {
 					"  and (s.feilregistrert is null or s.feilregistrert = 0)\n" +
 					"  and trunc(j.dato_opprettet) >= :startdato\n" +
 					"  and trunc(j.dato_opprettet) <= :sluttdato\n" +
-					"order by sa.id, j.journalpost_id, r.dokument_info_id, f.fil_detaljer_id";
+					"order by sa.id, j.journalpost_id, r.tilkn_jp_som, r.dokument_info_id, f.fil_detaljer_id";
 }

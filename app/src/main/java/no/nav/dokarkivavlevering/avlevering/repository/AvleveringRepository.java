@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
@@ -64,5 +65,13 @@ public class AvleveringRepository {
 		paramMap.put("startdato", Timestamp.valueOf(avleveringProperties.getPeriode().getStartdato().atStartOfDay()));
 		paramMap.put("sluttdato", Timestamp.valueOf(avleveringProperties.getPeriode().getSluttdato().atStartOfDay()));
 		return namedParameterJdbcTemplate.query(SqlQueries.FINN_SAKER_SQL, paramMap, SAK_RESULTSET_EXTRACTOR);
+	}
+
+	public InputStream getDokument(final String filUuid) {
+		final HashMap<String, Object> paramMap = new HashMap<>();
+		paramMap.put("filUuid", filUuid);
+		return namedParameterJdbcTemplate.query("select fil from t_dokument_fil where fil_uuid = :filUuid", paramMap, resultSet -> {
+			return resultSet.getBinaryStream(1);
+		});
 	}
 }
