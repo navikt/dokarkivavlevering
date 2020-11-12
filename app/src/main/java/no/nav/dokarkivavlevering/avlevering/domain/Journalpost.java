@@ -31,4 +31,5 @@ public class Journalpost {
 	@ToString.Exclude
 	private final String endretAv;
 	private final List<DokumentInfo> dokumenter;
+	private final List<Arkivendring> arkivendringer;
 }

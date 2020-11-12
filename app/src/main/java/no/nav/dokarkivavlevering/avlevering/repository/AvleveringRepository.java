@@ -24,7 +24,9 @@ public class AvleveringRepository {
 					"bruker_id",
 					"journalposter_id",
 					"journalposter_dokumenter_id",
-					"journalposter_dokumenter_fildetaljer_id")
+					"journalposter_dokumenter_fildetaljer_id",
+					"journalposter_arkivendringer_id",
+					"journalposter_dokumenter_arkivendringer_id")
 			.newResultSetExtractor(Sak.class);
 	public static final int ORACLE_MAX_IN = 1000;
 

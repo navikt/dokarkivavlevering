@@ -24,6 +24,7 @@ public class DokumentInfo {
 	@ToString.Exclude
 	private final String opprettetAv;
 	private final List<FilDetaljer> fildetaljer;
+	private final List<Arkivendring> arkivendringer;
 
 	public String getOpprettetAv() {
 		return opprettetAv;
