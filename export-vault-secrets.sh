@@ -15,10 +15,10 @@ fi
 if test -f /var/run/secrets/nais.io/database_user/username;
 then
     echo "Setting SPRING_DATASOURCE_USERNAME"
-    export  SPRING_DATASOURCE_USERNAME=$(cat /var/run/secrets/nais.io/database_user/username)
+    export SPRING_DATASOURCE_USERNAME=$(cat /var/run/secrets/nais.io/database_user/username)
 fi
 if test -f /var/run/secrets/nais.io/database_user/password;
 then
     echo "Setting SPRING_DATASOURCE_PASSWORD"
-    export  SPRING_DATASOURCE_PASSWORD=$(cat /var/run/secrets/nais.io/database_user/password)
+    export SPRING_DATASOURCE_PASSWORD=$(cat /var/run/secrets/nais.io/database_user/password)
 fi
