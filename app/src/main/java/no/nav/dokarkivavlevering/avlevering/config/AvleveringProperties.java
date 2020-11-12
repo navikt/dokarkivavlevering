@@ -1,4 +1,4 @@
-package no.nav.dokarkivavlevering.avlevering;
+package no.nav.dokarkivavlevering.avlevering.config;
 
 import lombok.Data;
 import lombok.ToString;
@@ -7,6 +7,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
+import java.time.LocalDate;
 
 /**
  * @author Joakim Bjørnstad, Jbit AS
@@ -33,9 +34,9 @@ public class AvleveringProperties {
 	@Validated
 	public static class Periode {
 		@NotEmpty
-		private String startdato;
+		private LocalDate startdato;
 		@NotEmpty
-		private String sluttdato;
+		private LocalDate sluttdato;
 
 	}
 }
