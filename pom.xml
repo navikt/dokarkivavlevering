@@ -18,7 +18,7 @@
 
 	<modules>
 		<module>app</module>
-        <module>dokarkivavlevering-schemas</module>
+        <module>arkivverket-schemas</module>
     </modules>
 
 	<properties>
@@ -41,6 +41,11 @@
 			<dependency>
 				<groupId>no.nav.dokarkivavlevering</groupId>
 				<artifactId>app</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>no.nav.dokarkivavlevering</groupId>
+				<artifactId>arkivverket-schemas</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
