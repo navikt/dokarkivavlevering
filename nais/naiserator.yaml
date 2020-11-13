@@ -31,7 +31,12 @@ spec:
             - mountPath: /var/run/secrets/nais.io/service_user
               name: vault-secrets
               subPath: subpath/var/run/secrets/nais.io/service_user
+            - mountPath: /var/run/secrets/nais.io/database_user
+              name: vault-secrets
+              subPath: subpath/var/run/secrets/nais.io/database_user
           env:
+            - name: SPRING_DATASOURCE_URL
+              value: "{{SPRING_DATASOURCE_URL}}"
             - name: VAULT_TOKEN_PATH
               value: /var/run/secrets/nais.io/vault/vault_token
             - name: AVLEVERING_PERIODE_STARTDATO
@@ -55,6 +60,9 @@ spec:
             - mountPath: /var/run/secrets/nais.io/service_user
               name: vault-secrets
               subPath: subpath/var/run/secrets/nais.io/service_user
+            - mountPath: /var/run/secrets/nais.io/database_user
+              name: vault-secrets
+              subPath: subpath/var/run/secrets/nais.io/database_user
           args:
             - -v=10
             - -logtostderr
@@ -63,6 +71,7 @@ spec:
             - -save-token=/var/run/secrets/nais.io/vault/vault_token
             - -cn=secret:{{VAULT_KV_PATH}}:dir=/var/run/secrets/nais.io/vault,fmt=flatten,retries=1
             - -cn=secret:{{SRVDOKAVLEVERING}}:dir=/var/run/secrets/nais.io/service_user,fmt=flatten,retries=1
+            - -cn=secret:{{VAULT_DATABASE_CREDS}}:dir=/var/run/secrets/nais.io/database_user,fmt=flatten,retries=1
           env:
             - name: VAULT_AUTH_METHOD
               value: kubernetes

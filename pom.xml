@@ -23,6 +23,9 @@
 
 	<properties>
 		<camel.version>3.6.0</camel.version>
+		<logstash-logback-encoder.version>6.4</logstash-logback-encoder.version>
+		<oracle-database.version>12.2.0.1</oracle-database.version>
+		<simpleflatmapper.version>8.2.3</simpleflatmapper.version>
 		<lombok.version>1.18.12</lombok.version>
 		<jaxb2-commons.version>0.6.5</jaxb2-commons.version>
 	</properties>
@@ -46,6 +49,16 @@
 				<version>${camel.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>net.logstash.logback</groupId>
+				<artifactId>logstash-logback-encoder</artifactId>
+				<version>${logstash-logback-encoder.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.simpleflatmapper</groupId>
+				<artifactId>sfm-springjdbc</artifactId>
+				<version>${simpleflatmapper.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.projectlombok</groupId>
