@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>dokarkivavlevering</artifactId>
+        <groupId>no.nav.dokarkivavlevering</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>dokarkivavlevering-schemas</artifactId>
+    <packaging>jar</packaging>
+    <name>dokarkivavlevering :: Schemas</name>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jvnet.jaxb2.maven2</groupId>
+                <artifactId>maven-jaxb2-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-jaxb-dokarkivavlevering</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <generatePackage>no.nav.dokarkivavlevering.xml.jaxb2.gen</generatePackage>
+                            <schemaDirectory>${project.basedir}/src/main/resources/dokarkivavlevering/</schemaDirectory>
+                            <bindingDirectory>${project.basedir}/src/main/resources/dokarkivavlevering/
+                            </bindingDirectory>
+                            <generateDirectory>${project.build.directory}/generated-sources/xjc-dokarkivavlevering
+                            </generateDirectory>
+                            <strict>false</strict>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.jvnet.jaxb2_commons</groupId>
+                                    <artifactId>jaxb2-basics</artifactId>
+                                    <version>${jaxb2-commons.version}</version>
+                                </plugin>
+                                <plugin>
+                                    <groupId>org.jvnet.jaxb2_commons</groupId>
+                                    <artifactId>jaxb2-basics-annotate</artifactId>
+                                    <version>${jaxb2-commons.version}</version>
+                                </plugin>
+                            </plugins>
+                            <args>
+                                <arg>-Xannotate</arg>
+                            </args>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
