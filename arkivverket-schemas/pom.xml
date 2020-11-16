@@ -13,6 +13,14 @@
 	<artifactId>arkivverket-schemas</artifactId>
 	<packaging>jar</packaging>
 
+
+	<dependencies>
+		<dependency>
+			<groupId>jakarta.xml.bind</groupId>
+			<artifactId>jakarta.xml.bind-api</artifactId>
+		</dependency>
+	</dependencies>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -35,7 +43,8 @@
 							<bindingIncludes>
 								<include>arkivstruktur.xjb</include>
 							</bindingIncludes>
-							<generateDirectory>${project.build.directory}/generated-sources/arkivstruktur</generateDirectory>
+							<generateDirectory>${project.build.directory}/generated-sources/arkivstruktur
+							</generateDirectory>
 							<strict>false</strict>
 							<plugins>
 								<plugin>
@@ -66,7 +75,8 @@
 								<include>endringslogg.xsd</include>
 							</schemaIncludes>
 							<bindingDirectory>${project.basedir}/src/main/resources/</bindingDirectory>
-							<generateDirectory>${project.build.directory}/generated-sources/endringslogg</generateDirectory>
+							<generateDirectory>${project.build.directory}/generated-sources/endringslogg
+							</generateDirectory>
 							<strict>false</strict>
 							<plugins>
 								<plugin>
@@ -97,7 +107,8 @@
 								<include>loependeJournal.xsd</include>
 							</schemaIncludes>
 							<bindingDirectory>${project.basedir}/src/main/resources/</bindingDirectory>
-							<generateDirectory>${project.build.directory}/generated-sources/loependejournal</generateDirectory>
+							<generateDirectory>${project.build.directory}/generated-sources/loependejournal
+							</generateDirectory>
 							<strict>false</strict>
 							<plugins>
 								<plugin>
@@ -128,7 +139,8 @@
 								<include>offentligJournal.xsd</include>
 							</schemaIncludes>
 							<bindingDirectory>${project.basedir}/src/main/resources/</bindingDirectory>
-							<generateDirectory>${project.build.directory}/generated-sources/offentligjournal</generateDirectory>
+							<generateDirectory>${project.build.directory}/generated-sources/offentligjournal
+							</generateDirectory>
 							<strict>false</strict>
 							<plugins>
 								<plugin>
