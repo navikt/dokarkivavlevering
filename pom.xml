@@ -18,7 +18,8 @@
 
 	<modules>
 		<module>app</module>
-	</modules>
+        <module>arkivverket-schemas</module>
+    </modules>
 
 	<properties>
 		<camel.version>3.6.0</camel.version>
@@ -26,13 +27,25 @@
 		<oracle-database.version>12.2.0.1</oracle-database.version>
 		<simpleflatmapper.version>8.2.3</simpleflatmapper.version>
 		<lombok.version>1.18.12</lombok.version>
+		<jaxb2-commons.version>0.6.5</jaxb2-commons.version>
 	</properties>
 
 	<dependencyManagement>
 		<dependencies>
+			<!-- https://mvnrepository.com/artifact/org.jvnet.jaxb2.maven2/maven-jaxb2-plugin -->
+			<dependency>
+				<groupId>org.jvnet.jaxb2.maven2</groupId>
+				<artifactId>maven-jaxb2-plugin</artifactId>
+				<version>${jaxb2-commons.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>no.nav.dokarkivavlevering</groupId>
 				<artifactId>app</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>no.nav.dokarkivavlevering</groupId>
+				<artifactId>arkivverket-schemas</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
