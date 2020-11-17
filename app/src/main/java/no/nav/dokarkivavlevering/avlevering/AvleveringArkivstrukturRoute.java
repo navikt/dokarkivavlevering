@@ -62,6 +62,6 @@ public class AvleveringArkivstrukturRoute extends RouteBuilder {
 				.setHeader(Exchange.XSLT_FILE_NAME, simple("{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/arkivstruktur.xml"))
 				.to("xslt:classpath:arkivstruktur/embed_klasse_into_arkivstruktur.xsl?output=file")
 				// skriv til sftp
-				.log(LoggingLevel.INFO, log, "Ferdig med å flette klasse inn i arkivstruktur til ${header.CamelFileNameProduced}.");
+				.log(LoggingLevel.INFO, log, "Ferdig med å flette klasse inn i arkivstruktur til ${header.CamelXsltFileName}.");
 	}
 }
