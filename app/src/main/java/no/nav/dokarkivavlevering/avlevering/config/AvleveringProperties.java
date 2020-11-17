@@ -17,6 +17,11 @@ import java.time.LocalDate;
 @ConfigurationProperties("avlevering")
 public class AvleveringProperties {
 
+	@NotEmpty
+	private String ststokenurl;
+	@NotEmpty
+	private String pdlurl;
+
 	private final Serviceuser serviceuser = new Serviceuser();
 	private final Periode periode = new Periode();
 
@@ -37,6 +42,5 @@ public class AvleveringProperties {
 		private LocalDate startdato;
 		@NotEmpty
 		private LocalDate sluttdato;
-
 	}
 }

@@ -15,68 +15,69 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+
 @Slf4j
 @Component
 public class AvleveringRoute extends RouteBuilder {
-	//	private static final Set<String> TEMA_AVLEVERES = Stream.of("ERS", "SAK", "KTR", "MED", "UFM", "RVE", "OPP", "SAP", "IAR").collect(Collectors.toSet());
-	private static final Set<String> TEMA_AVLEVERES = Stream.of("MED").collect(Collectors.toSet());
-	private final ApplicationContext springContext;
-	private final AvleveringProperties avleveringProperties;
+    //	private static final Set<String> TEMA_AVLEVERES = Stream.of("ERS", "SAK", "KTR", "MED", "UFM", "RVE", "OPP", "SAP", "IAR").collect(Collectors.toSet());
+    private static final Set<String> TEMA_AVLEVERES = Stream.of("MED").collect(Collectors.toSet());
+    private final ApplicationContext springContext;
+    private final AvleveringProperties avleveringProperties;
 
-	@Autowired
-	public AvleveringRoute(AvleveringProperties avleveringProperties,
-						   ApplicationContext springContext) {
-		this.avleveringProperties = avleveringProperties;
-		this.springContext = springContext;
-	}
+    @Autowired
+    public AvleveringRoute(AvleveringProperties avleveringProperties,
+                           ApplicationContext springContext) {
+        this.avleveringProperties = avleveringProperties;
+        this.springContext = springContext;
+    }
 
-	@Override
-	public void configure() throws Exception {
-		errorHandler(defaultErrorHandler()
-				.log(log)
-				.loggingLevel(LoggingLevel.ERROR)
-				.logHandled(true)
-				.logExhausted(true)
-				.logExhaustedMessageHistory(false));
+    @Override
+    public void configure() throws Exception {
+        errorHandler(defaultErrorHandler()
+                .log(log)
+                .loggingLevel(LoggingLevel.ERROR)
+                .logHandled(true)
+                .logExhausted(true)
+                .logExhaustedMessageHistory(false));
 
-		from("timer://runOnce?repeatCount=1&delay=1000")
-				.routeId("start_avlevering")
-				.log(LoggingLevel.INFO, log, "Dokarkivavlevering starter avlevering.")
-				.log(LoggingLevel.INFO, log, "Konfigurasjon=" + avleveringProperties)
-				.setBody(constant(TEMA_AVLEVERES))
-				.split(body())
-				.to("direct:behandle_tema")
-				.end()
-				.log(LoggingLevel.INFO, log, "Dokarkivavlevering er ferdig med avlevering.")
-				.to("direct:shutdown");
+        from("timer://runOnce?repeatCount=1&delay=1000")
+                .routeId("start_avlevering")
+                .log(LoggingLevel.INFO, log, "Dokarkivavlevering starter avlevering.")
+                .log(LoggingLevel.INFO, log, "Konfigurasjon=" + avleveringProperties)
+                .setBody(constant(TEMA_AVLEVERES))
+                .split(body())
+                .to("direct:behandle_tema")
+                .end()
+                .log(LoggingLevel.INFO, log, "Dokarkivavlevering er ferdig med avlevering.")
+                .to("direct:shutdown");
 
-		from("direct:shutdown")
-				.routeId("shutdown")
-				.process(new Processor() {
-					Thread stop;
+        from("direct:shutdown")
+                .routeId("shutdown")
+                .process(new Processor() {
+                    Thread stop;
 
-					@Override
-					public void process(final Exchange exchange) throws Exception {
-						// stop this route using a thread that will stop
-						// this route gracefully while we are still running
-						if (stop == null) {
-							stop = new Thread() {
-								@Override
-								public void run() {
-									try {
-										exchange.getContext().shutdown();
-										SpringApplication.exit(springContext, () -> 0);
-										System.exit(0);
-									} catch (Exception e) {
-										// ignore
-									}
-								}
-							};
-						}
+                    @Override
+                    public void process(final Exchange exchange) throws Exception {
+                        // stop this route using a thread that will stop
+                        // this route gracefully while we are still running
+                        if (stop == null) {
+                            stop = new Thread() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        exchange.getContext().shutdown();
+                                        SpringApplication.exit(springContext, () -> 0);
+                                        System.exit(0);
+                                    } catch (Exception e) {
+                                        // ignore
+                                    }
+                                }
+                            };
+                        }
 
-						// start the thread that stops this route
-						stop.start();
-					}
-				});
-	}
+                        // start the thread that stops this route
+                        stop.start();
+                    }
+                });
+    }
 }
