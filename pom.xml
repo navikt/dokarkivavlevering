@@ -26,7 +26,6 @@
 		<logstash-logback-encoder.version>6.4</logstash-logback-encoder.version>
 		<oracle-database.version>12.2.0.1</oracle-database.version>
 		<simpleflatmapper.version>8.2.3</simpleflatmapper.version>
-		<javax.inject.version>1</javax.inject.version>
 		<lombok.version>1.18.12</lombok.version>
 		<jaxb2-commons.version>0.6.5</jaxb2-commons.version>
 	</properties>
@@ -65,11 +64,6 @@
 				<groupId>org.simpleflatmapper</groupId>
 				<artifactId>sfm-springjdbc</artifactId>
 				<version>${simpleflatmapper.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>javax.inject</groupId>
-				<artifactId>javax.inject</artifactId>
-				<version>${javax.inject.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.projectlombok</groupId>
