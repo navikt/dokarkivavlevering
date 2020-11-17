@@ -1,8 +1,8 @@
 package no.nav.dokarkivavlevering.avlevering;
 
-import no.nav.dokarkivavlevering.avlevering.consumer.pdl.PdlGraphQLConsumer;
 import no.arkivverket.standarder.noark5.arkivstruktur.Saksmappe;
 import no.nav.dokarkivavlevering.avlevering.arkivstruktur.SaksmappeMapper;
+import no.nav.dokarkivavlevering.avlevering.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import org.apache.camel.Handler;
 import org.springframework.stereotype.Service;
@@ -18,8 +18,9 @@ public class AvleveringSakService {
 	private final PdlGraphQLConsumer pdlGraphQLConsumer;
 	private final SaksmappeMapper saksmappeMapper;
 
-	public AvleveringSakService(PdlGraphQLConsumer pdlGraphQLConsumer) {
+	public AvleveringSakService(PdlGraphQLConsumer pdlGraphQLConsumer, SaksmappeMapper saksmappeMapper) {
 		this.pdlGraphQLConsumer = pdlGraphQLConsumer;
+		this.saksmappeMapper = saksmappeMapper;
 	}
 
 	@Handler
