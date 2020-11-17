@@ -39,6 +39,10 @@ spec:
               value: "{{SPRING_DATASOURCE_URL}}"
             - name: VAULT_TOKEN_PATH
               value: /var/run/secrets/nais.io/vault/vault_token
+            - name: AVLEVERING_PDLURL
+              value: "{{PDL_URL}}"
+            - name: AVLEVERING_STSTOKENURL
+              value: "{{SECURITY_TOKEN_SERVICE_TOKEN_URL}}"
             - name: AVLEVERING_PERIODE_STARTDATO
               value: "{{periodestart}}"
             - name: AVLEVERING_PERIODE_SLUTTDATO
