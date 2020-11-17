@@ -13,14 +13,6 @@
 	<artifactId>arkivverket-schemas</artifactId>
 	<packaging>jar</packaging>
 
-
-	<dependencies>
-		<dependency>
-			<groupId>jakarta.xml.bind</groupId>
-			<artifactId>jakarta.xml.bind-api</artifactId>
-		</dependency>
-	</dependencies>
-
 	<build>
 		<plugins>
 			<plugin>
