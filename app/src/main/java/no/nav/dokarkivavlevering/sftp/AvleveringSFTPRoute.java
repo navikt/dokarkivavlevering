@@ -7,7 +7,6 @@ public class AvleveringSFTPRoute {
                     "?username={{sftp.username}}" +
                     "&password=" +
                     "&binary=true" +
-                    "&jschLoggingLevel=TRACE" +
                     "&privateKeyFile={{sftp.privateKeyFile}}" +
                     "&privateKeyPassphrase={{sftp.privateKeyPassphrase}}" +
                     "&preferredAuthentications=publickey";
