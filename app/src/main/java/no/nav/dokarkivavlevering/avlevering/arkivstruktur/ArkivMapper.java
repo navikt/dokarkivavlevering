@@ -7,6 +7,7 @@ import no.arkivverket.standarder.noark5.arkivstruktur.Klassifikasjonssystem;
 import no.arkivverket.standarder.noark5.arkivstruktur.Skjerming;
 import no.arkivverket.standarder.noark5.arkivstruktur.SystemID;
 import no.nav.dokarkivavlevering.avlevering.exception.AvleveringFunctionalException;
+import org.apache.camel.Handler;
 import org.springframework.stereotype.Component;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -29,6 +30,7 @@ public class ArkivMapper {
 	static final SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 	static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
+	@Handler
 	public Arkiv map() {
 		Arkiv arkiv = new Arkiv();
 		arkiv.setSystemID(mapSystemID(UUID.randomUUID().toString()));

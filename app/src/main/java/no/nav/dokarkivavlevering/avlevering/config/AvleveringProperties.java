@@ -22,8 +22,16 @@ public class AvleveringProperties {
 	@NotEmpty
 	private String pdlurl;
 
+	private final Filomraade filomraade = new Filomraade();
 	private final Serviceuser serviceuser = new Serviceuser();
 	private final Periode periode = new Periode();
+
+	@Data
+	@Validated
+	public static class Filomraade {
+		@NotEmpty
+		private String work;
+	}
 
 	@Data
 	@Validated

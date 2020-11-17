@@ -26,8 +26,10 @@
 		<logstash-logback-encoder.version>6.4</logstash-logback-encoder.version>
 		<oracle-database.version>12.2.0.1</oracle-database.version>
 		<simpleflatmapper.version>8.2.3</simpleflatmapper.version>
+		<Saxon-HE.version>10.3</Saxon-HE.version>
 		<lombok.version>1.18.12</lombok.version>
 		<jaxb2-commons.version>0.6.5</jaxb2-commons.version>
+		<commons-io.version>2.8.0</commons-io.version>
 	</properties>
 
 	<dependencyManagement>
@@ -54,6 +56,16 @@
 				<version>${camel.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>net.sf.saxon</groupId>
+				<artifactId>Saxon-HE</artifactId>
+				<version>${Saxon-HE.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>${commons-io.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>net.logstash.logback</groupId>

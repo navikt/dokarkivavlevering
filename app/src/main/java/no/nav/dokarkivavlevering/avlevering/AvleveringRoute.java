@@ -18,8 +18,11 @@ import java.util.stream.Stream;
 @Slf4j
 @Component
 public class AvleveringRoute extends RouteBuilder {
-	//	private static final Set<String> TEMA_AVLEVERES = Stream.of("ERS", "SAK", "KTR", "MED", "UFM", "RVE", "OPP", "SAP", "IAR").collect(Collectors.toSet());
-	private static final Set<String> TEMA_AVLEVERES = Stream.of("MED").collect(Collectors.toSet());
+	// static final Set<String> TEMA_AVLEVERES = Stream.of("ERS", "SAK", "KTR", "MED", "UFM", "RVE", "OPP", "SAP", "IAR").collect(Collectors.toSet());
+	static final Set<String> TEMA_AVLEVERES = Stream.of("MED").collect(Collectors.toSet());
+	public static final String PROPERTY_AVLEVERING_ID = "AvleveringId";
+	public static final String PROPERTY_TEMA = "AvleveringTema";
+
 	private final ApplicationContext springContext;
 	private final AvleveringProperties avleveringProperties;
 
@@ -41,12 +44,15 @@ public class AvleveringRoute extends RouteBuilder {
 
 		from("timer://runOnce?repeatCount=1&delay=1000")
 				.routeId("start_avlevering")
-				.log(LoggingLevel.INFO, log, "Dokarkivavlevering starter avlevering.")
+				.setProperty(PROPERTY_AVLEVERING_ID, simple("${date:now:yyyy-MM-dd_HH_mm}"))
+				.log(LoggingLevel.INFO, log, "Dokarkivavlevering starter avlevering=${exchangeProperty.AvleveringId}.")
 				.log(LoggingLevel.INFO, log, "Konfigurasjon=" + avleveringProperties)
 				.setBody(constant(TEMA_AVLEVERES))
 				.split(body())
+				.setProperty(PROPERTY_TEMA, body())
 				.to("direct:behandle_tema")
 				.end()
+				.to("direct:generer_arkivstruktur")
 				.log(LoggingLevel.INFO, log, "Dokarkivavlevering er ferdig med avlevering.")
 				.to("direct:shutdown");
 
