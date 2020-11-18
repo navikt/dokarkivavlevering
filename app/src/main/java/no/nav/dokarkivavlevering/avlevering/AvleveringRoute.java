@@ -36,8 +36,10 @@ public class AvleveringRoute extends RouteBuilder {
 
 	@Override
 	public void configure() throws Exception {
-		errorHandler(defaultErrorHandler()
+		// feil som ikke blir håndtert i try-catches eller i onException gjør at appen blir skrudd av.
+		errorHandler(deadLetterChannel("direct:shutdown")
 				.log(log)
+				.disableRedelivery()
 				.loggingLevel(LoggingLevel.ERROR)
 				.logHandled(true)
 				.logExhausted(true)
