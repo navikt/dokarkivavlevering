@@ -23,15 +23,15 @@ then
     export SPRING_DATASOURCE_PASSWORD=$(cat /var/run/secrets/nais.io/database_user/password)
 fi
 # sftp
-if test -f /var/run/secrets/nais.io/privatekey/privateKeyFile;
+if test -f /var/run/secrets/nais.io/vault/privateKeyFile;
 then
     echo "Setting SFTP_PRIVATEKEYFILE"
-    export SFTP_PRIVATEKEYFILE=/var/run/secrets/nais.io/privatekey/privateKeyFile
+    export SFTP_PRIVATEKEYFILE=/var/run/secrets/nais.io/vault/privateKeyFile
 fi
-if test -f /var/run/secrets/nais.io/privatekey/privateKeyPassphrase;
+if test -f /var/run/secrets/nais.io/vault/privateKeyPassphrase;
 then
     echo "Setting SFTP_PRIVATEKEYPASSPHRASE"
-    export SFTP_PRIVATEKEYPASSPHRASE=$(cat /var/run/secrets/nais.io/privatekey/privateKeyPassphrase)
+    export SFTP_PRIVATEKEYPASSPHRASE=$(cat /var/run/secrets/nais.io/vault/privateKeyPassphrase)
 fi
 if test -f /var/run/secrets/nais.io/ldap/username;
 then
