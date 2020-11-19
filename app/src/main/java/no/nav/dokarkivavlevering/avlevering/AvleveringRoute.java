@@ -36,8 +36,10 @@ public class AvleveringRoute extends RouteBuilder {
 
 	@Override
 	public void configure() throws Exception {
-		errorHandler(defaultErrorHandler()
+		// feil som ikke blir håndtert i try-catches eller i onException gjør at appen blir skrudd av.
+		errorHandler(deadLetterChannel("direct:shutdown")
 				.log(log)
+				.disableRedelivery()
 				.loggingLevel(LoggingLevel.ERROR)
 				.logHandled(true)
 				.logExhausted(true)
@@ -45,7 +47,7 @@ public class AvleveringRoute extends RouteBuilder {
 
 		from("timer://runOnce?repeatCount=1&delay=1000")
 				.routeId("start_avlevering")
-				.setProperty(PROPERTY_AVLEVERING_ID, simple("${date:now:yyyy-MM-dd_HH_mm}"))
+				.setProperty(PROPERTY_AVLEVERING_ID, constant(avleveringProperties.getAvleveringId()))
 				.log(LoggingLevel.INFO, log, "Dokarkivavlevering starter avlevering=${exchangeProperty.AvleveringId}.")
 				.log(LoggingLevel.INFO, log, "Konfigurasjon=" + avleveringProperties)
 				.setBody(constant(TEMA_AVLEVERES))
@@ -53,6 +55,7 @@ public class AvleveringRoute extends RouteBuilder {
 				.setProperty(PROPERTY_TEMA, body())
 				.to("direct:behandle_tema")
 				.end()
+				.to(AvleveringStatiskRoute.AVLEVERING_STATIC)
 				.to("direct:generer_arkivstruktur")
 				.log(LoggingLevel.INFO, log, "Dokarkivavlevering er ferdig med avlevering.")
 				.to("direct:shutdown");

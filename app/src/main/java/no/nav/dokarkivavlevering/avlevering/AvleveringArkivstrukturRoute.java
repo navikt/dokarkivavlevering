@@ -2,6 +2,7 @@ package no.nav.dokarkivavlevering.avlevering;
 
 import no.arkivverket.standarder.noark5.arkivstruktur.ObjectFactory;
 import no.nav.dokarkivavlevering.avlevering.arkivstruktur.ArkivMapper;
+import no.nav.dokarkivavlevering.avlevering.sftp.AvleveringSFTPRoute;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
@@ -39,10 +40,11 @@ public class AvleveringArkivstrukturRoute extends RouteBuilder {
 	@Override
 	public void configure() throws Exception {
 		from("direct:generer_arkivstruktur")
-				.log(LoggingLevel.INFO, log, "Starter generering av arkivstruktur.xml overordnet struktur.")
 				.routeId("generer_arkivstruktur")
+				.log(LoggingLevel.INFO, log, "Starter generering av arkivstruktur.xml.")
 				.to("direct:opprett_arkivstruktur_pre")
-				.to("direct:flett_klasse_arkivstruktur");
+				.to("direct:flett_klasse_arkivstruktur")
+				.log(LoggingLevel.INFO, log, "Ferdig med å generere arkivstruktur.xml.");
 
 		from("direct:opprett_arkivstruktur_pre")
 				.routeId("opprett_arkivstruktur_pre")
@@ -59,9 +61,8 @@ public class AvleveringArkivstrukturRoute extends RouteBuilder {
 					exchange.getIn().setBody(inputStream);
 				})
 				.setHeader(HEADER_XSL_PARAM_KLASSE_XML, simple("file:///{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}?select=klasse_*.xml"))
-				.setHeader(Exchange.XSLT_FILE_NAME, simple("{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/arkivstruktur.xml"))
-				.to("xslt:classpath:arkivstruktur/embed_klasse_into_arkivstruktur.xsl?output=file")
-				// skriv til sftp
-				.log(LoggingLevel.INFO, log, "Ferdig med å flette klasse inn i arkivstruktur til ${header.CamelXsltFileName}.");
+				.to("xslt:classpath:arkivstruktur/embed_klasse_into_arkivstruktur.xsl?output=bytes")
+				.setHeader(AvleveringSFTPRoute.HEADER_FILNAVN, simple("arkivstruktur.xml"))
+				.to(AvleveringSFTPRoute.SFTP);
 	}
 }

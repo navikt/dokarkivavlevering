@@ -8,6 +8,8 @@ import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * @author Joakim Bjørnstad, Jbit AS
@@ -17,13 +19,18 @@ import java.time.LocalDate;
 @ConfigurationProperties("avlevering")
 public class AvleveringProperties {
 
+	private final String avleveringId = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm"));
+
 	@NotEmpty
 	private String ststokenurl;
 	@NotEmpty
 	private String pdlurl;
 
+	@Valid
 	private final Filomraade filomraade = new Filomraade();
+	@Valid
 	private final Serviceuser serviceuser = new Serviceuser();
+	@Valid
 	private final Periode periode = new Periode();
 
 	@Data
