@@ -2,15 +2,18 @@ package no.nav.dokarkivavlevering.avlevering.domain;
 
 import lombok.ToString;
 import lombok.Value;
+import no.arkivverket.standarder.noark5.arkivstruktur.SystemID;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author Joakim Bjørnstad, Jbit AS
  */
 @Value
 public class Journalpost {
+	private final UUID uuid = UUID.randomUUID();
 	private final Long id;
 	private final String type;
 	private final String status;

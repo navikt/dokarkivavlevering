@@ -32,7 +32,7 @@ public class AvleveringSakService {
 		// returner liste av xml objekter for marshal
 		return saker.stream().map(sak -> {
 			try {
-				return saksmappeMapper.map(sak, systemID);
+				return saksmappeMapper.map(sak);
 			} catch (DatatypeConfigurationException e) {
 				e.printStackTrace();
 			}//TODO: proper feilhåndtering (gjennom hele mapping-løpet)

@@ -4,6 +4,7 @@ import lombok.ToString;
 import lombok.Value;
 
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * @author Joakim Bjørnstad, Jbit AS
@@ -15,4 +16,5 @@ public class FilDetaljer {
 	private final Date datoOpprettet;
 	@ToString.Exclude
 	private final String opprettetAv;
+	private final UUID uuid = UUID.randomUUID();
 }

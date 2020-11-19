@@ -5,12 +5,15 @@ import lombok.Value;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author Joakim Bjørnstad, Jbit AS
  */
 @Value
 public class DokumentInfo {
+
+	private final UUID uuid = UUID.randomUUID();
 	private final Long id;
 	private final String relasjonTilknyttetSom;
 	private final Date relasjonDatoOpprettet;

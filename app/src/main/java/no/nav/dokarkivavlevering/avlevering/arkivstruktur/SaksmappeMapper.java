@@ -8,6 +8,7 @@ import no.arkivverket.standarder.noark5.arkivstruktur.Registrering;
 import no.arkivverket.standarder.noark5.arkivstruktur.Saksmappe;
 import no.arkivverket.standarder.noark5.arkivstruktur.SystemID;
 import no.nav.dokarkivavlevering.avlevering.arkivstruktur.Utils.Utils;
+import no.nav.dokarkivavlevering.avlevering.config.Tema;
 import no.nav.dokarkivavlevering.avlevering.domain.Bruker;
 import no.nav.dokarkivavlevering.avlevering.domain.DokumentInfo;
 import no.nav.dokarkivavlevering.avlevering.domain.FilDetaljer;
@@ -23,6 +24,9 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Joakim Bjørnstad, Jbit AS
@@ -30,17 +34,15 @@ import java.util.NoSuchElementException;
 @Component
 public class SaksmappeMapper {
 
-	public Saksmappe map(Sak sak, SystemID systemID) throws DatatypeConfigurationException {
+	public Saksmappe map(Sak sak) throws DatatypeConfigurationException {
 		Saksmappe mappe = new Saksmappe();
-		mappe.setSystemID(systemID);
+		mappe.setSystemID(mapSystemID(sak.getUuid()));
 		mappe.setOpprettetDato(dateToXMLGregorianCalendar(sak.getOpprettetTidspunkt()));
-		//TODO: er sak.opprettet av et navn? if not må det fixes som skrevet i https://confluence.adeo.no/display/BOA/arkivstruktur.xml
-		//TODO: hent navn for saksbehandler med id = SAK.OPPRETTET_AV og sett navn
+		//TODO: sjekk at berikingen gir riktig svar
 		mappe.setOpprettetAv(mapOpprettetAv(sak.getOpprettetAv()));
-		//TODO: Dene skal være "T_K_FAGOMRADE.DEKODE". Hentes dette fra db eller skal jeg mappe over? Ref kommentaren i Utils
-		mappe.setTittel(sak.getTema());
-		mappe.getReferanseArkivdels().add(systemID.toString());
-		mappe.getParts().add(mapPart(sak.getBruker(), sak));
+		mappe.setTittel(temaNavnDecode(sak.getTema()));
+		mappe.getReferanseArkivdels().add(mapSystemID(sak.getUuid()).toString());
+		mappe.getParts().add(mapPart(sak));
 		mappe.setSaksaar(toBigInteger(sak.getOpprettetTidspunkt().getYear()));
 		mappe.setSakssekvensnummer(toBigInteger(sak.getId()));
 		mappe.setSaksdato(dateToXMLGregorianCalendar(sak.getOpprettetTidspunkt()));
@@ -48,22 +50,26 @@ public class SaksmappeMapper {
 		mappe.setSaksansvarlig(getSaksAnsvarlig(sak.getJournalposter()));
 		mappe.setSaksstatus("Under behandling");
 		for (Journalpost journalpost : sak.getJournalposter()) {
-			mappe.getRegistrerings().add(mapRegistrering(journalpost, systemID));
+			mappe.getRegistrerings().add(mapRegistrering(journalpost));
 		}
 		return mappe;
 	}
 
-	private Part mapPart(Bruker bruker, Sak sak) {
+	private String temaNavnDecode(String tema) {
+		return Tema.valueOf(tema).getTemanavn();
+	}
+
+	private Part mapPart(Sak sak) {
 		Part part = new Part();
 		part.setPartRolle("Bruker");
-		part.setPartID(determineSakID(bruker.getId(), sak));
-		part.setPartNavn(determinePartNavn(bruker.getId(), sak));
+		part.setPartID(determinePartID(sak));
+		part.setPartNavn(determinePartNavn(sak));
 		return part;
 	}
 
-	private Registrering mapRegistrering(Journalpost journalpost, SystemID systemID) throws DatatypeConfigurationException {
+	private Registrering mapRegistrering(Journalpost journalpost) throws DatatypeConfigurationException {
 		no.arkivverket.standarder.noark5.arkivstruktur.Journalpost registrering = new no.arkivverket.standarder.noark5.arkivstruktur.Journalpost();
-		registrering.setSystemID(systemID);
+		registrering.setSystemID(mapSystemID(journalpost.getUuid()));
 		registrering.setOpprettetDato(dateToXMLGregorianCalendar(journalpost.getDatoOpprettet()));
 		registrering.setOpprettetAv(journalpost.getOpprettetAvNavn());
 		registrering.setRegistreringsID(journalpost.getId().toString());
@@ -78,8 +84,7 @@ public class SaksmappeMapper {
 		registrering.setTittel(journalpost.getInnhold());
 		registrering.setJournalstatus("Arkivert");
 
-		//Skal kun settes hvis det er et notat.
-		//TODO: er det slik at alt som ikke er "N" er notater?
+		//Skal kun settes hvis det ikke er et notat.
 		if (!"N".equals(journalpost.getType())) {
 			registrering.getKorrespondanseparts().add(mapKorrespondansePart(journalpost));
 		}
@@ -92,7 +97,7 @@ public class SaksmappeMapper {
 			registrering.setMottattDato(dateToXMLGregorianCalendar(journalpost.getDatoDokument()));
 		}
 		for (DokumentInfo dokumentInfo : journalpost.getDokumenter()) {
-			registrering.getDokumentbeskrivelses().add(mapDokumentBeskrivelse(dokumentInfo, systemID));
+			registrering.getDokumentbeskrivelses().add(mapDokumentBeskrivelse(dokumentInfo));
 		}
 
 		return registrering;
@@ -107,12 +112,12 @@ public class SaksmappeMapper {
 		return korrespondansepart;
 	}
 
-	private Dokumentbeskrivelse mapDokumentBeskrivelse(DokumentInfo dokumentInfo, SystemID systemID) throws DatatypeConfigurationException {
+	private Dokumentbeskrivelse mapDokumentBeskrivelse(DokumentInfo dokumentInfo) throws DatatypeConfigurationException {
 		Dokumentbeskrivelse dokumentbeskrivelse = new Dokumentbeskrivelse();
-		dokumentbeskrivelse.setSystemID(systemID);
-		//TODO: add decode
+		dokumentbeskrivelse.setSystemID(mapSystemID(dokumentInfo.getUuid()));
+		//TODO: Denne ser riktig ut for meg.
 		dokumentbeskrivelse.setDokumenttype(dokumentInfo.getKategori());
-		//TODO: add decode
+		//TODO: Hvordan skal denne decodes? Ser ut som de gyldige verdiene gir mening
 		dokumentbeskrivelse.setDokumentstatus(dokumentInfo.getStatus());
 		dokumentbeskrivelse.setTittel(dokumentInfo.getTittel());
 		dokumentbeskrivelse.setOpprettetDato(dateToXMLGregorianCalendar(dokumentInfo.getDatoOpprettet()));
@@ -123,14 +128,14 @@ public class SaksmappeMapper {
 		dokumentbeskrivelse.setTilknyttetAv(dokumentInfo.getOpprettetAv());
 
 		for (FilDetaljer filDetaljer : dokumentInfo.getFildetaljer()) {
-			dokumentbeskrivelse.getDokumentobjekts().add(mapDokumentobjekt(filDetaljer, systemID));
+			dokumentbeskrivelse.getDokumentobjekts().add(mapDokumentobjekt(filDetaljer));
 		}
 		return dokumentbeskrivelse;
 	}
 
-	private Dokumentobjekt mapDokumentobjekt(FilDetaljer filDetaljer, SystemID systemID) throws DatatypeConfigurationException {
+	private Dokumentobjekt mapDokumentobjekt(FilDetaljer filDetaljer) throws DatatypeConfigurationException {
 		Dokumentobjekt dokumentobjekt = new Dokumentobjekt();
-		dokumentobjekt.setSystemID(systemID);
+		dokumentobjekt.setSystemID(mapSystemID(filDetaljer.getUuid()));
 		dokumentobjekt.setVersjonsnummer(toBigInteger(1));
 		dokumentobjekt.setVariantformat("Arkivformat");
 		dokumentobjekt.setFormat("PDF/A");
@@ -152,17 +157,13 @@ public class SaksmappeMapper {
 		return mapEndretAv(journalpost.getEndretAv());
 	}
 
-	private String determinePartNavn(String brukerID, Sak sak) {
-		//TODO: er det riktig at orgNr alltid er 9 i length? AktørID er hvor langt?
-		//TODO: Integrer med PDL
-		//TODO: Integrer med aktoerregister
-
+	private String determinePartNavn(Sak sak) {
+		//TODO: fix når all data er fylt ut
 		return sak.getOpprettetAv().length() == 9 ? "hent organisasjonens navn fra Enhetsregisteret" : "hent fnr fra aktørregister";
 	}
 
-	private String determineSakID(String brukerID, Sak sak) {
-		//TODO: er det riktig at orgNr alltid er 9 i length? AktørID er hvor langt?
-		//TODO: hent fnr fra aktoerregister
+	private String determinePartID(Sak sak) {
+		//TODO: fix når all data er fylt ut
 		return sak.getOpprettetAv().length() == 9 ? sak.getOpprettetAv() : "hent fnr fra aktørregister";
 	}
 
@@ -204,8 +205,9 @@ public class SaksmappeMapper {
 	}
 
 	private boolean isSystembruker(String bruker) {
-		//TODO: Hvordan finne ut av om det er snakk om en systembruker?
-		return bruker.contains("srv") ? true : false;
+		Pattern pattern = Pattern.compile("[azAZ]\\d{8}");
+		Matcher m = pattern.matcher(bruker);
+		return m.matches() ? false : true;
 	}
 
 	private String mapEndretAv(String endretAv) {
@@ -218,6 +220,12 @@ public class SaksmappeMapper {
 
 	private XMLGregorianCalendar dateToXMLGregorianCalendar(Date date) throws DatatypeConfigurationException {
 		return DatatypeFactory.newInstance().newXMLGregorianCalendar(date.toInstant().toString());
+	}
+
+	private SystemID mapSystemID(final UUID value) {
+		SystemID systemID = new SystemID();
+		systemID.setValue(value.toString());
+		return systemID;
 	}
 
 }
