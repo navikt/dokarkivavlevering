@@ -2,6 +2,7 @@ package no.nav.dokarkivavlevering.avlevering;
 
 import lombok.extern.slf4j.Slf4j;
 import no.arkivverket.standarder.noark5.arkivstruktur.Klasse;
+import no.arkivverket.standarder.noark5.arkivstruktur.Mappe;
 import no.arkivverket.standarder.noark5.arkivstruktur.ObjectFactory;
 import no.arkivverket.standarder.noark5.arkivstruktur.Saksmappe;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  * @author Joakim Bjørnstad, Jbit AS
@@ -71,6 +73,7 @@ public class AvleveringTemaRoute extends RouteBuilder {
 				.process(exchange -> {
 					//FIXME her må man ha generert hele <klasse>
 					Klasse klasse = new Klasse();
+					klasse.getMappes().addAll((List<Mappe>)exchange.getIn().getExchange().getIn().getBody());
 					klasse.setTittel(exchange.getProperty(AvleveringRoute.PROPERTY_TEMA, String.class));
 					exchange.getIn().setBody(klasse);
 				})

@@ -13,7 +13,7 @@ import java.util.UUID;
  * @author Joakim Bjørnstad, Jbit AS
  */
 @Value
-@Builder
+@Builder(toBuilder = true)
 public class Sak {
 	private final UUID uuid = UUID.randomUUID();
 	private Long id;
@@ -25,4 +25,9 @@ public class Sak {
 	@ToString.Exclude
 	private Bruker bruker;
 	private List<Journalpost> journalposter;
+
+	public Sak tilhoererBruker(Bruker bruker) {
+		return this.toBuilder()
+				.bruker(bruker).build();
+	}
 }

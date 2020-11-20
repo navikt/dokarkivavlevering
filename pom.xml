@@ -30,6 +30,7 @@
 		<lombok.version>1.18.12</lombok.version>
 		<jaxb2-commons.version>0.6.5</jaxb2-commons.version>
 		<commons-io.version>2.8.0</commons-io.version>
+		<rxjava.version>3.0.7</rxjava.version>
 	</properties>
 
 	<dependencyManagement>
@@ -76,6 +77,11 @@
 				<groupId>org.simpleflatmapper</groupId>
 				<artifactId>sfm-springjdbc</artifactId>
 				<version>${simpleflatmapper.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.reactivex.rxjava3</groupId>
+				<artifactId>rxjava</artifactId>
+				<version>${rxjava.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.projectlombok</groupId>

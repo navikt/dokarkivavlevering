@@ -6,12 +6,16 @@ import org.springframework.stereotype.Component;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
+import java.util.UUID;
 
 @Component
 public class KlasseMapper {
 
 	//Denne er bare halvtenkt
-	public Klasse map(SystemID systemID, String tema) throws DatatypeConfigurationException {
+	public Klasse map(String tema) throws DatatypeConfigurationException {
+		UUID uuid = UUID.randomUUID();
+		SystemID systemID = new SystemID();
+		systemID.setValue(uuid.toString());
 		Klasse klasse = new Klasse();
 		klasse.setSystemID(systemID);
 		klasse.setKlasseID(tema);

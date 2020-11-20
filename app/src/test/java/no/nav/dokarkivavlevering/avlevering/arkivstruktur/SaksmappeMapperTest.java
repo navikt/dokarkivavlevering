@@ -54,7 +54,7 @@ class SaksmappeMapperTest {
 		return Sak.builder()
 				.id((long) 1234567011)
 				.tema("MED")
-				.bruker(new Bruker("12009988772"))
+				//.bruker(new Bruker("12009988772"))
 				.opprettetAv("Skrue McDuck")
 				.opprettetTidspunkt(new Date(2018, 9, 24))
 				.journalposter(new ArrayList<Journalpost>()).build();

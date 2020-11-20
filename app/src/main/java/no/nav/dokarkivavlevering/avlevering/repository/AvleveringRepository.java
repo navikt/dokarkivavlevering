@@ -2,6 +2,7 @@ package no.nav.dokarkivavlevering.avlevering.repository;
 
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
+import no.nav.dokarkivavlevering.avlevering.exception.AvleveringFunctionalException;
 import org.apache.camel.Body;
 import org.simpleflatmapper.jdbc.spring.JdbcTemplateMapperFactory;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.io.InputStream;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -60,6 +62,9 @@ public class AvleveringRepository {
 	public List<Sak> findSaker(final List<Long> sakIds) {
 		if (sakIds.size() > ORACLE_MAX_IN) {
 			throw new UnsupportedOperationException("Støtter ikke å hente flere enn " + ORACLE_MAX_IN + " saker om gangen.");
+		}
+		else if(sakIds.size() < 1){
+			throw new AvleveringFunctionalException("Fant ingen saker ");
 		}
 
 		final HashMap<String, Object> paramMap = new HashMap<>();

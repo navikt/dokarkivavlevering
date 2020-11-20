@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 @Slf4j
 @Component
 public class AvleveringRoute extends RouteBuilder {
-	// static final Set<String> TEMA_AVLEVERES = Stream.of("ERS", "SAK", "KTR", "MED", "UFM", "RVE", "OPP", "SAP", "IAR").collect(Collectors.toSet());
+	//static final Set<String> TEMA_AVLEVERES = Stream.of("ERS", "SAK", "KTR", "MED", "UFM", "RVE", "OPP", "SAP", "IAR").collect(Collectors.toSet());
 	static final Set<String> TEMA_AVLEVERES = Stream.of("MED").collect(Collectors.toSet());
 	public static final String PROPERTY_AVLEVERING_ID = "AvleveringId";
 	public static final String PROPERTY_TEMA = "AvleveringTema";

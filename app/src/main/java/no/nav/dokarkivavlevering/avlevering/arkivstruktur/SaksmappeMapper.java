@@ -9,7 +9,6 @@ import no.arkivverket.standarder.noark5.arkivstruktur.Saksmappe;
 import no.arkivverket.standarder.noark5.arkivstruktur.SystemID;
 import no.nav.dokarkivavlevering.avlevering.arkivstruktur.Utils.Utils;
 import no.nav.dokarkivavlevering.avlevering.config.Tema;
-import no.nav.dokarkivavlevering.avlevering.domain.Bruker;
 import no.nav.dokarkivavlevering.avlevering.domain.DokumentInfo;
 import no.nav.dokarkivavlevering.avlevering.domain.FilDetaljer;
 import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
@@ -21,7 +20,6 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigInteger;
-import java.text.ParseException;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -43,6 +41,7 @@ public class SaksmappeMapper {
 		//TODO: sjekk at berikingen gir riktig svar
 		mappe.setOpprettetAv(mapOpprettetAv(sak.getOpprettetAv()));
 		mappe.setTittel(temaNavnDecode(sak.getTema()));
+		//TODO: FIX
 		mappe.getReferanseArkivdels().add(mapSystemID(sak.getUuid()).toString());
 		mappe.getParts().add(mapPart(sak));
 		mappe.setSaksaar(toBigInteger(sak.getOpprettetTidspunkt().getYear()));
