@@ -30,14 +30,6 @@ public class AvleveringSakService {
 		// map til xmlstruktur
 		// hent metadata
 		// returner liste av xml objekter for marshal
-		return saker.stream().map(sak -> {
-			try {
-				return saksmappeMapper.map(sak);
-			} catch (DatatypeConfigurationException e) {
-				e.printStackTrace();
-			}//TODO: proper feilhåndtering (gjennom hele mapping-løpet)
-			return null;
-		})
-				.collect(Collectors.toList());
+		return saker.stream().map(sak -> saksmappeMapper.map(sak)).collect(Collectors.toList());
 	}
 }

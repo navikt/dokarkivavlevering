@@ -14,12 +14,14 @@ import no.nav.dokarkivavlevering.avlevering.domain.DokumentInfo;
 import no.nav.dokarkivavlevering.avlevering.domain.FilDetaljer;
 import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
+import no.nav.dokarkivavlevering.avlevering.exception.AvleveringFunctionalException;
 import org.springframework.stereotype.Component;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigInteger;
+import java.text.ParseException;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -34,7 +36,7 @@ import java.util.regex.Pattern;
 @Component
 public class SaksmappeMapper {
 
-	public Saksmappe map(Sak sak) throws DatatypeConfigurationException {
+	public Saksmappe map(Sak sak){
 		Saksmappe mappe = new Saksmappe();
 		mappe.setSystemID(mapSystemID(sak.getUuid()));
 		mappe.setOpprettetDato(dateToXMLGregorianCalendar(sak.getOpprettetTidspunkt()));
@@ -67,7 +69,7 @@ public class SaksmappeMapper {
 		return part;
 	}
 
-	private Registrering mapRegistrering(Journalpost journalpost) throws DatatypeConfigurationException {
+	private Registrering mapRegistrering(Journalpost journalpost){
 		no.arkivverket.standarder.noark5.arkivstruktur.Journalpost registrering = new no.arkivverket.standarder.noark5.arkivstruktur.Journalpost();
 		registrering.setSystemID(mapSystemID(journalpost.getUuid()));
 		registrering.setOpprettetDato(dateToXMLGregorianCalendar(journalpost.getDatoOpprettet()));
@@ -112,7 +114,7 @@ public class SaksmappeMapper {
 		return korrespondansepart;
 	}
 
-	private Dokumentbeskrivelse mapDokumentBeskrivelse(DokumentInfo dokumentInfo) throws DatatypeConfigurationException {
+	private Dokumentbeskrivelse mapDokumentBeskrivelse(DokumentInfo dokumentInfo) {
 		Dokumentbeskrivelse dokumentbeskrivelse = new Dokumentbeskrivelse();
 		dokumentbeskrivelse.setSystemID(mapSystemID(dokumentInfo.getUuid()));
 		//TODO: Denne ser riktig ut for meg.
@@ -133,7 +135,7 @@ public class SaksmappeMapper {
 		return dokumentbeskrivelse;
 	}
 
-	private Dokumentobjekt mapDokumentobjekt(FilDetaljer filDetaljer) throws DatatypeConfigurationException {
+	private Dokumentobjekt mapDokumentobjekt(FilDetaljer filDetaljer) {
 		Dokumentobjekt dokumentobjekt = new Dokumentobjekt();
 		dokumentobjekt.setSystemID(mapSystemID(filDetaljer.getUuid()));
 		dokumentobjekt.setVersjonsnummer(toBigInteger(1));
@@ -218,8 +220,12 @@ public class SaksmappeMapper {
 		return isSystembruker(opprettetAv) ? "systembruker" : opprettetAv;
 	}
 
-	private XMLGregorianCalendar dateToXMLGregorianCalendar(Date date) throws DatatypeConfigurationException {
-		return DatatypeFactory.newInstance().newXMLGregorianCalendar(date.toInstant().toString());
+	private XMLGregorianCalendar dateToXMLGregorianCalendar(Date date) {
+		try {
+			return DatatypeFactory.newInstance().newXMLGregorianCalendar(date.toInstant().toString());
+		} catch (DatatypeConfigurationException e) {
+			throw new AvleveringFunctionalException("Kunne ikke mappe dato til XmlGregorianCalendar.", e);
+		}
 	}
 
 	private SystemID mapSystemID(final UUID value) {
