@@ -21,7 +21,6 @@ import java.util.Optional;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
-import static net.logstash.logback.encoder.org.apache.commons.lang3.StringUtils.trim;
 import static net.logstash.logback.encoder.org.apache.commons.lang3.StringUtils.trimToEmpty;
 
 @Component
@@ -65,6 +64,8 @@ public class EregConsumer {
 						.map(this::getFullName)
 						.orElse("Ukjent organisasjonsnavn");
 
+			} catch (HttpClientErrorException.NotFound e) {
+				return "Ukjent organisasjonsnummer";
 			} catch (HttpClientErrorException e) {
 				throw new EregFunctionalException(format("Funsjonell feil ved kall mot ereg:hentNoekkelinfo for organisasjonsnummer=%s. feilmelding=%s",
 						orgnr, e.getMessage()), e);
