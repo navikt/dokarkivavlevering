@@ -8,6 +8,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
@@ -16,9 +17,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.time.Duration;
+import java.util.Optional;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
+import static net.logstash.logback.encoder.org.apache.commons.lang3.StringUtils.trim;
+import static net.logstash.logback.encoder.org.apache.commons.lang3.StringUtils.trimToEmpty;
 
 @Component
 public class EregConsumer {
@@ -39,6 +43,7 @@ public class EregConsumer {
 		this.eregUrl = avleveringProperties.getEregurl();
 	}
 
+	@Retryable(include = HttpServerErrorException.class)
 	public String hentNavn(final String orgnr) {
 		if (isValidOrgnrFormat(orgnr)) {
 			try {
@@ -55,36 +60,22 @@ public class EregConsumer {
 				ResponseEntity<EregHentNoekkelInfoResponse> response =
 						requireNonNull(restTemplate.exchange(requestEntity, EregHentNoekkelInfoResponse.class));
 
-				assertResponse(response.getBody(), orgnr);
-				return getFullName(response.getBody().getNavn());
+				return Optional.ofNullable(response.getBody())
+						.map(EregHentNoekkelInfoResponse::getNavn)
+						.map(this::getFullName)
+						.orElse("Ukjent organisasjonsnavn");
 
 			} catch (HttpClientErrorException e) {
 				throw new EregFunctionalException(format("Funsjonell feil ved kall mot ereg:hentNoekkelinfo for organisasjonsnummer=%s. feilmelding=%s",
 						orgnr, e.getMessage()), e);
-			} catch (HttpServerErrorException e) {
-				throw new EregTechnicalException(format("Teknisk feil ved kall mot ereg:hentNoekkelinfo for organisasjonsnummer=%s. Feilmelding=%s",
-						orgnr, e.getMessage()), e);
 			}
 		}
 		return "Ugyldig organisasjonsnummer";
-
-	}
-
-	private void assertResponse(EregHentNoekkelInfoResponse eregHentNoekkelInfoResponse, String orgnr) {
-		if (eregHentNoekkelInfoResponse == null) {
-			throw new EregFunctionalException(format("Fikk ingen respons fra ereg:hentNoekkelinfo for organisasjonsnummer=%s.", orgnr));
-		} else if (eregHentNoekkelInfoResponse.getNavn() == null) {
-			throw new EregFunctionalException(format("Respons fra ereg:hentNoekkelinfo for organisasjonsnummer=%s mangler navn", orgnr));
-		}
 	}
 
 	private String getFullName(EregHentNoekkelInfoResponse.Navn navn) {
-		return trimString(format("%s %s %s %s %s", trimString(navn.getNavnelinje1()), trimString(navn.getNavnelinje2()),
-				trimString(navn.getNavnelinje3()), trimString(navn.getNavnelinje4()), trimString(navn.getNavnelinje5())));
-	}
-
-	private String trimString(String string) {
-		return string == null ? "" : string.trim();
+		return trimToEmpty(format("%s %s %s %s %s", trimToEmpty(navn.getNavnelinje1()), trimToEmpty(navn.getNavnelinje2()),
+				trimToEmpty(navn.getNavnelinje3()), trimToEmpty(navn.getNavnelinje4()), trimToEmpty(navn.getNavnelinje5())));
 	}
 
 	private static boolean isValidOrgnrFormat(String orgnr) {
