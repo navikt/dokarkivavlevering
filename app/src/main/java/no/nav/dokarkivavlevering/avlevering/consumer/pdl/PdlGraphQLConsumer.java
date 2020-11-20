@@ -1,7 +1,9 @@
 package no.nav.dokarkivavlevering.avlevering.consumer.pdl;
 
+import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.consumer.sts.StsRestConsumer;
+import no.nav.dokarkivavlevering.avlevering.domain.Bruker;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -17,7 +19,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
@@ -26,9 +30,11 @@ import static java.util.Objects.requireNonNull;
  *
  * @author Joakim Bjørnstad, Jbit AS
  */
+@Slf4j
 @Component
 public class PdlGraphQLConsumer {
 	private static final String HEADER_PDL_NAV_CONSUMER_TOKEN = "Nav-Consumer-Token";
+	private static final String HEADER_PDL_TEMA = "Tema";
 
 	private final RestTemplate restTemplate;
 	private final StsRestConsumer stsConsumer;
@@ -46,7 +52,7 @@ public class PdlGraphQLConsumer {
 	}
 
 	@Retryable(include = HttpServerErrorException.class)
-	public List<PdlHentIdenterBolkResponse.PdlHentIdenterBolk> hentIdenterBolk(final Set<String> aktoerIds) {
+	public Map<String, Bruker> hentPersonBolk(final Set<String> aktoerIds, final String tema) {
 		try {
 			final UriComponents uri = UriComponentsBuilder.fromHttpUrl(pdlUrl).build();
 			final String serviceuserToken = "Bearer " + stsConsumer.getStsToken().getAccess_token();
@@ -55,17 +61,24 @@ public class PdlGraphQLConsumer {
 					.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
 					.header(HttpHeaders.AUTHORIZATION, serviceuserToken)
 					.header(HEADER_PDL_NAV_CONSUMER_TOKEN, serviceuserToken)
+					.header(HEADER_PDL_TEMA, tema)
 					.body(mapRequest(aktoerIds));
-			final PdlHentIdenterBolkResponse pdlHentIdenterBolkResponse = requireNonNull(restTemplate.exchange(requestEntity, PdlHentIdenterBolkResponse.class).getBody());
-
-			if (pdlHentIdenterBolkResponse.getErrors() == null || pdlHentIdenterBolkResponse.getErrors().isEmpty()) {
-				return pdlHentIdenterBolkResponse.getData().getHentIdenterBolk();
+			log.debug("Henter fødselsnummer og navn for {} aktørIds", aktoerIds.size());
+			final PdlHentPersonBolkResponse pdlHentPersonBolkResponse = requireNonNull(restTemplate.exchange(requestEntity, PdlHentPersonBolkResponse.class).getBody());
+			log.debug("Ferdig hentet fødsesnummer og navn for {} aktørIds", aktoerIds.size());
+			if (pdlHentPersonBolkResponse.getErrors() == null || pdlHentPersonBolkResponse.getErrors().isEmpty()) {
+				return createResponseAsMap(pdlHentPersonBolkResponse.getData().getHentPersonBolk());
 			} else {
-				throw new PdlFunctionalException("Kunne ikke hente bolk identer fra pdl." + pdlHentIdenterBolkResponse.getErrors());
+				throw new PdlFunctionalException("Kunne ikke hente bolk identer fra pdl." + pdlHentPersonBolkResponse.getErrors());
 			}
 		} catch (HttpClientErrorException e) {
 			throw new PdlFunctionalException("Kunne ikke hente bolk identer fra pdl.", e);
 		}
+	}
+
+	private Map<String, Bruker> createResponseAsMap(List<PdlHentPersonBolkResponse.PdlHentPersonBolk> hentPersonBolk) {
+		return hentPersonBolk.stream().collect(Collectors.toMap(PdlHentPersonBolkResponse.PdlHentPersonBolk::getIdent,
+				pdlHentPersonBolk -> new Bruker(pdlHentPersonBolk.getFolkeregisterIdent(), pdlHentPersonBolk.getFulltnavn())));
 	}
 
 	private PdlRequest mapRequest(final Set<String> aktoerIds) {
@@ -73,12 +86,19 @@ public class PdlGraphQLConsumer {
 		variables.put("identer", aktoerIds);
 		return PdlRequest.builder()
 				.query("query hentIdenterBolk($identer: [ID!]!) {\n" +
-						"  hentIdenterBolk(identer: $identer, grupper: FOLKEREGISTERIDENT, historikk: false) {\n" +
+						"  hentPersonBolk(identer: $identer) {\n" +
 						"    ident\n" +
-						"    identer {\n" +
-						"      ident\n" +
-						"      gruppe\n" +
+						"    person {\n" +
+						"      folkeregisteridentifikator {\n" +
+						"        identifikasjonsnummer\n" +
+						"      }\n" +
+						"      navn {\n" +
+						"        fornavn\n" +
+						"        mellomnavn\n" +
+						"        etternavn\n" +
+						"      }\n" +
 						"    }\n" +
+						"    code\n" +
 						"  }\n" +
 						"}\n")
 				.variables(variables)

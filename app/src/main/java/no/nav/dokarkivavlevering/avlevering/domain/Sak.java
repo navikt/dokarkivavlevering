@@ -11,7 +11,7 @@ import java.util.List;
  * @author Joakim Bjørnstad, Jbit AS
  */
 @Value
-@Builder
+@Builder(toBuilder = true)
 public class Sak {
 	private Long id;
 	private String tema;
@@ -22,4 +22,9 @@ public class Sak {
 	@ToString.Exclude
 	private Bruker bruker;
 	private List<Journalpost> journalposter;
+
+	public Sak tilhoererBruker(Bruker bruker) {
+		return this.toBuilder()
+				.bruker(bruker).build();
+	}
 }
