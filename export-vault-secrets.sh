@@ -33,3 +33,13 @@ then
     echo "Setting SFTP_PRIVATEKEYPASSPHRASE"
     export SFTP_PRIVATEKEYPASSPHRASE=$(cat /var/run/secrets/nais.io/privatekey/privateKeyPassphrase)
 fi
+if test -f /var/run/secrets/nais.io/ldap/username;
+then
+    echo "Setting SPRING_LDAP_USERNAME"
+    export  SPRING_LDAP_USERNAME=$(cat /var/run/secrets/nais.io/service_user_linux/username)
+fi
+if test -f /var/run/secrets/nais.io/ldap/password;
+then
+    echo "Setting SPRING_LDAP_PASSWORD"
+    export  SPRING_LDAP_PASSWORD=$(cat /var/run/secrets/nais.io/service_user_linux/password)
+fi

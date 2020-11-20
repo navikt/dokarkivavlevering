@@ -1,5 +1,6 @@
 package no.nav.dokarkivavlevering.avlevering.domain;
 
+import lombok.Builder;
 import lombok.ToString;
 import lombok.Value;
 
@@ -10,6 +11,7 @@ import java.util.List;
  * @author Joakim Bjørnstad, Jbit AS
  */
 @Value
+@Builder(toBuilder = true)
 public class Journalpost {
 	private final Long id;
 	private final String type;
@@ -27,9 +29,13 @@ public class Journalpost {
 	@ToString.Exclude
 	private final String opprettetAv;
 	@ToString.Exclude
+	private final String opprettetAvBeriketNavn;
+	@ToString.Exclude
 	private final String opprettetAvNavn;
 	@ToString.Exclude
 	private final String endretAv;
+	@ToString.Exclude
+	private final String endretAvBeriketNavn;
 	private final List<DokumentInfo> dokumenter;
 	private final List<Arkivendring> arkivendringer;
 }

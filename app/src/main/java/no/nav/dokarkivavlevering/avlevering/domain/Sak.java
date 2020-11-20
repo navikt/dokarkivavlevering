@@ -17,13 +17,15 @@ public class Sak {
 	private String tema;
 	@ToString.Exclude
 	private String opprettetAv;
+	@ToString.Exclude
+	private String opprettetAvBeriketNavn;
 	private Date opprettetTidspunkt;
 
 	@ToString.Exclude
 	private Bruker bruker;
 	private List<Journalpost> journalposter;
 
-	public Sak tilhoererBruker(Bruker bruker) {
+	public Sak tilhoererBruker(final Bruker bruker) {
 		return this.toBuilder()
 				.bruker(bruker).build();
 	}

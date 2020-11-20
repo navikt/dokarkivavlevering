@@ -31,6 +31,9 @@ spec:
             - mountPath: /var/run/secrets/nais.io/service_user
               name: vault-secrets
               subPath: subpath/var/run/secrets/nais.io/service_user
+            - mountPath: /var/run/secrets/nais.io/service_user_linux
+              name: vault-secrets
+              subPath: subpath/var/run/secrets/nais.io/service_user_linux
             - mountPath: /var/run/secrets/nais.io/database_user
               name: vault-secrets
               subPath: subpath/var/run/secrets/nais.io/database_user
@@ -46,6 +49,8 @@ spec:
               value: "{{PDL_URL}}"
             - name: AVLEVERING_STSTOKENURL
               value: "{{SECURITY_TOKEN_SERVICE_TOKEN_URL}}"
+            - name: AVLEVERING_ACTIVEDIRECTORY_BASEDN
+              value: "{{AD_NAVUSER_BASEDN}}"
             - name: AVLEVERING_PERIODE_STARTDATO
               value: "{{periodestart}}"
             - name: AVLEVERING_PERIODE_SLUTTDATO
@@ -67,6 +72,9 @@ spec:
             - mountPath: /var/run/secrets/nais.io/service_user
               name: vault-secrets
               subPath: subpath/var/run/secrets/nais.io/service_user
+            - mountPath: /var/run/secrets/nais.io/service_user_linux
+              name: vault-secrets
+              subPath: subpath/var/run/secrets/nais.io/service_user_linux
             - mountPath: /var/run/secrets/nais.io/database_user
               name: vault-secrets
               subPath: subpath/var/run/secrets/nais.io/database_user
@@ -81,6 +89,7 @@ spec:
             - -save-token=/var/run/secrets/nais.io/vault/vault_token
             - -cn=secret:{{VAULT_KV_PATH}}:dir=/var/run/secrets/nais.io/vault,fmt=flatten,retries=1
             - -cn=secret:{{SRVDOKAVLEVERING}}:dir=/var/run/secrets/nais.io/service_user,fmt=flatten,retries=1
+            - -cn=secret:{{SRV_LINUX}}:dir=/var/run/secrets/nais.io/service_user_linux,fmt=flatten,retries=1
             - -cn=secret:{{VAULT_DATABASE_CREDS}}:dir=/var/run/secrets/nais.io/database_user,fmt=flatten,retries=1
             - -cn=secret:{{VAULT_SFTP_PRIVATEKEY}}:dir=/var/run/secrets/nais.io/privatekey,fmt=flatten,retries=1
           env:

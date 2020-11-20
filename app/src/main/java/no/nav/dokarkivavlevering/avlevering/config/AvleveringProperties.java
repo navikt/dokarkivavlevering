@@ -26,12 +26,22 @@ public class AvleveringProperties {
 	@NotEmpty
 	private String pdlurl;
 
+
+	@Valid
+	private final Activedirectory activedirectory = new Activedirectory();
 	@Valid
 	private final Filomraade filomraade = new Filomraade();
 	@Valid
 	private final Serviceuser serviceuser = new Serviceuser();
 	@Valid
 	private final Periode periode = new Periode();
+
+	@Data
+	@Validated
+	public static class Activedirectory {
+		@NotEmpty
+		private String basedn;
+	}
 
 	@Data
 	@Validated
