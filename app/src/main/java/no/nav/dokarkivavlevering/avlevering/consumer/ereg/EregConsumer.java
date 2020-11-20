@@ -10,6 +10,7 @@ import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -59,6 +60,9 @@ public class EregConsumer {
 
 			} catch (HttpClientErrorException e) {
 				throw new EregFunctionalException(format("Funsjonell feil ved kall mot ereg:hentNoekkelinfo for organisasjonsnummer=%s. feilmelding=%s",
+						orgnr, e.getMessage()), e);
+			} catch (HttpServerErrorException e) {
+				throw new EregTechnicalException(format("Teknisk feil ved kall mot ereg:hentNoekkelinfo for organisasjonsnummer=%s. Feilmelding=%s",
 						orgnr, e.getMessage()), e);
 			}
 		}
