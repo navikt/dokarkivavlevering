@@ -22,7 +22,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Joakim Bjørnstad, Jbit AS
@@ -30,16 +32,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SaksmappeMapperTest {
 
 	private SimpleDateFormat formatter = new SimpleDateFormat("yyy-MM-dd hh:mm:ss");
-
-
-	private enum journalpostType {
-		U, I, N
-	}
-
-	private enum journalpostStatus {
-		FS, J, FL
-	}
-
 	private final SaksmappeMapper saksmappeMapper = new SaksmappeMapper();
 
 	@Test
@@ -56,81 +48,81 @@ class SaksmappeMapperTest {
 
 		final Saksmappe saksmappe = saksmappeMapper.map(sak);
 		//saksmappe
-		assertThat(saksmappe.getSaksaar() == toBigInteger(2019));
-		assertThat(saksmappe.getSakssekvensnummer() == toBigInteger(1234567011));
-		assertThat(saksmappe.getSaksdato().equals(toGregorianCalendar("2019-10-28T10:41:36Z")));
-		assertThat(saksmappe.getAdministrativEnhet().equals("NAV Medlemskap og avgift"));
-		assertThat(saksmappe.getSaksansvarlig().equals("Automatisk jobb"));
-		assertThat(saksmappe.getSaksstatus().equals("Under behandling"));
-		assertThat(saksmappe.getSystemID().getValue()).isNotEmpty();
-		assertThat(saksmappe.getMappeID().equals(1234567011));
-		assertThat(saksmappe.getTittel().equals("Medlemskal"));
-		assertThat(saksmappe.getOpprettetDato().equals(toGregorianCalendar("2019-10-28T10:41:36Z")));
-		assertThat(saksmappe.getOpprettetAv().equals("systembruker"));
-		assertThat(saksmappe.getReferanseArkivdels().size() == 1);
-		assertThat(saksmappe.getParts().size() == 1);
-		assertThat(saksmappe.getRegistrerings().size() == 1);
+		assertEquals(saksmappe.getSaksaar().toString(), "2019");
+		assertEquals(saksmappe.getSakssekvensnummer().toString(), "1234567011");
+		assertTrue(saksmappe.getSaksdato().equals(toGregorianCalendar("2019-10-28T10:41:36Z")));
+		assertEquals(saksmappe.getAdministrativEnhet(), "NAV Medlemskap og avgift");
+		assertEquals(saksmappe.getSaksansvarlig(), "Automatisk jobb");
+		assertEquals(saksmappe.getSaksstatus(), "Under behandling");
+		assertFalse(saksmappe.getSystemID().getValue().isEmpty());
+		assertEquals(saksmappe.getMappeID(), "1234567011");
+		assertEquals(saksmappe.getTittel(), "Medlemskap");
+		assertTrue(saksmappe.getOpprettetDato().equals(toGregorianCalendar("2019-10-28T10:41:36Z")));
+		assertEquals(saksmappe.getOpprettetAv(), "systembruker");
+		assertEquals(saksmappe.getReferanseArkivdels().size(), 1);
+		assertEquals(saksmappe.getParts().size(), 1);
+		assertEquals(saksmappe.getRegistrerings().size(), 1);
 
 		//saksmappe/referansearkivdels
 		String referanseArkivdel = saksmappe.getReferanseArkivdels().get(0);
-		assertThat(referanseArkivdel.equals(sak.getUuid().toString()));
+		assertTrue(referanseArkivdel.equals(sak.getUuid().toString()));
 
 		//saksmappe/part
 		Part part = saksmappe.getParts().get(0);
-		assertThat(part.getPartID().equals("hent fnr fra aktørregister"));
-		assertThat(part.getPartNavn().equals("Hent navn fra PDL"));
-		assertThat(part.getPartRolle().equals("Bruker"));
+		assertTrue(part.getPartID().equals("12345678911"));
+		assertTrue(part.getPartNavn().equals("Frank"));
+		assertTrue(part.getPartRolle().equals("Bruker"));
 
 		//saksmappe/registrerings/registrering(journalpost)
 		no.arkivverket.standarder.noark5.arkivstruktur.Journalpost reg = (no.arkivverket.standarder.noark5.arkivstruktur.Journalpost) saksmappe.getRegistrerings().get(0);
-		assertThat(reg.getJournalaar().equals("2020"));
-		assertThat(reg.getJournalsekvensnummer().equals("453637481"));
-		assertThat(reg.getJournalpostnummer().equals(toBigInteger(453637481)));
-		assertThat(reg.getJournalposttype().equals("Utgående dokument"));
-		assertThat(reg.getJournalstatus().equals("Arkivert"));
-		assertThat(reg.getJournaldato().equals(toGregorianCalendar("2020-11-10T15:04:43Z")));
-		assertThat(reg.getDokumentetsDato().equals(toGregorianCalendar("2020-11-10T15:04:43Z")));
-		assertThat(!reg.getSystemID().getValue().isEmpty());
-		assertThat(reg.getOpprettetDato().equals(toGregorianCalendar("2020-11-10T15:04:43Z")));
-		assertThat(reg.getOpprettetAv().equals("srvmelosys"));
-		assertThat(reg.getRegistreringsID().equals("453637481"));
-		assertThat(reg.getTittel().equals("Legg til ny institusjon"));
-		assertThat(reg.getKorrespondanseparts().size() == 1);
-		assertThat(reg.getDokumentbeskrivelses().size() == 1);
+		assertTrue(reg.getJournalaar().toString().equals("2020"));
+		assertTrue(reg.getJournalsekvensnummer().toString().equals("453637481"));
+		assertTrue(reg.getJournalpostnummer().toString().equals("453637481"));
+		assertTrue(reg.getJournalposttype().equals("Utgående dokument"));
+		assertTrue(reg.getJournalstatus().equals("Arkivert"));
+		assertTrue(reg.getJournaldato().equals(toGregorianCalendar("2020-11-10T15:04:43Z")));
+		assertTrue(reg.getDokumentetsDato().equals(toGregorianCalendar("2020-11-10T15:04:43Z")));
+		assertTrue(!reg.getSystemID().getValue().isEmpty());
+		assertTrue(reg.getOpprettetDato().equals(toGregorianCalendar("2020-11-10T15:04:43Z")));
+		assertTrue(reg.getOpprettetAv().equals("srvmelosys"));
+		assertTrue(reg.getRegistreringsID().equals("453637481"));
+		assertTrue(reg.getTittel().equals("Legg til ny institusjon"));
+		assertTrue(reg.getKorrespondanseparts().size() == 1);
+		assertTrue(reg.getDokumentbeskrivelses().size() == 1);
 
 		//saksmappe/registrerings/registrering(journalpost)/dokumentbeskrivelse
 		Dokumentbeskrivelse dok = reg.getDokumentbeskrivelses().get(0);
-		assertThat(!dok.getSystemID().getValue().isEmpty());
-		assertThat(dok.getDokumenttype().equals("SED"));
-		assertThat(dok.getDokumentstatus().equals("FERDIGSTILT"));
-		assertThat(dok.getTittel().equals("Legg til ny institusjon"));
-		assertThat(dok.getOpprettetDato().equals(toGregorianCalendar("2020-11-10T15:04:43Z")));
-		assertThat(dok.getOpprettetAv().equals("systembruker"));
-		assertThat(dok.getTilknyttetRegistreringSom().equals("HOVEDDOKUMENT"));
-		assertThat(dok.getDokumentnummer().equals(toBigInteger(454017976)));
-		assertThat(dok.getTilknyttetDato().equals(toGregorianCalendar("2020-11-10T15:04:43Z")));
-		assertThat(dok.getTilknyttetAv().equals("srvmelosys"));
-		assertThat(dok.getDokumentobjekts().size() == 1);
+		assertTrue(!dok.getSystemID().getValue().isEmpty());
+		assertTrue(dok.getDokumenttype().equals("SED"));
+		assertTrue(dok.getDokumentstatus().equals("FERDIGSTILT"));
+		assertTrue(dok.getTittel().equals("Legg til ny institusjon"));
+		assertTrue(dok.getOpprettetDato().equals(toGregorianCalendar("2020-11-10T15:04:43Z")));
+		assertTrue(dok.getOpprettetAv().equals("systembruker"));
+		assertTrue(dok.getTilknyttetRegistreringSom().equals("HOVEDDOKUMENT"));
+		assertTrue(dok.getDokumentnummer().equals(toBigInteger(454017976)));
+		assertTrue(dok.getTilknyttetDato().equals(toGregorianCalendar("2020-11-10T15:04:43Z")));
+		assertTrue(dok.getTilknyttetAv().equals("srvmelosys"));
+		assertTrue(dok.getDokumentobjekts().size() == 1);
 
 		//saksmappe/registrerings/registrering(journalpost)/dokumentbeskrivelse/dokumentObjekts
 		Dokumentobjekt dokObjekt = dok.getDokumentobjekts().get(0);
-		assertThat(!dokObjekt.getSystemID().getValue().isEmpty());
-		assertThat(dokObjekt.getVersjonsnummer().equals(toBigInteger(1)));
-		assertThat(dokObjekt.getVariantformat().equals("Arkivformat"));
-		assertThat(dokObjekt.getFormat().equals("PDF/A"));
-		assertThat(dokObjekt.getOpprettetDato().equals(toGregorianCalendar("2020-11-10T15:04:43Z")));
-		assertThat(dokObjekt.getOpprettetAv().equals("srvRuting"));
+		assertTrue(!dokObjekt.getSystemID().getValue().isEmpty());
+		assertTrue(dokObjekt.getVersjonsnummer().equals(toBigInteger(1)));
+		assertTrue(dokObjekt.getVariantformat().equals("Arkivformat"));
+		assertTrue(dokObjekt.getFormat().equals("PDF/A"));
+		assertTrue(dokObjekt.getOpprettetDato().equals(toGregorianCalendar("2020-11-10T15:04:43Z")));
+		assertTrue(dokObjekt.getOpprettetAv().equals("srvRuting"));
 		//TODO: fix riktig
-		assertThat(dokObjekt.getReferanseDokumentfil().equals("URN til dokumentet i avleveringspakken (filnavn = DO + T_FIL_DETALJER.FIL_DETALJER_ID"));
-		assertThat(dokObjekt.getSjekksum().equals("TODO Sett sjekksum her"));
-		assertThat(dokObjekt.getSjekksumAlgoritme().equals("SHA-256"));
-		assertThat(dokObjekt.getFilstoerrelse().equals(toBigInteger(-1)));
+		assertTrue(dokObjekt.getReferanseDokumentfil().equals("URN til dokumentet i avleveringspakken (filnavn = DO + T_FIL_DETALJER.FIL_DETALJER_ID"));
+		assertTrue(dokObjekt.getSjekksum().equals("TODO Sett sjekksum her"));
+		assertTrue(dokObjekt.getSjekksumAlgoritme().equals("SHA-256"));
+		assertTrue(dokObjekt.getFilstoerrelse().equals(toBigInteger(-1)));
 
 		//saksmappe/registrerings/registrering(journalpost)/korrespondanseparts
 		Korrespondansepart korrPart = reg.getKorrespondanseparts().get(0);
-		assertThat(korrPart.getKorrespondanseparttype().equals("Mottaker"));
-		assertThat(korrPart.getKorrespondansepartNavn().equals("srvmelosys"));
-		assertThat(korrPart.getSaksbehandler().equals("srvmelosys"));
+		assertTrue(korrPart.getKorrespondanseparttype().equals("Mottaker"));
+		assertTrue(korrPart.getKorrespondansepartNavn().equals("srvmelosys"));
+		assertTrue(korrPart.getSaksbehandler().equals("srvmelosys"));
 
 	}
 
@@ -150,61 +142,64 @@ class SaksmappeMapperTest {
 
 	private Bruker generaterBruker() {
 		return new Bruker(
-				"00000000000",
-				//TODO: Rydd opp når enrichment er satt oppp
-				"Dette skal mappes utenifra."
+				"12345678911",
+				"Frank"
 		);
 	}
 
 	private Journalpost generateJournalPost() throws ParseException {
-		return new Journalpost(
-				(long) 453637481,
-				journalpostType.U.toString(),
-				journalpostStatus.FS.toString(),
-				"Legg til ny institusjon",
-				"Arena",
-				null,
-				formatter.parse("2020-11-10 16:04:43.332"),
-				formatter.parse("2020-11-10 16:04:43.35"),
-				formatter.parse("2020-11-10 16:04:43.338"),
-				null,
-				null,
-				"srvmelosys",
-				"srvmelosys",
-				"srvmelosys",
-				new ArrayList<DokumentInfo>(),
-				new ArrayList<Arkivendring>()
-		);
+		return Journalpost.builder()
+				.id((long) 453637481)
+				.type("U")
+				.status("FS")
+				.innhold("Legg til ny institusjon")
+				.avsenderMottaker("Arena")
+				.datoMottatt(null)
+				.datoDokument(formatter.parse("2020-11-10 16:04:43.332"))
+				.datoJournal(formatter.parse("2020-11-10 16:04:43.35"))
+				.datoOpprettet(formatter.parse("2020-11-10 16:04:43.338"))
+				.datoEkspedert(null)
+				.datoSendtPrint(null)
+				.opprettetAv("srvmelosys")
+				.opprettetAvBeriketNavn("Automatisk Jobb")
+				.opprettetAvNavn("srvmelosys")
+				.endretAv("srvmelosys")
+				.endretAvBeriketNavn(null)
+				.dokumenter(new ArrayList<DokumentInfo>())
+				.arkivendringer(new ArrayList<Arkivendring>())
+				.build();
 	}
 
 	private DokumentInfo generateDokumentInfo() throws Exception {
-		return new DokumentInfo(
-				(long) 454017976,
-				"HOVEDDOKUMENT",
-				formatter.parse("2020-11-10 16:04:43.343"),
-				"srvmelosys",
-				"SED",
-				"FERDIGSTILT",
-				"Legg til ny institusjon",
-				formatter.parse("2020-11-10 16:04:43.342"),
-				"srvmelosys",
-				new ArrayList<FilDetaljer>(),
-				new ArrayList<Arkivendring>()
-		);
+		return DokumentInfo.builder()
+				.id((long) 454017976)
+				.relasjonTilknyttetSom("HOVEDDOKUMENT")
+				.relasjonDatoOpprettet(formatter.parse("2020-11-10 16:04:43.343"))
+				.relasjonOpprettetAv("srvmelosys")
+				.relasjonOpprettetAvBeriketNavn("Automatisk Jobb")
+				.kategori("SED")
+				.status("FERDIGSTILT")
+				.tittel("Legg til ny institusjon")
+				.datoOpprettet(formatter.parse("2020-11-10 16:04:43.342"))
+				.opprettetAv("srvmelosys")
+				.opprettetAvBeriketNavn("Automatisk Jobb")
+				.fildetaljer(new ArrayList<FilDetaljer>())
+				.arkivendringer(new ArrayList<Arkivendring>())
+				.build();
 	}
 
 	private FilDetaljer generateFilDetaljer() throws Exception {
-		return new FilDetaljer(
-				(long) 539876247,
-				"55c39cdb-f052-4f4e-a9a5-900b455ca915",
-				formatter.parse("2020-11-10 16:04:43.343"),
-				"srvRuting"
-		);
+		return FilDetaljer.builder()
+				.id((long) 539876247)
+				.filUuid("55c39cdb-f052-4f4e-a9a5-900b455ca915")
+				.datoOpprettet(formatter.parse("2020-11-10 16:04:43.343"))
+				.opprettetAv("srvRuting")
+				.opprettetAvBeriketNavn("Automatisk Jobb")
+				.build();
 	}
 
 	private XMLGregorianCalendar toGregorianCalendar(String date) throws Exception {
 		return DatatypeFactory.newInstance().newXMLGregorianCalendar(date);
 	}
-
 
 }

@@ -39,10 +39,8 @@ public class SaksmappeMapper {
 		mappe.setSystemID(mapSystemID(sak.getUuid()));
 		mappe.setMappeID(sak.getId().toString());
 		mappe.setOpprettetDato(dateToXMLGregorianCalendar(sak.getOpprettetTidspunkt()));
-		//TODO: sjekk at berikingen gir riktig svar
 		mappe.setOpprettetAv(mapOpprettetAv(sak.getOpprettetAv()));
 		mappe.setTittel(temaNavnDecode(sak.getTema()));
-		//TODO: FIX
 		mappe.getReferanseArkivdels().add(mapSystemID(sak.getUuid()).getValue());
 		mappe.getParts().add(mapPart(sak));
 		mappe.setSaksaar(toBigInteger(getYearFromDate(sak.getOpprettetTidspunkt().getYear())));
@@ -57,19 +55,11 @@ public class SaksmappeMapper {
 		return mappe;
 	}
 
-	private String getAdministrativEnhetFromTema(String tema){
-		return Tema.valueOf(tema).getAdminEnhet();
-	}
-
-	private String temaNavnDecode(String tema) {
-		return Tema.valueOf(tema).getTemanavn();
-	}
-
 	private Part mapPart(Sak sak) {
 		Part part = new Part();
 		part.setPartRolle("Bruker");
 		part.setPartID(determinePartID(sak));
-		part.setPartNavn(determinePartNavn(sak));
+		part.setPartNavn(sak.getBruker().getNavn());
 		return part;
 	}
 
@@ -121,9 +111,7 @@ public class SaksmappeMapper {
 	private Dokumentbeskrivelse mapDokumentBeskrivelse(DokumentInfo dokumentInfo) {
 		Dokumentbeskrivelse dokumentbeskrivelse = new Dokumentbeskrivelse();
 		dokumentbeskrivelse.setSystemID(mapSystemID(dokumentInfo.getUuid()));
-		//TODO: Denne ser riktig ut for meg.
 		dokumentbeskrivelse.setDokumenttype(dokumentInfo.getKategori());
-		//TODO: Hvordan skal denne decodes? Ser ut som de gyldige verdiene gir mening
 		dokumentbeskrivelse.setDokumentstatus(dokumentInfo.getStatus());
 		dokumentbeskrivelse.setTittel(dokumentInfo.getTittel());
 		dokumentbeskrivelse.setOpprettetDato(dateToXMLGregorianCalendar(dokumentInfo.getDatoOpprettet()));
@@ -163,14 +151,8 @@ public class SaksmappeMapper {
 		return mapEndretAv(journalpost.getEndretAv());
 	}
 
-	private String determinePartNavn(Sak sak) {
-		//TODO: fix når all data er fylt ut
-		return sak.getOpprettetAv().length() == 9 ? "hent organisasjonens navn fra Enhetsregisteret" : "Hent navn fra PDL";
-	}
-
 	private String determinePartID(Sak sak) {
-		//TODO: fix når all data er fylt ut
-		return sak.getOpprettetAv().length() == 9 ? sak.getOpprettetAv() : "hent fnr fra aktørregister";
+		return sak.getBruker().isOrganisasjon()? sak.getBruker().getNavn() : sak.getBruker().getId();
 	}
 
 
@@ -233,7 +215,6 @@ public class SaksmappeMapper {
 			GregorianCalendar cal = new GregorianCalendar();
 			cal.setTime(date);
 			return DatatypeFactory.newInstance().newXMLGregorianCalendar(cal);
-			//return DatatypeFactory.newInstance().newXMLGregorianCalendar(date.toInstant().toString());
 		} catch (DatatypeConfigurationException e) {
 			throw new AvleveringFunctionalException("Kunne ikke mappe dato til XmlGregorianCalendar.", e);
 		}
@@ -244,5 +225,15 @@ public class SaksmappeMapper {
 		systemID.setValue(value.toString());
 		return systemID;
 	}
+
+
+	private String getAdministrativEnhetFromTema(String tema){
+		return Tema.valueOf(tema).getAdminEnhet();
+	}
+
+	private String temaNavnDecode(String tema) {
+		return Tema.valueOf(tema).getTemanavn();
+	}
+
 
 }
