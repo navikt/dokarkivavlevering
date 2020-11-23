@@ -25,6 +25,8 @@ public class AvleveringProperties {
 	private String ststokenurl;
 	@NotEmpty
 	private String pdlurl;
+	@NotEmpty
+	private String eregurl;
 
 
 	@Valid
