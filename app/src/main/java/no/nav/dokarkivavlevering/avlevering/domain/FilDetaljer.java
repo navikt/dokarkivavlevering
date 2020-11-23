@@ -1,5 +1,6 @@
 package no.nav.dokarkivavlevering.avlevering.domain;
 
+import lombok.Builder;
 import lombok.ToString;
 import lombok.Value;
 
@@ -10,6 +11,7 @@ import java.util.UUID;
  * @author Joakim Bjørnstad, Jbit AS
  */
 @Value
+@Builder(toBuilder = true)
 public class FilDetaljer {
 	private final Long id;
 	private final String filUuid;
@@ -17,4 +19,6 @@ public class FilDetaljer {
 	@ToString.Exclude
 	private final String opprettetAv;
 	private final UUID uuid = UUID.randomUUID();
+	@ToString.Exclude
+	private final String opprettetAvBeriketNavn;
 }
