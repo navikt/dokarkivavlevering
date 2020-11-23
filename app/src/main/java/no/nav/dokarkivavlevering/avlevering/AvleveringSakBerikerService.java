@@ -3,6 +3,7 @@ package no.nav.dokarkivavlevering.avlevering;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import no.nav.dokarkivavlevering.avlevering.consumer.activedirectory.NavActiveDirectoryConsumer;
+import no.nav.dokarkivavlevering.avlevering.consumer.ereg.EregService;
 import no.nav.dokarkivavlevering.avlevering.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokarkivavlevering.avlevering.domain.Arkivendring;
 import no.nav.dokarkivavlevering.avlevering.domain.Bruker;
@@ -30,11 +31,14 @@ public class AvleveringSakBerikerService {
 	private static final String AUTOMATISK_JOBB = "Automatisk Jobb";
 	private final PdlGraphQLConsumer pdlGraphQLConsumer;
 	private final NavActiveDirectoryConsumer navActiveDirectoryConsumer;
+	private final EregService eregService;
 
 	public AvleveringSakBerikerService(PdlGraphQLConsumer pdlGraphQLConsumer,
-									   NavActiveDirectoryConsumer navActiveDirectoryConsumer) {
+									   NavActiveDirectoryConsumer navActiveDirectoryConsumer,
+									   EregService eregService) {
 		this.pdlGraphQLConsumer = pdlGraphQLConsumer;
 		this.navActiveDirectoryConsumer = navActiveDirectoryConsumer;
+		this.eregService = eregService;
 	}
 
 	public List<Sak> berikSaker(final List<Sak> saker, @ExchangeProperty(AvleveringRoute.PROPERTY_TEMA) final String tema) {
@@ -51,12 +55,19 @@ public class AvleveringSakBerikerService {
 							.map(s -> s.getBruker().getId())
 							.collect(Collectors.toSet());
 					final Map<String, Bruker> pdlHentIdenterBolks = pdlGraphQLConsumer.hentPersonBolk(unikeAktoerids, tema);
+					final Set<String> unikeOrgnr = saks.stream()
+							.filter(s -> s.getBruker().isOrganisasjon())
+							.map(s -> s.getBruker().getId())
+							.collect(Collectors.toSet());
+					final Map<String, Bruker> eregOrganisasjonBolk = eregService.hentOrganisasjonBrukere(unikeOrgnr);
 					return saks.stream()
 							.map(sak -> {
 								if (sak.getBruker().isPerson()) {
-									return sak.tilhoererBruker(pdlHentIdenterBolks.get(sak.getBruker().getId()));
+									return sak.tilhoererBruker(pdlHentIdenterBolks.getOrDefault(sak.getBruker().getId(),
+											Bruker.ukjentPerson(sak.getBruker().getId())));
 								} else {
-									return sak;
+									return sak.tilhoererBruker(eregOrganisasjonBolk.getOrDefault(sak.getBruker().getId(),
+											Bruker.ukjentOrganisasjon(sak.getBruker().getId())));
 								}
 							})
 							.map(sak -> navneberiketSak(sak, navAnsatteNavn))

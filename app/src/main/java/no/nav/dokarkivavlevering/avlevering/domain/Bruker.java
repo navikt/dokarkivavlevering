@@ -10,6 +10,8 @@ import static org.apache.commons.lang3.StringUtils.isNumeric;
  */
 @Value
 public class Bruker {
+	public static final String UKJENT_PERSON = "Ukjent person";
+	public static final String UKJENT_ORGANISASJON = "Ukjent organisasjon";
 	@ToString.Exclude
 	private final String id;
 	@ToString.Exclude
@@ -21,5 +23,13 @@ public class Bruker {
 
 	public boolean isOrganisasjon() {
 		return isNumeric(id) && id.length() == 9;
+	}
+
+	public static Bruker ukjentOrganisasjon(final String id) {
+		return new Bruker(id, UKJENT_ORGANISASJON);
+	}
+
+	public static Bruker ukjentPerson(final String id) {
+		return new Bruker(id, UKJENT_PERSON);
 	}
 }

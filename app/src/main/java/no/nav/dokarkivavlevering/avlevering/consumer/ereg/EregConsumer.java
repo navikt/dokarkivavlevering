@@ -1,5 +1,6 @@
 package no.nav.dokarkivavlevering.avlevering.consumer.ereg;
 
+import lombok.extern.slf4j.Slf4j;
 import net.logstash.logback.encoder.org.apache.commons.lang3.StringUtils;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.consumer.sts.StsRestConsumer;
@@ -23,6 +24,7 @@ import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static net.logstash.logback.encoder.org.apache.commons.lang3.StringUtils.trimToEmpty;
 
+@Slf4j
 @Component
 public class EregConsumer {
 	private static final String NAV_CONSUMER_TOKEN = "Nav-Consumer-Token";
@@ -49,16 +51,18 @@ public class EregConsumer {
 				final URI uri = UriComponentsBuilder.fromUriString(eregUrl).pathSegment(orgnr + "/noekkelinfo").build().toUri();
 				final String serviceuserToken = "Bearer " + stsRestConsumer.getStsToken().getAccess_token();
 
-				final RequestEntity requestEntity = RequestEntity.get(uri)
+				final RequestEntity<Void> requestEntity = RequestEntity.get(uri)
 						.accept(MediaType.APPLICATION_JSON)
 						.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
 						.header(HttpHeaders.AUTHORIZATION, serviceuserToken)
 						.header(NAV_CONSUMER_TOKEN, serviceuserToken)
 						.build();
 
+
+				log.debug("Henter organisasjonavn for orgnr={}", orgnr);
 				ResponseEntity<EregHentNoekkelInfoResponse> response =
 						requireNonNull(restTemplate.exchange(requestEntity, EregHentNoekkelInfoResponse.class));
-
+				log.debug("Ferdig hentet organisasjonavn for orgnr={}", orgnr);
 				return Optional.ofNullable(response.getBody())
 						.map(EregHentNoekkelInfoResponse::getNavn)
 						.map(this::getFullName)

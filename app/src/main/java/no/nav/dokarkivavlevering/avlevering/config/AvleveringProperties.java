@@ -7,6 +7,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -15,7 +16,7 @@ import java.time.format.DateTimeFormatter;
  * @author Joakim Bjørnstad, Jbit AS
  */
 @Data
-@Valid
+@Validated
 @ConfigurationProperties("avlevering")
 public class AvleveringProperties {
 
@@ -27,7 +28,6 @@ public class AvleveringProperties {
 	private String pdlurl;
 	@NotEmpty
 	private String eregurl;
-
 
 	@Valid
 	private final Activedirectory activedirectory = new Activedirectory();
@@ -65,9 +65,9 @@ public class AvleveringProperties {
 	@Data
 	@Validated
 	public static class Periode {
-		@NotEmpty
+		@NotNull
 		private LocalDate startdato;
-		@NotEmpty
+		@NotNull
 		private LocalDate sluttdato;
 	}
 }
