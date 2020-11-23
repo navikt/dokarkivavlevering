@@ -57,7 +57,7 @@ public class AvleveringSakBerikerService {
 					final Map<String, Bruker> pdlHentIdenterBolks = pdlGraphQLConsumer.hentPersonBolk(unikeAktoerids, tema);
 					final Set<String> unikeOrgnr = saks.stream()
 							.filter(s -> s.getBruker().isOrganisasjon())
-							.map(s-> s.getBruker().getId())
+							.map(s -> s.getBruker().getId())
 							.collect(Collectors.toSet());
 					final Map<String, Bruker> eregOrganisasjonBolk = eregService.hentOrganisasjonBrukere(unikeOrgnr);
 					return saks.stream()

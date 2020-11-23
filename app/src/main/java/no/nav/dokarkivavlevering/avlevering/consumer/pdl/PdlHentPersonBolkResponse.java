@@ -2,6 +2,7 @@ package no.nav.dokarkivavlevering.avlevering.consumer.pdl;
 
 import lombok.Data;
 import lombok.ToString;
+import no.nav.dokarkivavlevering.avlevering.domain.Bruker;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.List;
  */
 @Data
 public class PdlHentPersonBolkResponse {
+	public static final String CODE_OK = "ok";
 	private PdlHentIdenterBolkData data;
 	private List<PdlError> errors;
 
@@ -27,7 +29,7 @@ public class PdlHentPersonBolkResponse {
 		private PdlPerson person;
 
 		String getFolkeregisterIdent() {
-			if ("ok".equals(code) && !person.getFolkeregisteridentifikator().isEmpty()) {
+			if (CODE_OK.equals(code) && !person.getFolkeregisteridentifikator().isEmpty()) {
 				return person.getFolkeregisteridentifikator().get(0).getIdentifikasjonsnummer();
 			} else {
 				return ident;
@@ -35,13 +37,13 @@ public class PdlHentPersonBolkResponse {
 		}
 
 		String getFulltnavn() {
-			if ("ok".equals(code) && !person.getNavn().isEmpty()) {
+			if (CODE_OK.equals(code) && !person.getNavn().isEmpty()) {
 				PdlNavn pdlNavn = person.getNavn().get(0);
-				return pdlNavn.getFornavn() +
-						(StringUtils.isBlank(pdlNavn.getMellomnavn()) ? "" : pdlNavn.getMellomnavn()) +
+				return pdlNavn.getFornavn() + " " +
+						(StringUtils.isBlank(pdlNavn.getMellomnavn()) ? "" : pdlNavn.getMellomnavn() + " ") +
 						pdlNavn.getEtternavn();
 			} else {
-				return "Ukjent person";
+				return Bruker.UKJENT_PERSON;
 			}
 		}
 	}
