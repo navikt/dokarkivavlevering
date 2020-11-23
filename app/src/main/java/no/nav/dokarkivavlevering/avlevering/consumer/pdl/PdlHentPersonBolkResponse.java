@@ -2,6 +2,7 @@ package no.nav.dokarkivavlevering.avlevering.consumer.pdl;
 
 import lombok.Data;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -26,19 +27,21 @@ public class PdlHentPersonBolkResponse {
 		private PdlPerson person;
 
 		String getFolkeregisterIdent() {
-			if("ok".equals(code)) {
+			if ("ok".equals(code) && !person.getFolkeregisteridentifikator().isEmpty()) {
 				return person.getFolkeregisteridentifikator().get(0).getIdentifikasjonsnummer();
 			} else {
-				return "00000000000";
+				return ident;
 			}
 		}
 
 		String getFulltnavn() {
-			if(person.getNavn().isEmpty()) {
-				return "Ukjent navn";
-			} else {
+			if ("ok".equals(code) && !person.getNavn().isEmpty()) {
 				PdlNavn pdlNavn = person.getNavn().get(0);
-				return pdlNavn.getFornavn() + " " + pdlNavn.getMellomnavn() + " " + pdlNavn.getEtternavn();
+				return pdlNavn.getFornavn() +
+						(StringUtils.isBlank(pdlNavn.getMellomnavn()) ? "" : pdlNavn.getMellomnavn()) +
+						pdlNavn.getEtternavn();
+			} else {
+				return "Ukjent person";
 			}
 		}
 	}

@@ -22,4 +22,12 @@ public class Bruker {
 	public boolean isOrganisasjon() {
 		return isNumeric(id) && id.length() == 9;
 	}
+
+	public static Bruker ukjentOrganisasjon(final String id) {
+		return new Bruker(id, "Ukjent organisasjon");
+	}
+
+	public static Bruker ukjentPerson(final String id) {
+		return new Bruker(id, "Ukjent person");
+	}
 }
