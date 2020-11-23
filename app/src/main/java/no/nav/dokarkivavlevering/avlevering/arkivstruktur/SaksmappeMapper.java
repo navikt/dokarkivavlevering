@@ -7,7 +7,6 @@ import no.arkivverket.standarder.noark5.arkivstruktur.Part;
 import no.arkivverket.standarder.noark5.arkivstruktur.Registrering;
 import no.arkivverket.standarder.noark5.arkivstruktur.Saksmappe;
 import no.arkivverket.standarder.noark5.arkivstruktur.SystemID;
-import no.nav.dokarkivavlevering.avlevering.arkivstruktur.Utils.Utils;
 import no.nav.dokarkivavlevering.avlevering.config.Tema;
 import no.nav.dokarkivavlevering.avlevering.domain.DokumentInfo;
 import no.nav.dokarkivavlevering.avlevering.domain.FilDetaljer;
@@ -22,6 +21,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigInteger;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -37,23 +37,28 @@ public class SaksmappeMapper {
 	public Saksmappe map(Sak sak){
 		Saksmappe mappe = new Saksmappe();
 		mappe.setSystemID(mapSystemID(sak.getUuid()));
+		mappe.setMappeID(sak.getId().toString());
 		mappe.setOpprettetDato(dateToXMLGregorianCalendar(sak.getOpprettetTidspunkt()));
 		//TODO: sjekk at berikingen gir riktig svar
 		mappe.setOpprettetAv(mapOpprettetAv(sak.getOpprettetAv()));
 		mappe.setTittel(temaNavnDecode(sak.getTema()));
 		//TODO: FIX
-		mappe.getReferanseArkivdels().add(mapSystemID(sak.getUuid()).toString());
+		mappe.getReferanseArkivdels().add(mapSystemID(sak.getUuid()).getValue());
 		mappe.getParts().add(mapPart(sak));
-		mappe.setSaksaar(toBigInteger(sak.getOpprettetTidspunkt().getYear()));
+		mappe.setSaksaar(toBigInteger(getYearFromDate(sak.getOpprettetTidspunkt().getYear())));
 		mappe.setSakssekvensnummer(toBigInteger(sak.getId()));
 		mappe.setSaksdato(dateToXMLGregorianCalendar(sak.getOpprettetTidspunkt()));
-		mappe.setAdministrativEnhet(Utils.getAdministrativEnhetFromTema(sak.getTema()));
+		mappe.setAdministrativEnhet(getAdministrativEnhetFromTema((sak.getTema())));
 		mappe.setSaksansvarlig(getSaksAnsvarlig(sak.getJournalposter()));
 		mappe.setSaksstatus("Under behandling");
 		for (Journalpost journalpost : sak.getJournalposter()) {
 			mappe.getRegistrerings().add(mapRegistrering(journalpost));
 		}
 		return mappe;
+	}
+
+	private String getAdministrativEnhetFromTema(String tema){
+		return Tema.valueOf(tema).getAdminEnhet();
 	}
 
 	private String temaNavnDecode(String tema) {
@@ -75,7 +80,7 @@ public class SaksmappeMapper {
 		registrering.setOpprettetAv(journalpost.getOpprettetAvNavn());
 		registrering.setRegistreringsID(journalpost.getId().toString());
 		registrering.setTittel(journalpost.getInnhold());
-		registrering.setJournalaar(toBigInteger(journalpost.getDatoJournal().getYear()));
+		registrering.setJournalaar(toBigInteger(getYearFromDate(journalpost.getDatoJournal().getYear())));
 		registrering.setJournalsekvensnummer(toBigInteger(journalpost.getId()));
 		registrering.setJournalpostnummer(toBigInteger(journalpost.getId()));
 		registrering.setJournalposttype(determineJournalPostType(journalpost.getType()));
@@ -160,7 +165,7 @@ public class SaksmappeMapper {
 
 	private String determinePartNavn(Sak sak) {
 		//TODO: fix når all data er fylt ut
-		return sak.getOpprettetAv().length() == 9 ? "hent organisasjonens navn fra Enhetsregisteret" : "hent fnr fra aktørregister";
+		return sak.getOpprettetAv().length() == 9 ? "hent organisasjonens navn fra Enhetsregisteret" : "Hent navn fra PDL";
 	}
 
 	private String determinePartID(Sak sak) {
@@ -219,9 +224,16 @@ public class SaksmappeMapper {
 		return isSystembruker(opprettetAv) ? "systembruker" : opprettetAv;
 	}
 
+	private int getYearFromDate(int year){
+		return year + 1900;
+	}
+
 	private XMLGregorianCalendar dateToXMLGregorianCalendar(Date date) {
 		try {
-			return DatatypeFactory.newInstance().newXMLGregorianCalendar(date.toInstant().toString());
+			GregorianCalendar cal = new GregorianCalendar();
+			cal.setTime(date);
+			return DatatypeFactory.newInstance().newXMLGregorianCalendar(cal);
+			//return DatatypeFactory.newInstance().newXMLGregorianCalendar(date.toInstant().toString());
 		} catch (DatatypeConfigurationException e) {
 			throw new AvleveringFunctionalException("Kunne ikke mappe dato til XmlGregorianCalendar.", e);
 		}
