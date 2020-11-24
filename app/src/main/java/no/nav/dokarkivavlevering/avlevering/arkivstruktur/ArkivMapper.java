@@ -6,29 +6,21 @@ import no.arkivverket.standarder.noark5.arkivstruktur.Arkivskaper;
 import no.arkivverket.standarder.noark5.arkivstruktur.Klassifikasjonssystem;
 import no.arkivverket.standarder.noark5.arkivstruktur.Skjerming;
 import no.arkivverket.standarder.noark5.arkivstruktur.SystemID;
-import no.nav.dokarkivavlevering.avlevering.exception.AvleveringFunctionalException;
 import org.apache.camel.Handler;
 import org.springframework.stereotype.Component;
 
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigInteger;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.UUID;
+
+import static no.nav.dokarkivavlevering.avlevering.arkivstruktur.utils.Utils.DATE_FORMAT;
+import static no.nav.dokarkivavlevering.avlevering.arkivstruktur.utils.Utils.DATE_TIME_FORMAT;
+import static no.nav.dokarkivavlevering.avlevering.arkivstruktur.utils.Utils.mapXmlGregorianCalendar;
 
 /**
  * @author Joakim Bjørnstad, Jbit AS
  */
 @Component
 public class ArkivMapper {
-
-	static final SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-	static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
 	@Handler
 	public Arkiv map() {
@@ -92,16 +84,5 @@ public class ArkivMapper {
 		SystemID systemID = new SystemID();
 		systemID.setValue(value);
 		return systemID;
-	}
-
-	private XMLGregorianCalendar mapXmlGregorianCalendar(final DateFormat format, final String value) {
-		try {
-			Date date = format.parse(value);
-			GregorianCalendar cal = new GregorianCalendar();
-			cal.setTime(date);
-			return DatatypeFactory.newInstance().newXMLGregorianCalendar(cal);
-		} catch (DatatypeConfigurationException | ParseException e) {
-			throw new AvleveringFunctionalException("Kunne ikke mappe dato til XmlGregorianCalendar.", e);
-		}
 	}
 }

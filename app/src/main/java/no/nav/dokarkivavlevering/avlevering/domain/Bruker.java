@@ -10,7 +10,7 @@ import static org.apache.commons.lang3.StringUtils.isNumeric;
  */
 @Value
 public class Bruker {
-	public static final String UKJENT_PERSON = "Ukjent person";
+	public static final String UKJENT_PERSON = "Ukjent navn";
 	public static final String UKJENT_ORGANISASJON = "Ukjent organisasjon";
 	@ToString.Exclude
 	private final String id;
