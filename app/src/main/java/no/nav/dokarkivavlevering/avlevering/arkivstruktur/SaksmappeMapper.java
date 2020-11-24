@@ -12,21 +12,19 @@ import no.nav.dokarkivavlevering.avlevering.domain.DokumentInfo;
 import no.nav.dokarkivavlevering.avlevering.domain.FilDetaljer;
 import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
-import no.nav.dokarkivavlevering.avlevering.exception.AvleveringFunctionalException;
 import org.springframework.stereotype.Component;
 
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigInteger;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static no.nav.dokarkivavlevering.avlevering.arkivstruktur.utils.Utils.dateToXMLGregorianCalendar;
+import static no.nav.dokarkivavlevering.avlevering.arkivstruktur.utils.Utils.temaNavnDecode;
 
 /**
  * @author Joakim Bjørnstad, Jbit AS
@@ -119,7 +117,7 @@ public class SaksmappeMapper {
 		dokumentbeskrivelse.setTilknyttetRegistreringSom(dokumentInfo.getRelasjonTilknyttetSom());
 		dokumentbeskrivelse.setDokumentnummer(toBigInteger(dokumentInfo.getId()));
 		dokumentbeskrivelse.setTilknyttetDato(dateToXMLGregorianCalendar(dokumentInfo.getRelasjonDatoOpprettet()));
-		dokumentbeskrivelse.setTilknyttetAv(dokumentInfo.getOpprettetAv());
+		dokumentbeskrivelse.setTilknyttetAv(setSystembrukerOrBeriket(dokumentInfo.getOpprettetAv(), dokumentInfo.getOpprettetAvBeriketNavn()));
 
 		for (FilDetaljer filDetaljer : dokumentInfo.getFildetaljer()) {
 			dokumentbeskrivelse.getDokumentobjekts().add(mapDokumentobjekt(filDetaljer));
@@ -134,7 +132,7 @@ public class SaksmappeMapper {
 		dokumentobjekt.setVariantformat("Arkivformat");
 		dokumentobjekt.setFormat("PDF/A");
 		dokumentobjekt.setOpprettetDato(dateToXMLGregorianCalendar(filDetaljer.getDatoOpprettet()));
-		dokumentobjekt.setOpprettetAv(filDetaljer.getOpprettetAv());
+		dokumentobjekt.setOpprettetAv(setSystembrukerOrBeriket(filDetaljer.getOpprettetAv(), filDetaljer.getOpprettetAvBeriketNavn()));
 		//TODO: Fix filpath
 		dokumentobjekt.setReferanseDokumentfil("URN til dokumentet i avleveringspakken (filnavn = DO + T_FIL_DETALJER.FIL_DETALJER_ID");
 		//TODO: checksum
@@ -205,16 +203,6 @@ public class SaksmappeMapper {
 		return year + 1900;
 	}
 
-	private XMLGregorianCalendar dateToXMLGregorianCalendar(Date date) {
-		try {
-			GregorianCalendar cal = new GregorianCalendar();
-			cal.setTime(date);
-			return DatatypeFactory.newInstance().newXMLGregorianCalendar(cal);
-		} catch (DatatypeConfigurationException e) {
-			throw new AvleveringFunctionalException("Kunne ikke mappe dato til XmlGregorianCalendar.", e);
-		}
-	}
-
 	private SystemID mapSystemID(final UUID value) {
 		SystemID systemID = new SystemID();
 		systemID.setValue(value.toString());
@@ -223,10 +211,6 @@ public class SaksmappeMapper {
 
 	private String getAdministrativEnhetFromTema(String tema) {
 		return Tema.valueOf(tema).getAdminEnhet();
-	}
-
-	private String temaNavnDecode(String tema) {
-		return Tema.valueOf(tema).getTemanavn();
 	}
 
 
