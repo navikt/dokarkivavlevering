@@ -39,7 +39,7 @@ public class SaksmappeMapper {
 		mappe.setSystemID(mapSystemID(sak.getUuid()));
 		mappe.setMappeID(sak.getId().toString());
 		mappe.setOpprettetDato(dateToXMLGregorianCalendar(sak.getOpprettetTidspunkt()));
-		mappe.setOpprettetAv(mapOpprettetAv(sak.getOpprettetAv(), sak.getOpprettetAvBeriketNavn()));
+		mappe.setOpprettetAv(setSystembrukerOrBeriket(sak.getOpprettetAv(), sak.getOpprettetAvBeriketNavn()));
 		mappe.setTittel(temaNavnDecode(sak.getTema()));
 		mappe.getReferanseArkivdels().add("Legg inn UUID'en fra arkivdel her");
 		mappe.getParts().add(mapPart(sak));
@@ -115,7 +115,7 @@ public class SaksmappeMapper {
 		dokumentbeskrivelse.setDokumentstatus(dokumentInfo.getStatus());
 		dokumentbeskrivelse.setTittel(dokumentInfo.getTittel());
 		dokumentbeskrivelse.setOpprettetDato(dateToXMLGregorianCalendar(dokumentInfo.getDatoOpprettet()));
-		dokumentbeskrivelse.setOpprettetAv(mapOpprettetAv(dokumentInfo.getOpprettetAv(), dokumentInfo.getOpprettetAvBeriketNavn()));
+		dokumentbeskrivelse.setOpprettetAv(setSystembrukerOrBeriket(dokumentInfo.getOpprettetAv(), dokumentInfo.getOpprettetAvBeriketNavn()));
 		dokumentbeskrivelse.setTilknyttetRegistreringSom(dokumentInfo.getRelasjonTilknyttetSom());
 		dokumentbeskrivelse.setDokumentnummer(toBigInteger(dokumentInfo.getId()));
 		dokumentbeskrivelse.setTilknyttetDato(dateToXMLGregorianCalendar(dokumentInfo.getRelasjonDatoOpprettet()));
@@ -148,7 +148,7 @@ public class SaksmappeMapper {
 
 	private String getSaksAnsvarlig(List<Journalpost> journalposter) {
 		Journalpost journalpost = journalposter.stream().min(Comparator.comparing(Journalpost::getId)).orElseThrow(NoSuchElementException::new);
-		return mapEndretAv(journalpost.getEndretAv(), journalpost.getEndretAvBeriketNavn());
+		return setSystembrukerOrBeriket(journalpost.getEndretAv(), journalpost.getEndretAvBeriketNavn());
 	}
 
 	private String determinePartID(Sak sak) {
@@ -197,11 +197,7 @@ public class SaksmappeMapper {
 		return m.matches() ? false : true;
 	}
 
-	private String mapEndretAv(String endretAv, String endretAvBeriketNavn) {
-		return isSystembruker(endretAv) ? "Automatisk jobb" : endretAvBeriketNavn;
-	}
-
-	private String mapOpprettetAv(String opprettetAv, String opprettetAvBeriketNavn) {
+	private String setSystembrukerOrBeriket(String opprettetAv, String opprettetAvBeriketNavn) {
 		return isSystembruker(opprettetAv) ? "Automatisk jobb" : opprettetAvBeriketNavn;
 	}
 
