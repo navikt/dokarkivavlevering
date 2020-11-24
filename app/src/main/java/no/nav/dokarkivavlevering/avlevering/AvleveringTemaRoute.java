@@ -54,7 +54,7 @@ public class AvleveringTemaRoute extends RouteBuilder {
 				.setHeader(HEADER_AVLEVERING_TEMA_SIZE, simple("${body.size}"))
 				.log(LoggingLevel.INFO, log,
 						"Behandler ${header.AvleveringTemaSize} sakId for tema=${exchangeProperty.AvleveringTema}, " +
-								"loop=${header.CamelLoopIndex}, lastSakId=${header.AvleveringLastSakId}")
+								"lastSakId=${header.AvleveringLastSakId}, loop=${header.CamelLoopIndex}")
 				.bean(avleveringRepository, "findSaker")
 				.bean(avleveringSakBerikerService)
 				.multicast((oldExchange, newExchange) -> {
