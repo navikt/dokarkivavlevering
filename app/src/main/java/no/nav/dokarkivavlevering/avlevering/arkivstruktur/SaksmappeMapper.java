@@ -34,14 +34,14 @@ import java.util.regex.Pattern;
 @Component
 public class SaksmappeMapper {
 
-	public Saksmappe map(Sak sak){
+	public Saksmappe map(Sak sak) {
 		Saksmappe mappe = new Saksmappe();
 		mappe.setSystemID(mapSystemID(sak.getUuid()));
 		mappe.setMappeID(sak.getId().toString());
 		mappe.setOpprettetDato(dateToXMLGregorianCalendar(sak.getOpprettetTidspunkt()));
 		mappe.setOpprettetAv(mapOpprettetAv(sak.getOpprettetAv()));
 		mappe.setTittel(temaNavnDecode(sak.getTema()));
-		mappe.getReferanseArkivdels().add(mapSystemID(sak.getUuid()).getValue());
+		mappe.getReferanseArkivdels().add("Legg inn UUID'en fra arkivdel her");
 		mappe.getParts().add(mapPart(sak));
 		mappe.setSaksaar(toBigInteger(getYearFromDate(sak.getOpprettetTidspunkt().getYear())));
 		mappe.setSakssekvensnummer(toBigInteger(sak.getId()));
@@ -63,7 +63,7 @@ public class SaksmappeMapper {
 		return part;
 	}
 
-	private Registrering mapRegistrering(Journalpost journalpost){
+	private Registrering mapRegistrering(Journalpost journalpost) {
 		no.arkivverket.standarder.noark5.arkivstruktur.Journalpost registrering = new no.arkivverket.standarder.noark5.arkivstruktur.Journalpost();
 		registrering.setSystemID(mapSystemID(journalpost.getUuid()));
 		registrering.setOpprettetDato(dateToXMLGregorianCalendar(journalpost.getDatoOpprettet()));
@@ -152,9 +152,8 @@ public class SaksmappeMapper {
 	}
 
 	private String determinePartID(Sak sak) {
-		return sak.getBruker().isOrganisasjon()? sak.getBruker().getNavn() : sak.getBruker().getId();
+		return sak.getBruker().isOrganisasjon() ? sak.getBruker().getNavn() : sak.getBruker().getId();
 	}
-
 
 	private String determineJournalPostType(String journalpostType) {
 		switch (journalpostType) {
@@ -206,7 +205,7 @@ public class SaksmappeMapper {
 		return isSystembruker(opprettetAv) ? "systembruker" : opprettetAv;
 	}
 
-	private int getYearFromDate(int year){
+	private int getYearFromDate(int year) {
 		return year + 1900;
 	}
 
@@ -226,8 +225,7 @@ public class SaksmappeMapper {
 		return systemID;
 	}
 
-
-	private String getAdministrativEnhetFromTema(String tema){
+	private String getAdministrativEnhetFromTema(String tema) {
 		return Tema.valueOf(tema).getAdminEnhet();
 	}
 
