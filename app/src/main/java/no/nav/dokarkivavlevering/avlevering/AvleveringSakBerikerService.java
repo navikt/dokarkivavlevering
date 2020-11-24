@@ -2,6 +2,7 @@ package no.nav.dokarkivavlevering.avlevering;
 
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avlevering.consumer.activedirectory.NavActiveDirectoryConsumer;
 import no.nav.dokarkivavlevering.avlevering.consumer.ereg.EregService;
 import no.nav.dokarkivavlevering.avlevering.consumer.pdl.PdlGraphQLConsumer;
@@ -11,6 +12,7 @@ import no.nav.dokarkivavlevering.avlevering.domain.DokumentInfo;
 import no.nav.dokarkivavlevering.avlevering.domain.FilDetaljer;
 import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
+import org.apache.camel.Body;
 import org.apache.camel.ExchangeProperty;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,7 @@ import java.util.stream.Collectors;
 /**
  * @author Joakim Bjørnstad, Jbit AS
  */
+@Slf4j
 @Service
 public class AvleveringSakBerikerService {
 
@@ -41,8 +44,9 @@ public class AvleveringSakBerikerService {
 		this.eregService = eregService;
 	}
 
-	public List<Sak> berikSaker(final List<Sak> saker, @ExchangeProperty(AvleveringRoute.PROPERTY_TEMA) final String tema) {
+	public List<Sak> berikSaker(@Body final List<Sak> saker, @ExchangeProperty(AvleveringRoute.PROPERTY_TEMA) final String tema) {
 		// hent metadata og berik modellen
+		log.info("Beriker metadata for {} saker med tema={}", saker.size(), tema);
 		return Flowable.fromIterable(saker)
 				.buffer(100)
 				.parallel(10)

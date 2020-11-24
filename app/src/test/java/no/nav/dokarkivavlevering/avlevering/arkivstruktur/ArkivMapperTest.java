@@ -5,6 +5,7 @@ import no.arkivverket.standarder.noark5.arkivstruktur.Arkivdel;
 import no.arkivverket.standarder.noark5.arkivstruktur.Arkivskaper;
 import no.arkivverket.standarder.noark5.arkivstruktur.Klassifikasjonssystem;
 import no.arkivverket.standarder.noark5.arkivstruktur.Skjerming;
+import no.nav.dokarkivavlevering.avlevering.arkivstruktur.utils.Utils;
 import org.junit.jupiter.api.Test;
 
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -75,10 +76,10 @@ class ArkivMapperTest {
 	}
 
 	private String toDateString(final XMLGregorianCalendar xmlGregorianCalendar) {
-		return ArkivMapper.DATE_FORMAT.format(xmlGregorianCalendar.toGregorianCalendar().getTime());
+		return Utils.DATE_FORMAT.format(xmlGregorianCalendar.toGregorianCalendar().getTime());
 	}
 
 	private String toDateTimeString(final XMLGregorianCalendar xmlGregorianCalendar) {
-		return ArkivMapper.DATE_TIME_FORMAT.format(xmlGregorianCalendar.toGregorianCalendar().getTime());
+		return Utils.DATE_TIME_FORMAT.format(xmlGregorianCalendar.toGregorianCalendar().getTime());
 	}
 }

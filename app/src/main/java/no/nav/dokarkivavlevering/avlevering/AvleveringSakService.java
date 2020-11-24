@@ -3,7 +3,7 @@ package no.nav.dokarkivavlevering.avlevering;
 import no.arkivverket.standarder.noark5.arkivstruktur.Saksmappe;
 import no.nav.dokarkivavlevering.avlevering.arkivstruktur.SaksmappeMapper;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
-import org.apache.camel.ExchangeProperty;
+import org.apache.camel.Body;
 import org.apache.camel.Handler;
 import org.springframework.stereotype.Service;
 
@@ -15,18 +15,16 @@ import java.util.stream.Collectors;
  */
 @Service
 public class AvleveringSakService {
-	private final AvleveringSakBerikerService avleveringSakBerikerService;
 	private final SaksmappeMapper saksmappeMapper;
 
-	public AvleveringSakService(AvleveringSakBerikerService avleveringSakBerikerService, SaksmappeMapper saksmappeMapper) {
-		this.avleveringSakBerikerService = avleveringSakBerikerService;
+	public AvleveringSakService(SaksmappeMapper saksmappeMapper) {
 		this.saksmappeMapper = saksmappeMapper;
 	}
 
 	@Handler
-	public List<Saksmappe> avlevering(final List<Sak> saker, @ExchangeProperty(AvleveringRoute.PROPERTY_TEMA) final String tema) {
-		return avleveringSakBerikerService.berikSaker(saker, tema)
-				.stream().map(saksmappeMapper::map)
+	public List<Saksmappe> avlevering(@Body final List<Sak> saker) {
+		return saker.stream()
+				.map(saksmappeMapper::map)
 				.collect(Collectors.toList());
 	}
 }
