@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
@@ -69,5 +70,8 @@ public class AvleveringProperties {
 		private LocalDate startdato;
 		@NotNull
 		private LocalDate sluttdato;
+		@NotNull
+		@Max(1000) // max IN query i Oracle
+		private Long batchsize;
 	}
 }
