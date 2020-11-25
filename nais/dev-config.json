@@ -5,8 +5,8 @@
   "VAULT_KV_PATH": "/kv/preprod/fss/dokarkivavlevering/teamdokumenthandtering",
   "VAULT_K8S_LOGIN_PATH": "auth/kubernetes/preprod/fss/login",
   "SPRING_DATASOURCE_URL": "jdbc:oracle:thin:@a01dbfl033.adeo.no:1521/joark_q2",
-  "SECURITY_TOKEN_SERVICE_TOKEN_URL": "https://security-token-service.nais.preprod.local/rest/v1/sts/token",
-  "PDL_URL": "https://pdl-api.nais.preprod.local/graphql",
+  "SECURITY_TOKEN_SERVICE_TOKEN_URL": "https://security-token-service.dev.adeo.no/rest/v1/sts/token",
+  "PDL_URL": "https://pdl-api.dev.adeo.no/graphql",
   "SPRING_LDAP_URLS": "ldaps://ldapgw.preprod.local",
   "AD_NAVUSER_BASEDN": "ou=NAV,ou=BusinessUnits,dc=preprod,dc=local",
   "EREG_URL": "https://modapp-q1.adeo.no/ereg/api/v1/organisasjon/"
