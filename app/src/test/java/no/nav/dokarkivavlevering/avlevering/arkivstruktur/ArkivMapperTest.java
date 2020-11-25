@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigInteger;
 
+import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.DATE_FORMAT;
+import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.DATE_TIME_FORMAT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -75,10 +77,10 @@ class ArkivMapperTest {
 	}
 
 	private String toDateString(final XMLGregorianCalendar xmlGregorianCalendar) {
-		return ArkivMapper.DATE_FORMAT.format(xmlGregorianCalendar.toGregorianCalendar().getTime());
+		return DATE_FORMAT.format(xmlGregorianCalendar.toGregorianCalendar().getTime());
 	}
 
 	private String toDateTimeString(final XMLGregorianCalendar xmlGregorianCalendar) {
-		return ArkivMapper.DATE_TIME_FORMAT.format(xmlGregorianCalendar.toGregorianCalendar().getTime());
+		return DATE_TIME_FORMAT.format(xmlGregorianCalendar.toGregorianCalendar().getTime());
 	}
 }

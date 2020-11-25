@@ -14,7 +14,6 @@ import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import org.springframework.stereotype.Component;
 
-import java.math.BigInteger;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -23,8 +22,9 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static no.nav.dokarkivavlevering.avlevering.arkivstruktur.utils.Utils.dateToXMLGregorianCalendar;
-import static no.nav.dokarkivavlevering.avlevering.arkivstruktur.utils.Utils.temaNavnDecode;
+import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.dateToXMLGregorianCalendar;
+import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.temaNavnDecode;
+import static org.apache.camel.converter.ObjectConverter.toBigInteger;
 
 /**
  * @author Joakim Bjørnstad, Jbit AS
@@ -175,14 +175,6 @@ public class SaksmappeMapper {
 			default:
 				return journalpost.getDatoJournal();
 		}
-	}
-
-	private BigInteger toBigInteger(int smallInteger) {
-		return new BigInteger(String.valueOf(smallInteger));
-	}
-
-	private BigInteger toBigInteger(long smallLong) {
-		return new BigInteger(String.valueOf(smallLong));
 	}
 
 	private String mapKorrespondanseParttype(String journalpost_t) {

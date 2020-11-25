@@ -1,4 +1,4 @@
-package no.nav.dokarkivavlevering.avlevering.arkivstruktur.utils;
+package no.nav.dokarkivavlevering.avlevering.utils;
 
 import no.nav.dokarkivavlevering.avlevering.config.Tema;
 import no.nav.dokarkivavlevering.avlevering.exception.AvleveringFunctionalException;
@@ -12,7 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-public class Utils {
+public class AvleveringUtils {
 
 	public static final SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
@@ -37,7 +37,6 @@ public class Utils {
 			throw new AvleveringFunctionalException("Kunne ikke mappe dato til XmlGregorianCalendar.", e);
 		}
 	}
-
 
 	public static String temaNavnDecode(String tema) {
 		return Tema.valueOf(tema).getTemanavn();

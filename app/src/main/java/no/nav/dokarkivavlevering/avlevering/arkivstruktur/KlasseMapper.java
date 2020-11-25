@@ -2,16 +2,13 @@ package no.nav.dokarkivavlevering.avlevering.arkivstruktur;
 
 import no.arkivverket.standarder.noark5.arkivstruktur.Klasse;
 import no.arkivverket.standarder.noark5.arkivstruktur.SystemID;
-import no.nav.dokarkivavlevering.avlevering.arkivstruktur.utils.Utils;
 import org.springframework.stereotype.Component;
 
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
 import java.util.UUID;
 
-import static no.nav.dokarkivavlevering.avlevering.arkivstruktur.utils.Utils.DATE_TIME_FORMAT;
-import static no.nav.dokarkivavlevering.avlevering.arkivstruktur.utils.Utils.mapXmlGregorianCalendar;
-import static no.nav.dokarkivavlevering.avlevering.arkivstruktur.utils.Utils.temaNavnDecode;
+import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.DATE_TIME_FORMAT;
+import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.mapXmlGregorianCalendar;
+import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.temaNavnDecode;
 
 @Component
 public class KlasseMapper {
