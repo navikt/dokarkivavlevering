@@ -19,7 +19,7 @@ import static org.apache.camel.converter.ObjectConverter.toBigInteger;
 public class JournalRegistreringMapper {
 
 
-	private Journalregistrering mapJournalRegistrering(Sak sak, Journalpost fraJournalpost) {
+	public Journalregistrering map(Sak sak, Journalpost fraJournalpost) {
 		Journalregistrering registrering = new Journalregistrering();
 		registrering.setJournalpost(mapJournalPost(fraJournalpost));
 		registrering.setKlasse(mapKlasse(sak.getTema()));
