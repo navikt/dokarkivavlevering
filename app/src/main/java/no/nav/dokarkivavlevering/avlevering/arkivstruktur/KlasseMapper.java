@@ -22,9 +22,6 @@ public class KlasseMapper {
 		klasse.setBeskrivelse("Klassene representerer de av NAVs fagområder som registreres i fagsystemet Gosys");
 		klasse.setOpprettetDato(mapXmlGregorianCalendar(DATE_TIME_FORMAT, "2010-02-18T12:00:00"));
 		klasse.setOpprettetAv("Arbeids- og velferdsetaten");
-		//TODO: Finne ut hvordan disse to skal sys sammen (klasse og saksmappene)
-		klasse.getMappes().add(null);
-
 		return klasse;
 	}
 
