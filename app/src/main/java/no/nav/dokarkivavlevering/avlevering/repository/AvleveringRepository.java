@@ -42,24 +42,6 @@ public class AvleveringRepository {
 		this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
 	}
 
-	public List<Long> findSakIdForTema(@Body final String tema) {
-		final HashMap<String, Object> paramMap = new HashMap<>();
-		paramMap.put("tema", tema);
-		paramMap.put("startdato", Timestamp.valueOf(avleveringProperties.getPeriode().getStartdato().atStartOfDay()));
-		paramMap.put("sluttdato", Timestamp.valueOf(avleveringProperties.getPeriode().getSluttdato().atStartOfDay()));
-		return namedParameterJdbcTemplate.queryForList("select distinct sa.id " +
-						"from t_journalpost j " +
-						"join t_saksrelasjon s on j.journalpost_id = s.journalpost_id " +
-						"join sak sa on sa.id = to_number(regexp_replace(s.sak_nr_fk,'[^0-9]','')) " +
-						"where sa.tema = :tema " +
-						"and (s.feilregistrert is null or s.feilregistrert = 0) " +
-						"and j.k_journal_s in('J','FS','FL','E') " +
-						"and trunc(j.dato_opprettet) >= :startdato " +
-						"and trunc(j.dato_opprettet) <= :sluttdato " +
-						"order by sa.id",
-				paramMap, Long.class);
-	}
-
 	// Keyset pagination
 	public List<Long> findSakIdsPagination(@Body final String tema, @Header(AvleveringTemaRoute.HEADER_LAST_SAK_ID) final Long lastSakId) {
 		final HashMap<String, Object> paramMap = new HashMap<>();
