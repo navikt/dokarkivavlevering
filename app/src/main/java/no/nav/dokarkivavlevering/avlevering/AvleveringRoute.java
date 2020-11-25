@@ -53,6 +53,7 @@ public class AvleveringRoute extends RouteBuilder {
 				.to(AvleveringStatiskRoute.AVLEVERING_STATIC)
 				.to("direct:generer_arkivstruktur")
 				.to(AvleveringLoependeJournalRoute.GENERER_LOEPENDEJOURNAL)
+				.to("direct:generer_endringslogg")
 				.log(LoggingLevel.INFO, log, "Dokarkivavlevering er ferdig med avlevering.")
 				.to("direct:shutdown");
 

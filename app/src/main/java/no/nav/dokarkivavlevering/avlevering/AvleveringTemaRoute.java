@@ -94,17 +94,6 @@ public class AvleveringTemaRoute extends RouteBuilder {
 				.end(); // end multicast
 
 		// Denne skilles ut i en egen Route klasse. Impementasjon må være trådsikker pga dette kjører i en egen tråd.
-		from("direct:endringslogg")
-				.routeId("endringslogg")
-				.log(LoggingLevel.INFO, log, "Behandler endringslogg.xml for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelLoopIndex}")
-				.process(exchange -> {
-					// Her skal body inneholde en List<Sak> som er ferdig beriket.
-					final List<Sak> berikedeSaker = exchange.getIn().getBody(List.class);
-					log.info("{} berikede saker for endringslogg.xml", berikedeSaker.size());
-				})
-				.log(LoggingLevel.INFO, log, "Behandlet ferdig endringslogg.xml for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelLoopIndex}");
-		
-		// Denne skilles ut i en egen Route klasse. Impementasjon må være trådsikker pga dette kjører i en egen tråd.
 		from("direct:offentligJournal")
 				.routeId("offentligJournal")
 				.log(LoggingLevel.INFO, log, "Behandler offentligJournal.xml for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelLoopIndex}")
