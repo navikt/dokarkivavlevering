@@ -2,6 +2,7 @@ package no.nav.dokarkivavlevering.avlevering.repository;
 
 import no.nav.dokarkivavlevering.avlevering.AvleveringTemaRoute;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
+import no.nav.dokarkivavlevering.avlevering.config.Tema;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import org.apache.camel.Body;
 import org.apache.camel.Header;
@@ -43,11 +44,11 @@ public class AvleveringRepository {
 	}
 
 	// Keyset pagination
-	public List<Long> findSakIdsPagination(@Body final String tema, @Header(AvleveringTemaRoute.HEADER_LAST_SAK_ID) final Long lastSakId) {
+	public List<Long> findSakIdsPagination(@Body final Tema tema, @Header(AvleveringTemaRoute.HEADER_LAST_SAK_ID) final Long lastSakId) {
 		final HashMap<String, Object> paramMap = new HashMap<>();
-		paramMap.put("batchsize", avleveringProperties.getPeriode().getBatchsize());
+		paramMap.put("batchsize", avleveringProperties.getBatchsize());
 		paramMap.put("lastSakId", lastSakId);
-		paramMap.put("tema", tema);
+		paramMap.put("tema", tema.getTemakode());
 		paramMap.put("startdato", Timestamp.valueOf(avleveringProperties.getPeriode().getStartdato().atStartOfDay()));
 		paramMap.put("sluttdato", Timestamp.valueOf(avleveringProperties.getPeriode().getSluttdato().atStartOfDay()));
 		return namedParameterJdbcTemplate.queryForList("select distinct sa.id\n" +

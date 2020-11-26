@@ -12,6 +12,7 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Set;
 
 /**
  * @author Joakim Bjørnstad, Jbit AS
@@ -22,6 +23,11 @@ import java.time.format.DateTimeFormatter;
 public class AvleveringProperties {
 
 	private final String avleveringId = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm"));
+	@NotEmpty
+	private Set<Tema> tema;
+	@NotNull
+	@Max(1000) // max IN query i Oracle
+	private Long batchsize;
 
 	@NotEmpty
 	private String ststokenurl;
@@ -70,8 +76,5 @@ public class AvleveringProperties {
 		private LocalDate startdato;
 		@NotNull
 		private LocalDate sluttdato;
-		@NotNull
-		@Max(1000) // max IN query i Oracle
-		private Long batchsize;
 	}
 }
