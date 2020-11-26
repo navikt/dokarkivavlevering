@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet
 		xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-		xmlns:ark="http://www.arkivverket.no/standarder/noark5/arkivstruktur"
+		xmlns:ark="http://www.arkivverket.no/standarder/noark5/loependeJournal"
 		version="2.0">
 	<xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes"/>
-	<xsl:param name="journalregistrering_xml"/>
+	<xsl:param name="loependejournal_xml"/>
 
-	<xsl:variable name="journalregistrering" select="collection($journalregistrering_xml)/ark:loependeJournal/ark:journalregistrering"/>
+	<xsl:variable name="journalregistrering" select="collection($loependejournal_xml)/ark:loependeJournal/ark:journalregistrering"/>
 
 	<xsl:template match="node()|@*" name="identity">
 		<xsl:copy>

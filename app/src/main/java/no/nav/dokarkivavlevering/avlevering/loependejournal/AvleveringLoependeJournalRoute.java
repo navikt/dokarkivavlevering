@@ -86,9 +86,9 @@ public class AvleveringLoependeJournalRoute extends RouteBuilder {
 					InputStream inputStream = FileUtils.openInputStream(Paths.get(exchange.getIn().getHeader(Exchange.FILE_NAME_PRODUCED, String.class)).toFile());
 					exchange.getIn().setBody(inputStream);
 				})
-				.setHeader(HEADER_XSL_PARAM_LOEPENDEJOURNAL_XML, simple("file:///{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/?select=journalregistrering_*"))
+				.setHeader(HEADER_XSL_PARAM_LOEPENDEJOURNAL_XML, simple("file:///{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/?select=journalregistrering_*.xml"))
 				.setHeader(Exchange.XSLT_FILE_NAME, simple("{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/loependejournal.xml"))
-				.to("xslt:classpath:loependejournal/embed_registrering_into_loependejournal2.xsl?output=file")
+				.to("xslt:classpath:loependejournal/embed_registrering_into_loependejournal.xsl?output=file")
 				.log(LoggingLevel.INFO, log, "Genererte loependeJournal til ${header.CamelXsltFileName}");
 
 
