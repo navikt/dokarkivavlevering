@@ -10,19 +10,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class RegistreringService {
+public class JournalregistreringService {
 
 	private final JournalRegistreringMapper journalRegistreringMapper;
 
-	public RegistreringService(JournalRegistreringMapper journalRegistreringMapper) {
+	public JournalregistreringService(JournalRegistreringMapper journalRegistreringMapper) {
 
 		this.journalRegistreringMapper = journalRegistreringMapper;
 	}
 
 	@Handler
 	public List<Journalregistrering> avlevering(@Body final List<Sak> saker) {
-		return saker.stream().flatMap(sak -> sak.getJournalposter().stream().map(journalpost ->
-				journalRegistreringMapper.map(sak, journalpost)))
-				.collect(Collectors.toList());
+		return saker.stream().flatMap(sak ->
+				sak.getJournalposter().stream().map(journalpost ->
+						journalRegistreringMapper.map(sak, journalpost))).collect(Collectors.toList());
 	}
 }

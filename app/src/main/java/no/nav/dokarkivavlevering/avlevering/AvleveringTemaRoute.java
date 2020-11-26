@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avlevering.arkivstruktur.AvleveringArkivstrukturRoute;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
+import no.nav.dokarkivavlevering.avlevering.loependejournal.AvleveringLoependeJournalRoute;
 import no.nav.dokarkivavlevering.avlevering.repository.AvleveringRepository;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
@@ -66,7 +67,7 @@ public class AvleveringTemaRoute extends RouteBuilder {
 					return oldExchange;
 				})
 				.parallelProcessing()
-				.to(AvleveringArkivstrukturRoute.ARKIVSTRUKTUR, "direct:endringslogg", "direct:loependeJournal", "direct:offentligJournal")
+				.to(AvleveringArkivstrukturRoute.ARKIVSTRUKTUR, "direct:endringslogg", AvleveringLoependeJournalRoute.LOEPENDEJOURNAL, "direct:offentligJournal")
 				.end() // end multicast
 				.end() // end loop
 				.to(AvleveringArkivstrukturRoute.GENERER_KLASSE)
@@ -84,7 +85,7 @@ public class AvleveringTemaRoute extends RouteBuilder {
 				.log(LoggingLevel.INFO, log, "Behandlet ferdig endringslogg.xml for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelLoopIndex}");
 
 		// Denne skilles ut i en egen Route klasse. Impementasjon må være trådsikker pga dette kjører i en egen tråd.
-		from("direct:loependeJournal")
+		/*from("direct:loependeJournal")
 				.routeId("loependeJournal")
 				.log(LoggingLevel.INFO, log, "Behandler loependeJournal.xml for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelLoopIndex}")
 				.process(exchange -> {
@@ -92,7 +93,7 @@ public class AvleveringTemaRoute extends RouteBuilder {
 					final List<Sak> berikedeSaker = exchange.getIn().getBody(List.class);
 					log.info("{} berikede saker for loependeJournal.xml", berikedeSaker.size());
 				})
-				.log(LoggingLevel.INFO, log, "Behandlet ferdig loependeJournal.xml for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelLoopIndex}");
+				.log(LoggingLevel.INFO, log, "Behandlet ferdig loependeJournal.xml for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelLoopIndex}");*/
 
 		// Denne skilles ut i en egen Route klasse. Impementasjon må være trådsikker pga dette kjører i en egen tråd.
 		from("direct:offentligJournal")

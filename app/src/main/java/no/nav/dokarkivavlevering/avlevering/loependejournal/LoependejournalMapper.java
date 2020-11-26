@@ -3,28 +3,20 @@ package no.nav.dokarkivavlevering.avlevering.loependejournal;
 import no.arkivverket.standarder.noark5.loependejournal.Arkivskaper;
 import no.arkivverket.standarder.noark5.loependejournal.Journalhode;
 import no.arkivverket.standarder.noark5.loependejournal.LoependeJournal;
-import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import org.springframework.stereotype.Component;
 
 import static org.apache.camel.converter.ObjectConverter.toBigInteger;
 
 @Component
 public class LoependejournalMapper {
-	public LoependeJournal map(Sak sak) {
+	public LoependeJournal map() {
 		LoependeJournal journal = new LoependeJournal();
-		journal.setJournalhode(mapJournalHode(sak));
+		journal.setJournalhode(mapJournalHode());
 		journal.getJournalregistrerings();
-
-		/*sak.getJournalposter().stream().forEach(
-				journalpost -> journal.getJournalregistrerings().add(
-						mapJournalRegistrering(sak, journalpost)
-				)
-		);*/
-
 		return journal;
 	}
 
-	private Journalhode mapJournalHode(Sak sak) {
+	private Journalhode mapJournalHode() {
 		Journalhode journalHode = new Journalhode();
 		//TODO: input.periodeStart
 		//journalHode.setJournalStartDato(dateToXMLGregorianCalendar());
