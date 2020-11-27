@@ -34,22 +34,6 @@ public class AvleveringLoependeJournalRoute extends RouteBuilder {
 		return jaxbDataFormat;
 	}
 
-	private JaxbDataFormat loependeJournalJaxb() {
-		JaxbDataFormat jaxbDataFormat = new JaxbDataFormat(ObjectFactory.class.getPackage().getName());
-		jaxbDataFormat.setEncoding(StandardCharsets.UTF_8.toString());
-		jaxbDataFormat.setFragment(true);
-		jaxbDataFormat.setPartClass(LoependeJournal.class);
-		return jaxbDataFormat;
-	}
-
-	private JaxbDataFormat journalregistreringJaxb() {
-		JaxbDataFormat jaxbDataFormat = new JaxbDataFormat(ObjectFactory.class.getPackage().getName());
-		jaxbDataFormat.setEncoding(StandardCharsets.UTF_8.toString());
-		jaxbDataFormat.setFragment(true);
-		jaxbDataFormat.setPartClass(Journalregistrering.class);
-		return jaxbDataFormat;
-	}
-
 	private JournalregistreringService journalregistreringService;
 	private LoependejournalMapper loependejournalMapper;
 

@@ -9,6 +9,9 @@ import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import org.springframework.stereotype.Component;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 import java.util.UUID;
 
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.dateToXMLGregorianCalendar;
@@ -46,7 +49,7 @@ public class JournalRegistreringMapper {
 	private no.arkivverket.standarder.noark5.loependejournal.Journalpost mapJournalPost(Journalpost fraJournalpost) {
 		no.arkivverket.standarder.noark5.loependejournal.Journalpost tilJournalpost = new no.arkivverket.standarder.noark5.loependejournal.Journalpost();
 		tilJournalpost.setSystemID(mapSystemID(fraJournalpost.getUuid()));
-		tilJournalpost.setJournalaar(toBigInteger(mapDateYear(fraJournalpost.getDatoOpprettet().getYear())));
+		tilJournalpost.setJournalaar(toBigInteger(getYear(fraJournalpost.getDatoOpprettet())));
 		tilJournalpost.setJournalsekvensnummer(toBigInteger(fraJournalpost.getId()));
 		tilJournalpost.setJournalpostnummer(toBigInteger(fraJournalpost.getId()));
 		tilJournalpost.setTittel(fraJournalpost.getInnhold());
@@ -57,6 +60,12 @@ public class JournalRegistreringMapper {
 			tilJournalpost.setDokumentetsDato(dateToXMLGregorianCalendar(fraJournalpost.getDatoDokument()));
 		}
 		return tilJournalpost;
+	}
+
+	private int getYear(Date date){
+		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Oslo"));
+		cal.setTime(date);
+		return cal.get(Calendar.YEAR);
 	}
 
 	private Korrespondansepart mapKorrespondansepart(Journalpost journalpost) {

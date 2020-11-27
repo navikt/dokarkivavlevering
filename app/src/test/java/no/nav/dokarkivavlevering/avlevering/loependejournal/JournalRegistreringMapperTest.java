@@ -1,0 +1,108 @@
+package no.nav.dokarkivavlevering.avlevering.loependejournal;
+
+import no.arkivverket.standarder.noark5.loependejournal.Journalregistrering;
+import no.arkivverket.standarder.noark5.loependejournal.Klasse;
+import no.arkivverket.standarder.noark5.loependejournal.Korrespondansepart;
+import no.arkivverket.standarder.noark5.loependejournal.Saksmappe;
+import no.nav.dokarkivavlevering.avlevering.domain.Arkivendring;
+import no.nav.dokarkivavlevering.avlevering.domain.DokumentInfo;
+import no.nav.dokarkivavlevering.avlevering.domain.FilDetaljer;
+import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
+import no.nav.dokarkivavlevering.avlevering.domain.Sak;
+import org.junit.jupiter.api.Test;
+
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import static org.apache.camel.converter.ObjectConverter.toBigInteger;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class JournalRegistreringMapperTest {
+	private SimpleDateFormat formatter = new SimpleDateFormat("yyy-MM-dd hh:mm:ss");
+	private JournalRegistreringMapper mapper = new JournalRegistreringMapper();
+
+	@Test
+	void testMapping() throws Exception {
+		final Journalregistrering registrering = mapper.map(generateSak(), generateSak().getJournalposter().get(0));
+
+		Klasse k = registrering.getKlasse();
+		assertEquals(k.getKlasseID(), "MED");
+		assertEquals(k.getTittel(), "Medlemskap");
+
+		Saksmappe mappe = registrering.getSaksmappe();
+		assertEquals(mappe.getSaksaar(), null);
+		assertEquals(mappe.getSakssekvensnummer(), toBigInteger((1234567011)));
+		assertEquals(mappe.getTittel(), "Medlemskap");
+		assertEquals(mappe.getOffentligTittel(), null);
+
+		no.arkivverket.standarder.noark5.loependejournal.Journalpost jp = registrering.getJournalpost();
+		assertEquals(jp.getSystemID().getValue().isEmpty(), false);
+		assertEquals(jp.getJournalaar(), toBigInteger(2020));
+		assertEquals(jp.getTittel(), "Legg til ny institusjon");
+		assertEquals(jp.getJournaldato(), toGregorianCalendar("2020-11-10T15:04:43Z"));
+		assertEquals(jp.getDokumentetsDato(), toGregorianCalendar("2020-11-10T15:04:43Z"));
+
+		Korrespondansepart part = jp.getKorrespondanseparts().get(0);
+		assertEquals(part.getKorrespondansepartNavn(), "Arena");
+		assertEquals(part.getKorrespondanseparttype(), "Mottaker");
+
+	}
+
+	private XMLGregorianCalendar toGregorianCalendar(String date) throws Exception {
+		return DatatypeFactory.newInstance().newXMLGregorianCalendar(date);
+	}
+
+	private Sak generateSak() throws Exception {
+		return Sak.builder()
+				.id((long) 1234567011)
+				.tema("MED")
+				.opprettetAv("srvmelosys")
+				.opprettetTidspunkt(formatter.parse("2019-10-28 11:41:36.673"))
+				.journalposter(Arrays.asList(generateJournalPost())).build();
+	}
+
+	private Journalpost generateJournalPost() throws Exception {
+		return Journalpost.builder()
+				.id((long) 453637481)
+				.type("U")
+				.status("FS")
+				.innhold("Legg til ny institusjon")
+				.avsenderMottaker("Arena")
+				.datoMottatt(null)
+				.datoDokument(formatter.parse("2020-11-10 16:04:43.332"))
+				.datoJournal(formatter.parse("2020-11-10 16:04:43.35"))
+				.datoOpprettet(formatter.parse("2020-11-10 16:04:43.338"))
+				.datoEkspedert(null)
+				.datoSendtPrint(null)
+				.opprettetAv("srvmelosys")
+				.opprettetAvBeriketNavn("Automatisk Jobb")
+				.opprettetAvNavn("srvmelosys")
+				.endretAv("srvmelosys")
+				.endretAvBeriketNavn(null)
+				.dokumenter(Arrays.asList(generateDokumentInfo()))
+				.arkivendringer(new ArrayList<Arkivendring>())
+				.build();
+	}
+
+	private DokumentInfo generateDokumentInfo() throws Exception {
+		return DokumentInfo.builder()
+				.id((long) 454017976)
+				.relasjonTilknyttetSom("HOVEDDOKUMENT")
+				.relasjonDatoOpprettet(formatter.parse("2020-11-10 16:04:43.343"))
+				.relasjonOpprettetAv("srvmelosys")
+				.relasjonOpprettetAvBeriketNavn("Automatisk Jobb")
+				.kategori("SED")
+				.status("FERDIGSTILT")
+				.tittel("Legg til ny institusjon")
+				.datoOpprettet(formatter.parse("2020-11-10 16:04:43.342"))
+				.opprettetAv("srvmelosys")
+				.opprettetAvBeriketNavn("Automatisk Jobb")
+				.fildetaljer(new ArrayList<FilDetaljer>())
+				.arkivendringer(new ArrayList<Arkivendring>())
+				.build();
+	}
+
+}
