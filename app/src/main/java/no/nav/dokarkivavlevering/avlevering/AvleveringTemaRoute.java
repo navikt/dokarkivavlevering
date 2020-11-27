@@ -3,6 +3,7 @@ package no.nav.dokarkivavlevering.avlevering;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avlevering.arkivstruktur.AvleveringArkivstrukturRoute;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
+import no.nav.dokarkivavlevering.avlevering.dokument.DokumentRoute;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import no.nav.dokarkivavlevering.avlevering.loependejournal.AvleveringLoependeJournalRoute;
 import no.nav.dokarkivavlevering.avlevering.repository.AvleveringRepository;
@@ -90,7 +91,7 @@ public class AvleveringTemaRoute extends RouteBuilder {
 					return oldExchange;
 				})
 				.parallelProcessing()
-				.to(AvleveringArkivstrukturRoute.ARKIVSTRUKTUR, "direct:endringslogg", AvleveringLoependeJournalRoute.LOEPENDEJOURNAL, "direct:offentligJournal")
+				.to(AvleveringArkivstrukturRoute.ARKIVSTRUKTUR, "direct:endringslogg", AvleveringLoependeJournalRoute.LOEPENDEJOURNAL, "direct:offentligJournal", DokumentRoute.SEND_DOKUMENT)
 				.end(); // end multicast
 
 		// Denne skilles ut i en egen Route klasse. Impementasjon må være trådsikker pga dette kjører i en egen tråd.

@@ -5,6 +5,7 @@ import no.arkivverket.standarder.noark5.arkivstruktur.Arkivdel;
 import no.arkivverket.standarder.noark5.arkivstruktur.Arkivskaper;
 import no.arkivverket.standarder.noark5.arkivstruktur.Klassifikasjonssystem;
 import no.arkivverket.standarder.noark5.arkivstruktur.Skjerming;
+import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import org.junit.jupiter.api.Test;
 
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -19,12 +20,12 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class ArkivMapperTest {
 
-	private final ArkivMapper arkivMapper = new ArkivMapper();
+	private final ArkivMapper arkivMapper = new ArkivMapper(new AvleveringProperties());
 
 	@Test
 	void shouldMap() {
 		final Arkiv arkiv = arkivMapper.map();
-		assertThat(arkiv.getSystemID()).isNotNull();
+		assertThat(arkiv.getSystemID().getValue()).isNotEmpty();
 		assertThat(arkiv.getTittel()).isEqualTo("NAV Fagarkiv");
 		assertThat(arkiv.getBeskrivelse()).isEqualTo("Fagarkivet dokumenterer behandlingen av enkeltsaker knyttet til en bruker – person eller organisasjon – som etter lov om arbeids- og velferdsforvaltningen har satt fram søknad om ytelser, tiltak og oppfølging for Arbeids- og velferdsetaten");
 		assertThat(arkiv.getDokumentmedium()).isEqualTo("Elektronisk arkiv");
@@ -45,7 +46,7 @@ class ArkivMapperTest {
 	private void assertArkivdel(Arkiv arkiv) {
 		assertThat(arkiv.getArkivdels()).hasSize(1);
 		final Arkivdel arkivdel = arkiv.getArkivdels().get(0);
-		assertThat(arkivdel.getSystemID()).isNotNull();
+		assertThat(arkivdel.getSystemID().getValue()).isNotEmpty();
 		assertThat(arkivdel.getTittel()).isEqualTo("Fellessystem for samhandling - fagsystemet Gosys");
 		assertThat(arkivdel.getBeskrivelse()).isEqualTo("Arkivdel for saksbehandling av de fagområdene som bare behandles i et felles fagsystem uten spesifikk saksbehandlingsstøtte - Gosys");
 		assertThat(arkivdel.getArkivdelstatus()).isEqualTo("Aktiv periode");

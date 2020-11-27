@@ -6,6 +6,7 @@ import no.arkivverket.standarder.noark5.arkivstruktur.Arkivskaper;
 import no.arkivverket.standarder.noark5.arkivstruktur.Klassifikasjonssystem;
 import no.arkivverket.standarder.noark5.arkivstruktur.Skjerming;
 import no.arkivverket.standarder.noark5.arkivstruktur.SystemID;
+import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import org.apache.camel.Handler;
 import org.springframework.stereotype.Component;
 
@@ -23,10 +24,16 @@ import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.mapXmlG
 @Component
 public class ArkivMapper {
 
+	private final AvleveringProperties.ArkivConfig arkivConfig;
+
+	public ArkivMapper(AvleveringProperties avleveringProperties) {
+		this.arkivConfig = avleveringProperties.getArkivConfig();
+	}
+
 	@Handler
 	public Arkiv map() {
 		Arkiv arkiv = new Arkiv();
-		arkiv.setSystemID(mapSystemID(UUID.randomUUID().toString()));
+		arkiv.setSystemID(mapSystemID(arkivConfig.getSystemID()));
 		arkiv.setTittel("NAV Fagarkiv");
 		arkiv.setBeskrivelse("Fagarkivet dokumenterer behandlingen av enkeltsaker knyttet til en bruker – person eller organisasjon – som etter lov om arbeids- og velferdsforvaltningen har satt fram søknad om ytelser, tiltak og oppfølging for Arbeids- og velferdsetaten");
 		arkiv.setDokumentmedium("Elektronisk arkiv");
@@ -46,7 +53,7 @@ public class ArkivMapper {
 
 	private Arkivdel mapArkivdel() {
 		Arkivdel arkivdel = new Arkivdel();
-		arkivdel.setSystemID(mapSystemID(UUID.randomUUID().toString()));
+		arkivdel.setSystemID(mapSystemID(arkivConfig.getArkivdelConfig().getSystemID()));
 		arkivdel.setTittel("Fellessystem for samhandling - fagsystemet Gosys");
 		arkivdel.setBeskrivelse("Arkivdel for saksbehandling av de fagområdene som bare behandles i et felles fagsystem uten spesifikk saksbehandlingsstøtte - Gosys");
 		arkivdel.setArkivdelstatus("Aktiv periode");
