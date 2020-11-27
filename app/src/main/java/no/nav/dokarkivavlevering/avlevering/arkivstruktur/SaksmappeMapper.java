@@ -193,10 +193,6 @@ public class SaksmappeMapper {
 		return isSystembruker(opprettetAv) ? "Automatisk jobb" : opprettetAvBeriketNavn;
 	}
 
-	private int getYearFromDate(int year) {
-		return year + 1900;
-	}
-
 	private int getYear(Date date){
 		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Oslo"));
 		cal.setTime(date);
