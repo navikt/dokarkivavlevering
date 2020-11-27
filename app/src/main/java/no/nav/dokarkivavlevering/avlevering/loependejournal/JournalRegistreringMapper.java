@@ -82,10 +82,6 @@ public class JournalRegistreringMapper {
 		return systemID;
 	}
 
-	private int  mapDateYear(int year){
-		return year +190;
-	}
-
 	private String mapKorrespondansepartNavn(no.nav.dokarkivavlevering.avlevering.domain.Journalpost journalpost){
 		return isNav(journalpost.getType()) ? journalpost.getAvsenderMottaker() : "NAV";
 	}
