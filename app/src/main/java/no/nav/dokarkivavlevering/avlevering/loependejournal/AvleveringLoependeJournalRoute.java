@@ -3,6 +3,7 @@ package no.nav.dokarkivavlevering.avlevering.loependejournal;
 import no.arkivverket.standarder.noark5.arkivstruktur.ObjectFactory;
 import no.arkivverket.standarder.noark5.loependejournal.Journalregistrering;
 import no.arkivverket.standarder.noark5.loependejournal.LoependeJournal;
+import no.nav.dokarkivavlevering.avlevering.sftp.AvleveringSFTPRoute;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
@@ -73,6 +74,8 @@ public class AvleveringLoependeJournalRoute extends RouteBuilder {
 				.setHeader(HEADER_XSL_PARAM_LOEPENDEJOURNAL_XML, simple("file:///{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/?select=journalregistrering_*.xml"))
 				.setHeader(Exchange.XSLT_FILE_NAME, simple("{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/loependejournal.xml"))
 				.to("xslt:classpath:loependejournal/embed_registrering_into_loependejournal.xsl?output=file")
+				.setHeader(AvleveringSFTPRoute.HEADER_FILNAVN, simple("loependejournal.xml"))
+				.to(AvleveringSFTPRoute.SFTP)
 				.log(LoggingLevel.INFO, log, "Genererte loependeJournal til ${header.CamelXsltFileName}");
 
 
