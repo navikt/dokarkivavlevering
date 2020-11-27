@@ -12,9 +12,10 @@ import org.springframework.stereotype.Component;
 import java.math.BigInteger;
 import java.util.UUID;
 
-import static no.nav.dokarkivavlevering.avlevering.arkivstruktur.utils.Utils.DATE_FORMAT;
-import static no.nav.dokarkivavlevering.avlevering.arkivstruktur.utils.Utils.DATE_TIME_FORMAT;
-import static no.nav.dokarkivavlevering.avlevering.arkivstruktur.utils.Utils.mapXmlGregorianCalendar;
+import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.DATE_FORMAT;
+import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.DATE_TIME_FORMAT;
+import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.mapXmlGregorianCalendar;
+
 
 /**
  * @author Joakim Bjørnstad, Jbit AS

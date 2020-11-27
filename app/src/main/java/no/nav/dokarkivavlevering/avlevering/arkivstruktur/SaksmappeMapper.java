@@ -14,17 +14,19 @@ import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import org.springframework.stereotype.Component;
 
-import java.math.BigInteger;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.TimeZone;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static no.nav.dokarkivavlevering.avlevering.arkivstruktur.utils.Utils.dateToXMLGregorianCalendar;
-import static no.nav.dokarkivavlevering.avlevering.arkivstruktur.utils.Utils.temaNavnDecode;
+import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.dateToXMLGregorianCalendar;
+import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.temaNavnDecode;
+import static org.apache.camel.converter.ObjectConverter.toBigInteger;
 
 /**
  * @author Joakim Bjørnstad, Jbit AS
@@ -41,7 +43,7 @@ public class SaksmappeMapper {
 		mappe.setTittel(temaNavnDecode(sak.getTema()));
 		mappe.getReferanseArkivdels().add("Legg inn UUID'en fra arkivdel her");
 		mappe.getParts().add(mapPart(sak));
-		mappe.setSaksaar(toBigInteger(getYearFromDate(sak.getOpprettetTidspunkt().getYear())));
+		mappe.setSaksaar(toBigInteger(getYear(sak.getOpprettetTidspunkt())));
 		mappe.setSakssekvensnummer(toBigInteger(sak.getId()));
 		mappe.setSaksdato(dateToXMLGregorianCalendar(sak.getOpprettetTidspunkt()));
 		mappe.setAdministrativEnhet(getAdministrativEnhetFromTema((sak.getTema())));
@@ -68,7 +70,7 @@ public class SaksmappeMapper {
 		registrering.setOpprettetAv(journalpost.getOpprettetAvNavn());
 		registrering.setRegistreringsID(journalpost.getId().toString());
 		registrering.setTittel(journalpost.getInnhold());
-		registrering.setJournalaar(toBigInteger(getYearFromDate(journalpost.getDatoJournal().getYear())));
+		registrering.setJournalaar(toBigInteger(getYear(journalpost.getDatoJournal())));
 		registrering.setJournalsekvensnummer(toBigInteger(journalpost.getId()));
 		registrering.setJournalpostnummer(toBigInteger(journalpost.getId()));
 		registrering.setJournalposttype(determineJournalPostType(journalpost.getType()));
@@ -177,14 +179,6 @@ public class SaksmappeMapper {
 		}
 	}
 
-	private BigInteger toBigInteger(int smallInteger) {
-		return new BigInteger(String.valueOf(smallInteger));
-	}
-
-	private BigInteger toBigInteger(long smallLong) {
-		return new BigInteger(String.valueOf(smallLong));
-	}
-
 	private String mapKorrespondanseParttype(String journalpost_t) {
 		return "I".equalsIgnoreCase(journalpost_t) ? "Avsender" : "Mottaker";
 	}
@@ -199,8 +193,10 @@ public class SaksmappeMapper {
 		return isSystembruker(opprettetAv) ? "Automatisk jobb" : opprettetAvBeriketNavn;
 	}
 
-	private int getYearFromDate(int year) {
-		return year + 1900;
+	private int getYear(Date date){
+		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Oslo"));
+		cal.setTime(date);
+		return cal.get(Calendar.YEAR);
 	}
 
 	private SystemID mapSystemID(final UUID value) {

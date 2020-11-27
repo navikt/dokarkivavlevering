@@ -3,7 +3,6 @@ package no.nav.dokarkivavlevering.avlevering.domain;
 import lombok.Builder;
 import lombok.ToString;
 import lombok.Value;
-import no.arkivverket.standarder.noark5.arkivstruktur.SystemID;
 
 import java.util.Date;
 import java.util.List;
