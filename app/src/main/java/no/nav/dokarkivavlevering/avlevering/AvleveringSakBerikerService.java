@@ -3,6 +3,7 @@ package no.nav.dokarkivavlevering.avlevering;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.dokarkivavlevering.avlevering.config.Tema;
 import no.nav.dokarkivavlevering.avlevering.consumer.activedirectory.NavActiveDirectoryConsumer;
 import no.nav.dokarkivavlevering.avlevering.consumer.ereg.EregService;
 import no.nav.dokarkivavlevering.avlevering.consumer.pdl.PdlGraphQLConsumer;
@@ -44,7 +45,7 @@ public class AvleveringSakBerikerService {
 		this.eregService = eregService;
 	}
 
-	public List<Sak> berikSaker(@Body final List<Sak> saker, @ExchangeProperty(AvleveringRoute.PROPERTY_TEMA) final String tema) {
+	public List<Sak> berikSaker(@Body final List<Sak> saker, @ExchangeProperty(AvleveringRoute.PROPERTY_TEMA) final Tema tema) {
 		// hent metadata og berik modellen
 		log.info("Beriker metadata for {} saker med tema={}", saker.size(), tema);
 		return Flowable.fromIterable(saker)
@@ -58,7 +59,7 @@ public class AvleveringSakBerikerService {
 							.filter(s -> s.getBruker().isPerson())
 							.map(s -> s.getBruker().getId())
 							.collect(Collectors.toSet());
-					final Map<String, Bruker> pdlHentIdenterBolks = pdlGraphQLConsumer.hentPersonBolk(unikeAktoerids, tema);
+					final Map<String, Bruker> pdlHentIdenterBolks = pdlGraphQLConsumer.hentPersonBolk(unikeAktoerids, tema.getTemakode());
 					final Set<String> unikeOrgnr = saks.stream()
 							.filter(s -> s.getBruker().isOrganisasjon())
 							.map(s -> s.getBruker().getId())
