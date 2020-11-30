@@ -21,4 +21,7 @@ public class FilDetaljer {
 	private final UUID uuid = UUID.randomUUID();
 	@ToString.Exclude
 	private final String opprettetAvBeriketNavn;
+	private final byte[] fil;
+	private final int filstorrelseBeriket;
+	private final String sha256hashBeriket;
 }

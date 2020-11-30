@@ -59,7 +59,7 @@ public class AvleveringRepository {
 						"      sa.tema = :tema\n" +
 						"  and (s.feilregistrert is null or s.feilregistrert = 0)\n" +
 						"  and j.k_journal_s in ('J', 'FS', 'FL', 'E')\n" +
-						"  and (j.dato_opprettet between :startdato and :sluttdato)\n" +
+						"  and (trunc(j.dato_opprettet) between :startdato and :sluttdato)\n" +
 						"order by sa.id desc\n" +
 						"    fetch first :batchsize rows only",
 				paramMap, Long.class);

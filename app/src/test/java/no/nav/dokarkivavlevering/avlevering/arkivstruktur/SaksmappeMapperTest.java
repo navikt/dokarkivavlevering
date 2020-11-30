@@ -6,6 +6,7 @@ import no.arkivverket.standarder.noark5.arkivstruktur.Korrespondansepart;
 import no.arkivverket.standarder.noark5.arkivstruktur.Part;
 import no.arkivverket.standarder.noark5.arkivstruktur.Saksmappe;
 import no.arkivverket.standarder.noark5.arkivstruktur.SystemID;
+import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.domain.Arkivendring;
 import no.nav.dokarkivavlevering.avlevering.domain.Bruker;
 import no.nav.dokarkivavlevering.avlevering.domain.DokumentInfo;
@@ -22,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -29,8 +31,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class SaksmappeMapperTest {
 
-	private SimpleDateFormat formatter = new SimpleDateFormat("yyy-MM-dd hh:mm:ss");
-	private final SaksmappeMapper saksmappeMapper = new SaksmappeMapper();
+	public static final String FIL = "Hello World";
+	private SimpleDateFormat DATETIME_FORMAT = new SimpleDateFormat("yyy-MM-dd hh:mm:ss");
+	private final AvleveringProperties avleveringProperties = new AvleveringProperties();
+	private final SaksmappeMapper saksmappeMapper = new SaksmappeMapper(avleveringProperties);
 
 	@Test
 	void shouldMap() throws Exception {
@@ -60,8 +64,7 @@ class SaksmappeMapperTest {
 		assertEquals(saksmappe.getReferanseArkivdels().size(), 1);
 		assertEquals(saksmappe.getParts().size(), 1);
 		assertEquals(saksmappe.getRegistrerings().size(), 1);
-		//TODO:Fix
-		//assertTrue(referanseArkivdel,sak.getUuid().toString()));
+		assertThat(saksmappe.getReferanseArkivdels()).contains(avleveringProperties.getArkivConfig().getArkivdelConfig().getSystemID());
 		//saksmappe/part
 		assertPart(saksmappe.getParts().get(0));
 
@@ -101,11 +104,10 @@ class SaksmappeMapperTest {
 		assertEquals(dokObjekt.getFormat(), "PDF/A");
 		assertEquals(dokObjekt.getOpprettetDato(), toGregorianCalendar("2020-11-10T15:04:43Z"));
 		assertEquals(dokObjekt.getOpprettetAv(), "Automatisk jobb");
-		//TODO: fix riktig
-		assertEquals(dokObjekt.getReferanseDokumentfil(), "URN til dokumentet i avleveringspakken (filnavn = DO + T_FIL_DETALJER.FIL_DETALJER_ID");
-		assertEquals(dokObjekt.getSjekksum(), "TODO Sett sjekksum her");
+		assertEquals(dokObjekt.getReferanseDokumentfil(), "DOKUMENTER/MED/55c39cdb-f052-4f4e-a9a5-900b455ca915.pdf");
+		assertEquals(dokObjekt.getSjekksum(), "a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e");
 		assertEquals(dokObjekt.getSjekksumAlgoritme(), "SHA-256");
-		assertEquals(dokObjekt.getFilstoerrelse(), toBigInteger(-1));
+		assertEquals(dokObjekt.getFilstoerrelse(), toBigInteger(FIL.length()));
 	}
 
 	private void assertKorrespondanseparts(Korrespondansepart korrPart) {
@@ -140,7 +142,7 @@ class SaksmappeMapperTest {
 				.tema("MED")
 				.bruker(generaterBruker())
 				.opprettetAv("srvmelosys")
-				.opprettetTidspunkt(formatter.parse("2019-10-28 11:41:36.673"))
+				.opprettetTidspunkt(DATETIME_FORMAT.parse("2019-10-28 11:41:36.673"))
 				.journalposter(new ArrayList<Journalpost>()).build();
 	}
 
@@ -159,9 +161,9 @@ class SaksmappeMapperTest {
 				.innhold("Legg til ny institusjon")
 				.avsenderMottaker("Arena")
 				.datoMottatt(null)
-				.datoDokument(formatter.parse("2020-11-10 16:04:43.332"))
-				.datoJournal(formatter.parse("2020-11-10 16:04:43.35"))
-				.datoOpprettet(formatter.parse("2020-11-10 16:04:43.338"))
+				.datoDokument(DATETIME_FORMAT.parse("2020-11-10 16:04:43.332"))
+				.datoJournal(DATETIME_FORMAT.parse("2020-11-10 16:04:43.35"))
+				.datoOpprettet(DATETIME_FORMAT.parse("2020-11-10 16:04:43.338"))
 				.datoEkspedert(null)
 				.datoSendtPrint(null)
 				.opprettetAv("srvmelosys")
@@ -178,13 +180,13 @@ class SaksmappeMapperTest {
 		return DokumentInfo.builder()
 				.id((long) 454017976)
 				.relasjonTilknyttetSom("HOVEDDOKUMENT")
-				.relasjonDatoOpprettet(formatter.parse("2020-11-10 16:04:43.343"))
+				.relasjonDatoOpprettet(DATETIME_FORMAT.parse("2020-11-10 16:04:43.343"))
 				.relasjonOpprettetAv("srvmelosys")
 				.relasjonOpprettetAvBeriketNavn("Automatisk Jobb")
 				.kategori("SED")
 				.status("FERDIGSTILT")
 				.tittel("Legg til ny institusjon")
-				.datoOpprettet(formatter.parse("2020-11-10 16:04:43.342"))
+				.datoOpprettet(DATETIME_FORMAT.parse("2020-11-10 16:04:43.342"))
 				.opprettetAv("srvmelosys")
 				.opprettetAvBeriketNavn("Automatisk Jobb")
 				.fildetaljer(new ArrayList<FilDetaljer>())
@@ -196,7 +198,10 @@ class SaksmappeMapperTest {
 		return FilDetaljer.builder()
 				.id((long) 539876247)
 				.filUuid("55c39cdb-f052-4f4e-a9a5-900b455ca915")
-				.datoOpprettet(formatter.parse("2020-11-10 16:04:43.343"))
+				.fil(FIL.getBytes())
+				.filstorrelseBeriket(FIL.length())
+				.sha256hashBeriket("a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e")
+				.datoOpprettet(DATETIME_FORMAT.parse("2020-11-10 16:04:43.343"))
 				.opprettetAv("srvRuting")
 				.opprettetAvBeriketNavn("Automatisk Jobb")
 				.build();

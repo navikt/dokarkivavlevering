@@ -2,6 +2,7 @@ package no.nav.dokarkivavlevering.avlevering.config;
 
 import lombok.Data;
 import lombok.ToString;
+import lombok.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
@@ -13,6 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * @author Joakim Bjørnstad, Jbit AS
@@ -28,7 +30,6 @@ public class AvleveringProperties {
 	@NotNull
 	@Max(1000) // max IN query i Oracle
 	private Long batchsize;
-
 	@NotEmpty
 	private String ststokenurl;
 	@NotEmpty
@@ -36,6 +37,11 @@ public class AvleveringProperties {
 	@NotEmpty
 	private String eregurl;
 
+	/**
+	 * Brukes for å generere systemID for avlevering under oppstart. Referes til på forskjellige nivåer i arkivstruktur.xml.
+	 */
+	@Valid
+	private final AvleveringProperties.ArkivConfig arkivConfig = new ArkivConfig();
 	@Valid
 	private final Activedirectory activedirectory = new Activedirectory();
 	@Valid
@@ -44,6 +50,19 @@ public class AvleveringProperties {
 	private final Serviceuser serviceuser = new Serviceuser();
 	@Valid
 	private final Periode periode = new Periode();
+
+	@Value
+	@Valid
+	public static class ArkivConfig {
+		private final String systemID = UUID.randomUUID().toString();
+		private final ArkivdelConfig arkivdelConfig = new ArkivdelConfig();
+	}
+
+	@Value
+	@Valid
+	public static class ArkivdelConfig {
+		private final String systemID = UUID.randomUUID().toString();
+	}
 
 	@Data
 	@Validated

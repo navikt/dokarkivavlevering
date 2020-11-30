@@ -22,8 +22,8 @@ spec:
               memory: "256Mi"
               cpu: "100m"
             limits:
-              memory: "1024Mi"
-              cpu: "1000m"
+              memory: "4096Mi"
+              cpu: "4000m"
           volumeMounts:
             - mountPath: /var/run/secrets/nais.io/vault
               name: vault-secrets
