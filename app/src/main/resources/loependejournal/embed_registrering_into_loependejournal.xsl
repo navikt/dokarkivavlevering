@@ -22,4 +22,8 @@
 			</xsl:for-each>
 		</xsl:copy>
 	</xsl:template>
+
+	<xsl:template match="//ark:loependeJournal/ark:journalhode/ark:antallJournalposter/text()">
+		<xsl:value-of select="count($journalregistrering)"/>
+	</xsl:template>
 </xsl:stylesheet>
