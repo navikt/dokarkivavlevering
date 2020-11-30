@@ -5,6 +5,7 @@ import no.nav.dokarkivavlevering.avlevering.arkivstruktur.AvleveringArkivstruktu
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.dokument.DokumentRoute;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
+import no.nav.dokarkivavlevering.avlevering.endringlogg.AvleveringEndringsloggRoute;
 import no.nav.dokarkivavlevering.avlevering.loependejournal.AvleveringLoependeJournalRoute;
 import no.nav.dokarkivavlevering.avlevering.repository.AvleveringRepository;
 import org.apache.camel.LoggingLevel;
@@ -91,7 +92,7 @@ public class AvleveringTemaRoute extends RouteBuilder {
 					return oldExchange;
 				})
 				.parallelProcessing()
-				.to(AvleveringArkivstrukturRoute.ARKIVSTRUKTUR, "direct:endringslogg", AvleveringLoependeJournalRoute.LOEPENDEJOURNAL, "direct:offentligJournal", DokumentRoute.SEND_DOKUMENT)
+				.to(AvleveringArkivstrukturRoute.ARKIVSTRUKTUR, AvleveringEndringsloggRoute.ENDRINGSLOGG, AvleveringLoependeJournalRoute.LOEPENDEJOURNAL, "direct:offentligJournal", DokumentRoute.SEND_DOKUMENT)
 				.end(); // end multicast
 
 		// Denne skilles ut i en egen Route klasse. Impementasjon må være trådsikker pga dette kjører i en egen tråd.
