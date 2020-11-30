@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
-import static no.nav.dokarkivavlevering.avlevering.arkivstruktur.utils.Utils.dateToXMLGregorianCalendar;
+import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.dateToXMLGregorianCalendar;
 
 @Component
 public class EndringsloggMapper {

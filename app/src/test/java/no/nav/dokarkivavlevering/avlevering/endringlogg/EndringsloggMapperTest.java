@@ -1,7 +1,7 @@
 package no.nav.dokarkivavlevering.avlevering.endringlogg;
 
 import no.arkivverket.standarder.noark5.endringslogg.Endring;
-import no.nav.dokarkivavlevering.avlevering.arkivstruktur.utils.Utils;
+
 import no.nav.dokarkivavlevering.avlevering.domain.Arkivendring;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
+
+import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.dateToXMLGregorianCalendar;
 
 class EndringsloggMapperTest {
 
@@ -34,7 +36,7 @@ class EndringsloggMapperTest {
 		SoftAssertions softly = new SoftAssertions();
 		softly.assertThat(endring.getReferanseArkivenhet()).isEqualTo(uuid.toString());
 		softly.assertThat(endring.getReferanseMetadata()).isEqualTo(arkivendring.getElement());
-		softly.assertThat(endring.getEndretDato()).isEqualTo(Utils.dateToXMLGregorianCalendar(arkivendring.getTidspunkt()));
+		softly.assertThat(endring.getEndretDato()).isEqualTo(dateToXMLGregorianCalendar(arkivendring.getTidspunkt()));
 		softly.assertThat(endring.getEndretAv()).isEqualTo(arkivendring.getUtfoertAv());
 		softly.assertThat(endring.getTidligereVerdi()).isEqualTo(arkivendring.getFraVerdi());
 		softly.assertThat(endring.getNyVerdi()).isEqualTo(arkivendring.getTilVerdi());
