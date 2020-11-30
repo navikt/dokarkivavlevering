@@ -1,6 +1,6 @@
-package no.nav.dokarkivavlevering.avlevering.loependejournal;
+package no.nav.dokarkivavlevering.avlevering.offentligjournal;
 
-import no.arkivverket.standarder.noark5.loependejournal.Journalregistrering;
+import no.arkivverket.standarder.noark5.offentligjournal.Journalregistrering;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import org.apache.camel.Body;
 import org.apache.camel.Handler;
@@ -10,11 +10,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class JournalregistreringService {
+public class JournalRegistreringService {
+	private final OffentligJournalRegistreringMapper journalRegistreringMapper;
 
-	private final JournalRegistreringMapper journalRegistreringMapper;
-
-	public JournalregistreringService(JournalRegistreringMapper journalRegistreringMapper) {
+	public JournalRegistreringService(OffentligJournalRegistreringMapper journalRegistreringMapper) {
 
 		this.journalRegistreringMapper = journalRegistreringMapper;
 	}

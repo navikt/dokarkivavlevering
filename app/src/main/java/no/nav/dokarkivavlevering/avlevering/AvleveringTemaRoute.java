@@ -5,6 +5,7 @@ import no.nav.dokarkivavlevering.avlevering.arkivstruktur.AvleveringArkivstruktu
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import no.nav.dokarkivavlevering.avlevering.loependejournal.AvleveringLoependeJournalRoute;
+import no.nav.dokarkivavlevering.avlevering.offentligjournal.AvleveringOffentligJournalRoute;
 import no.nav.dokarkivavlevering.avlevering.repository.AvleveringRepository;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
@@ -90,7 +91,7 @@ public class AvleveringTemaRoute extends RouteBuilder {
 					return oldExchange;
 				})
 				.parallelProcessing()
-				.to(AvleveringArkivstrukturRoute.ARKIVSTRUKTUR, "direct:endringslogg", AvleveringLoependeJournalRoute.LOEPENDEJOURNAL, "direct:offentligJournal")
+				.to(AvleveringArkivstrukturRoute.ARKIVSTRUKTUR, "direct:endringslogg", AvleveringLoependeJournalRoute.LOEPENDEJOURNAL, AvleveringOffentligJournalRoute.OFFENTLIGJOURNAL)
 				.end(); // end multicast
 
 		// Denne skilles ut i en egen Route klasse. Impementasjon må være trådsikker pga dette kjører i en egen tråd.
@@ -103,17 +104,6 @@ public class AvleveringTemaRoute extends RouteBuilder {
 					log.info("{} berikede saker for endringslogg.xml", berikedeSaker.size());
 				})
 				.log(LoggingLevel.INFO, log, "Behandlet ferdig endringslogg.xml for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelLoopIndex}");
-		
-		// Denne skilles ut i en egen Route klasse. Impementasjon må være trådsikker pga dette kjører i en egen tråd.
-		from("direct:offentligJournal")
-				.routeId("offentligJournal")
-				.log(LoggingLevel.INFO, log, "Behandler offentligJournal.xml for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelLoopIndex}")
-				.process(exchange -> {
-					// Her skal body inneholde en List<Sak> som er ferdig beriket.
-					final List<Sak> berikedeSaker = exchange.getIn().getBody(List.class);
-					log.info("{} berikede saker for offentligJournal.xml", berikedeSaker.size());
-				})
-				.log(LoggingLevel.INFO, log, "Behandlet ferdig offentligJournal.xml for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelLoopIndex}");
 	}
 
 

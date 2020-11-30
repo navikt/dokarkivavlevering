@@ -38,6 +38,19 @@ public class AvleveringUtils {
 		}
 	}
 
+	public static String mapKorrespondansepartNavn(no.nav.dokarkivavlevering.avlevering.domain.Journalpost journalpost) {
+		return isNav(journalpost.getType()) ? journalpost.getAvsenderMottaker() : "NAV";
+	}
+
+	public static boolean isNav(String journalpostType) {
+		return "I".equalsIgnoreCase(journalpostType) | "U".equalsIgnoreCase(journalpostType);
+	}
+
+	public static String mapKorrespondansepartType(String journalpostType) {
+		return "I".equalsIgnoreCase(journalpostType) ? "Avsender" :
+				"U".equalsIgnoreCase(journalpostType) ? "Mottaker" : "Intern avsender";
+	}
+
 	public static String temaNavnDecode(String tema) {
 		return Tema.valueOf(tema).getTemanavn();
 	}

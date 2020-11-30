@@ -35,11 +35,11 @@ public class AvleveringLoependeJournalRoute extends RouteBuilder {
 		return jaxbDataFormat;
 	}
 
-	private JournalregistreringService journalregistreringService;
+	private LoependeJournalregistreringService loependeJournalregistreringService;
 	private LoependejournalMapper loependejournalMapper;
 
-	public AvleveringLoependeJournalRoute(JournalregistreringService journalregistreringService, LoependejournalMapper loependejournalMapper) {
-		this.journalregistreringService = journalregistreringService;
+	public AvleveringLoependeJournalRoute(LoependeJournalregistreringService loependeJournalregistreringService, LoependejournalMapper loependejournalMapper) {
+		this.loependeJournalregistreringService = loependeJournalregistreringService;
 		this.loependejournalMapper = loependejournalMapper;
 	}
 
@@ -83,7 +83,7 @@ public class AvleveringLoependeJournalRoute extends RouteBuilder {
 				.routeId("loependeJournal")
 				.log(LoggingLevel.INFO, log, "RouteID: loependejournal")
 				.log(LoggingLevel.INFO, log, "Behandler loependeJournal.xml for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelLoopIndex}")
-				.bean(journalregistreringService)
+				.bean(loependeJournalregistreringService)
 				.process(exchange -> {
 					LoependeJournal journal = new LoependeJournal();
 					journal.getJournalregistrerings().addAll((List<Journalregistrering>) exchange.getIn().getBody());
