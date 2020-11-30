@@ -41,6 +41,7 @@ public class SqlQueries {
 					"       f.fil_uuid                    as journalposter_dokumenter_fildetaljer_filuuid,\n" +
 					"       f.dato_opprettet              as journalposter_dokumenter_fildetaljer_datoopprettet,\n" +
 					"       f.opprettet_av                as journalposter_dokumenter_fildetaljer_opprettetav,\n" +
+					"       df.fil                        as journalposter_dokumenter_fildetaljer_fil,\n" +
 					"       aeej.arkiv_element_endring_id as journalposter_arkivendringer_id,\n" +
 					"       aeej.arkiv_element            as journalposter_arkivendringer_element,\n" +
 					"       alj.tidspunkt                 as journalposter_arkivendringer_tidspunkt,\n" +
@@ -59,6 +60,7 @@ public class SqlQueries {
 					"         join t_jp_dok_info_rel r on j.journalpost_id = r.journalpost_id\n" +
 					"         join t_dokument_info d on r.dokument_info_id = d.dokument_info_id\n" +
 					"         join t_fil_detaljer f on d.dokument_info_id = f.dokument_info_id\n" +
+					"         join t_dokument_fil df on f.fil_uuid = df.fil_uuid\n" +
 					"         left join t_aksjonslogg alj on alj.journalpost_id = j.journalpost_id and alj.dokument_info_id is null\n" +
 					"         left join t_arkiv_element_endring aeej on alj.aksjonslogg_id = aeej.aksjonslogg_id\n" +
 					"         left join t_aksjonslogg ald on ald.journalpost_id = j.journalpost_id and ald.dokument_info_id = d.dokument_info_id\n" +
@@ -66,8 +68,9 @@ public class SqlQueries {
 					"where s.sak_nr_fk in (:sakIds)\n" +
 					"  and j.k_journal_s in ('J', 'FS', 'FL', 'E')\n" +
 					"  and (s.feilregistrert is null or s.feilregistrert = 0)\n" +
-					"  and trunc(j.dato_opprettet) >= :startdato\n" +
-					"  and trunc(j.dato_opprettet) <= :sluttdato\n" +
+					"  and (trunc(j.dato_opprettet) between :startdato and :sluttdato)\n" +
+					"  and d.k_dokument_s = 'FERDIGSTILT'\n" +
+					"  and f.k_variant_format = 'ARKIV'\n" +
 					"order by sa.id desc, j.journalpost_id, r.k_tilkn_jp_som, r.dokument_info_id, f.fil_detaljer_id, aeej.arkiv_element_endring_id,\n" +
 					"         alj.tidspunkt, aeed.arkiv_element_endring_id, aeed.tidspunkt";
 }

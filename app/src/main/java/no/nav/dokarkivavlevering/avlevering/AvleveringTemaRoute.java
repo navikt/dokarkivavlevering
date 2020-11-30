@@ -3,6 +3,7 @@ package no.nav.dokarkivavlevering.avlevering;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avlevering.arkivstruktur.AvleveringArkivstrukturRoute;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
+import no.nav.dokarkivavlevering.avlevering.dokument.DokumentRoute;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import no.nav.dokarkivavlevering.avlevering.loependejournal.AvleveringLoependeJournalRoute;
 import no.nav.dokarkivavlevering.avlevering.offentligjournal.AvleveringOffentligJournalRoute;
@@ -91,19 +92,9 @@ public class AvleveringTemaRoute extends RouteBuilder {
 					return oldExchange;
 				})
 				.parallelProcessing()
-				.to(AvleveringArkivstrukturRoute.ARKIVSTRUKTUR, "direct:endringslogg", AvleveringLoependeJournalRoute.LOEPENDEJOURNAL, AvleveringOffentligJournalRoute.OFFENTLIGJOURNAL)
+				.to(AvleveringArkivstrukturRoute.ARKIVSTRUKTUR, "direct:endringslogg", AvleveringLoependeJournalRoute.LOEPENDEJOURNAL, AvleveringOffentligJournalRoute.OFFENTLIGJOURNAL, DokumentRoute.SEND_DOKUMENT)
 				.end(); // end multicast
 
-		// Denne skilles ut i en egen Route klasse. Impementasjon må være trådsikker pga dette kjører i en egen tråd.
-		from("direct:endringslogg")
-				.routeId("endringslogg")
-				.log(LoggingLevel.INFO, log, "Behandler endringslogg.xml for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelLoopIndex}")
-				.process(exchange -> {
-					// Her skal body inneholde en List<Sak> som er ferdig beriket.
-					final List<Sak> berikedeSaker = exchange.getIn().getBody(List.class);
-					log.info("{} berikede saker for endringslogg.xml", berikedeSaker.size());
-				})
-				.log(LoggingLevel.INFO, log, "Behandlet ferdig endringslogg.xml for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelLoopIndex}");
 	}
 
 

@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -32,17 +33,18 @@ import java.util.stream.Collectors;
 public class AvleveringSakBerikerService {
 
 	public static final Pattern ADEO_IDENT_PATTERN = Pattern.compile("^[a-zA-Z]\\d{6}$");
-	private static final String AUTOMATISK_JOBB = "Automatisk Jobb";
 	private final PdlGraphQLConsumer pdlGraphQLConsumer;
 	private final NavActiveDirectoryConsumer navActiveDirectoryConsumer;
 	private final EregService eregService;
+	private final AvleveringSakBerikerMapper avleveringSakBerikerMapper;
 
 	public AvleveringSakBerikerService(PdlGraphQLConsumer pdlGraphQLConsumer,
 									   NavActiveDirectoryConsumer navActiveDirectoryConsumer,
-									   EregService eregService) {
+									   EregService eregService, AvleveringSakBerikerMapper avleveringSakBerikerMapper) {
 		this.pdlGraphQLConsumer = pdlGraphQLConsumer;
 		this.navActiveDirectoryConsumer = navActiveDirectoryConsumer;
 		this.eregService = eregService;
+		this.avleveringSakBerikerMapper = avleveringSakBerikerMapper;
 	}
 
 	public List<Sak> berikSaker(@Body final List<Sak> saker, @ExchangeProperty(AvleveringRoute.PROPERTY_TEMA) final Tema tema) {
@@ -66,16 +68,7 @@ public class AvleveringSakBerikerService {
 							.collect(Collectors.toSet());
 					final Map<String, Bruker> eregOrganisasjonBolk = eregService.hentOrganisasjonBrukere(unikeOrgnr);
 					return saks.stream()
-							.map(sak -> {
-								if (sak.getBruker().isPerson()) {
-									return sak.tilhoererBruker(pdlHentIdenterBolks.getOrDefault(sak.getBruker().getId(),
-											Bruker.ukjentPerson(sak.getBruker().getId())));
-								} else {
-									return sak.tilhoererBruker(eregOrganisasjonBolk.getOrDefault(sak.getBruker().getId(),
-											Bruker.ukjentOrganisasjon(sak.getBruker().getId())));
-								}
-							})
-							.map(sak -> navneberiketSak(sak, navAnsatteNavn))
+							.map(sak -> avleveringSakBerikerMapper.berik(sak, navAnsatteNavn, pdlHentIdenterBolks, eregOrganisasjonBolk))
 							.collect(Collectors.toList());
 				})
 				.flatMapIterable(items -> items)
@@ -103,51 +96,10 @@ public class AvleveringSakBerikerService {
 				}
 			}
 		}
-		return adeoIdenter.stream().filter(s -> ADEO_IDENT_PATTERN.matcher(s).matches()).collect(Collectors.toSet());
+		return adeoIdenter.stream()
+				.filter(Objects::nonNull)
+				.filter(s -> ADEO_IDENT_PATTERN.matcher(s).matches())
+				.collect(Collectors.toSet());
 	}
 
-	private Sak navneberiketSak(final Sak sak, final Map<String, String> navAnsatteNavn) {
-		return sak.toBuilder()
-				.opprettetAvBeriketNavn(utledNavn(sak.getOpprettetAv(), navAnsatteNavn))
-				.journalposter(sak.getJournalposter().stream().map(journalpost -> {
-					return journalpost.toBuilder()
-							.opprettetAvBeriketNavn(utledNavn(journalpost.getOpprettetAv(), navAnsatteNavn))
-							.endretAv(utledNavn(journalpost.getEndretAv(), navAnsatteNavn))
-							.dokumenter(journalpost.getDokumenter().stream()
-									.map(dokumentInfo -> {
-										return dokumentInfo.toBuilder()
-												.opprettetAvBeriketNavn(utledNavn(dokumentInfo.getOpprettetAv(), navAnsatteNavn))
-												.relasjonOpprettetAvBeriketNavn(utledNavn(dokumentInfo.getRelasjonOpprettetAv(), navAnsatteNavn))
-												.fildetaljer(dokumentInfo.getFildetaljer().stream()
-														.map(filDetaljer -> {
-															return filDetaljer.toBuilder()
-																	.opprettetAvBeriketNavn(utledNavn(filDetaljer.getOpprettetAv(), navAnsatteNavn))
-																	.build();
-														})
-														.collect(Collectors.toList()))
-												.arkivendringer(dokumentInfo.getArkivendringer().stream()
-														.map(arkivendring -> {
-															return arkivendring.toBuilder()
-																	.utfoertAvBeriketNavn(utledNavn(arkivendring.getUtfoertAv(), navAnsatteNavn))
-																	.build();
-														})
-														.collect(Collectors.toList()))
-												.build();
-									})
-									.collect(Collectors.toList()))
-							.arkivendringer(journalpost.getArkivendringer().stream()
-									.map(arkivendring -> {
-										return arkivendring.toBuilder()
-												.utfoertAvBeriketNavn(utledNavn(arkivendring.getUtfoertAv(), navAnsatteNavn))
-												.build();
-									})
-									.collect(Collectors.toList()))
-							.build();
-				}).collect(Collectors.toList()))
-				.build();
-	}
-
-	private String utledNavn(final String adeoIdent, final Map<String, String> navAnsatteNavn) {
-		return navAnsatteNavn.getOrDefault(adeoIdent, AUTOMATISK_JOBB);
-	}
 }
