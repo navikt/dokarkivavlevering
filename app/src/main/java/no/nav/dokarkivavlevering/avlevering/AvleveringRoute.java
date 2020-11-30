@@ -1,7 +1,9 @@
 package no.nav.dokarkivavlevering.avlevering;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.dokarkivavlevering.avlevering.arkivstruktur.AvleveringArkivstrukturRoute;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
+import no.nav.dokarkivavlevering.avlevering.endringlogg.AvleveringEndringsloggRoute;
 import no.nav.dokarkivavlevering.avlevering.loependejournal.AvleveringLoependeJournalRoute;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
@@ -51,8 +53,9 @@ public class AvleveringRoute extends RouteBuilder {
 				.to("direct:behandle_tema")
 				.end()
 				.to(AvleveringStatiskRoute.AVLEVERING_STATIC)
-				.to("direct:generer_arkivstruktur")
+				.to(AvleveringArkivstrukturRoute.GENERER_ARKIVSTRUKTUR)
 				.to(AvleveringLoependeJournalRoute.GENERER_LOEPENDEJOURNAL)
+				.to(AvleveringEndringsloggRoute.GENERER_ENDRINGSLOGG)
 				.log(LoggingLevel.INFO, log, "Dokarkivavlevering er ferdig med avlevering.")
 				.to("direct:shutdown");
 
