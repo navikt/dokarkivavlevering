@@ -32,6 +32,7 @@ public class AvleveringLoependeJournalRoute extends RouteBuilder {
 		final JaxbDataFormat jaxbDataFormat = new JaxbDataFormat();
 		jaxbDataFormat.setEncoding(StandardCharsets.UTF_8.toString());
 		jaxbDataFormat.setContext(JAXBContext.newInstance(ObjectFactory.class));
+		jaxbDataFormat.setSchemaLocation("http://www.arkivverket.no/standarder/noark5/loependeJournal loependeJournal.xsd");
 		return jaxbDataFormat;
 	}
 
