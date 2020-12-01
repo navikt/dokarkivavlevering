@@ -3,12 +3,21 @@ package no.nav.dokarkivavlevering.avlevering.loependejournal;
 import no.arkivverket.standarder.noark5.loependejournal.Arkivskaper;
 import no.arkivverket.standarder.noark5.loependejournal.Journalhode;
 import no.arkivverket.standarder.noark5.loependejournal.LoependeJournal;
+import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import org.springframework.stereotype.Component;
 
+import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.dateTimeToXMLGregorianCalendar;
 import static org.apache.camel.converter.ObjectConverter.toBigInteger;
 
 @Component
 public class LoependejournalMapper {
+
+	private final AvleveringProperties.Periode periode;
+
+	public LoependejournalMapper(AvleveringProperties avleveringProperties) {
+		this.periode = avleveringProperties.getPeriode();
+	}
+
 	public LoependeJournal map() {
 		LoependeJournal journal = new LoependeJournal();
 		journal.setJournalhode(mapJournalHode());
@@ -18,10 +27,8 @@ public class LoependejournalMapper {
 
 	private Journalhode mapJournalHode() {
 		Journalhode journalHode = new Journalhode();
-		//TODO: input.periodeStart
-		//journalHode.setJournalStartDato(dateToXMLGregorianCalendar());
-		//TODO: input.periodeSlutt
-		//journalHode.setJournalSluttDato(dateToXMLGregorianCalendar("${value}".. eller noe));
+		journalHode.setJournalStartDato(dateTimeToXMLGregorianCalendar(periode.getStartdato()));
+		journalHode.setJournalSluttDato(dateTimeToXMLGregorianCalendar(periode.getStartdato()));
 		journalHode.setSeleksjon("journaldato");
 		//TODO: "antall journalregistrering i filen". Menes det her i arkivstruktur.xml eller i saken?
 		journalHode.setAntallJournalposter(toBigInteger("-1"));

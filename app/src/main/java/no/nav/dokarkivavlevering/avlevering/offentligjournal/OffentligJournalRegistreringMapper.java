@@ -9,14 +9,11 @@ import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import org.springframework.stereotype.Component;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
 import java.util.UUID;
 
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.dateToXMLGregorianCalendar;
+import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.getYear;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.isNav;
-import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.mapKorrespondansepartNavn;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.mapKorrespondansepartType;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.temaNavnDecode;
 import static org.apache.camel.converter.ObjectConverter.toBigInteger;
@@ -60,7 +57,7 @@ public class OffentligJournalRegistreringMapper {
 		tilJournalpost.setSkjermingshjemmel("Offentleglova § 13");
 
 		if (isNav(fraJournalpost.getType())) {
-			if (fraJournalpost.getType().equalsIgnoreCase("I")) {
+			if ("I".equalsIgnoreCase(fraJournalpost.getType())) {
 				tilJournalpost.setSkjermingMetadata("Skjerming navn avsender");
 			} else {
 				tilJournalpost.setSkjermingMetadata("Skjerming navn mottaker");
@@ -73,23 +70,16 @@ public class OffentligJournalRegistreringMapper {
 		return tilJournalpost;
 	}
 
-	private int getYear(Date date) {
-		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Oslo"));
-		cal.setTime(date);
-		return cal.get(Calendar.YEAR);
-	}
-
 	private Korrespondansepart mapKorrespondansepart(Journalpost journalpost) {
 		Korrespondansepart part = new Korrespondansepart();
 		part.setKorrespondanseparttype(mapKorrespondansepartType(journalpost.getType()));
 		if (isNav(journalpost.getType())) {
 			part.setKorrespondansepartNavn("****");
 		} else {
-			part.setKorrespondansepartNavn(mapKorrespondansepartNavn(journalpost));
+			part.setKorrespondansepartNavn("NAV");
 		}
 		return part;
 	}
-
 
 	private SystemID mapSystemID(final UUID value) {
 		SystemID systemID = new SystemID();

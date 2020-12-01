@@ -9,13 +9,11 @@ import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import org.springframework.stereotype.Component;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
 import java.util.UUID;
 
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.dateToXMLGregorianCalendar;
-import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.mapKorrespondansepartNavn;
+import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.getYear;
+import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.isNav;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.mapKorrespondansepartType;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.temaNavnDecode;
 import static org.apache.camel.converter.ObjectConverter.toBigInteger;
@@ -39,7 +37,7 @@ public class JournalRegistreringMapper {
 		return klasse;
 	}
 
-	private Saksmappe mapSaksmappe(Sak sak){
+	private Saksmappe mapSaksmappe(Sak sak) {
 		Saksmappe mappe = new Saksmappe();
 		mappe.setSaksaar(toBigInteger(getYear(sak.getOpprettetTidspunkt())));
 		mappe.setSakssekvensnummer(toBigInteger(sak.getId()));
@@ -58,16 +56,10 @@ public class JournalRegistreringMapper {
 		tilJournalpost.setJournaldato(dateToXMLGregorianCalendar(fraJournalpost.getDatoJournal()));
 		tilJournalpost.getKorrespondanseparts().add(mapKorrespondansepart(fraJournalpost));
 
-		if(fraJournalpost.getDatoDokument() != null) {
+		if (fraJournalpost.getDatoDokument() != null) {
 			tilJournalpost.setDokumentetsDato(dateToXMLGregorianCalendar(fraJournalpost.getDatoDokument()));
 		}
 		return tilJournalpost;
-	}
-
-	private int getYear(Date date){
-		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Oslo"));
-		cal.setTime(date);
-		return cal.get(Calendar.YEAR);
 	}
 
 	private Korrespondansepart mapKorrespondansepart(Journalpost journalpost) {
@@ -77,10 +69,13 @@ public class JournalRegistreringMapper {
 		return part;
 	}
 
-
 	private SystemID mapSystemID(final UUID value) {
 		SystemID systemID = new SystemID();
 		systemID.setValue(value.toString());
 		return systemID;
+	}
+
+	public static String mapKorrespondansepartNavn(no.nav.dokarkivavlevering.avlevering.domain.Journalpost journalpost) {
+		return isNav(journalpost.getType()) ? journalpost.getAvsenderMottaker() : "NAV";
 	}
 }
