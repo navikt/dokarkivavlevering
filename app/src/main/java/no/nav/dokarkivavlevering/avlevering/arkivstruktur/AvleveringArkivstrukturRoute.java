@@ -93,7 +93,8 @@ public class AvleveringArkivstrukturRoute extends RouteBuilder {
 					exchange.getIn().setBody(inputStream);
 				})
 				.setHeader(HEADER_XSL_PARAM_KLASSE_XML, simple("file:///{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}?select=klasse_*.xml"))
-				.to("xslt:classpath:arkivstruktur/embed_klasse_into_arkivstruktur.xsl?output=bytes")
+				.setHeader(Exchange.XSLT_FILE_NAME, simple("{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/arkivstruktur.xml"))
+				.to("xslt:classpath:arkivstruktur/embed_klasse_into_arkivstruktur.xsl?output=file")
 				.setHeader(AvleveringSFTPRoute.HEADER_FILNAVN, simple("arkivstruktur.xml"))
 				.to(AvleveringSFTPRoute.SFTP);
 

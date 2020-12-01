@@ -67,7 +67,7 @@ public class AvleveringEndringsloggRoute extends RouteBuilder {
 				})
 				.setHeader(HEADER_XSL_PARAM_ENDRING_XML, simple("file:///{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}?select=endring_*.xml"))
 				.setHeader(Exchange.XSLT_FILE_NAME, simple("{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/endringslogg.xml"))
-				.to("xslt:classpath:arkivstruktur/embed_arkivendring_into_endringslogg.xsl?output=file")
+				.to("xslt:classpath:endringslogg/embed_arkivendring_into_endringslogg.xsl?output=file")
 				.setHeader(AvleveringSFTPRoute.HEADER_FILNAVN, simple("endringslogg.xml"))
 				.to(AvleveringSFTPRoute.SFTP);
 
