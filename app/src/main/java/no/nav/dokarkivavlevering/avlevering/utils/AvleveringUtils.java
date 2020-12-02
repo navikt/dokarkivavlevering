@@ -19,7 +19,6 @@ import java.util.TimeZone;
 @Component
 public class AvleveringUtils {
 
-	private static final Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Europe/Oslo"));
 	public static final SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -62,6 +61,7 @@ public class AvleveringUtils {
 	}
 
 	public static int getYear(Date date) {
+		final Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Europe/Oslo"));
 		calendar.setTime(date);
 		return calendar.get(Calendar.YEAR);
 	}
