@@ -1,12 +1,10 @@
-package no.nav.dokarkivavlevering.avlevering.loependejournal;
+package no.nav.dokarkivavlevering.avlevering.offentligjournal;
 
-import no.arkivverket.standarder.noark5.loependejournal.Journalregistrering;
-import no.arkivverket.standarder.noark5.loependejournal.Klasse;
-import no.arkivverket.standarder.noark5.loependejournal.Korrespondansepart;
-import no.arkivverket.standarder.noark5.loependejournal.Saksmappe;
-import no.nav.dokarkivavlevering.avlevering.domain.Arkivendring;
+import no.arkivverket.standarder.noark5.offentligjournal.Journalregistrering;
+import no.arkivverket.standarder.noark5.offentligjournal.Klasse;
+import no.arkivverket.standarder.noark5.offentligjournal.Korrespondansepart;
+import no.arkivverket.standarder.noark5.offentligjournal.Saksmappe;
 import no.nav.dokarkivavlevering.avlevering.domain.DokumentInfo;
-import no.nav.dokarkivavlevering.avlevering.domain.FilDetaljer;
 import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import org.junit.jupiter.api.Test;
@@ -14,41 +12,51 @@ import org.junit.jupiter.api.Test;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import static org.apache.camel.converter.ObjectConverter.toBigInteger;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class JournalRegistreringMapperTest {
+class OffentligJournalRegistreringMapperTest {
 	private SimpleDateFormat formatter = new SimpleDateFormat("yyy-MM-dd hh:mm:ss");
-	private JournalRegistreringMapper mapper = new JournalRegistreringMapper();
+	private OffentligJournalRegistreringMapper mapper = new OffentligJournalRegistreringMapper();
 
 	@Test
 	void testMapping() throws Exception {
-		final Journalregistrering registrering = mapper.map(generateSak(), generateSak().getJournalposter().get(0));
+		final Journalregistrering journalRegistrering = mapper.map(generateSak(), generateSak().getJournalposter().get(0));
 
-		Klasse k = registrering.getKlasse();
-		assertEquals(k.getKlasseID(), "MED");
-		assertEquals(k.getTittel(), "Medlemskap");
+		assertKlasse(journalRegistrering.getKlasse());
+		assertMappe(journalRegistrering.getSaksmappe());
+		assertJournalpost(journalRegistrering.getJournalpost());
+	}
 
-		Saksmappe mappe = registrering.getSaksmappe();
-		assertEquals(mappe.getSaksaar(), null);
-		assertEquals(mappe.getSakssekvensnummer(), toBigInteger((1234567011)));
-		assertEquals(mappe.getTittel(), "Medlemskap");
-		assertEquals(mappe.getOffentligTittel(), null);
+	private void assertKlasse(Klasse klasse) {
+		assertEquals(klasse.getKlasseID(), "MED");
+		assertEquals(klasse.getTittel(), "Medlemskap");
+	}
 
-		no.arkivverket.standarder.noark5.loependejournal.Journalpost jp = registrering.getJournalpost();
+	private void assertJournalpost(no.arkivverket.standarder.noark5.offentligjournal.Journalpost jp) throws Exception {
 		assertEquals(jp.getSystemID().getValue().isEmpty(), false);
 		assertEquals(jp.getJournalaar(), toBigInteger(2020));
-		assertEquals(jp.getTittel(), "Legg til ny institusjon");
+		assertEquals(jp.getJournalsekvensnummer(), toBigInteger(453637481));
+		assertEquals(jp.getJournalpostnummer(), toBigInteger(453637481));
+		assertEquals(jp.getOffentligTittel(), "Legg til ny institusjon");
 		assertEquals(jp.getJournaldato(), toGregorianCalendar("2020-11-10T15:04:43Z"));
 		assertEquals(jp.getDokumentetsDato(), toGregorianCalendar("2020-11-10T15:04:43Z"));
+		assertEquals(jp.getSkjermingMetadata(), "Skjerming navn mottaker");
+		assertEquals(jp.getSkjermingshjemmel(), "Offentleglova § 13");
+		assertKorrespondanseParts(jp.getKorrespondanseparts().get(0));
+	}
 
-		Korrespondansepart part = jp.getKorrespondanseparts().get(0);
-		assertEquals(part.getKorrespondansepartNavn(), "Arena");
+	private void assertKorrespondanseParts(Korrespondansepart part) {
+		assertEquals(part.getKorrespondansepartNavn(), "****");
 		assertEquals(part.getKorrespondanseparttype(), "Mottaker");
+	}
 
+	private void assertMappe(Saksmappe mappe) {
+		assertEquals(mappe.getSaksaar(), toBigInteger(2019));
+		assertEquals(mappe.getSakssekvensnummer(), toBigInteger((1234567011)));
+		assertEquals(mappe.getOffentligTittel(), "Medlemskap");
 	}
 
 	private XMLGregorianCalendar toGregorianCalendar(String date) throws Exception {
@@ -83,7 +91,6 @@ class JournalRegistreringMapperTest {
 				.endretAv("srvmelosys")
 				.endretAvBeriketNavn(null)
 				.dokumenter(Arrays.asList(generateDokumentInfo()))
-				.arkivendringer(new ArrayList<Arkivendring>())
 				.build();
 	}
 
@@ -100,8 +107,6 @@ class JournalRegistreringMapperTest {
 				.datoOpprettet(formatter.parse("2020-11-10 16:04:43.342"))
 				.opprettetAv("srvmelosys")
 				.opprettetAvBeriketNavn("Automatisk Jobb")
-				.fildetaljer(new ArrayList<FilDetaljer>())
-				.arkivendringer(new ArrayList<Arkivendring>())
 				.build();
 	}
 

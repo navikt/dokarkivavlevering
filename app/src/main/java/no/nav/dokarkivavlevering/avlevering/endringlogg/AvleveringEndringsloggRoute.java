@@ -6,7 +6,6 @@ import no.nav.dokarkivavlevering.avlevering.sftp.AvleveringSFTPRoute;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.converter.jaxb.JaxbConstants;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
@@ -81,9 +80,8 @@ public class AvleveringEndringsloggRoute extends RouteBuilder {
 					endringslogg.getEndrings().addAll(exchange.getIn().getBody(List.class));
 					exchange.getIn().setBody(endringslogg);
 				})
-				.setHeader(JaxbConstants.JAXB_PART_NAMESPACE, simple("{http://www.arkivverket.no/standarder/noark5/endringslogg}endringslogg"))
 				.setHeader(Exchange.FILE_NAME, simple("${exchangeProperty.AvleveringId}/endring_${exchangeProperty.AvleveringTema}_${header.CamelLoopIndex}.xml"))
 				.to("file://{{avlevering.filomraade.work}}?fileExist=Override")
-				.log(LoggingLevel.INFO, log, "Behandlet ferdig endringslogg.xml for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelLoopIndex}");
+				.log(LoggingLevel.INFO, log, "Behandlet ferdig ${header.CamelFilenameProduced} for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelLoopIndex}");
 	}
 }

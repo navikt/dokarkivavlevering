@@ -1,10 +1,10 @@
-package no.nav.dokarkivavlevering.avlevering.loependejournal;
+package no.nav.dokarkivavlevering.avlevering.offentligjournal;
 
-import no.arkivverket.standarder.noark5.loependejournal.Journalregistrering;
-import no.arkivverket.standarder.noark5.loependejournal.Klasse;
-import no.arkivverket.standarder.noark5.loependejournal.Korrespondansepart;
-import no.arkivverket.standarder.noark5.loependejournal.Saksmappe;
-import no.arkivverket.standarder.noark5.loependejournal.SystemID;
+import no.arkivverket.standarder.noark5.offentligjournal.Journalregistrering;
+import no.arkivverket.standarder.noark5.offentligjournal.Klasse;
+import no.arkivverket.standarder.noark5.offentligjournal.Korrespondansepart;
+import no.arkivverket.standarder.noark5.offentligjournal.Saksmappe;
+import no.arkivverket.standarder.noark5.offentligjournal.SystemID;
 import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import org.springframework.stereotype.Component;
@@ -19,8 +19,7 @@ import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.temaNav
 import static org.apache.camel.converter.ObjectConverter.toBigInteger;
 
 @Component
-public class JournalRegistreringMapper {
-
+public class OffentligJournalRegistreringMapper {
 
 	public Journalregistrering map(Sak sak, Journalpost fraJournalpost) {
 		Journalregistrering registrering = new Journalregistrering();
@@ -41,20 +40,29 @@ public class JournalRegistreringMapper {
 		Saksmappe mappe = new Saksmappe();
 		mappe.setSaksaar(toBigInteger(getYear(sak.getOpprettetTidspunkt())));
 		mappe.setSakssekvensnummer(toBigInteger(sak.getId()));
-		mappe.setTittel(temaNavnDecode(sak.getTema()));
+		mappe.setOffentligTittel(temaNavnDecode(sak.getTema()));
 
 		return mappe;
 	}
 
-	private no.arkivverket.standarder.noark5.loependejournal.Journalpost mapJournalPost(Journalpost fraJournalpost) {
-		no.arkivverket.standarder.noark5.loependejournal.Journalpost tilJournalpost = new no.arkivverket.standarder.noark5.loependejournal.Journalpost();
+	private no.arkivverket.standarder.noark5.offentligjournal.Journalpost mapJournalPost(Journalpost fraJournalpost) {
+		no.arkivverket.standarder.noark5.offentligjournal.Journalpost tilJournalpost = new no.arkivverket.standarder.noark5.offentligjournal.Journalpost();
 		tilJournalpost.setSystemID(mapSystemID(fraJournalpost.getUuid()));
 		tilJournalpost.setJournalaar(toBigInteger(getYear(fraJournalpost.getDatoOpprettet())));
 		tilJournalpost.setJournalsekvensnummer(toBigInteger(fraJournalpost.getId()));
 		tilJournalpost.setJournalpostnummer(toBigInteger(fraJournalpost.getId()));
-		tilJournalpost.setTittel(fraJournalpost.getInnhold());
+		tilJournalpost.setOffentligTittel(fraJournalpost.getInnhold());
 		tilJournalpost.setJournaldato(dateToXMLGregorianCalendar(fraJournalpost.getDatoJournal()));
 		tilJournalpost.getKorrespondanseparts().add(mapKorrespondansepart(fraJournalpost));
+		tilJournalpost.setSkjermingshjemmel("Offentleglova § 13");
+
+		if (isNav(fraJournalpost.getType())) {
+			if ("I".equalsIgnoreCase(fraJournalpost.getType())) {
+				tilJournalpost.setSkjermingMetadata("Skjerming navn avsender");
+			} else {
+				tilJournalpost.setSkjermingMetadata("Skjerming navn mottaker");
+			}
+		}
 
 		if (fraJournalpost.getDatoDokument() != null) {
 			tilJournalpost.setDokumentetsDato(dateToXMLGregorianCalendar(fraJournalpost.getDatoDokument()));
@@ -65,7 +73,11 @@ public class JournalRegistreringMapper {
 	private Korrespondansepart mapKorrespondansepart(Journalpost journalpost) {
 		Korrespondansepart part = new Korrespondansepart();
 		part.setKorrespondanseparttype(mapKorrespondansepartType(journalpost.getType()));
-		part.setKorrespondansepartNavn(mapKorrespondansepartNavn(journalpost));
+		if (isNav(journalpost.getType())) {
+			part.setKorrespondansepartNavn("****");
+		} else {
+			part.setKorrespondansepartNavn("NAV");
+		}
 		return part;
 	}
 
@@ -73,9 +85,5 @@ public class JournalRegistreringMapper {
 		SystemID systemID = new SystemID();
 		systemID.setValue(value.toString());
 		return systemID;
-	}
-
-	public static String mapKorrespondansepartNavn(no.nav.dokarkivavlevering.avlevering.domain.Journalpost journalpost) {
-		return isNav(journalpost.getType()) ? journalpost.getAvsenderMottaker() : "NAV";
 	}
 }
