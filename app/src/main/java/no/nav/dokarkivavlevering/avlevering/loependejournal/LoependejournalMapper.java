@@ -28,9 +28,8 @@ public class LoependejournalMapper {
 	private Journalhode mapJournalHode() {
 		Journalhode journalHode = new Journalhode();
 		journalHode.setJournalStartDato(dateTimeToXMLGregorianCalendar(periode.getStartdato()));
-		journalHode.setJournalSluttDato(dateTimeToXMLGregorianCalendar(periode.getStartdato()));
+		journalHode.setJournalSluttDato(dateTimeToXMLGregorianCalendar(periode.getSluttdato()));
 		journalHode.setSeleksjon("journaldato");
-		//TODO: "antall journalregistrering i filen". Menes det her i arkivstruktur.xml eller i saken?
 		journalHode.setAntallJournalposter(toBigInteger("-1"));
 		journalHode.getArkivskapers().add(mapArkivSkaper());
 		return journalHode;

@@ -1,13 +1,12 @@
 package no.nav.dokarkivavlevering.avlevering.offentligjournal;
 
-import no.arkivverket.standarder.noark5.arkivstruktur.ObjectFactory;
 import no.arkivverket.standarder.noark5.offentligjournal.Journalregistrering;
+import no.arkivverket.standarder.noark5.offentligjournal.ObjectFactory;
 import no.arkivverket.standarder.noark5.offentligjournal.OffentligJournal;
 import no.nav.dokarkivavlevering.avlevering.sftp.AvleveringSFTPRoute;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.converter.jaxb.JaxbConstants;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
@@ -47,16 +46,15 @@ public class AvleveringOffentligJournalRoute extends RouteBuilder {
 	public void configure() throws Exception {
 		from(GENERER_OFFENTLIGJOURNAL)
 				.routeId("generer_offentligjournal")
-				.log(LoggingLevel.INFO, log, "Starter generering av offentligjournall.xml.")
+				.log(LoggingLevel.INFO, log, "Starter generering av offentligJournal.xml.")
 				.to(OPPRETT_OFFENTLIGJOURNAL_PRE)
 				.to(FLETT_OFFENTLIGJOURNAL)
-				.log(LoggingLevel.INFO, log, "Ferdig med å generere arkivstruktur.xml.");
+				.log(LoggingLevel.INFO, log, "Ferdig med å generere offentligJournal.xml.");
 
 		from(OPPRETT_OFFENTLIGJOURNAL_PRE)
 				.routeId("opprett_offentligjournal_pre")
-				.log(LoggingLevel.INFO, log, "loependejournal_pre")
+				.log(LoggingLevel.INFO, log, "offentligjournal_pre")
 				.bean(offentligJournalMapper)
-				.setHeader(JaxbConstants.JAXB_PART_NAMESPACE, simple("{http://www.arkivverket.no/standarder/noark5/arkivstruktur}offentligjournal"))
 				.marshal(marshalJaxbFormat())
 				.setHeader(Exchange.FILE_NAME, simple("${exchangeProperty.AvleveringId}/pre_offentligjournal.xml"))
 				.to("file://{{avlevering.filomraade.work}}?fileExist=Override")
@@ -64,13 +62,13 @@ public class AvleveringOffentligJournalRoute extends RouteBuilder {
 
 		from(FLETT_OFFENTLIGJOURNAL)
 				.routeId("flett_offentligjournal")
-				.log(LoggingLevel.INFO, log, "flett_loependejournal")
+				.log(LoggingLevel.INFO, log, "flett_offentligjournal")
 				.process(exchange -> {
-					// Fra opprett_loependeJournal_pre
+					// Fra opprett_offentligjournal_pre
 					InputStream inputStream = FileUtils.openInputStream(Paths.get(exchange.getIn().getHeader(Exchange.FILE_NAME_PRODUCED, String.class)).toFile());
 					exchange.getIn().setBody(inputStream);
 				})
-				.setHeader(HEADER_XSL_PARAM_OFFENTLIGJOURNAL_XML, simple("file:///{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/?select=journalregistrering_*.xml"))
+				.setHeader(HEADER_XSL_PARAM_OFFENTLIGJOURNAL_XML, simple("file:///{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/?select=offentligjournal_*.xml"))
 				.setHeader(Exchange.XSLT_FILE_NAME, simple("{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/offentligJournal.xml"))
 				.to("xslt:classpath:offentligjournal/embed_registrering_into_offentligjournal.xsl?output=file")
 				.setHeader(AvleveringSFTPRoute.HEADER_FILNAVN, simple("offentligJournal.xml"))
@@ -79,7 +77,7 @@ public class AvleveringOffentligJournalRoute extends RouteBuilder {
 
 
 		from(OFFENTLIGJOURNAL)
-				.routeId("loependeJournal")
+				.routeId("offentligJournal")
 				.log(LoggingLevel.INFO, log, "RouteID: offentligjournal")
 				.log(LoggingLevel.INFO, log, "Behandler offentligjournal.xml for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelLoopIndex}")
 				.bean(journalregistreringService)
@@ -88,10 +86,9 @@ public class AvleveringOffentligJournalRoute extends RouteBuilder {
 					journal.getJournalregistrerings().addAll((List<Journalregistrering>) exchange.getIn().getBody());
 					exchange.getIn().setBody(journal);
 				})
-				.setHeader(JaxbConstants.JAXB_PART_NAMESPACE, simple("{http://www.arkivverket.no/standarder/noark5/arkivstruktur}offentligjournal"))
 				.marshal(marshalJaxbFormat())
-				.setHeader(Exchange.FILE_NAME, simple("${exchangeProperty.AvleveringId}/journalregistrering_${exchangeProperty.AvleveringTema}_${header.CamelLoopIndex}.xml"))
+				.setHeader(Exchange.FILE_NAME, simple("${exchangeProperty.AvleveringId}/offentligjournal_${exchangeProperty.AvleveringTema}_${header.CamelLoopIndex}.xml"))
 				.to("file://{{avlevering.filomraade.work}}?fileExist=Append")
-				.log(LoggingLevel.INFO, log, "Behandlet ferdig loependeJournal.xml for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelLoopIndex}");
+				.log(LoggingLevel.INFO, log, "Behandlet ferdig ${header.CamelFilenameProduced} for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelLoopIndex}");
 	}
 }

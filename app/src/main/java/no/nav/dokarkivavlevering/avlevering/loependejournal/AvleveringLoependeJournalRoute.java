@@ -1,13 +1,12 @@
 package no.nav.dokarkivavlevering.avlevering.loependejournal;
 
-import no.arkivverket.standarder.noark5.arkivstruktur.ObjectFactory;
 import no.arkivverket.standarder.noark5.loependejournal.Journalregistrering;
 import no.arkivverket.standarder.noark5.loependejournal.LoependeJournal;
+import no.arkivverket.standarder.noark5.loependejournal.ObjectFactory;
 import no.nav.dokarkivavlevering.avlevering.sftp.AvleveringSFTPRoute;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.converter.jaxb.JaxbConstants;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
@@ -36,8 +35,8 @@ public class AvleveringLoependeJournalRoute extends RouteBuilder {
 		return jaxbDataFormat;
 	}
 
-	private LoependeJournalregistreringService loependeJournalregistreringService;
-	private LoependejournalMapper loependejournalMapper;
+	private final LoependeJournalregistreringService loependeJournalregistreringService;
+	private final LoependejournalMapper loependejournalMapper;
 
 	public AvleveringLoependeJournalRoute(LoependeJournalregistreringService loependeJournalregistreringService, LoependejournalMapper loependejournalMapper) {
 		this.loependeJournalregistreringService = loependeJournalregistreringService;
@@ -49,16 +48,15 @@ public class AvleveringLoependeJournalRoute extends RouteBuilder {
 
 		from(GENERER_LOEPENDEJOURNAL)
 				.routeId("generer_loependeJournal")
-				.log(LoggingLevel.INFO, log, "Starter generering av loependejournal.xml.")
+				.log(LoggingLevel.INFO, log, "Starter generering av loependeJournal.xml.")
 				.to(OPPRETT_LOEPENDEJOURNAL_PRE)
 				.to(FLETT_LOEPENDEJOURNAL)
-				.log(LoggingLevel.INFO, log, "Ferdig med å generere arkivstruktur.xml.");
+				.log(LoggingLevel.INFO, log, "Ferdig med å generere loependeJournal.xml.");
 
 		from(OPPRETT_LOEPENDEJOURNAL_PRE)
 				.routeId("opprett_loependeJournal_pre")
 				.log(LoggingLevel.INFO, log, "loependejournal_pre")
 				.bean(loependejournalMapper)
-				.setHeader(JaxbConstants.JAXB_PART_NAMESPACE, simple("{http://www.arkivverket.no/standarder/noark5/arkivstruktur}loependejournal"))
 				.marshal(marshalJaxbFormat())
 				.setHeader(Exchange.FILE_NAME, simple("${exchangeProperty.AvleveringId}/pre_loependeJournal.xml"))
 				.to("file://{{avlevering.filomraade.work}}?fileExist=Override")
@@ -72,8 +70,8 @@ public class AvleveringLoependeJournalRoute extends RouteBuilder {
 					InputStream inputStream = FileUtils.openInputStream(Paths.get(exchange.getIn().getHeader(Exchange.FILE_NAME_PRODUCED, String.class)).toFile());
 					exchange.getIn().setBody(inputStream);
 				})
-				.setHeader(HEADER_XSL_PARAM_LOEPENDEJOURNAL_XML, simple("file:///{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/?select=journalregistrering_*.xml"))
-				.setHeader(Exchange.XSLT_FILE_NAME, simple("{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/loependejournal.xml"))
+				.setHeader(HEADER_XSL_PARAM_LOEPENDEJOURNAL_XML, simple("file:///{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/?select=loependejournal_*.xml"))
+				.setHeader(Exchange.XSLT_FILE_NAME, simple("{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/loependeJournal.xml"))
 				.to("xslt:classpath:loependejournal/embed_registrering_into_loependejournal.xsl?output=file")
 				.setHeader(AvleveringSFTPRoute.HEADER_FILNAVN, simple("loependeJournal.xml"))
 				.to(AvleveringSFTPRoute.SFTP)
@@ -82,7 +80,6 @@ public class AvleveringLoependeJournalRoute extends RouteBuilder {
 
 		from(LOEPENDEJOURNAL)
 				.routeId("loependeJournal")
-				.log(LoggingLevel.INFO, log, "RouteID: loependejournal")
 				.log(LoggingLevel.INFO, log, "Behandler loependeJournal.xml for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelLoopIndex}")
 				.bean(loependeJournalregistreringService)
 				.process(exchange -> {
@@ -90,10 +87,9 @@ public class AvleveringLoependeJournalRoute extends RouteBuilder {
 					journal.getJournalregistrerings().addAll((List<Journalregistrering>) exchange.getIn().getBody());
 					exchange.getIn().setBody(journal);
 				})
-				.setHeader(JaxbConstants.JAXB_PART_NAMESPACE, simple("{http://www.arkivverket.no/standarder/noark5/arkivstruktur}loependejournal"))
 				.marshal(marshalJaxbFormat())
-				.setHeader(Exchange.FILE_NAME, simple("${exchangeProperty.AvleveringId}/journalregistrering_${exchangeProperty.AvleveringTema}_${header.CamelLoopIndex}.xml"))
+				.setHeader(Exchange.FILE_NAME, simple("${exchangeProperty.AvleveringId}/loependejournal_${exchangeProperty.AvleveringTema}_${header.CamelLoopIndex}.xml"))
 				.to("file://{{avlevering.filomraade.work}}?fileExist=Append")
-				.log(LoggingLevel.INFO, log, "Behandlet ferdig loependeJournal.xml for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelLoopIndex}");
+				.log(LoggingLevel.INFO, log, "Behandlet ferdig ${header.CamelFilenameProduced} for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelLoopIndex}");
 	}
 }
