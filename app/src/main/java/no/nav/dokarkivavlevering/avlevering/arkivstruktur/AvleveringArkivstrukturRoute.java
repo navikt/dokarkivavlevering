@@ -2,7 +2,6 @@ package no.nav.dokarkivavlevering.avlevering.arkivstruktur;
 
 import no.arkivverket.standarder.noark5.arkivstruktur.Klasse;
 import no.arkivverket.standarder.noark5.arkivstruktur.ObjectFactory;
-import no.arkivverket.standarder.noark5.arkivstruktur.Saksmappe;
 import no.nav.dokarkivavlevering.avlevering.sftp.AvleveringSFTPRoute;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
@@ -46,14 +45,6 @@ public class AvleveringArkivstrukturRoute extends RouteBuilder {
 		this.klasseMapper = klasseMapper;
 	}
 
-	private JaxbDataFormat saksmappeArkivstrukturJaxb() {
-		JaxbDataFormat jaxbDataFormat = new JaxbDataFormat(ObjectFactory.class.getPackage().getName());
-		jaxbDataFormat.setEncoding(StandardCharsets.UTF_8.toString());
-		jaxbDataFormat.setFragment(true);
-		jaxbDataFormat.setPartClass(Saksmappe.class);
-		return jaxbDataFormat;
-	}
-
 	private JaxbDataFormat klasseArkivstrukturJaxb() {
 		JaxbDataFormat jaxbDataFormat = new JaxbDataFormat(ObjectFactory.class.getPackage().getName());
 		jaxbDataFormat.setEncoding(StandardCharsets.UTF_8.toString());
@@ -66,6 +57,7 @@ public class AvleveringArkivstrukturRoute extends RouteBuilder {
 		final JaxbDataFormat jaxbDataFormat = new JaxbDataFormat();
 		jaxbDataFormat.setEncoding(StandardCharsets.UTF_8.toString());
 		jaxbDataFormat.setContext(JAXBContext.newInstance(ObjectFactory.class));
+		jaxbDataFormat.setSchemaLocation("http://www.arkivverket.no/standarder/noark5/arkivstruktur arkivstruktur.xsd");
 		return jaxbDataFormat;
 	}
 
@@ -93,7 +85,8 @@ public class AvleveringArkivstrukturRoute extends RouteBuilder {
 					exchange.getIn().setBody(inputStream);
 				})
 				.setHeader(HEADER_XSL_PARAM_KLASSE_XML, simple("file:///{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}?select=klasse_*.xml"))
-				.to("xslt:classpath:arkivstruktur/embed_klasse_into_arkivstruktur.xsl?output=bytes")
+				.setHeader(Exchange.XSLT_FILE_NAME, simple("{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/arkivstruktur.xml"))
+				.to("xslt:classpath:arkivstruktur/embed_klasse_into_arkivstruktur.xsl?output=file")
 				.setHeader(AvleveringSFTPRoute.HEADER_FILNAVN, simple("arkivstruktur.xml"))
 				.to(AvleveringSFTPRoute.SFTP);
 

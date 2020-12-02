@@ -32,6 +32,7 @@ public class AvleveringLoependeJournalRoute extends RouteBuilder {
 		final JaxbDataFormat jaxbDataFormat = new JaxbDataFormat();
 		jaxbDataFormat.setEncoding(StandardCharsets.UTF_8.toString());
 		jaxbDataFormat.setContext(JAXBContext.newInstance(ObjectFactory.class));
+		jaxbDataFormat.setSchemaLocation("http://www.arkivverket.no/standarder/noark5/loependeJournal loependeJournal.xsd");
 		return jaxbDataFormat;
 	}
 
@@ -74,7 +75,7 @@ public class AvleveringLoependeJournalRoute extends RouteBuilder {
 				.setHeader(HEADER_XSL_PARAM_LOEPENDEJOURNAL_XML, simple("file:///{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/?select=journalregistrering_*.xml"))
 				.setHeader(Exchange.XSLT_FILE_NAME, simple("{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/loependejournal.xml"))
 				.to("xslt:classpath:loependejournal/embed_registrering_into_loependejournal.xsl?output=file")
-				.setHeader(AvleveringSFTPRoute.HEADER_FILNAVN, simple("loependejournal.xml"))
+				.setHeader(AvleveringSFTPRoute.HEADER_FILNAVN, simple("loependeJournal.xml"))
 				.to(AvleveringSFTPRoute.SFTP)
 				.log(LoggingLevel.INFO, log, "Genererte loependeJournal til ${header.CamelXsltFileName}");
 

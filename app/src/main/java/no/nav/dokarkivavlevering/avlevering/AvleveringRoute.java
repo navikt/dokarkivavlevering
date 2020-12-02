@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 public class AvleveringRoute extends RouteBuilder {
 	public static final String PROPERTY_AVLEVERING_ID = "AvleveringId";
 	public static final String PROPERTY_TEMA = "AvleveringTema";
+	public static final String SHUTDOWN = "direct:shutdown";
 
 	private final ApplicationContext springContext;
 	private final AvleveringProperties avleveringProperties;
@@ -35,7 +36,7 @@ public class AvleveringRoute extends RouteBuilder {
 	@Override
 	public void configure() throws Exception {
 		// feil som ikke blir håndtert i try-catches eller i onException gjør at appen blir skrudd av.
-		errorHandler(deadLetterChannel("direct:shutdown")
+		errorHandler(deadLetterChannel(SHUTDOWN)
 				.log(log)
 				.disableRedelivery()
 				.loggingLevel(LoggingLevel.ERROR)
@@ -59,9 +60,9 @@ public class AvleveringRoute extends RouteBuilder {
 				.to(AvleveringEndringsloggRoute.GENERER_ENDRINGSLOGG)
 				.to(AvleveringOffentligJournalRoute.GENERER_OFFENTLIGJOURNAL)
 				.log(LoggingLevel.INFO, log, "Dokarkivavlevering er ferdig med avlevering.")
-				.to("direct:shutdown");
+				.to(SHUTDOWN);
 
-		from("direct:shutdown")
+		from(SHUTDOWN)
 				.routeId("shutdown")
 				.process(new Processor() {
 					Thread stop;

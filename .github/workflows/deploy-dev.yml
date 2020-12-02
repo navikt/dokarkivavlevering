@@ -7,10 +7,10 @@ on:
         required: true
         default: 'warning'
       periodeStart:
-        description: 'Periode start (f.o.m) for avlevering'
+        description: 'Periode start (f.o.m) for avlevering. YYYY-MM-DD'
         required: true
       periodeSlutt:
-        description: 'Periode slutt (t.o.m) for avlevering'
+        description: 'Periode slutt (t.o.m) for avlevering. YYYY-MM-DD'
         required: true
 
 env:

@@ -5,6 +5,7 @@ import no.nav.dokarkivavlevering.avlevering.arkivstruktur.AvleveringArkivstruktu
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.dokument.DokumentRoute;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
+import no.nav.dokarkivavlevering.avlevering.endringlogg.AvleveringEndringsloggRoute;
 import no.nav.dokarkivavlevering.avlevering.loependejournal.AvleveringLoependeJournalRoute;
 import no.nav.dokarkivavlevering.avlevering.offentligjournal.AvleveringOffentligJournalRoute;
 import no.nav.dokarkivavlevering.avlevering.repository.AvleveringRepository;
@@ -92,7 +93,7 @@ public class AvleveringTemaRoute extends RouteBuilder {
 					return oldExchange;
 				})
 				.parallelProcessing()
-				.to(AvleveringArkivstrukturRoute.ARKIVSTRUKTUR, "direct:endringslogg", AvleveringLoependeJournalRoute.LOEPENDEJOURNAL, AvleveringOffentligJournalRoute.OFFENTLIGJOURNAL, DokumentRoute.SEND_DOKUMENT)
+				.to(AvleveringArkivstrukturRoute.ARKIVSTRUKTUR, AvleveringEndringsloggRoute.ENDRINGSLOGG, AvleveringLoependeJournalRoute.LOEPENDEJOURNAL, AvleveringOffentligJournalRoute.OFFENTLIGJOURNAL, DokumentRoute.SEND_DOKUMENT)
 				.end(); // end multicast
 
 	}
