@@ -71,9 +71,9 @@ public class AvleveringOffentligJournalRoute extends RouteBuilder {
 					exchange.getIn().setBody(inputStream);
 				})
 				.setHeader(HEADER_XSL_PARAM_OFFENTLIGJOURNAL_XML, simple("file:///{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/?select=journalregistrering_*.xml"))
-				.setHeader(Exchange.XSLT_FILE_NAME, simple("{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/offentligjournal.xml"))
+				.setHeader(Exchange.XSLT_FILE_NAME, simple("{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/offentligJournal.xml"))
 				.to("xslt:classpath:offentligjournal/embed_registrering_into_offentligjournal.xsl?output=file")
-				.setHeader(AvleveringSFTPRoute.HEADER_FILNAVN, simple("offentligjournal.xml"))
+				.setHeader(AvleveringSFTPRoute.HEADER_FILNAVN, simple("offentligJournal.xml"))
 				.to(AvleveringSFTPRoute.SFTP)
 				.log(LoggingLevel.INFO, log, "Genererte offentligjournal til ${header.CamelXsltFileName}");
 
