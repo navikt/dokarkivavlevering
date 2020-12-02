@@ -31,11 +31,12 @@ public class AvleveringOffentligJournalRoute extends RouteBuilder {
 		final JaxbDataFormat jaxbDataFormat = new JaxbDataFormat();
 		jaxbDataFormat.setEncoding(StandardCharsets.UTF_8.toString());
 		jaxbDataFormat.setContext(JAXBContext.newInstance(ObjectFactory.class));
+		jaxbDataFormat.setSchemaLocation("http://www.arkivverket.no/standarder/noark5/offentligJournal offentligJournal.xsd");
 		return jaxbDataFormat;
 	}
 
-	private JournalRegistreringService journalregistreringService;
-	private OffentligJournalMapper offentligJournalMapper;
+	private final JournalRegistreringService journalregistreringService;
+	private final OffentligJournalMapper offentligJournalMapper;
 
 	public AvleveringOffentligJournalRoute(JournalRegistreringService journalregistreringService, OffentligJournalMapper offentligJournalMapper) {
 		this.journalregistreringService = journalregistreringService;
@@ -44,7 +45,6 @@ public class AvleveringOffentligJournalRoute extends RouteBuilder {
 
 	@Override
 	public void configure() throws Exception {
-
 		from(GENERER_OFFENTLIGJOURNAL)
 				.routeId("generer_offentligjournal")
 				.log(LoggingLevel.INFO, log, "Starter generering av offentligjournall.xml.")
