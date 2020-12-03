@@ -52,14 +52,14 @@ class SaksmappeMapperTest {
 		//saksmappe
 		assertEquals(saksmappe.getSaksaar().toString(), "2019");
 		assertEquals(saksmappe.getSakssekvensnummer().toString(), "1234567011");
-		assertEquals(saksmappe.getSaksdato(), toGregorianCalendar("2019-10-28T10:41:36.000Z"));
+		assertEquals(saksmappe.getSaksdato(), toGregorianCalendar("2019-10-28T10:41:36Z"));
 		assertEquals(saksmappe.getAdministrativEnhet(), "NAV Medlemskap og avgift");
 		assertEquals(saksmappe.getSaksansvarlig(), "Automatisk jobb");
 		assertEquals(saksmappe.getSaksstatus(), "Under behandling");
 		assertEquals(saksmappe.getSystemID().getValue().isEmpty(), false);
 		assertEquals(saksmappe.getMappeID(), "1234567011");
 		assertEquals(saksmappe.getTittel(), "Medlemskap");
-		assertEquals(saksmappe.getOpprettetDato(), toGregorianCalendar("2019-10-28T10:41:36.000Z"));
+		assertEquals(saksmappe.getOpprettetDato(), toGregorianCalendar("2019-10-28T10:41:36Z"));
 		assertEquals(saksmappe.getOpprettetAv(), "Automatisk jobb");
 		assertEquals(saksmappe.getReferanseArkivdels().size(), 1);
 		assertEquals(saksmappe.getParts().size(), 1);
@@ -83,10 +83,10 @@ class SaksmappeMapperTest {
 		assertEquals(registrering.getJournalpostnummer().toString(), "453637481");
 		assertEquals(registrering.getJournalposttype(), "Utgående dokument");
 		assertEquals(registrering.getJournalstatus(), "Arkivert");
-		assertEquals(registrering.getJournaldato(), toGregorianCalendar("2020-11-10T15:04:43.000Z"));
-		assertEquals(registrering.getDokumentetsDato(), toGregorianCalendar("2020-11-10T15:04:43.000Z"));
+		assertEquals(registrering.getJournaldato(), toGregorianCalendar("2020-11-10T15:04:43Z"));
+		assertEquals(registrering.getDokumentetsDato(), toGregorianCalendar("2020-11-10T15:04:43Z"));
 		assertEquals(registrering.getSystemID().getValue().isEmpty(), false);
-		assertEquals(registrering.getOpprettetDato(), toGregorianCalendar("2020-11-10T15:04:43.000Z"));
+		assertEquals(registrering.getOpprettetDato(), toGregorianCalendar("2020-11-10T15:04:43Z"));
 		assertEquals(registrering.getOpprettetAv(), "srvmelosys");
 		assertEquals(registrering.getRegistreringsID(), "453637481");
 		assertEquals(registrering.getTittel(), "Legg til ny institusjon");
@@ -102,7 +102,7 @@ class SaksmappeMapperTest {
 		assertEquals(dokObjekt.getVersjonsnummer(), toBigInteger(1));
 		assertEquals(dokObjekt.getVariantformat(), "Arkivformat");
 		assertEquals(dokObjekt.getFormat(), "PDF/A");
-		assertEquals(dokObjekt.getOpprettetDato(), toGregorianCalendar("2020-11-10T15:04:43.000Z"));
+		assertEquals(dokObjekt.getOpprettetDato(), toGregorianCalendar("2020-11-10T15:04:43Z"));
 		assertEquals(dokObjekt.getOpprettetAv(), "Automatisk jobb");
 		assertEquals(dokObjekt.getReferanseDokumentfil(), "DOKUMENTER/MED/55c39cdb-f052-4f4e-a9a5-900b455ca915.pdf");
 		assertEquals(dokObjekt.getSjekksum(), "a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e");
@@ -121,11 +121,11 @@ class SaksmappeMapperTest {
 		assertEquals(dok.getDokumenttype(), "SED");
 		assertEquals(dok.getDokumentstatus(), "FERDIGSTILT");
 		assertEquals(dok.getTittel(), "Legg til ny institusjon");
-		assertEquals(dok.getOpprettetDato(), toGregorianCalendar("2020-11-10T15:04:43.000Z"));
+		assertEquals(dok.getOpprettetDato(), toGregorianCalendar("2020-11-10T15:04:43Z"));
 		assertEquals(dok.getOpprettetAv(), "Automatisk jobb");
 		assertEquals(dok.getTilknyttetRegistreringSom(), "HOVEDDOKUMENT");
 		assertEquals(dok.getDokumentnummer(), toBigInteger(454017976));
-		assertEquals(dok.getTilknyttetDato(), toGregorianCalendar("2020-11-10T15:04:43.000Z"));
+		assertEquals(dok.getTilknyttetDato(), toGregorianCalendar("2020-11-10T15:04:43Z"));
 		assertEquals(dok.getTilknyttetAv(), "Automatisk jobb");
 		assertEquals(dok.getDokumentobjekts().size(), 1);
 
