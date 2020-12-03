@@ -23,7 +23,7 @@ class OffentligJournalRegistreringMapperTest {
 
 	@Test
 	void testMapping() throws Exception {
-		final Journalregistrering journalRegistrering = mapper.map(generateSak(), generateSak().getJournalposter().get(0));
+		final Journalregistrering journalRegistrering = mapper.map(generateSak(), generateSak().getJp().get(0));
 
 		assertKlasse(journalRegistrering.getKlasse());
 		assertMappe(journalRegistrering.getSaksmappe());
@@ -69,7 +69,7 @@ class OffentligJournalRegistreringMapperTest {
 				.tema("MED")
 				.opprettetAv("srvmelosys")
 				.opprettetTidspunkt(formatter.parse("2019-10-28 11:41:36.673"))
-				.journalposter(Arrays.asList(generateJournalPost())).build();
+				.jp(Arrays.asList(generateJournalPost())).build();
 	}
 
 	private Journalpost generateJournalPost() throws Exception {
@@ -90,17 +90,17 @@ class OffentligJournalRegistreringMapperTest {
 				.opprettetAvNavn("srvmelosys")
 				.endretAv("srvmelosys")
 				.endretAvBeriketNavn(null)
-				.dokumenter(Arrays.asList(generateDokumentInfo()))
+				.dok(Arrays.asList(generateDokumentInfo()))
 				.build();
 	}
 
 	private DokumentInfo generateDokumentInfo() throws Exception {
 		return DokumentInfo.builder()
 				.id((long) 454017976)
-				.relasjonTilknyttetSom("HOVEDDOKUMENT")
-				.relasjonDatoOpprettet(formatter.parse("2020-11-10 16:04:43.343"))
-				.relasjonOpprettetAv("srvmelosys")
-				.relasjonOpprettetAvBeriketNavn("Automatisk Jobb")
+				.relTilknyttetSom("HOVEDDOKUMENT")
+				.relDatoOpprettet(formatter.parse("2020-11-10 16:04:43.343"))
+				.relOpprettetAv("srvmelosys")
+				.relOpprettetAvBeriketNavn("Automatisk Jobb")
 				.kategori("SED")
 				.status("FERDIGSTILT")
 				.tittel("Legg til ny institusjon")

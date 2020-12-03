@@ -4,9 +4,7 @@ import no.arkivverket.standarder.noark5.loependejournal.Journalregistrering;
 import no.arkivverket.standarder.noark5.loependejournal.Klasse;
 import no.arkivverket.standarder.noark5.loependejournal.Korrespondansepart;
 import no.arkivverket.standarder.noark5.loependejournal.Saksmappe;
-import no.nav.dokarkivavlevering.avlevering.domain.Arkivendring;
 import no.nav.dokarkivavlevering.avlevering.domain.DokumentInfo;
-import no.nav.dokarkivavlevering.avlevering.domain.FilDetaljer;
 import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import org.junit.jupiter.api.Test;
@@ -14,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import static org.apache.camel.converter.ObjectConverter.toBigInteger;
@@ -27,7 +24,7 @@ class LoependeJournalRegistreringMapperTest {
 	@Test
 	void testMapping() throws Exception {
 		final Sak sak = generateSak();
-		final Journalregistrering registrering = mapper.map(sak, sak.getJournalposter().get(0));
+		final Journalregistrering registrering = mapper.map(sak, sak.getJp().get(0));
 
 		Klasse k = registrering.getKlasse();
 		assertEquals(k.getKlasseID(), "MED");
@@ -90,7 +87,7 @@ class LoependeJournalRegistreringMapperTest {
 				.tema("MED")
 				.opprettetAv("srvmelosys")
 				.opprettetTidspunkt(formatter.parse("2019-10-28 11:41:36.673"))
-				.journalposter(Arrays.asList(generateJournalPost())).build();
+				.jp(Arrays.asList(generateJournalPost())).build();
 	}
 
 	private Journalpost generateJournalPost() throws Exception {
@@ -111,17 +108,17 @@ class LoependeJournalRegistreringMapperTest {
 				.opprettetAvNavn("srvmelosys")
 				.endretAv("srvmelosys")
 				.endretAvBeriketNavn(null)
-				.dokumenter(Arrays.asList(generateDokumentInfo()))
+				.dok(Arrays.asList(generateDokumentInfo()))
 				.build();
 	}
 
 	private DokumentInfo generateDokumentInfo() throws Exception {
 		return DokumentInfo.builder()
 				.id((long) 454017976)
-				.relasjonTilknyttetSom("HOVEDDOKUMENT")
-				.relasjonDatoOpprettet(formatter.parse("2020-11-10 16:04:43.343"))
-				.relasjonOpprettetAv("srvmelosys")
-				.relasjonOpprettetAvBeriketNavn("Automatisk Jobb")
+				.relTilknyttetSom("HOVEDDOKUMENT")
+				.relDatoOpprettet(formatter.parse("2020-11-10 16:04:43.343"))
+				.relOpprettetAv("srvmelosys")
+				.relOpprettetAvBeriketNavn("Automatisk Jobb")
 				.kategori("SED")
 				.status("FERDIGSTILT")
 				.tittel("Legg til ny institusjon")

@@ -3,7 +3,6 @@ package no.nav.dokarkivavlevering.avlevering.domain;
 import lombok.Builder;
 import lombok.ToString;
 import lombok.Value;
-import no.arkivverket.standarder.noark5.arkivstruktur.SystemID;
 
 import java.util.Date;
 import java.util.List;
@@ -26,7 +25,7 @@ public class Sak {
 
 	@ToString.Exclude
 	private Bruker bruker;
-	private List<Journalpost> journalposter;
+	private List<Journalpost> jp;
 
 	public Sak tilhoererBruker(final Bruker bruker) {
 		return this.toBuilder()

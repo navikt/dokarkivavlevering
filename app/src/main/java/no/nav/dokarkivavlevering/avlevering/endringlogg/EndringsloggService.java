@@ -28,12 +28,12 @@ public class EndringsloggService {
 
 		List<Endring> endringer = new ArrayList<>();
 		for (Sak sak : saker) {
-			for (Journalpost jp : sak.getJournalposter()) {
-				for (Arkivendring ae : jp.getArkivendringer()) {
+			for (Journalpost jp : sak.getJp()) {
+				for (Arkivendring ae : jp.getAe()) {
 					endringer.add(endringsloggMapper.map(ae, ae.getElement().startsWith(SAKSRELASJON) ? sak.getUuid() : jp.getUuid()));
 				}
-				for (DokumentInfo di : jp.getDokumenter()) {
-					for (Arkivendring ae : di.getArkivendringer()) {
+				for (DokumentInfo di : jp.getDok()) {
+					for (Arkivendring ae : di.getAe()) {
 						endringer.add(endringsloggMapper.map(ae, di.getUuid()));
 					}
 				}

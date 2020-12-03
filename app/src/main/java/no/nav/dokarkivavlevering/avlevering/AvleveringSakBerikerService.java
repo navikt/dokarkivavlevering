@@ -80,17 +80,17 @@ public class AvleveringSakBerikerService {
 		Set<String> adeoIdenter = new HashSet<>();
 		for (Sak sak : saker) {
 			adeoIdenter.add(sak.getOpprettetAv());
-			for (Journalpost journalpost : sak.getJournalposter()) {
+			for (Journalpost journalpost : sak.getJp()) {
 				adeoIdenter.add(journalpost.getOpprettetAv());
 				adeoIdenter.add(journalpost.getEndretAv());
-				for (Arkivendring journalpostArkivendring : journalpost.getArkivendringer()) {
+				for (Arkivendring journalpostArkivendring : journalpost.getAe()) {
 					adeoIdenter.add(journalpostArkivendring.getUtfoertAv());
 				}
-				for (DokumentInfo dokumentInfo : journalpost.getDokumenter()) {
-					for (Arkivendring dokumentInfoArkivendring : dokumentInfo.getArkivendringer()) {
+				for (DokumentInfo dokumentInfo : journalpost.getDok()) {
+					for (Arkivendring dokumentInfoArkivendring : dokumentInfo.getAe()) {
 						adeoIdenter.add(dokumentInfoArkivendring.getUtfoertAv());
 					}
-					for (FilDetaljer filDetaljer : dokumentInfo.getFildetaljer()) {
+					for (FilDetaljer filDetaljer : dokumentInfo.getFd()) {
 						adeoIdenter.add(filDetaljer.getOpprettetAv());
 					}
 				}

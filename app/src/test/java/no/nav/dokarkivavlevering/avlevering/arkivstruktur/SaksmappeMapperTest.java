@@ -43,10 +43,10 @@ class SaksmappeMapperTest {
 
 		Journalpost jp = generateJournalPost();
 		DokumentInfo dokInfo = generateDokumentInfo();
-		dokInfo.getFildetaljer().add(generateFilDetaljer());
-		jp.getDokumenter().add(dokInfo);
+		dokInfo.getFd().add(generateFilDetaljer());
+		jp.getDok().add(dokInfo);
 		Sak sak = generateSak();
-		sak.getJournalposter().add(jp);
+		sak.getJp().add(jp);
 
 		final Saksmappe saksmappe = saksmappeMapper.map(sak);
 		//saksmappe
@@ -143,7 +143,7 @@ class SaksmappeMapperTest {
 				.bruker(generaterBruker())
 				.opprettetAv("srvmelosys")
 				.opprettetTidspunkt(DATETIME_FORMAT.parse("2019-10-28 11:41:36.673"))
-				.journalposter(new ArrayList<Journalpost>()).build();
+				.jp(new ArrayList<Journalpost>()).build();
 	}
 
 	private Bruker generaterBruker() {
@@ -171,26 +171,26 @@ class SaksmappeMapperTest {
 				.opprettetAvNavn("srvmelosys")
 				.endretAv("srvmelosys")
 				.endretAvBeriketNavn(null)
-				.dokumenter(new ArrayList<DokumentInfo>())
-				.arkivendringer(new ArrayList<Arkivendring>())
+				.dok(new ArrayList<DokumentInfo>())
+				.ae(new ArrayList<Arkivendring>())
 				.build();
 	}
 
 	private DokumentInfo generateDokumentInfo() throws Exception {
 		return DokumentInfo.builder()
 				.id((long) 454017976)
-				.relasjonTilknyttetSom("HOVEDDOKUMENT")
-				.relasjonDatoOpprettet(DATETIME_FORMAT.parse("2020-11-10 16:04:43.343"))
-				.relasjonOpprettetAv("srvmelosys")
-				.relasjonOpprettetAvBeriketNavn("Automatisk Jobb")
+				.relTilknyttetSom("HOVEDDOKUMENT")
+				.relDatoOpprettet(DATETIME_FORMAT.parse("2020-11-10 16:04:43.343"))
+				.relOpprettetAv("srvmelosys")
+				.relOpprettetAvBeriketNavn("Automatisk Jobb")
 				.kategori("SED")
 				.status("FERDIGSTILT")
 				.tittel("Legg til ny institusjon")
 				.datoOpprettet(DATETIME_FORMAT.parse("2020-11-10 16:04:43.342"))
 				.opprettetAv("srvmelosys")
 				.opprettetAvBeriketNavn("Automatisk Jobb")
-				.fildetaljer(new ArrayList<FilDetaljer>())
-				.arkivendringer(new ArrayList<Arkivendring>())
+				.fd(new ArrayList<FilDetaljer>())
+				.ae(new ArrayList<Arkivendring>())
 				.build();
 	}
 

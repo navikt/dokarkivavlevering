@@ -17,12 +17,12 @@ public class DokumentInfo {
 
 	private final UUID uuid = UUID.randomUUID();
 	private final Long id;
-	private final String relasjonTilknyttetSom;
-	private final Date relasjonDatoOpprettet;
+	private final String relTilknyttetSom;
+	private final Date relDatoOpprettet;
 	@ToString.Exclude
-	private final String relasjonOpprettetAv;
+	private final String relOpprettetAv;
 	@ToString.Exclude
-	private final String relasjonOpprettetAvBeriketNavn;
+	private final String relOpprettetAvBeriketNavn;
 	private final String kategori;
 	private final String status;
 	@ToString.Exclude
@@ -32,8 +32,8 @@ public class DokumentInfo {
 	private final String opprettetAv;
 	@ToString.Exclude
 	private final String opprettetAvBeriketNavn;
-	private final List<FilDetaljer> fildetaljer;
-	private final List<Arkivendring> arkivendringer;
+	private final List<FilDetaljer> fd;
+	private final List<Arkivendring> ae;
 
 	public String getOpprettetAv() {
 		return opprettetAv;
