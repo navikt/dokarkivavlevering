@@ -25,6 +25,7 @@ public class AvleveringUtils {
 	public static XMLGregorianCalendar dateToXMLGregorianCalendar(Date date) {
 		try {
 			GregorianCalendar cal = new GregorianCalendar();
+			cal.setTimeZone(TimeZone.getDefault());
 			cal.setTime(date);
 			return DatatypeFactory.newInstance().newXMLGregorianCalendar(cal);
 		} catch (DatatypeConfigurationException e) {
