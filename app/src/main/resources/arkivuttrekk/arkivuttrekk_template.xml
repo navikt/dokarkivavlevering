@@ -13,15 +13,15 @@
 						</additionalElements>
 					</additionalElement>
 					<additionalElement name="systemType">
-						<!-- Oppgi type system/lÃ¸sning arkivuttrekket kom fra -->
+						<!-- Oppgi type systemløsning arkivuttrekket kom fra -->
 						<value>Journal og arkivsystem</value>
 					</additionalElement>
 					<additionalElement name="systemName">
-						<!-- Oppgi navn pÃ¥ system/lÃ¸sning -->
+						<!-- Oppgi navn på systemløsning -->
 						<value>Joark</value>
 					</additionalElement>
 					<additionalElement name="archive">
-						<!-- Oppgi navn pÃ¥ arkiv -->
+						<!-- Oppgi navn på arkiv -->
 						<value>NAV Fagarkiv</value>
 					</additionalElement>
 				</additionalElements>
@@ -31,11 +31,11 @@
 					<additionalElement name="archivalPeriod">
 						<properties>
 							<property name="startDate">
-								<!-- Ã…Ã…Ã…Ã…-MM-DD -->
+								<!-- ÅÅÅÅ-MM-DD -->
 								<value>2010-02-18</value>
 							</property>
 							<property name="endDate">
-								<!-- Ã…Ã…Ã…Ã…-MM-DD -->
+								<!-- ÅÅÅÅ-MM-DD -->
 								<value>$AVLEVERING_SLUTTDATO$</value>
 							</property>
 						</properties>

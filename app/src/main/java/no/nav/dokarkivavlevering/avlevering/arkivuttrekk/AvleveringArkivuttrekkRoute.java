@@ -35,6 +35,6 @@ public class AvleveringArkivuttrekkRoute extends RouteBuilder {
 				.to("file://{{avlevering.filomraade.work}}?fileExist=Override")
 				.setHeader(AvleveringSFTPRoute.HEADER_FILNAVN, simple("arkivuttrekk.xml"))
 				.to(AvleveringSFTPRoute.SFTP)
-				.log(LoggingLevel.INFO, log, "Genererte arkivuttrekk til ${header.CamelXsltFileName}");
+				.log(LoggingLevel.INFO, log, "Genererte arkivuttrekk til ${header.CamelFileNameProduced}");
 	}
 }
