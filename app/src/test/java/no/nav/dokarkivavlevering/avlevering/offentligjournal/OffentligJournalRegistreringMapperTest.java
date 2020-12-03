@@ -41,8 +41,8 @@ class OffentligJournalRegistreringMapperTest {
 		assertEquals(jp.getJournalsekvensnummer(), toBigInteger(453637481));
 		assertEquals(jp.getJournalpostnummer(), toBigInteger(453637481));
 		assertEquals(jp.getOffentligTittel(), "Legg til ny institusjon");
-		assertEquals(jp.getJournaldato(), toGregorianCalendar("2020-11-10T15:04:43Z"));
-		assertEquals(jp.getDokumentetsDato(), toGregorianCalendar("2020-11-10T15:04:43Z"));
+		assertEquals(jp.getJournaldato(), toGregorianCalendar("2020-11-10T15:04:43.000Z"));
+		assertEquals(jp.getDokumentetsDato(), toGregorianCalendar("2020-11-10T15:04:43.000Z"));
 		assertEquals(jp.getSkjermingMetadata(), "Skjerming navn mottaker");
 		assertEquals(jp.getSkjermingshjemmel(), "Offentleglova § 13");
 		assertKorrespondanseParts(jp.getKorrespondanseparts().get(0));

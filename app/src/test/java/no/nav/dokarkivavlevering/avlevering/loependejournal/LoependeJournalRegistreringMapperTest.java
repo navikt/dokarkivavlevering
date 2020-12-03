@@ -44,8 +44,8 @@ class LoependeJournalRegistreringMapperTest {
 		assertEquals(jp.getSystemID().getValue().isEmpty(), false);
 		assertEquals(jp.getJournalaar(), toBigInteger(2020));
 		assertEquals(jp.getTittel(), "Legg til ny institusjon");
-		assertEquals(jp.getJournaldato(), toGregorianCalendar("2020-11-10T15:04:43Z"));
-		assertEquals(jp.getDokumentetsDato(), toGregorianCalendar("2020-11-10T15:04:43Z"));
+		assertEquals(jp.getJournaldato(), toGregorianCalendar("2020-11-10T15:04:43.000Z"));
+		assertEquals(jp.getDokumentetsDato(), toGregorianCalendar("2020-11-10T15:04:43.000Z"));
 
 		Korrespondansepart part = jp.getKorrespondanseparts().get(0);
 		assertEquals(part.getKorrespondansepartNavn(), "Arena");
@@ -60,8 +60,8 @@ class LoependeJournalRegistreringMapperTest {
 		assertEquals(jp.getTittel(), "Legg til ny institusjon");
 		assertEquals(jp.getJournalsekvensnummer(), toBigInteger(453637481));
 		assertEquals(jp.getJournalpostnummer(), toBigInteger(453637481));
-		assertEquals(jp.getJournaldato(), toGregorianCalendar("2020-11-10T15:04:43Z"));
-		assertEquals(jp.getDokumentetsDato(), toGregorianCalendar("2020-11-10T15:04:43Z"));
+		assertEquals(jp.getJournaldato(), toGregorianCalendar("2020-11-10T15:04:43.000Z"));
+		assertEquals(jp.getDokumentetsDato(), toGregorianCalendar("2020-11-10T15:04:43.000Z"));
 		assertKorrespondanseParts(jp.getKorrespondanseparts().get(0));
 	}
 
