@@ -30,20 +30,16 @@ public class ArkivuttrekkMapper {
 	private static final String AVLEVERING_SLUTTDATO = "$AVLEVERING_SLUTTDATO$";
 	private static final String AVLEVERING_ANTALLDOKUMENTER = "$AVLEVERING_ANTALLDOKUMENTER$";
 	private static final String METADATAKATALOG_XSD_SJEKKSUM = "$METADATAKATALOG_XSD_SJEKKSUM$";
-
 	private static final String ARKIVSTRUKTUR_XML_SJEKKSUM = "$ARKIVSTRUKTUR_XML_SJEKKSUM$";
 	private static final String ARKIVSTRUKTUR_XSD_SJEKKSUM = "$ARKIVSTRUKTUR_XSD_SJEKKSUM$";
 	private static final String ARKIVSTRUKTUR_ANTALL_MAPPE = "$ARKIVSTRUKTUR_ANTALL_MAPPE$";
 	private static final String ARKIVSTRUKTUR_ANTALL_REGISTRERING = "$ARKIVSTRUKTUR_ANTALL_REGISTRERING$";
-
 	private static final String ENDRINGSLOGG_XML_SJEKKSUM = "$ENDRINGSLOGG_XML_SJEKKSUM$";
 	private static final String ENDRINGSLOGG_XSD_SJEKKSUM = "$ENDRINGSLOGG_XSD_SJEKKSUM$";
 	private static final String ENDRINGSLOGG_ANTALL_ENDRING = "$ENDRINGSLOGG_ANTALL_ENDRING$";
-
 	private static final String LOEPENDEJOURNAL_XML_SJEKKSUM = "$LOEPENDEJOURNAL_XML_SJEKKSUM$";
 	private static final String LOEPENDEJOURNAL_XSD_SJEKKSUM = "$LOEPENDEJOURNAL_XSD_SJEKKSUM$";
 	private static final String LOEPENDEJOURNAL_ANTALL_JOURNALREGISTRERING = "$LOEPENDEJOURNAL_ANTALL_JOURNALREGISTRERING$";
-
 	private static final String OFFENTLIGJOURNAL_XML_SJEKKSUM = "$OFFENTLIGJOURNAL_XML_SJEKKSUM$";
 	private static final String OFFENTLIGJOURNAL_XSD_SJEKKSUM = "$OFFENTLIGJOURNAL_XSD_SJEKKSUM$";
 	private static final String OFFENTLIGJOURNAL_ANTALL_JOURNALREGISTRERING = "$OFFENTLIGJOURNAL_ANTALL_JOURNALREGISTRERING$";
@@ -85,12 +81,9 @@ public class ArkivuttrekkMapper {
 	}
 
 	private String generateSHA256(String fileName) throws IOException {
-		File file;
-		if (fileName.endsWith(".xml")) {
-			file = Paths.get(filomraade + "/" + avleveringId + "/" + fileName).toFile();
-		} else {
-			file = new File(Objects.requireNonNull(this.getClass().getClassLoader().getResource(fileName)).getFile());
-		}
+		File file = fileName.endsWith(".xml")
+				? Paths.get(filomraade + "/" + avleveringId + "/" + fileName).toFile()
+				: new File(Objects.requireNonNull(this.getClass().getClassLoader().getResource(fileName)).getFile());
 		return DigestUtils.sha256Hex(readFileToByteArray(file));
 	}
 
