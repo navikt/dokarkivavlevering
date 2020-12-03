@@ -2,7 +2,6 @@ package no.nav.dokarkivavlevering.avlevering;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avlevering.arkivstruktur.AvleveringArkivstrukturRoute;
-import no.nav.dokarkivavlevering.avlevering.arkivuttrekk.AvleveringArkivuttrekkRoute;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.dokument.DokumentRoute;
 import no.nav.dokarkivavlevering.avlevering.endringlogg.AvleveringEndringsloggRoute;
