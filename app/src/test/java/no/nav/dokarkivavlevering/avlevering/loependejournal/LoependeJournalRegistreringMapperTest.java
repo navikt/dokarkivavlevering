@@ -4,9 +4,7 @@ import no.arkivverket.standarder.noark5.loependejournal.Journalregistrering;
 import no.arkivverket.standarder.noark5.loependejournal.Klasse;
 import no.arkivverket.standarder.noark5.loependejournal.Korrespondansepart;
 import no.arkivverket.standarder.noark5.loependejournal.Saksmappe;
-import no.nav.dokarkivavlevering.avlevering.domain.Arkivendring;
 import no.nav.dokarkivavlevering.avlevering.domain.DokumentInfo;
-import no.nav.dokarkivavlevering.avlevering.domain.FilDetaljer;
 import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import org.junit.jupiter.api.Test;
@@ -14,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import static org.apache.camel.converter.ObjectConverter.toBigInteger;
@@ -47,8 +44,8 @@ class LoependeJournalRegistreringMapperTest {
 		assertEquals(jp.getSystemID().getValue().isEmpty(), false);
 		assertEquals(jp.getJournalaar(), toBigInteger(2020));
 		assertEquals(jp.getTittel(), "Legg til ny institusjon");
-		assertEquals(jp.getJournaldato(), toGregorianCalendar("2020-11-10T15:04:43Z"));
-		assertEquals(jp.getDokumentetsDato(), toGregorianCalendar("2020-11-10T15:04:43Z"));
+		assertEquals(jp.getJournaldato(), toGregorianCalendar("2020-11-10T15:04:43.000Z"));
+		assertEquals(jp.getDokumentetsDato(), toGregorianCalendar("2020-11-10T15:04:43.000Z"));
 
 		Korrespondansepart part = jp.getKorrespondanseparts().get(0);
 		assertEquals(part.getKorrespondansepartNavn(), "Arena");
@@ -63,8 +60,8 @@ class LoependeJournalRegistreringMapperTest {
 		assertEquals(jp.getTittel(), "Legg til ny institusjon");
 		assertEquals(jp.getJournalsekvensnummer(), toBigInteger(453637481));
 		assertEquals(jp.getJournalpostnummer(), toBigInteger(453637481));
-		assertEquals(jp.getJournaldato(), toGregorianCalendar("2020-11-10T15:04:43Z"));
-		assertEquals(jp.getDokumentetsDato(), toGregorianCalendar("2020-11-10T15:04:43Z"));
+		assertEquals(jp.getJournaldato(), toGregorianCalendar("2020-11-10T15:04:43.000Z"));
+		assertEquals(jp.getDokumentetsDato(), toGregorianCalendar("2020-11-10T15:04:43.000Z"));
 		assertKorrespondanseParts(jp.getKorrespondanseparts().get(0));
 	}
 
