@@ -26,11 +26,11 @@ public class AvleveringRepository {
 	private static final ResultSetExtractor<List<Sak>> SAK_RESULTSET_EXTRACTOR = JdbcTemplateMapperFactory.newInstance()
 			.addKeys("id",
 					"bruker_id",
-					"journalposter_id",
-					"journalposter_dokumenter_id",
-					"journalposter_dokumenter_fildetaljer_id",
-					"journalposter_arkivendringer_id",
-					"journalposter_dokumenter_arkivendringer_id")
+					"jp_id",
+					"jp_dok_id",
+					"jp_dok_fd_id",
+					"jp_ae_id",
+					"jp_dok_ae_id")
 			.newResultSetExtractor(Sak.class);
 	public static final int ORACLE_MAX_IN = 1000;
 

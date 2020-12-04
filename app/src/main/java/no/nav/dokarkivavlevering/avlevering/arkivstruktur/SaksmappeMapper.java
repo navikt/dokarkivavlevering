@@ -54,9 +54,9 @@ public class SaksmappeMapper {
 		mappe.setSakssekvensnummer(toBigInteger(sak.getId()));
 		mappe.setSaksdato(dateToXMLGregorianCalendar(sak.getOpprettetTidspunkt()));
 		mappe.setAdministrativEnhet(getAdministrativEnhetFromTema((sak.getTema())));
-		mappe.setSaksansvarlig(getSaksAnsvarlig(sak.getJournalposter()));
+		mappe.setSaksansvarlig(getSaksAnsvarlig(sak.getJp()));
 		mappe.setSaksstatus("Under behandling");
-		for (Journalpost journalpost : sak.getJournalposter()) {
+		for (Journalpost journalpost : sak.getJp()) {
 			mappe.getRegistrerings().add(mapRegistrering(journalpost, sak.getTema()));
 		}
 		return mappe;
@@ -99,7 +99,7 @@ public class SaksmappeMapper {
 		if ("I".equals(journalpost.getType()) && journalpost.getDatoMottatt() != null) {
 			registrering.setMottattDato(dateToXMLGregorianCalendar(journalpost.getDatoMottatt()));
 		}
-		for (DokumentInfo dokumentInfo : journalpost.getDokumenter()) {
+		for (DokumentInfo dokumentInfo : journalpost.getDok()) {
 			registrering.getDokumentbeskrivelses().add(mapDokumentBeskrivelse(dokumentInfo, tema));
 		}
 
@@ -123,12 +123,12 @@ public class SaksmappeMapper {
 		dokumentbeskrivelse.setTittel(dokumentInfo.getTittel());
 		dokumentbeskrivelse.setOpprettetDato(dateToXMLGregorianCalendar(dokumentInfo.getDatoOpprettet()));
 		dokumentbeskrivelse.setOpprettetAv(setSystembrukerOrBeriket(dokumentInfo.getOpprettetAv(), dokumentInfo.getOpprettetAvBeriketNavn()));
-		dokumentbeskrivelse.setTilknyttetRegistreringSom(dokumentInfo.getRelasjonTilknyttetSom());
+		dokumentbeskrivelse.setTilknyttetRegistreringSom(dokumentInfo.getRelTilknyttetSom());
 		dokumentbeskrivelse.setDokumentnummer(toBigInteger(dokumentInfo.getId()));
-		dokumentbeskrivelse.setTilknyttetDato(dateToXMLGregorianCalendar(dokumentInfo.getRelasjonDatoOpprettet()));
+		dokumentbeskrivelse.setTilknyttetDato(dateToXMLGregorianCalendar(dokumentInfo.getRelDatoOpprettet()));
 		dokumentbeskrivelse.setTilknyttetAv(setSystembrukerOrBeriket(dokumentInfo.getOpprettetAv(), dokumentInfo.getOpprettetAvBeriketNavn()));
 
-		for (FilDetaljer filDetaljer : dokumentInfo.getFildetaljer()) {
+		for (FilDetaljer filDetaljer : dokumentInfo.getFd()) {
 			dokumentbeskrivelse.getDokumentobjekts().add(mapDokumentobjekt(filDetaljer, tema));
 		}
 		return dokumentbeskrivelse;

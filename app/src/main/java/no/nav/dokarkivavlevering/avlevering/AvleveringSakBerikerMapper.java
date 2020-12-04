@@ -19,16 +19,16 @@ public class AvleveringSakBerikerMapper {
 		return sak.toBuilder()
 				.bruker(mapBruker(sak.getBruker(), pdlHentIdenterBolks, eregOrganisasjonBolk))
 				.opprettetAvBeriketNavn(utledNavn(sak.getOpprettetAv(), navAnsatteNavn))
-				.journalposter(sak.getJournalposter().stream().map(journalpost -> {
+				.jp(sak.getJp().stream().map(journalpost -> {
 					return journalpost.toBuilder()
 							.opprettetAvBeriketNavn(utledNavn(journalpost.getOpprettetAv(), navAnsatteNavn))
 							.endretAv(utledNavn(journalpost.getEndretAv(), navAnsatteNavn))
-							.dokumenter(journalpost.getDokumenter().stream()
+							.dok(journalpost.getDok().stream()
 									.map(dokumentInfo -> {
 										return dokumentInfo.toBuilder()
 												.opprettetAvBeriketNavn(utledNavn(dokumentInfo.getOpprettetAv(), navAnsatteNavn))
-												.relasjonOpprettetAvBeriketNavn(utledNavn(dokumentInfo.getRelasjonOpprettetAv(), navAnsatteNavn))
-												.fildetaljer(dokumentInfo.getFildetaljer().stream()
+												.relOpprettetAvBeriketNavn(utledNavn(dokumentInfo.getRelOpprettetAv(), navAnsatteNavn))
+												.fd(dokumentInfo.getFd().stream()
 														.map(filDetaljer -> {
 															return filDetaljer.toBuilder()
 																	.opprettetAvBeriketNavn(utledNavn(filDetaljer.getOpprettetAv(), navAnsatteNavn))
@@ -37,7 +37,7 @@ public class AvleveringSakBerikerMapper {
 																	.build();
 														})
 														.collect(Collectors.toList()))
-												.arkivendringer(dokumentInfo.getArkivendringer().stream()
+												.ae(dokumentInfo.getAe().stream()
 														.map(arkivendring -> {
 															return arkivendring.toBuilder()
 																	.utfoertAvBeriketNavn(utledNavn(arkivendring.getUtfoertAv(), navAnsatteNavn))
@@ -47,7 +47,7 @@ public class AvleveringSakBerikerMapper {
 												.build();
 									})
 									.collect(Collectors.toList()))
-							.arkivendringer(journalpost.getArkivendringer().stream()
+							.ae(journalpost.getAe().stream()
 									.map(arkivendring -> {
 										return arkivendring.toBuilder()
 												.utfoertAvBeriketNavn(utledNavn(arkivendring.getUtfoertAv(), navAnsatteNavn))

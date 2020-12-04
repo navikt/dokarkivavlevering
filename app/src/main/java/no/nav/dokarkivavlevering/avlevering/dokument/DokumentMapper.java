@@ -13,9 +13,9 @@ import java.util.stream.Collectors;
 @Component
 public class DokumentMapper {
 	public List<FilDetaljer> map(final List<Sak> saker) {
-		return saker.stream().flatMap(sak -> sak.getJournalposter().stream()
-				.flatMap(journalpost -> journalpost.getDokumenter().stream()
-						.flatMap(dokumentInfo -> dokumentInfo.getFildetaljer().stream())))
+		return saker.stream().flatMap(sak -> sak.getJp().stream()
+				.flatMap(journalpost -> journalpost.getDok().stream()
+						.flatMap(dokumentInfo -> dokumentInfo.getFd().stream())))
 				.collect(Collectors.toList());
 	}
 }

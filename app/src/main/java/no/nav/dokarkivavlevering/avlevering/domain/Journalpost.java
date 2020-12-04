@@ -38,6 +38,6 @@ public class Journalpost {
 	private final String endretAv;
 	@ToString.Exclude
 	private final String endretAvBeriketNavn;
-	private final List<DokumentInfo> dokumenter;
-	private final List<Arkivendring> arkivendringer;
+	private final List<DokumentInfo> dok;
+	private final List<Arkivendring> ae;
 }

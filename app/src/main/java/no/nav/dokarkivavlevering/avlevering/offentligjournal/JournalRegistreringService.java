@@ -21,7 +21,7 @@ public class JournalRegistreringService {
 	@Handler
 	public List<Journalregistrering> avlevering(@Body final List<Sak> saker) {
 		return saker.stream().flatMap(sak ->
-				sak.getJournalposter().stream().map(journalpost ->
+				sak.getJp().stream().map(journalpost ->
 						journalRegistreringMapper.map(sak, journalpost))).collect(Collectors.toList());
 	}
 }
