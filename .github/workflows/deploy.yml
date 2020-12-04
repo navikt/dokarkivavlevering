@@ -1,11 +1,11 @@
-name: Deploy dokarkivavlevering [dev-fss]
+name: Deploy dokarkivavlevering
 on:
   workflow_dispatch:
     inputs:
-      logLevel:
-        description: 'Log level'
+      cluster:
+        description: 'Cluster. dev-fss | prod-fss'
         required: true
-        default: 'warning'
+        default: 'dev-fss'
       periodeStart:
         description: 'Periode start (f.o.m) for avlevering. YYYY-MM-DD'
         required: true
@@ -41,17 +41,17 @@ jobs:
           docker login --username "$GITHUB_REPOSITORY" -p ${{ secrets.GITHUB_TOKEN }} https://docker.pkg.github.com
           docker push ${IMAGE}
   deploy:
-    name: Deploy job to dev
+    name: Deploy job to ${{github.event.inputs.cluster}}
     needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - name: Deploy job to NAIS dev-fss
+      - name: Deploy job to NAIS ${{github.event.inputs.cluster}}
         uses: nais/deploy/actions/deploy@v1
         env:
           PRINT_PAYLOAD: true
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: dev-fss
+          CLUSTER: ${{github.event.inputs.cluster}}
           RESOURCE: nais/naiserator.yaml
           VAR: periodestart=${{github.event.inputs.periodeStart}},periodeslutt=${{github.event.inputs.periodeSlutt}}
-          VARS: nais/dev-config.json
+          VARS: nais/${{github.event.inputs.cluster}}-config.json
