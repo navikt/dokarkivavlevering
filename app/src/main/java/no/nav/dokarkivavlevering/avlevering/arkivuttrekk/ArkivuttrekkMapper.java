@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import org.apache.camel.Handler;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
@@ -71,10 +72,12 @@ public class ArkivuttrekkMapper {
 	}
 
 	private String generateSHA256(String fileName) throws IOException {
-		File file = fileName.endsWith(".xml")
-				? Paths.get(avleveringProperties.getFilomraade().getWork() + "/" + avleveringProperties.getAvleveringId() + "/" + fileName).toFile()
-				: new File(Objects.requireNonNull(this.getClass().getClassLoader().getResource(fileName)).getFile());
-		return DigestUtils.sha256Hex(readFileToByteArray(file));
+		if (fileName.endsWith(".xml")) {
+			File fil = Paths.get(avleveringProperties.getFilomraade().getWork() + "/" + avleveringProperties.getAvleveringId() + "/" + fileName).toFile();
+			return DigestUtils.sha256Hex(readFileToByteArray(fil));
+		} else {
+			return DigestUtils.sha256Hex(IOUtils.toByteArray(this.getClass().getClassLoader().getResourceAsStream(fileName)));
+		}
 	}
 
 	private String countElements(String fileName, String element) {
