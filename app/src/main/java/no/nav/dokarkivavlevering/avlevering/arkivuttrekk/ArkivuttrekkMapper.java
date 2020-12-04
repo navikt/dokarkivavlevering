@@ -63,12 +63,12 @@ public class ArkivuttrekkMapper {
 				.replace(ENDRINGSLOGG_XML_SJEKKSUM, generateSHA256("endringslogg.xml"))
 				.replace(ENDRINGSLOGG_XSD_SJEKKSUM, generateSHA256("endringslogg.xsd"))
 				.replace(ENDRINGSLOGG_ANTALL_ENDRING, countElements("endringslogg.xml", "endring"))
-				.replace(LOEPENDEJOURNAL_XML_SJEKKSUM, generateSHA256("loependejournal.xml"))
-				.replace(LOEPENDEJOURNAL_XSD_SJEKKSUM, generateSHA256("loependejournal.xsd"))
-				.replace(LOEPENDEJOURNAL_ANTALL_JOURNALREGISTRERING, countElements("loependejournal.xml", "journalregistrering"))
-				.replace(OFFENTLIGJOURNAL_XML_SJEKKSUM, generateSHA256("offentligjournal.xml"))
-				.replace(OFFENTLIGJOURNAL_XSD_SJEKKSUM, generateSHA256("offentligjournal.xsd"))
-				.replace(OFFENTLIGJOURNAL_ANTALL_JOURNALREGISTRERING, countElements("offentligjournal.xml", "journalregistrering"));
+				.replace(LOEPENDEJOURNAL_XML_SJEKKSUM, generateSHA256("loependeJournal.xml"))
+				.replace(LOEPENDEJOURNAL_XSD_SJEKKSUM, generateSHA256("loependeJournal.xsd"))
+				.replace(LOEPENDEJOURNAL_ANTALL_JOURNALREGISTRERING, countElements("loependeJournal.xml", "journalregistrering"))
+				.replace(OFFENTLIGJOURNAL_XML_SJEKKSUM, generateSHA256("offentligJournal.xml"))
+				.replace(OFFENTLIGJOURNAL_XSD_SJEKKSUM, generateSHA256("offentligJournal.xsd"))
+				.replace(OFFENTLIGJOURNAL_ANTALL_JOURNALREGISTRERING, countElements("offentligJournal.xml", "journalregistrering"));
 	}
 
 	private String generateSHA256(String fileName) throws IOException {
