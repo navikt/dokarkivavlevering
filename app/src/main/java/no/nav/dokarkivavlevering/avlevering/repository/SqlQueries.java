@@ -4,6 +4,24 @@ package no.nav.dokarkivavlevering.avlevering.repository;
  * @author Joakim Bjørnstad, Jbit AS
  */
 public class SqlQueries {
+	static final String FINN_SAK_PAGE =
+			"select distinct to_number(s.sak_nr_fk)\n" +
+					"from t_journalpost j\n" +
+					"         join t_saksrelasjon s on j.journalpost_id = s.journalpost_id\n" +
+					"where (s.feilregistrert is null or s.feilregistrert = 0)\n" +
+					"  and j.k_journal_s in ('J', 'FS', 'FL', 'E')\n" +
+					"  and (trunc(j.dato_opprettet) between :startdato and :sluttdato)\n" +
+					"  and s.sak_nr_fk in (\n" +
+					"    select to_char(sa.id)\n" +
+					"    from sak sa\n" +
+					"    where tema = :tema\n" +
+					"      and sa.id < :lastSakId\n" +
+					"      and trunc(sa.opprettet_tidspunkt) <= :startdato\n" +
+					")\n" +
+					"  and s.k_fagsystem = 'FS22'\n" +
+					"order by to_number(s.sak_nr_fk) desc\n" +
+					"    fetch first :batchsize rows only";
+
 	static final String FINN_SAKER_SQL =
 			"select sa.id                         as id,\n" +
 					"       sa.tema                       as tema,\n" +

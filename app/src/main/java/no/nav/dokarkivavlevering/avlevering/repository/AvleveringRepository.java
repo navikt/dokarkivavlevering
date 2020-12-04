@@ -11,7 +11,6 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,18 +50,7 @@ public class AvleveringRepository {
 		paramMap.put("tema", tema.getTemakode());
 		paramMap.put("startdato", Timestamp.valueOf(avleveringProperties.getPeriode().getStartdato().atStartOfDay()));
 		paramMap.put("sluttdato", Timestamp.valueOf(avleveringProperties.getPeriode().getSluttdato().atStartOfDay()));
-		return namedParameterJdbcTemplate.queryForList("select distinct sa.id\n" +
-						"from t_journalpost j\n" +
-						"         join t_saksrelasjon s on j.journalpost_id = s.journalpost_id\n" +
-						"         join sak sa on sa.id = to_number(regexp_replace(s.sak_nr_fk, '[^0-9]', ''))\n" +
-						"where sa.id < :lastSakId and\n" +
-						"      sa.tema = :tema\n" +
-						"  and (s.feilregistrert is null or s.feilregistrert = 0)\n" +
-						"  and j.k_journal_s in ('J', 'FS', 'FL', 'E')\n" +
-						"  and (trunc(j.dato_opprettet) between :startdato and :sluttdato)\n" +
-						"order by sa.id desc\n" +
-						"    fetch first :batchsize rows only",
-				paramMap, Long.class);
+		return namedParameterJdbcTemplate.queryForList(SqlQueries.FINN_SAK_PAGE, paramMap, Long.class);
 	}
 
 	public List<Sak> findSaker(final List<Long> sakIds) {
@@ -77,13 +65,5 @@ public class AvleveringRepository {
 		paramMap.put("startdato", Timestamp.valueOf(avleveringProperties.getPeriode().getStartdato().atStartOfDay()));
 		paramMap.put("sluttdato", Timestamp.valueOf(avleveringProperties.getPeriode().getSluttdato().atStartOfDay()));
 		return namedParameterJdbcTemplate.query(SqlQueries.FINN_SAKER_SQL, paramMap, SAK_RESULTSET_EXTRACTOR);
-	}
-
-	public InputStream getDokument(final String filUuid) {
-		final HashMap<String, Object> paramMap = new HashMap<>();
-		paramMap.put("filUuid", filUuid);
-		return namedParameterJdbcTemplate.query("select fil from t_dokument_fil where fil_uuid = :filUuid", paramMap, resultSet -> {
-			return resultSet.getBinaryStream(1);
-		});
 	}
 }
