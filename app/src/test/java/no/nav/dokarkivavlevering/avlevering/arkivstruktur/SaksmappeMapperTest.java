@@ -13,6 +13,7 @@ import no.nav.dokarkivavlevering.avlevering.domain.DokumentInfo;
 import no.nav.dokarkivavlevering.avlevering.domain.FilDetaljer;
 import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import javax.xml.datatype.DatatypeFactory;
@@ -29,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Joakim Bjørnstad, Jbit AS
  */
+@Disabled
 class SaksmappeMapperTest {
 
 	public static final String FIL = "Hello World";

@@ -7,6 +7,7 @@ import no.arkivverket.standarder.noark5.offentligjournal.Saksmappe;
 import no.nav.dokarkivavlevering.avlevering.domain.DokumentInfo;
 import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import javax.xml.datatype.DatatypeFactory;
@@ -17,6 +18,7 @@ import java.util.Arrays;
 import static org.apache.camel.converter.ObjectConverter.toBigInteger;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Disabled
 class OffentligJournalRegistreringMapperTest {
 	private SimpleDateFormat formatter = new SimpleDateFormat("yyy-MM-dd hh:mm:ss");
 	private OffentligJournalRegistreringMapper mapper = new OffentligJournalRegistreringMapper();
