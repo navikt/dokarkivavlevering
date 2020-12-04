@@ -1,4 +1,4 @@
-name: Deploy dokarkivavlevering [dev-fss]
+name: Deploy dokarkivavlevering [prod-fss]
 on:
   workflow_dispatch:
     inputs:
@@ -41,12 +41,12 @@ jobs:
           docker login --username "$GITHUB_REPOSITORY" -p ${{ secrets.GITHUB_TOKEN }} https://docker.pkg.github.com
           docker push ${IMAGE}
   deploy:
-    name: Deploy job to dev
+    name: Deploy job to prod
     needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - name: Deploy job to NAIS dev-fss
+      - name: Deploy job to NAIS prod-fss
         uses: nais/deploy/actions/deploy@v1
         env:
           PRINT_PAYLOAD: true
