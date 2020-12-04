@@ -2,6 +2,7 @@ package no.nav.dokarkivavlevering.avlevering;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avlevering.arkivstruktur.AvleveringArkivstrukturRoute;
+import no.nav.dokarkivavlevering.avlevering.arkivuttrekk.AvleveringArkivuttrekkRoute;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.endringlogg.AvleveringEndringsloggRoute;
 import no.nav.dokarkivavlevering.avlevering.loependejournal.AvleveringLoependeJournalRoute;
@@ -59,6 +60,7 @@ public class AvleveringRoute extends RouteBuilder {
 				.to(AvleveringLoependeJournalRoute.GENERER_LOEPENDEJOURNAL)
 				.to(AvleveringEndringsloggRoute.GENERER_ENDRINGSLOGG)
 				.to(AvleveringOffentligJournalRoute.GENERER_OFFENTLIGJOURNAL)
+				.to(AvleveringArkivuttrekkRoute.GENERER_ARKIVUTTREKK)
 				.log(LoggingLevel.INFO, log, "Dokarkivavlevering er ferdig med avlevering.")
 				.to(SHUTDOWN);
 
