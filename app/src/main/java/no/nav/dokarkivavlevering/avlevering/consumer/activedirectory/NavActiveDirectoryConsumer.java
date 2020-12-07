@@ -2,6 +2,7 @@ package no.nav.dokarkivavlevering.avlevering.consumer.activedirectory;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
+import org.springframework.ldap.NamingException;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.query.LdapQuery;
 import org.springframework.stereotype.Component;
@@ -33,8 +34,13 @@ public class NavActiveDirectoryConsumer {
 		if(adeoIdenter.isEmpty()) {
 			return new HashMap<>();
 		}
-		final List<NavAnsatt> navAnsatts = ldapTemplate.find(getQuery(adeoIdenter), NavAnsatt.class);
-		return navAnsatts.stream().collect(Collectors.toMap(NavAnsatt::getUserId, NavAnsatt::getNavn));
+		try {
+			final List<NavAnsatt> navAnsatts = ldapTemplate.find(getQuery(adeoIdenter), NavAnsatt.class);
+			return navAnsatts.stream().collect(Collectors.toMap(NavAnsatt::getUserId, NavAnsatt::getNavn));
+		} catch(NamingException e) {
+			log.error("Klarte ikke hente navn på NAV ansatte. Fortsetter behandling.", e);
+			return new HashMap<>();
+		}
 	}
 
 	private LdapQuery getQuery(final Set<String> adeoIdenter) {

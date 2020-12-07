@@ -16,7 +16,7 @@ public class SqlQueries {
 					"    from sak sa\n" +
 					"    where tema = :tema\n" +
 					"      and sa.id < :lastSakId\n" +
-					"      and trunc(sa.opprettet_tidspunkt) <= :startdato\n" +
+					"      and trunc(sa.opprettet_tidspunkt) <= :sluttdato\n" +
 					")\n" +
 					"  and s.k_fagsystem = 'FS22'\n" +
 					"order by to_number(s.sak_nr_fk) desc\n" +
