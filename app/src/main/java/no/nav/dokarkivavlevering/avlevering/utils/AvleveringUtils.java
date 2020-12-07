@@ -24,6 +24,9 @@ public class AvleveringUtils {
 
 	public static XMLGregorianCalendar dateToXMLGregorianCalendar(Date date) {
 		try {
+			if(date == null) {
+				return null;
+			}
 			GregorianCalendar cal = new GregorianCalendar();
 			cal.setTime(date);
 			return DatatypeFactory.newInstance().newXMLGregorianCalendar(cal);

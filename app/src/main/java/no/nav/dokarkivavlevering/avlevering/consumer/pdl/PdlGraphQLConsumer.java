@@ -53,6 +53,9 @@ public class PdlGraphQLConsumer {
 
 	@Retryable(include = HttpServerErrorException.class)
 	public Map<String, Bruker> hentPersonBolk(final Set<String> aktoerIds, final String tema) {
+		if(aktoerIds.isEmpty()) {
+			return new HashMap<>();
+		}
 		try {
 			final UriComponents uri = UriComponentsBuilder.fromHttpUrl(pdlUrl).build();
 			final String serviceuserToken = "Bearer " + stsConsumer.getStsToken().getAccess_token();
