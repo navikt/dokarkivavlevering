@@ -64,6 +64,9 @@ public class AvleveringUtils {
 	}
 
 	public static int getYear(Date date) {
+		if(date == null) {
+			return 0;
+		}
 		final Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Europe/Oslo"));
 		calendar.setTime(date);
 		return calendar.get(Calendar.YEAR);

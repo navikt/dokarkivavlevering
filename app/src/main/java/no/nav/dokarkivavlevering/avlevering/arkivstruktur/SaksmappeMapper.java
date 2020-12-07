@@ -15,17 +15,16 @@ import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import org.springframework.stereotype.Component;
 
-import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.TimeZone;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.dateToXMLGregorianCalendar;
+import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.getYear;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.temaNavnDecode;
 import static org.apache.camel.converter.ObjectConverter.toBigInteger;
 
@@ -195,12 +194,6 @@ public class SaksmappeMapper {
 
 	private String setSystembrukerOrBeriket(String opprettetAv, String opprettetAvBeriketNavn) {
 		return isSystembruker(opprettetAv) ? "Automatisk jobb" : opprettetAvBeriketNavn;
-	}
-
-	private int getYear(Date date){
-		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Oslo"));
-		cal.setTime(date);
-		return cal.get(Calendar.YEAR);
 	}
 
 	private SystemID mapSystemID(final UUID value) {
