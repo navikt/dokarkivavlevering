@@ -19,10 +19,11 @@ import java.util.Arrays;
 import static org.apache.camel.converter.ObjectConverter.toBigInteger;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Disabled
 class LoependeJournalRegistreringMapperTest {
 	private SimpleDateFormat formatter = new SimpleDateFormat("yyy-MM-dd hh:mm:ss");
 	private JournalRegistreringMapper mapper = new JournalRegistreringMapper(new JournaldatoMapper());
+	
+	private final String journalDato = "2020-11-10T16:04:43.000+01:00";
 
 	@Test
 	void testMapping() throws Exception {
@@ -47,8 +48,8 @@ class LoependeJournalRegistreringMapperTest {
 		assertEquals(jp.getSystemID().getValue().isEmpty(), false);
 		assertEquals(jp.getJournalaar(), toBigInteger(2020));
 		assertEquals(jp.getTittel(), "Legg til ny institusjon");
-		assertEquals(jp.getJournaldato(), toGregorianCalendar("2020-11-10T15:04:43Z"));
-		assertEquals(jp.getDokumentetsDato(), toGregorianCalendar("2020-11-10T15:04:43Z"));
+		assertEquals(jp.getJournaldato().toString(), journalDato);
+		assertEquals(jp.getDokumentetsDato().toString(),journalDato);
 
 		Korrespondansepart part = jp.getKorrespondanseparts().get(0);
 		assertEquals(part.getKorrespondansepartNavn(), "Arena");
@@ -63,8 +64,8 @@ class LoependeJournalRegistreringMapperTest {
 		assertEquals(jp.getTittel(), "Legg til ny institusjon");
 		assertEquals(jp.getJournalsekvensnummer(), toBigInteger(453637481));
 		assertEquals(jp.getJournalpostnummer(), toBigInteger(453637481));
-		assertEquals(jp.getJournaldato(), toGregorianCalendar("2020-11-10T15:04:43Z"));
-		assertEquals(jp.getDokumentetsDato(), toGregorianCalendar("2020-11-10T15:04:43Z"));
+		assertEquals(jp.getJournaldato().toString(), journalDato);
+		assertEquals(jp.getDokumentetsDato().toString(),journalDato);
 		assertKorrespondanseParts(jp.getKorrespondanseparts().get(0));
 	}
 
