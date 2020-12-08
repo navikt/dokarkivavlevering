@@ -4,6 +4,7 @@ import no.arkivverket.standarder.noark5.loependejournal.Journalregistrering;
 import no.arkivverket.standarder.noark5.loependejournal.Klasse;
 import no.arkivverket.standarder.noark5.loependejournal.Korrespondansepart;
 import no.arkivverket.standarder.noark5.loependejournal.Saksmappe;
+import no.nav.dokarkivavlevering.avlevering.common.JournaldatoMapper;
 import no.nav.dokarkivavlevering.avlevering.domain.DokumentInfo;
 import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
@@ -21,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Disabled
 class LoependeJournalRegistreringMapperTest {
 	private SimpleDateFormat formatter = new SimpleDateFormat("yyy-MM-dd hh:mm:ss");
-	private JournalRegistreringMapper mapper = new JournalRegistreringMapper();
+	private JournalRegistreringMapper mapper = new JournalRegistreringMapper(new JournaldatoMapper());
 
 	@Test
 	void testMapping() throws Exception {

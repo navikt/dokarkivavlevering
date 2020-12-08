@@ -41,6 +41,7 @@ public class SqlQueries {
 					"       j.dato_dokument               as jp_datodokument,\n" +
 					"       j.dato_journal                as jp_datojournal,\n" +
 					"       j.dato_opprettet              as jp_datoopprettet,\n" +
+					"       j.dato_endret                 as jp_datoendret,\n" +
 					"       j.dato_ekspedert              as jp_datoekspedert,\n" +
 					"       j.dato_sendt_print            as jp_datosendtprint,\n" +
 					"       j.opprettet_av                as jp_opprettetav,\n" +
@@ -55,6 +56,7 @@ public class SqlQueries {
 					"       d.k_dokument_s                as jp_dok_status,\n" +
 					"       d.tittel                      as jp_dok_tittel,\n" +
 					"       d.dato_opprettet              as jp_dok_datoopprettet,\n" +
+					"       d.dato_dok_ferdig             as jp_dok_datoferdig,\n" +
 					"       f.fil_detaljer_id             as jp_dok_fd_id,\n" +
 					"       f.fil_uuid                    as jp_dok_fd_filuuid,\n" +
 					"       f.dato_opprettet              as jp_dok_fd_datoopprettet,\n" +

@@ -26,6 +26,7 @@ public class Journalpost {
 	private final Date datoDokument;
 	private final Date datoJournal;
 	private final Date datoOpprettet;
+	private final Date datoEndret;
 	private final Date datoEkspedert;
 	private final Date datoSendtPrint;
 	@ToString.Exclude

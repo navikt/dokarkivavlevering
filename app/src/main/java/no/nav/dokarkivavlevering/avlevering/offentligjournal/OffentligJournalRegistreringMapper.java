@@ -5,10 +5,12 @@ import no.arkivverket.standarder.noark5.offentligjournal.Klasse;
 import no.arkivverket.standarder.noark5.offentligjournal.Korrespondansepart;
 import no.arkivverket.standarder.noark5.offentligjournal.Saksmappe;
 import no.arkivverket.standarder.noark5.offentligjournal.SystemID;
+import no.nav.dokarkivavlevering.avlevering.common.JournaldatoMapper;
 import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.UUID;
 
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.dateToXMLGregorianCalendar;
@@ -20,6 +22,12 @@ import static org.apache.camel.converter.ObjectConverter.toBigInteger;
 
 @Component
 public class OffentligJournalRegistreringMapper {
+
+	private final JournaldatoMapper journaldatoMapper;
+
+	public OffentligJournalRegistreringMapper(JournaldatoMapper journaldatoMapper) {
+		this.journaldatoMapper = journaldatoMapper;
+	}
 
 	public Journalregistrering map(Sak sak, Journalpost fraJournalpost) {
 		Journalregistrering registrering = new Journalregistrering();
@@ -46,13 +54,14 @@ public class OffentligJournalRegistreringMapper {
 	}
 
 	private no.arkivverket.standarder.noark5.offentligjournal.Journalpost mapJournalPost(Journalpost fraJournalpost) {
+		final Date journaldato = journaldatoMapper.mapJournaldato(fraJournalpost);
 		no.arkivverket.standarder.noark5.offentligjournal.Journalpost tilJournalpost = new no.arkivverket.standarder.noark5.offentligjournal.Journalpost();
 		tilJournalpost.setSystemID(mapSystemID(fraJournalpost.getUuid()));
-		tilJournalpost.setJournalaar(toBigInteger(getYear(fraJournalpost.getDatoOpprettet())));
+		tilJournalpost.setJournalaar(toBigInteger(getYear(journaldato)));
 		tilJournalpost.setJournalsekvensnummer(toBigInteger(fraJournalpost.getId()));
 		tilJournalpost.setJournalpostnummer(toBigInteger(fraJournalpost.getId()));
 		tilJournalpost.setOffentligTittel(fraJournalpost.getInnhold());
-		tilJournalpost.setJournaldato(dateToXMLGregorianCalendar(fraJournalpost.getDatoJournal()));
+		tilJournalpost.setJournaldato(dateToXMLGregorianCalendar(journaldato));
 		tilJournalpost.getKorrespondanseparts().add(mapKorrespondansepart(fraJournalpost));
 		tilJournalpost.setSkjermingshjemmel("Offentleglova § 13");
 
