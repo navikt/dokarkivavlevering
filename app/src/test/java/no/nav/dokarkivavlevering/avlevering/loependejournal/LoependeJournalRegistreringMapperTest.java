@@ -8,13 +8,16 @@ import no.nav.dokarkivavlevering.avlevering.common.JournaldatoMapper;
 import no.nav.dokarkivavlevering.avlevering.domain.DokumentInfo;
 import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
-import org.junit.jupiter.api.Disabled;
+import no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils;
 import org.junit.jupiter.api.Test;
 
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 
 import static org.apache.camel.converter.ObjectConverter.toBigInteger;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,11 +25,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class LoependeJournalRegistreringMapperTest {
 	private SimpleDateFormat formatter = new SimpleDateFormat("yyy-MM-dd hh:mm:ss");
 	private JournalRegistreringMapper mapper = new JournalRegistreringMapper(new JournaldatoMapper());
-	
-	private final String journalDato = "2020-11-10T16:04:43.000+01:00";
+
+	//private final String journalCalendar = "2020-11-10T16:04:43.000+" + TimeZone.getTimeZone("Europe/Oslo");
+	private XMLGregorianCalendar journalCalendar;
+
+	private void setDate() throws Exception{
+		Date d = formatter.parse("2020-11-10 16:04:43.000");
+		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Oslo"));
+		cal.setTime(d);
+		journalCalendar = AvleveringUtils.dateToXMLGregorianCalendar(d);
+	}
 
 	@Test
 	void testMapping() throws Exception {
+		setDate();
 		final Sak sak = generateSak();
 		final Journalregistrering registrering = mapper.map(sak, sak.getJp().get(0));
 
@@ -48,13 +60,12 @@ class LoependeJournalRegistreringMapperTest {
 		assertEquals(jp.getSystemID().getValue().isEmpty(), false);
 		assertEquals(jp.getJournalaar(), toBigInteger(2020));
 		assertEquals(jp.getTittel(), "Legg til ny institusjon");
-		assertEquals(jp.getJournaldato().toString(), journalDato);
-		assertEquals(jp.getDokumentetsDato().toString(),journalDato);
+		assertEquals(jp.getJournaldato(), journalCalendar);
+		assertEquals(jp.getDokumentetsDato(), journalCalendar);
 
 		Korrespondansepart part = jp.getKorrespondanseparts().get(0);
 		assertEquals(part.getKorrespondansepartNavn(), "Arena");
 		assertEquals(part.getKorrespondanseparttype(), "Mottaker");
-
 
 	}
 
@@ -64,12 +75,12 @@ class LoependeJournalRegistreringMapperTest {
 		assertEquals(jp.getTittel(), "Legg til ny institusjon");
 		assertEquals(jp.getJournalsekvensnummer(), toBigInteger(453637481));
 		assertEquals(jp.getJournalpostnummer(), toBigInteger(453637481));
-		assertEquals(jp.getJournaldato().toString(), journalDato);
-		assertEquals(jp.getDokumentetsDato().toString(),journalDato);
+		assertEquals(jp.getJournaldato(), journalCalendar);
+		assertEquals(jp.getDokumentetsDato(), journalCalendar);
 		assertKorrespondanseParts(jp.getKorrespondanseparts().get(0));
 	}
 
-	private void assertKorrespondanseParts(Korrespondansepart part){
+	private void assertKorrespondanseParts(Korrespondansepart part) {
 		assertEquals(part.getKorrespondansepartNavn(), "Arena");
 		assertEquals(part.getKorrespondanseparttype(), "Mottaker");
 	}
