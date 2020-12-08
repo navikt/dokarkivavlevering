@@ -30,6 +30,7 @@ public class DokumentInfo {
 	private final Date datoOpprettet;
 	@ToString.Exclude
 	private final String opprettetAv;
+	private final Date datoFerdig;
 	@ToString.Exclude
 	private final String opprettetAvBeriketNavn;
 	private final List<FilDetaljer> fd;

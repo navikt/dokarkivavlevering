@@ -27,7 +27,7 @@ public class DokumentRoute extends RouteBuilder {
 				.routeId("send_dokument")
 				.bean(dokumentMapper)
 				.split(body())
-				.setHeader(HEADER_FILNAVN, simple("DOKUMENTER/${exchangeProperty.AvleveringTema}/${body.filUuid}.pdf"))
+				.setHeader(HEADER_FILNAVN, simple("DOKUMENTER/${exchangeProperty.AvleveringTema}/${body.journalpostId}_${body.filUuid}.pdf"))
 				.setBody(simple("${body.fil}"))
 				.to(SFTP)
 				.end();

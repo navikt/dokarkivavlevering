@@ -6,6 +6,7 @@ import no.arkivverket.standarder.noark5.arkivstruktur.Korrespondansepart;
 import no.arkivverket.standarder.noark5.arkivstruktur.Part;
 import no.arkivverket.standarder.noark5.arkivstruktur.Saksmappe;
 import no.arkivverket.standarder.noark5.arkivstruktur.SystemID;
+import no.nav.dokarkivavlevering.avlevering.common.JournaldatoMapper;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.domain.Arkivendring;
 import no.nav.dokarkivavlevering.avlevering.domain.Bruker;
@@ -36,7 +37,7 @@ class SaksmappeMapperTest {
 	public static final String FIL = "Hello World";
 	private SimpleDateFormat DATETIME_FORMAT = new SimpleDateFormat("yyy-MM-dd hh:mm:ss");
 	private final AvleveringProperties avleveringProperties = new AvleveringProperties();
-	private final SaksmappeMapper saksmappeMapper = new SaksmappeMapper(avleveringProperties);
+	private final SaksmappeMapper saksmappeMapper = new SaksmappeMapper(new JournaldatoMapper(), avleveringProperties);
 
 	@Test
 	void shouldMap() throws Exception {
@@ -106,7 +107,7 @@ class SaksmappeMapperTest {
 		assertEquals(dokObjekt.getFormat(), "PDF/A");
 		assertEquals(dokObjekt.getOpprettetDato(), toGregorianCalendar("2020-11-10T15:04:43Z"));
 		assertEquals(dokObjekt.getOpprettetAv(), "Automatisk jobb");
-		assertEquals(dokObjekt.getReferanseDokumentfil(), "DOKUMENTER/MED/55c39cdb-f052-4f4e-a9a5-900b455ca915.pdf");
+		assertEquals(dokObjekt.getReferanseDokumentfil(), "DOKUMENTER/MED/453637481_55c39cdb-f052-4f4e-a9a5-900b455ca915.pdf");
 		assertEquals(dokObjekt.getSjekksum(), "a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e");
 		assertEquals(dokObjekt.getSjekksumAlgoritme(), "SHA-256");
 		assertEquals(dokObjekt.getFilstoerrelse(), toBigInteger(FIL.length()));

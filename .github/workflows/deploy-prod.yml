@@ -2,10 +2,6 @@ name: Deploy dokarkivavlevering [prod-fss]
 on:
   workflow_dispatch:
     inputs:
-      logLevel:
-        description: 'Log level'
-        required: true
-        default: 'warning'
       periodeStart:
         description: 'Periode start (f.o.m) for avlevering. YYYY-MM-DD'
         required: true

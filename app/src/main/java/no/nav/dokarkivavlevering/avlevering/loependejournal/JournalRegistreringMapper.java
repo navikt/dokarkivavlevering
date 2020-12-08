@@ -5,10 +5,12 @@ import no.arkivverket.standarder.noark5.loependejournal.Klasse;
 import no.arkivverket.standarder.noark5.loependejournal.Korrespondansepart;
 import no.arkivverket.standarder.noark5.loependejournal.Saksmappe;
 import no.arkivverket.standarder.noark5.loependejournal.SystemID;
+import no.nav.dokarkivavlevering.avlevering.common.JournaldatoMapper;
 import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.UUID;
 
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.dateToXMLGregorianCalendar;
@@ -21,6 +23,11 @@ import static org.apache.camel.converter.ObjectConverter.toBigInteger;
 @Component
 public class JournalRegistreringMapper {
 
+	private final JournaldatoMapper journaldatoMapper;
+
+	public JournalRegistreringMapper(JournaldatoMapper journaldatoMapper) {
+		this.journaldatoMapper = journaldatoMapper;
+	}
 
 	public Journalregistrering map(Sak sak, Journalpost fraJournalpost) {
 		Journalregistrering registrering = new Journalregistrering();
@@ -47,13 +54,14 @@ public class JournalRegistreringMapper {
 	}
 
 	private no.arkivverket.standarder.noark5.loependejournal.Journalpost mapJournalPost(Journalpost fraJournalpost) {
+		final Date journaldato = journaldatoMapper.mapJournaldato(fraJournalpost);
 		no.arkivverket.standarder.noark5.loependejournal.Journalpost tilJournalpost = new no.arkivverket.standarder.noark5.loependejournal.Journalpost();
 		tilJournalpost.setSystemID(mapSystemID(fraJournalpost.getUuid()));
-		tilJournalpost.setJournalaar(toBigInteger(getYear(fraJournalpost.getDatoOpprettet())));
+		tilJournalpost.setJournalaar(toBigInteger(getYear(journaldato)));
 		tilJournalpost.setJournalsekvensnummer(toBigInteger(fraJournalpost.getId()));
 		tilJournalpost.setJournalpostnummer(toBigInteger(fraJournalpost.getId()));
 		tilJournalpost.setTittel(fraJournalpost.getInnhold());
-		tilJournalpost.setJournaldato(dateToXMLGregorianCalendar(fraJournalpost.getDatoJournal()));
+		tilJournalpost.setJournaldato(dateToXMLGregorianCalendar(journaldato));
 		tilJournalpost.getKorrespondanseparts().add(mapKorrespondansepart(fraJournalpost));
 
 		if (fraJournalpost.getDatoDokument() != null) {
