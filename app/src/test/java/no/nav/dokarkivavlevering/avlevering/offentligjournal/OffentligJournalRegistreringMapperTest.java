@@ -8,20 +8,16 @@ import no.nav.dokarkivavlevering.avlevering.common.JournaldatoMapper;
 import no.nav.dokarkivavlevering.avlevering.domain.DokumentInfo;
 import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
-import org.junit.jupiter.api.Disabled;
+import no.nav.dokarkivavlevering.avlevering.testUtils.TestUtils;
 import org.junit.jupiter.api.Test;
 
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 
+import static no.nav.dokarkivavlevering.avlevering.testUtils.TestUtils.formatter;
 import static org.apache.camel.converter.ObjectConverter.toBigInteger;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Disabled
 class OffentligJournalRegistreringMapperTest {
-	private SimpleDateFormat formatter = new SimpleDateFormat("yyy-MM-dd hh:mm:ss");
 	private OffentligJournalRegistreringMapper mapper = new OffentligJournalRegistreringMapper(new JournaldatoMapper());
 
 	@Test
@@ -44,8 +40,8 @@ class OffentligJournalRegistreringMapperTest {
 		assertEquals(jp.getJournalsekvensnummer(), toBigInteger(453637481));
 		assertEquals(jp.getJournalpostnummer(), toBigInteger(453637481));
 		assertEquals(jp.getOffentligTittel(), "Legg til ny institusjon");
-		assertEquals(jp.getJournaldato(), toGregorianCalendar("2020-11-10T15:04:43Z"));
-		assertEquals(jp.getDokumentetsDato(), toGregorianCalendar("2020-11-10T15:04:43Z"));
+		assertEquals(jp.getJournaldato(), TestUtils.toXmlGregCalendar("2020-11-10 16:04:43"));
+		assertEquals(jp.getDokumentetsDato(), TestUtils.toXmlGregCalendar("2020-11-10 16:05:43"));
 		assertEquals(jp.getSkjermingMetadata(), "Skjerming navn mottaker");
 		assertEquals(jp.getSkjermingshjemmel(), "Offentleglova § 13");
 		assertKorrespondanseParts(jp.getKorrespondanseparts().get(0));
@@ -60,10 +56,6 @@ class OffentligJournalRegistreringMapperTest {
 		assertEquals(mappe.getSaksaar(), toBigInteger(2019));
 		assertEquals(mappe.getSakssekvensnummer(), toBigInteger((1234567011)));
 		assertEquals(mappe.getOffentligTittel(), "Medlemskap");
-	}
-
-	private XMLGregorianCalendar toGregorianCalendar(String date) throws Exception {
-		return DatatypeFactory.newInstance().newXMLGregorianCalendar(date);
 	}
 
 	private Sak generateSak() throws Exception {
@@ -83,7 +75,7 @@ class OffentligJournalRegistreringMapperTest {
 				.innhold("Legg til ny institusjon")
 				.avsenderMottaker("Arena")
 				.datoMottatt(null)
-				.datoDokument(formatter.parse("2020-11-10 16:04:43.332"))
+				.datoDokument(formatter.parse("2020-11-10 16:05:43.332"))
 				.datoJournal(formatter.parse("2020-11-10 16:04:43.35"))
 				.datoOpprettet(formatter.parse("2020-11-10 16:04:43.338"))
 				.datoEkspedert(null)
@@ -112,5 +104,6 @@ class OffentligJournalRegistreringMapperTest {
 				.opprettetAvBeriketNavn("Automatisk Jobb")
 				.build();
 	}
+
 
 }
