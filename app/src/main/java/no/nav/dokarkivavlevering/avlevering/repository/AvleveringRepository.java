@@ -1,10 +1,12 @@
 package no.nav.dokarkivavlevering.avlevering.repository;
 
 import no.nav.dokarkivavlevering.avlevering.AvleveringTemaRoute;
+import no.nav.dokarkivavlevering.avlevering.arkivstruktur.IdRange;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.config.Tema;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import org.apache.camel.Body;
+import org.apache.camel.ExchangeProperty;
 import org.apache.camel.Header;
 import org.simpleflatmapper.jdbc.spring.JdbcTemplateMapperFactory;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -43,11 +45,14 @@ public class AvleveringRepository {
 	}
 
 	// Keyset pagination
-	public List<Long> findSakIdsPagination(@Body final Tema tema, @Header(AvleveringTemaRoute.HEADER_LAST_SAK_ID) final Long lastSakId) {
+	public List<Long> findSakIdsPagination(@Body final Tema tema, @Header(AvleveringTemaRoute.HEADER_LAST_SAK_ID) final Long lastSakId,
+										   @ExchangeProperty(AvleveringTemaRoute.PROPERTY_TEMA_IDRANGE) final IdRange idRange) {
 		final HashMap<String, Object> paramMap = new HashMap<>();
 		paramMap.put("batchsize", avleveringProperties.getBatchsize());
 		paramMap.put("lastSakId", lastSakId);
 		paramMap.put("tema", tema.getTemakode());
+		paramMap.put("minJournalpostId", idRange.getJournalpostIdMin());
+		paramMap.put("maxJournalpostId", idRange.getJournalpostIdMax());
 		paramMap.put("startdato", Timestamp.valueOf(avleveringProperties.getPeriode().getStartdato().atStartOfDay()));
 		paramMap.put("sluttdato", Timestamp.valueOf(avleveringProperties.getPeriode().getSluttdato().atStartOfDay()));
 		return namedParameterJdbcTemplate.queryForList(SqlQueries.FINN_SAK_PAGE, paramMap, Long.class);
@@ -56,7 +61,7 @@ public class AvleveringRepository {
 	public List<Sak> findSaker(final List<Long> sakIds) {
 		if (sakIds.isEmpty()) {
 			return new ArrayList<>();
-		} else if(sakIds.size() > ORACLE_MAX_IN) {
+		} else if (sakIds.size() > ORACLE_MAX_IN) {
 			throw new UnsupportedOperationException("Støtter ikke å hente flere enn " + ORACLE_MAX_IN + " saker om gangen.");
 		}
 
@@ -65,5 +70,14 @@ public class AvleveringRepository {
 		paramMap.put("startdato", Timestamp.valueOf(avleveringProperties.getPeriode().getStartdato().atStartOfDay()));
 		paramMap.put("sluttdato", Timestamp.valueOf(avleveringProperties.getPeriode().getSluttdato().atStartOfDay()));
 		return namedParameterJdbcTemplate.query(SqlQueries.FINN_SAKER_SQL, paramMap, SAK_RESULTSET_EXTRACTOR);
+	}
+
+	public IdRange findJournalpostIdRange(@Body final Tema tema) {
+		final HashMap<String, Object> paramMap = new HashMap<>();
+		paramMap.put("tema", tema.getTemakode());
+		paramMap.put("startdato", Timestamp.valueOf(avleveringProperties.getPeriode().getStartdato().atStartOfDay()));
+		paramMap.put("sluttdato", Timestamp.valueOf(avleveringProperties.getPeriode().getSluttdato().atStartOfDay()));
+		return namedParameterJdbcTemplate.queryForObject(SqlQueries.JOURNALPOST_ID_RANGE, paramMap,
+				(rs, rowNum) -> new IdRange(rs.getLong(1), rs.getLong(2), rs.getLong(3)));
 	}
 }

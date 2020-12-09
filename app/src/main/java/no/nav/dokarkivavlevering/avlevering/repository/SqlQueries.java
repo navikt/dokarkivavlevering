@@ -4,22 +4,31 @@ package no.nav.dokarkivavlevering.avlevering.repository;
  * @author Joakim Bjørnstad, Jbit AS
  */
 public class SqlQueries {
-	static final String FINN_SAK_PAGE =
-			"select distinct to_number(s.sak_nr_fk)\n" +
-					"from t_journalpost j\n" +
+	static final String JOURNALPOST_ID_RANGE =
+			"select min(j.journalpost_id), max(j.journalpost_id), max(sa.id)\n" +
+					"from t_journalpost j \n" +
 					"         join t_saksrelasjon s on j.journalpost_id = s.journalpost_id\n" +
-					"where (s.feilregistrert is null or s.feilregistrert = 0)\n" +
+					"         join sak sa on sa.id = to_number(regexp_replace(s.sak_nr_fk, '[^0-9]', ''))\n" +
+					"where \n" +
+					"    (s.feilregistrert is null or s.feilregistrert = 0)\n" +
+					"  and sa.tema = :tema\n" +
 					"  and j.k_journal_s in ('J', 'FS', 'FL', 'E')\n" +
-					"  and (trunc(j.dato_opprettet) between :startdato and :sluttdato)\n" +
-					"  and s.sak_nr_fk in (\n" +
-					"    select to_char(sa.id)\n" +
-					"    from sak sa\n" +
-					"    where tema = :tema\n" +
-					"      and sa.id < :lastSakId\n" +
-					"      and trunc(sa.opprettet_tidspunkt) <= :sluttdato\n" +
+					"  and (trunc(j.dato_opprettet) between :startdato and :sluttdato)";
+	static final String FINN_SAK_PAGE =
+			"select distinct sa.id\n" +
+					"from sak sa\n" +
+					"where sa.tema = :tema\n" +
+					"  and sa.id < :lastSakId\n" +
+					"  and sa.id in (\n" +
+					"    select to_number(regexp_replace(s.sak_nr_fk, '[^0-9]', ''))\n" +
+					"    from t_saksrelasjon s\n" +
+					"             join t_journalpost j on s.journalpost_id = j.journalpost_id\n" +
+					"    where (j.journalpost_id between :minJournalpostId and :maxJournalpostId)\n" +
+					"      and (s.feilregistrert is null or s.feilregistrert = 0)\n" +
+					"      and j.k_journal_s in ('J', 'FS', 'FL', 'E')\n" +
+					"      and (trunc(j.dato_opprettet) between :startdato and :sluttdato)\n" +
 					")\n" +
-					"  and s.k_fagsystem = 'FS22'\n" +
-					"order by to_number(s.sak_nr_fk) desc\n" +
+					"order by sa.id desc\n" +
 					"    fetch first :batchsize rows only";
 
 	static final String FINN_SAKER_SQL =
