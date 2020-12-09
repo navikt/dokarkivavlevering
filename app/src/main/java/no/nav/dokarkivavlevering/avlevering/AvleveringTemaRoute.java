@@ -2,7 +2,9 @@ package no.nav.dokarkivavlevering.avlevering;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avlevering.arkivstruktur.AvleveringArkivstrukturRoute;
+import no.nav.dokarkivavlevering.avlevering.arkivstruktur.IdRange;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
+import no.nav.dokarkivavlevering.avlevering.config.Tema;
 import no.nav.dokarkivavlevering.avlevering.dokument.DokumentRoute;
 import no.nav.dokarkivavlevering.avlevering.endringlogg.AvleveringEndringsloggRoute;
 import no.nav.dokarkivavlevering.avlevering.loependejournal.AvleveringLoependeJournalRoute;
@@ -27,6 +29,7 @@ public class AvleveringTemaRoute extends RouteBuilder {
 	public static final String HEADER_AVLEVERING_TEMA_SIZE = "AvleveringTemaSize";
 	public static final String HEADER_LAST_SAK_ID = "AvleveringLastSakId";
 	public static final String HEADER_TEMA_SKIP = "AvleveringTemaSkip";
+	public static final String PROPERTY_TEMA_IDRANGE = "AvleveringIdRange";
 	private final AvleveringProperties avleveringProperties;
 	private final AvleveringRepository avleveringRepository;
 	private final AvleveringSakBerikerService avleveringSakBerikerService;
@@ -45,8 +48,17 @@ public class AvleveringTemaRoute extends RouteBuilder {
 
 		from(BEHANDLE_TEMA)
 				.routeId("behandle_tema")
+				.removeHeaders("*")
+				.removeProperty(PROPERTY_TEMA_IDRANGE)
 				.log(LoggingLevel.INFO, log, "Dokarkivavlevering behandler tema=${exchangeProperty.AvleveringTema}")
-				.setHeader(HEADER_LAST_SAK_ID, constant(Long.MAX_VALUE)) // init paginering
+				.process(exchange -> {
+					final Tema tema = exchange.getIn().getBody(Tema.class);
+					final IdRange idRange = avleveringRepository.findJournalpostIdRange(tema);
+					// Vi må passe på få med høyeste verdi siden vi sjekker alle sakId før max.
+					exchange.getIn().setHeader(HEADER_LAST_SAK_ID, idRange.getSakIdMax() + 1);
+					exchange.setProperty(PROPERTY_TEMA_IDRANGE, idRange);
+					log.info("Tema={} har idRange={}", tema, idRange);
+				})
 				.setHeader(HEADER_AVLEVERING_TEMA_SIZE, constant(avleveringProperties.getBatchsize())) // init paginering
 				.loopDoWhile(exchange -> {
 					final Long avleveringTemaSize = exchange.getIn().getHeader(HEADER_AVLEVERING_TEMA_SIZE, Long.class);
