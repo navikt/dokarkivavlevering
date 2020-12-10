@@ -29,6 +29,7 @@ public class AvleveringUtils {
 			}
 			GregorianCalendar cal = new GregorianCalendar();
 			cal.setTime(date);
+			cal.setTimeZone(TimeZone.getTimeZone("Europe/Oslo"));
 			return DatatypeFactory.newInstance().newXMLGregorianCalendar(cal);
 		} catch (DatatypeConfigurationException e) {
 			throw new AvleveringFunctionalException("Kunne ikke mappe dato til XmlGregorianCalendar.", e);
