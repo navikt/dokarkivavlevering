@@ -12,6 +12,7 @@ import java.util.Date;
 @Value
 @Builder(toBuilder = true)
 public class Arkivendring {
+	public static final String INGEN_VERDI = "ingen verdi";
 	private final Long id;
 	private final String element;
 	private final Date tidspunkt;

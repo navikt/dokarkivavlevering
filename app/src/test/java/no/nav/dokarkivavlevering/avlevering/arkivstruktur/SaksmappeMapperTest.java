@@ -4,6 +4,7 @@ import no.arkivverket.standarder.noark5.arkivstruktur.Dokumentbeskrivelse;
 import no.arkivverket.standarder.noark5.arkivstruktur.Dokumentobjekt;
 import no.arkivverket.standarder.noark5.arkivstruktur.Korrespondansepart;
 import no.arkivverket.standarder.noark5.arkivstruktur.Part;
+import no.arkivverket.standarder.noark5.arkivstruktur.Registrering;
 import no.arkivverket.standarder.noark5.arkivstruktur.Saksmappe;
 import no.arkivverket.standarder.noark5.arkivstruktur.SystemID;
 import no.nav.dokarkivavlevering.avlevering.common.JournaldatoMapper;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.UUID;
 
 import static no.nav.dokarkivavlevering.avlevering.testUtils.TestUtils.formatter;
@@ -47,7 +49,7 @@ class SaksmappeMapperTest {
 		assertEquals(saksmappe.getSakssekvensnummer().toString(), "1234567011");
 		assertEquals(saksmappe.getSaksdato(), TestUtils.toXmlGregCalendar("2019-10-28 11:41:36"));
 		assertEquals(saksmappe.getAdministrativEnhet(), "NAV Medlemskap og avgift");
-		assertEquals(saksmappe.getSaksansvarlig(), "Automatisk jobb");
+		assertEquals(saksmappe.getSaksansvarlig(), "Bjarne Betjent");
 		assertEquals(saksmappe.getSaksstatus(), "Under behandling");
 		assertEquals(saksmappe.getSystemID().getValue().isEmpty(), false);
 		assertEquals(saksmappe.getMappeID(), "1234567011");
@@ -62,6 +64,34 @@ class SaksmappeMapperTest {
 		assertPart(saksmappe.getParts().get(0));
 
 		assertRegistrering((no.arkivverket.standarder.noark5.arkivstruktur.Journalpost) saksmappe.getRegistrerings().get(0));
+	}
+
+	@Test
+	void shouldMapOpprettetAvToBeriketNavnWhenOpprettetAvNavnIsNull() throws Exception {
+		final Sak sak = generateSak().toBuilder().jp(Collections.singletonList(
+				generateJournalpost().toBuilder()
+						.opprettetAv("A000000")
+						.opprettetAvNavn(null)
+						.opprettetAvBeriketNavn("Saksbehandler Sakbehandlerstad")
+						.dok(Collections.singletonList(generateDokumentInfo()))
+						.build())).build();
+		final Saksmappe saksmappe = saksmappeMapper.map(sak);
+		final Registrering registrering = saksmappe.getRegistrerings().get(0);
+		assertThat(registrering.getOpprettetAv()).isEqualTo("Saksbehandler Sakbehandlerstad");
+	}
+
+	@Test
+	void shouldMapOpprettetAvUkjentWhenOpprettetAvIsNull() throws Exception {
+		final Sak sak = generateSak().toBuilder().jp(Collections.singletonList(
+				generateJournalpost().toBuilder()
+						.opprettetAv(null)
+						.opprettetAvNavn(null)
+						.opprettetAvBeriketNavn(null)
+						.dok(Collections.singletonList(generateDokumentInfo()))
+						.build())).build();
+		final Saksmappe saksmappe = saksmappeMapper.map(sak);
+		final Registrering registrering = saksmappe.getRegistrerings().get(0);
+		assertThat(registrering.getOpprettetAv()).isEqualTo(Bruker.UKJENT_PERSON);
 	}
 
 	private void assertPart(Part part) {
@@ -105,7 +135,7 @@ class SaksmappeMapperTest {
 
 	private void assertKorrespondanseparts(Korrespondansepart korrPart) {
 		assertEquals(korrPart.getKorrespondanseparttype(), "Mottaker");
-		assertEquals(korrPart.getKorrespondansepartNavn(), "srvmelosys");
+		assertEquals(korrPart.getKorrespondansepartNavn(), "Bruker Brukersen");
 		assertEquals(korrPart.getSaksbehandler(), "srvmelosys");
 	}
 
@@ -136,7 +166,8 @@ class SaksmappeMapperTest {
 				.bruker(generaterBruker())
 				.opprettetAv("srvmelosys")
 				.opprettetTidspunkt(formatter.parse("2019-10-28 11:41:36.673"))
-				.jp(Arrays.asList(generateJournalPost())).build();
+				.opprettetAvBeriketNavn("Automatisk jobb")
+				.jp(Arrays.asList(generateJournalpost())).build();
 	}
 
 	private Bruker generaterBruker() {
@@ -146,13 +177,13 @@ class SaksmappeMapperTest {
 		);
 	}
 
-	private Journalpost generateJournalPost() throws Exception {
+	private Journalpost generateJournalpost() throws Exception {
 		return Journalpost.builder()
 				.id((long) 453637481)
 				.type("U")
 				.status("FS")
 				.innhold("Legg til ny institusjon")
-				.avsenderMottaker("Arena")
+				.avsenderMottaker("Bruker Brukersen")
 				.datoMottatt(null)
 				.datoDokument(formatter.parse("2020-11-10 16:05:43.332"))
 				.datoJournal(formatter.parse("2020-11-10 16:04:43.35"))
@@ -163,7 +194,7 @@ class SaksmappeMapperTest {
 				.opprettetAvBeriketNavn("Automatisk Jobb")
 				.opprettetAvNavn("srvmelosys")
 				.endretAv("srvmelosys")
-				.endretAvBeriketNavn(null)
+				.endretAvBeriketNavn("Bjarne Betjent")
 				.dok(Arrays.asList(generateDokumentInfo()))
 				.build();
 	}
@@ -174,13 +205,13 @@ class SaksmappeMapperTest {
 				.relTilknyttetSom("HOVEDDOKUMENT")
 				.relDatoOpprettet(formatter.parse("2020-11-10 16:04:43.343"))
 				.relOpprettetAv("srvmelosys")
-				.relOpprettetAvBeriketNavn("Automatisk Jobb")
+				.relOpprettetAvBeriketNavn("Automatisk jobb")
 				.kategori("SED")
 				.status("FERDIGSTILT")
 				.tittel("Legg til ny institusjon")
 				.datoOpprettet(formatter.parse("2020-11-10 16:04:43.342"))
 				.opprettetAv("srvmelosys")
-				.opprettetAvBeriketNavn("Automatisk Jobb")
+				.opprettetAvBeriketNavn("Automatisk jobb")
 				.fd(Arrays.asList(generateFilDetaljer()))
 				.build();
 	}
@@ -194,7 +225,7 @@ class SaksmappeMapperTest {
 				.sha256hashBeriket("a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e")
 				.datoOpprettet(formatter.parse("2020-11-10 16:04:43.343"))
 				.opprettetAv("srvRuting")
-				.opprettetAvBeriketNavn("Automatisk Jobb")
+				.opprettetAvBeriketNavn("Automatisk jobb")
 				.build();
 	}
 
