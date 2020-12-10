@@ -1,7 +1,6 @@
 package no.nav.dokarkivavlevering.avlevering.endringlogg;
 
 import no.arkivverket.standarder.noark5.endringslogg.Endring;
-
 import no.nav.dokarkivavlevering.avlevering.domain.Arkivendring;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
@@ -40,6 +39,28 @@ class EndringsloggMapperTest {
 		softly.assertThat(endring.getEndretAv()).isEqualTo(arkivendring.getUtfoertAv());
 		softly.assertThat(endring.getTidligereVerdi()).isEqualTo(arkivendring.getFraVerdi());
 		softly.assertThat(endring.getNyVerdi()).isEqualTo(arkivendring.getTilVerdi());
+		softly.assertAll();
+	}
+
+	@Test
+	void shouldMapIngenVerdiWhenFraVerdiIsNull() {
+		Date date = Date.from(Instant.now());
+		UUID uuid = UUID.randomUUID();
+
+		Arkivendring arkivendring = Arkivendring.builder()
+				.id(1L)
+				.element("Saksrelasjon.sakId")
+				.tidspunkt(date)
+				.utfoertAv("JonBlund")
+				.utfoertAvBeriketNavn("JonBlund")
+				.fraVerdi(null)
+				.tilVerdi("1234")
+				.build();
+
+		final Endring endring = mapper.map(arkivendring, uuid);
+
+		SoftAssertions softly = new SoftAssertions();
+		softly.assertThat(endring.getTidligereVerdi()).isEqualTo(Arkivendring.INGEN_VERDI);
 		softly.assertAll();
 	}
 }
