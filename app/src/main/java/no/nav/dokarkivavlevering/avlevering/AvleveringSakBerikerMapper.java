@@ -22,7 +22,7 @@ public class AvleveringSakBerikerMapper {
 				.jp(sak.getJp().stream().map(journalpost -> {
 					return journalpost.toBuilder()
 							.opprettetAvBeriketNavn(utledNavn(journalpost.getOpprettetAv(), navAnsatteNavn))
-							.endretAv(utledNavn(journalpost.getEndretAv(), navAnsatteNavn))
+							.endretAvBeriketNavn(utledNavn(journalpost.getEndretAv(), navAnsatteNavn))
 							.dok(journalpost.getDok().stream()
 									.map(dokumentInfo -> {
 										return dokumentInfo.toBuilder()
