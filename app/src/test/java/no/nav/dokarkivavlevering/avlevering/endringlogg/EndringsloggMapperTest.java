@@ -24,7 +24,7 @@ class EndringsloggMapperTest {
 				.id(1L)
 				.element("Saksrelasjon.sakId")
 				.tidspunkt(date)
-				.utfoertAv("JonBlund")
+				.utfoertAv("B000000")
 				.utfoertAvBeriketNavn("JonBlund")
 				.fraVerdi("123")
 				.tilVerdi("1234")
@@ -34,11 +34,11 @@ class EndringsloggMapperTest {
 
 		SoftAssertions softly = new SoftAssertions();
 		softly.assertThat(endring.getReferanseArkivenhet()).isEqualTo(uuid.toString());
-		softly.assertThat(endring.getReferanseMetadata()).isEqualTo(arkivendring.getElement());
+		softly.assertThat(endring.getReferanseMetadata()).isEqualTo("Saksrelasjon.sakId");
 		softly.assertThat(endring.getEndretDato()).isEqualTo(dateToXMLGregorianCalendar(arkivendring.getTidspunkt()));
-		softly.assertThat(endring.getEndretAv()).isEqualTo(arkivendring.getUtfoertAv());
-		softly.assertThat(endring.getTidligereVerdi()).isEqualTo(arkivendring.getFraVerdi());
-		softly.assertThat(endring.getNyVerdi()).isEqualTo(arkivendring.getTilVerdi());
+		softly.assertThat(endring.getEndretAv()).isEqualTo("JonBlund");
+		softly.assertThat(endring.getTidligereVerdi()).isEqualTo("123");
+		softly.assertThat(endring.getNyVerdi()).isEqualTo("1234");
 		softly.assertAll();
 	}
 
@@ -51,7 +51,7 @@ class EndringsloggMapperTest {
 				.id(1L)
 				.element("Saksrelasjon.sakId")
 				.tidspunkt(date)
-				.utfoertAv("JonBlund")
+				.utfoertAv("B000000")
 				.utfoertAvBeriketNavn("JonBlund")
 				.fraVerdi(null)
 				.tilVerdi("1234")

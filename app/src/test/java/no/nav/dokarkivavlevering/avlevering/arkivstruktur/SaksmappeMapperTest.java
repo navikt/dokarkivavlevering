@@ -142,7 +142,7 @@ class SaksmappeMapperTest {
 	private void assertDokumentBeskrivelse(Dokumentbeskrivelse dok) throws Exception {
 		assertEquals(dok.getSystemID().getValue().isEmpty(), false);
 		assertEquals(dok.getDokumenttype(), "SED");
-		assertEquals(dok.getDokumentstatus(), "FERDIGSTILT");
+		assertEquals(dok.getDokumentstatus(), "Dokumentet er ferdigstilt");
 		assertEquals(dok.getTittel(), "Legg til ny institusjon");
 		assertEquals(dok.getOpprettetDato(), TestUtils.toXmlGregCalendar("2020-11-10 16:04:43"));
 		assertEquals(dok.getOpprettetAv(), "Automatisk jobb");

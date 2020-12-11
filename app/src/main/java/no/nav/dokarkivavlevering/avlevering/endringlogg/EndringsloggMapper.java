@@ -17,7 +17,7 @@ public class EndringsloggMapper {
 		endring.setReferanseArkivenhet(uuid.toString());
 		endring.setReferanseMetadata(arkivendring.getElement());
 		endring.setEndretDato(dateToXMLGregorianCalendar(arkivendring.getTidspunkt()));
-		endring.setEndretAv(arkivendring.getUtfoertAv());
+		endring.setEndretAv(arkivendring.getUtfoertAvBeriketNavn());
 		endring.setTidligereVerdi(mapTidligereVerdi(arkivendring));
 		endring.setNyVerdi(arkivendring.getTilVerdi());
 		return endring;

@@ -35,6 +35,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 @Component
 public class SaksmappeMapper {
 
+	public static final String DOKUMENT_STATUS_FERDIGSTILT = "FERDIGSTILT";
 	private final JournaldatoMapper journaldatoMapper;
 	private final AvleveringProperties.ArkivConfig arkivConfig;
 
@@ -133,7 +134,7 @@ public class SaksmappeMapper {
 		Dokumentbeskrivelse dokumentbeskrivelse = new Dokumentbeskrivelse();
 		dokumentbeskrivelse.setSystemID(mapSystemID(dokumentInfo.getUuid()));
 		dokumentbeskrivelse.setDokumenttype(dokumentInfo.getKategori());
-		dokumentbeskrivelse.setDokumentstatus(dokumentInfo.getStatus());
+		dokumentbeskrivelse.setDokumentstatus(mapDokumentstatus(dokumentInfo));
 		dokumentbeskrivelse.setTittel(dokumentInfo.getTittel());
 		dokumentbeskrivelse.setOpprettetDato(dateToXMLGregorianCalendar(dokumentInfo.getDatoOpprettet()));
 		dokumentbeskrivelse.setOpprettetAv(dokumentInfo.getOpprettetAvBeriketNavn());
@@ -146,6 +147,14 @@ public class SaksmappeMapper {
 			dokumentbeskrivelse.getDokumentobjekts().add(mapDokumentobjekt(filDetaljer, tema, journalpostId));
 		}
 		return dokumentbeskrivelse;
+	}
+
+	private String mapDokumentstatus(DokumentInfo dokumentInfo) {
+		if(DOKUMENT_STATUS_FERDIGSTILT.equals(dokumentInfo.getStatus())) {
+			return "Dokumentet er ferdigstilt";
+		} else {
+			return "Dokumentet er under redigering";
+		}
 	}
 
 	private Dokumentobjekt mapDokumentobjekt(FilDetaljer filDetaljer, String tema, String journalpostId) {
