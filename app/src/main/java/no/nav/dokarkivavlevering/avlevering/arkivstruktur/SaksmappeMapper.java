@@ -166,6 +166,9 @@ public class SaksmappeMapper {
 
 	private String getSaksAnsvarlig(List<Journalpost> journalposter) {
 		Journalpost journalpost = journalposter.stream().min(Comparator.comparing(Journalpost::getId)).orElseThrow(NoSuchElementException::new);
+		if(isBlank(journalpost.getEndretAv())) {
+			return Bruker.UKJENT_PERSON;
+		}
 		return journalpost.getEndretAvBeriketNavn();
 	}
 
