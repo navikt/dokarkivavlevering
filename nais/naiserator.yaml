@@ -5,8 +5,8 @@ metadata:
   namespace: teamdokumenthandtering
   labels:
     team: teamdokumenthandtering
-    annotations:
-      nais.io/read-only-file-system:
+  annotations:
+    nais.io/read-only-file-system:
 spec:
   ttlSecondsAfterFinished: 100
   backoffLimit: 1
