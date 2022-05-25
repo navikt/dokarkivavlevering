@@ -6,7 +6,7 @@ metadata:
   labels:
     team: teamdokumenthandtering
   annotations:
-    nais.io/read-only-file-system:
+    nais.io/read-only-file-system: "false"
 spec:
   ttlSecondsAfterFinished: 100
   backoffLimit: 1
