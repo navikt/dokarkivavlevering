@@ -23,6 +23,7 @@
 
 	<properties>
 		<camel.version>3.6.0</camel.version>
+		<java.version>11</java.version>
 		<logstash-logback-encoder.version>6.4</logstash-logback-encoder.version>
 		<oracle-database.version>12.2.0.1</oracle-database.version>
 		<simpleflatmapper.version>8.2.3</simpleflatmapper.version>
@@ -89,9 +90,13 @@
 				<version>${lombok.version}</version>
 				<scope>provided</scope>
 			</dependency>
+			<dependency>
+				<groupId>com.aspose</groupId>
+				<artifactId>aspose-pdf</artifactId>
+				<version>22.4</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
 	<build>
 		<plugins>
 			<plugin>
