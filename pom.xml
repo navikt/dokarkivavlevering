@@ -35,6 +35,14 @@
 		<verapdf.version>1.20.1</verapdf.version>
 	</properties>
 
+	<repositories>
+		<repository>
+			<id>AsposeJavaAPI</id>
+			<name>Aspose Java API</name>
+			<url>https://repository.aspose.com/repo/</url>
+		</repository>
+	</repositories>
+
 	<dependencyManagement>
 		<dependencies>
 			<!--pdf validator-->
