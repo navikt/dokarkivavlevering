@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static no.nav.dokarkivavlevering.avlevering.aspose.AsposeService.convertPdf;
+
 /**
  * @author Joakim Bjørnstad, Jbit AS
  */
@@ -15,7 +17,7 @@ public class DokumentMapper {
 		return saker.stream().flatMap(sak -> sak.getJp().stream()
 				.flatMap(journalpost -> journalpost.getDok().stream()
 						.flatMap(dokumentInfo -> dokumentInfo.getFd().stream()
-								.map(fd -> new Dokument(journalpost.getId().toString(), fd.getFilUuid(), fd.getFil())))))
+								.map(fd -> new Dokument(journalpost.getId().toString(), fd.getFilUuid(), convertPdf(fd.getFil()))))))
 				.collect(Collectors.toList());
 	}
 }

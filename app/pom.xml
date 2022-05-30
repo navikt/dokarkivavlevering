@@ -15,6 +15,10 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.verapdf</groupId>
+            <artifactId>validation-model</artifactId>
+        </dependency>
+        <dependency>
             <groupId>no.nav.dokarkivavlevering</groupId>
             <artifactId>arkivverket-schemas</artifactId>
         </dependency>
