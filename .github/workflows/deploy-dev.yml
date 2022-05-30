@@ -28,9 +28,11 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2-
-      - name: Build and run tests
+      - name: Create settings.xml
+        uses: whelk-io/maven-settings-xml-action@v20
         with:
-          repositories: maven-central=https://repo.maven.apache.org/maven2,github-packages=https://maven.pkg.github.com/navikt/maven-release,AsposeJavaAPI=https://repository.aspose.com/repo/
+          repositories: '[{ "id": "maven-central", "url": "https://repo.maven.apache.org/maven2"}, { "id": "github-packages", "url": "https://maven.pkg.github.com/navikt/maven-release"}, { "id": "AsposeJavaAPI", "url": "AsposeJavaAPI=https://repository.aspose.com/repo/"}]'
+      - name: Build and run tests
         run: mvn -B package --file pom.xml
       - name: Build Docker image
         run: docker build . --pull --tag ${IMAGE}
