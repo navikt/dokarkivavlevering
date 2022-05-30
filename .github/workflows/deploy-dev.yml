@@ -31,8 +31,7 @@ jobs:
       - name: Create settings.xml
         uses: whelk-io/maven-settings-xml-action@v20
         with:
-          repositories: '[{ "id": "maven-central", "url": "https://repo.maven.apache.org/maven2"}, { "id": "github-packages", "url": "https://maven.pkg.github.com/navikt/maven-release"}, { "id": "AsposeJavaAPI", "url": "AsposeJavaAPI=https://repository.aspose.com/repo/"}]'
-          servers: '[{ "id": "github", "username": "${{ GITHUB_REPOSITORY }}", "password": "${{ secrets.GITHUB_TOKEN }}" }]'
+          repositories: '[{ "id": "maven-central", "url": "https://repo.maven.apache.org/maven2"}, { "id": "AsposeJavaAPI", "url": "AsposeJavaAPI=https://repository.aspose.com/repo/"}]'
       - name: Build and run tests
         run: mvn -B package --file pom.xml
       - name: Build Docker image
