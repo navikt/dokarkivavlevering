@@ -28,6 +28,7 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2-
+          repositories: maven-central=https://repo.maven.apache.org/maven2,github-packages=https://maven.pkg.github.com/navikt/maven-release,AsposeJavaAPI=https://repository.aspose.com/repo/
       - name: Build and run tests
         run: mvn -B package --file pom.xml
       - name: Build Docker image
