@@ -36,7 +36,7 @@ public class AsposeService {
 
 	public static byte[] convertToPDFA(byte[] pdf, String dokumentInfoId) {
 
-		if(isValidPdf(pdf, dokumentInfoId)){
+		if(isValidPdf(pdf)){
 			log.info("dokumentInfoId: {} er allerede en gyldig PDF/A!", dokumentInfoId);
 			return pdf;
 		}
