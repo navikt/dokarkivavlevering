@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 
-import static no.nav.dokarkivavlevering.avlevering.aspose.AsposeService.convertPdf;
+import static no.nav.dokarkivavlevering.avlevering.aspose.AsposeService.convertToPDFA;
 import static no.nav.dokarkivavlevering.avlevering.pdfValidation.PDFAValidatorUtil.validatePDFA;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.verapdf.pdfa.flavours.PDFAFlavour.PDFA_2_U;
@@ -25,12 +25,12 @@ public class PdfaKonvertering {
 	@Test
 	public void convertPdfToPdfa() throws Exception {
 		//sjekk at PDF'en vi tester ikke er gyldig før konvertering
-		assertThat(validatePDFA(getPdfStream(UGYLDIG_PDF_PATH)).isValidPdf()).isEqualTo(false);
+		assertThat(validatePDFA(getPdfStream(UGYLDIG_PDF_PATH).readAllBytes()).isValidPdf()).isEqualTo(false);
 
-		ByteArrayOutputStream result = convertPdf(getPdfStream(UGYLDIG_PDF_PATH));
+		ByteArrayOutputStream result = convertToPDFA(getPdfStream(UGYLDIG_PDF_PATH));
 		InputStream stream = new ByteArrayInputStream(result.toByteArray());
 
-		PDFAValidatorResponse pdfaValidatorResponse = validatePDFA(stream);
+		PDFAValidatorResponse pdfaValidatorResponse = validatePDFA(stream.readAllBytes());
 		assertThat(pdfaValidatorResponse.isValidPdf()).isEqualTo(true);
 		assertThat(pdfaValidatorResponse.getPdfVersion()).isEqualTo(PDFA_2_U);
 	}

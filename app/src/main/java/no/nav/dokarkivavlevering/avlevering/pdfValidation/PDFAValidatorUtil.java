@@ -38,14 +38,14 @@ public class PDFAValidatorUtil {
 		VeraGreenfieldFoundryProvider.initialise();
 	}
 
-	public static PDFAValidatorResponse validatePDFA(InputStream fil) throws Exception {
+	public static PDFAValidatorResponse validatePDFA(byte[] fil) throws Exception {
 		if (fil == null) {
 			throw new Exception("Filen er null!");
 		}
 
-		try (PDFAParser parser = Foundries.defaultInstance().createParser(fil)) {
+		try (PDFAParser parser = Foundries.defaultInstance().createParser(new ByteArrayInputStream(fil))) {
 
-			//Hvis PDF'en ikke er på et av de lovlige foratene hopp over valideringen
+			//Hvis PDF/A'en ikke er på et av de lovlige foratene hopp over valideringen
 			if (!validPdfas.contains(parser.getFlavour())) {
 				return returnIncorrectFlavourReponse(parser.getFlavour());
 			}
