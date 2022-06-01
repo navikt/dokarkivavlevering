@@ -34,19 +34,34 @@ public class AsposeService {
 	}
 
 	public static byte[] convertToPDFA(byte[] pdf, String dokumentInfoId) {
-		try {
-			if (validatePDFA(pdf).isValidPdf()) {
-				log.info("dokumentInfoId: {} er allerede en gyldig PDF/A!", dokumentInfoId);
-				return pdf;
-			}
-		} catch (Exception e) {
-			log.error("message: {} "+ e.getMessage(), e.getStackTrace());
-			//gjør noe smart
+
+		if(isValidPdf(pdf, dokumentInfoId)){
+			log.info("dokumentInfoId: {} er allerede en gyldig PDF/A!", dokumentInfoId);
+			return pdf;
 		}
 		Document doc = new Document(pdf);
 		doc.convert("test", PdfFormat.PDF_A_2U, ConvertErrorAction.Delete);
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		doc.save(stream);
-		return stream.toByteArray();
+		pdf = stream.toByteArray();
+		if(isValidPdf(pdf, dokumentInfoId)){
+			log.info("DokumentInfoId: {} er en gyldig PDF etter konvertering!");
+		} else {
+			log.error("DokumentInfoId: {} er IKKE en gyldig PDF etter konvertering!");
+
+		}
+		return pdf;
+	}
+
+	private static boolean isValidPdf(byte[] pdf, String dokumentInfoId){
+		try {
+			if (validatePDFA(pdf).isValidPdf()) {
+				return true;
+			}
+		} catch (Exception e) {
+			log.error("message: {} "+ e.getMessage(), e.getStackTrace());
+			//gjør noe smart
+		}
+		return false;
 	}
 }
