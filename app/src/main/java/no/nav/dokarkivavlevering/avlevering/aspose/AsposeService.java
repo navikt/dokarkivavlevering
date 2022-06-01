@@ -9,8 +9,10 @@ import no.nav.dokarkivavlevering.avlevering.pdfValidation.PDFAValidatorResponse;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
+import static no.nav.dokarkivavlevering.avlevering.pdfValidation.PDFAValidatorUtil.safeValidatePDFA;
 import static no.nav.dokarkivavlevering.avlevering.pdfValidation.PDFAValidatorUtil.validatePDFA;
 
 @Slf4j
@@ -26,54 +28,35 @@ public class AsposeService {
 		}
 	}
 
-	public static ByteArrayOutputStream convertToPDFA(InputStream pdf) {
-		Document doc = new Document(pdf);
-		doc.convert("test", PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
-		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		doc.save(stream);
-		return stream;
-	}
-
 	public static byte[] convertToPDFA(byte[] pdf, String dokumentInfoId) {
+		if(isValidPdf(pdf)){
+			return pdf;
+		}
+
 		ByteArrayOutputStream logStream = new ByteArrayOutputStream();
-
-		validatePDF(pdf, dokumentInfoId, "FØR", logStream);
-
-		logStream = new ByteArrayOutputStream();
-
 		Document doc = new Document(pdf);
 		doc.convert(logStream, PdfFormat.PDF_A_1A, ConvertErrorAction.Delete);
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		doc.save(stream);
 		pdf = stream.toByteArray();
 
-		validatePDF(pdf, dokumentInfoId, "ETTER", logStream);
+		validatePDF(pdf, dokumentInfoId,  logStream);
 
 		return pdf;
 	}
 
-	private static void validatePDF(byte[] pdf, String dokumentInfoId, String tidspunkt, ByteArrayOutputStream logstream){
-		try {
-			PDFAValidatorResponse response = response = validatePDFA(pdf);
-			if(response.isValidPdf()){
-				log.info("dokumentInfo {} er en gyldig pdf/a {} konvertering! Format:{}", dokumentInfoId, tidspunkt, response.getPdfVersion());
-			} else{
-				log.warn("dokumentInfo {} er ikke en gyldig PDF/A {} konvertering! Format: {} \n Aspose feilmeldinger: {}, Feilmeldinger: {}", dokumentInfoId, tidspunkt, response.getPdfVersion(), logstream.toString("UTF-8"), response.getAssertionResults());
+	private static void validatePDF(byte[] pdf, String dokumentInfoId, ByteArrayOutputStream logstream){
+		PDFAValidatorResponse response = safeValidatePDFA(pdf);
+		if(response.isValidPdf()){
+		} else{
+			try {
+				log.warn("dokumentInfo {} er ikke en gyldig PDF/A etter konvertering! Format: {} \n Aspose feilmeldinger: {}, Feilmeldinger: {}", dokumentInfoId, response.getPdfVersion(), logstream.toString(Charset. "UTF-8"), response.getAssertionResults());
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
 			}
-		} catch (Exception e){
-			//Bare for test
 		}
 	}
 
 	private static boolean isValidPdf(byte[] pdf){
-		try {
-			if (validatePDFA(pdf).isValidPdf()) {
-				return true;
-			}
-		} catch (Exception e) {
-			log.error("message: {} "+ e.getMessage(), e.getStackTrace());
-			//gjør noe smart
-		}
-		return false;
-	}
+		return safeValidatePDFA(pdf).isValidPdf() ? true : false;
 }

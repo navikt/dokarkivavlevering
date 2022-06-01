@@ -11,7 +11,6 @@ import org.verapdf.pdfa.results.TestAssertion;
 import org.verapdf.pdfa.results.ValidationResult;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -38,7 +37,19 @@ public class PDFAValidatorUtil {
 		VeraGreenfieldFoundryProvider.initialise();
 	}
 
-	public static PDFAValidatorResponse validatePDFA(byte[] fil) throws Exception {
+	/*
+	 * Validering er mest for convenience. Ønsker ikke at den ødelegger for resten av logikken
+	 */
+	public static PDFAValidatorResponse safeValidatePDFA(byte[] fil){
+		try {
+			return validatePDFA(fil);
+		} catch (Exception e){
+			log.warn("VeraPDF kunne ikke validere PDF'en! Feilmelding: " + e.getMessage(), e.getStackTrace());
+			return new PDFAValidatorResponse(false, false, null, null);
+		}
+	}
+
+	private static PDFAValidatorResponse validatePDFA(byte[] fil) throws Exception {
 		if (fil == null || fil.length == 0) {
 			throw new Exception("Filen er null!");
 		}

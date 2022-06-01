@@ -5,40 +5,40 @@ import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 
 import static no.nav.dokarkivavlevering.avlevering.aspose.AsposeService.convertToPDFA;
-import static no.nav.dokarkivavlevering.avlevering.pdfValidation.PDFAValidatorUtil.validatePDFA;
+import static no.nav.dokarkivavlevering.avlevering.pdfValidation.PDFAValidatorUtil.safeValidatePDFA;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.verapdf.pdfa.flavours.PDFAFlavour.PDFA_2_U;
-
+import static org.verapdf.pdfa.flavours.PDFAFlavour.PDFA_1_A;
 
 public class PdfaKonvertering {
 
-	private static final String UGYLDIG_PDF_PATH = "pdf/JasperReports-Ultimate-Guide-3.pdf";
+	private static final String UGYLDIG_PDF_PATH = "pdf/notPdfa.pdf";
 
 	@Test
 	public void convertPdfToPdfa() throws Exception {
 		//sjekk at PDF'en vi tester ikke er gyldig før konvertering
-		assertThat(validatePDFA(getPdfStream(UGYLDIG_PDF_PATH).readAllBytes()).isValidPdf()).isEqualTo(false);
+		assertThat(safeValidatePDFA(getPdfStream(UGYLDIG_PDF_PATH).readAllBytes()).isValidPdf()).isEqualTo(false);
 
-		ByteArrayOutputStream result = convertToPDFA(getPdfStream(UGYLDIG_PDF_PATH));
-		InputStream stream = new ByteArrayInputStream(result.toByteArray());
+		byte[] result = convertToPDFA(getPdfStream(UGYLDIG_PDF_PATH).readAllBytes(), "test-dokument");
 
-		PDFAValidatorResponse pdfaValidatorResponse = validatePDFA(stream.readAllBytes());
+		PDFAValidatorResponse pdfaValidatorResponse = safeValidatePDFA(result);
 		assertThat(pdfaValidatorResponse.isValidPdf()).isEqualTo(true);
-		assertThat(pdfaValidatorResponse.getPdfVersion()).isEqualTo(PDFA_2_U);
+		assertThat(pdfaValidatorResponse.getPdfVersion()).isEqualTo(PDFA_1_A);
 	}
 
 	private InputStream getPdfStream(String path) throws IOException {
 		return classpathToInputStream(path);
 	}
 
+	/*
+	 * For å lagre testfiler som filer man kan åpne lokalt.
+	 * Gjør testing lettere
+	 */
 	private void writePdfToFileForInspection(byte[] result){
 		File tempOutput = null;
 		try {
