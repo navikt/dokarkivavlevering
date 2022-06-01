@@ -35,8 +35,11 @@ public class AsposeService {
 	}
 
 	public static byte[] convertToPDFA(byte[] pdf, String dokumentInfoId) {
+		ByteArrayOutputStream logStream = new ByteArrayOutputStream();
 
-		validatePDF(pdf, dokumentInfoId, "FØR");
+		validatePDF(pdf, dokumentInfoId, "FØR", logStream);
+
+		logStream = new ByteArrayOutputStream();
 
 		Document doc = new Document(pdf);
 		doc.convert("test", PdfFormat.PDF_A_1A, ConvertErrorAction.Delete);
@@ -44,18 +47,18 @@ public class AsposeService {
 		doc.save(stream);
 		pdf = stream.toByteArray();
 
-		validatePDF(pdf, dokumentInfoId, "ETTER");
+		validatePDF(pdf, dokumentInfoId, "ETTER", logStream);
 
 		return pdf;
 	}
 
-	private static void validatePDF(byte[] pdf, String dokumentInfoId, String tidspunkt){
+	private static void validatePDF(byte[] pdf, String dokumentInfoId, String tidspunkt, ByteArrayOutputStream logstream){
 		try {
 			PDFAValidatorResponse response = response = validatePDFA(pdf);
 			if(response.isValidPdf()){
 				log.info("dokumentInfo {} er en gyldig pdf/a {} konvertering! Format:{}", dokumentInfoId, tidspunkt, response.getPdfVersion());
 			} else{
-				log.warn("dokumentInfo {} er ikke en gyldig PDF/A {} konvertering! Format: {} \n Feilmeldinger: {}", dokumentInfoId, tidspunkt, response.getPdfVersion(), response.getAssertionResults());
+				log.warn("dokumentInfo {} er ikke en gyldig PDF/A {} konvertering! Format: {} \n Aspose feilmeldinger: {}, Feilmeldinger: {}", dokumentInfoId, tidspunkt, response.getPdfVersion(), logstream.toString("UTF-8"), response.getAssertionResults());
 			}
 		} catch (Exception e){
 			//Bare for test
