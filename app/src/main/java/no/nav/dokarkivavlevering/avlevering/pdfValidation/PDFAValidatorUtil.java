@@ -39,7 +39,7 @@ public class PDFAValidatorUtil {
 	}
 
 	public static PDFAValidatorResponse validatePDFA(byte[] fil) throws Exception {
-		if (fil == null) {
+		if (fil == null || fil.length == 0) {
 			throw new Exception("Filen er null!");
 		}
 
