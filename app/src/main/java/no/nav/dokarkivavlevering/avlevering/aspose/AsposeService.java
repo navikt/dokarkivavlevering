@@ -39,7 +39,7 @@ public class AsposeService {
 		validatePDF(pdf, dokumentInfoId, "FØR");
 
 		Document doc = new Document(pdf);
-		doc.convert("test", PdfFormat.PDF_A_2U, ConvertErrorAction.Delete);
+		doc.convert("test", PdfFormat.PDF_A_1A, ConvertErrorAction.Delete);
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		doc.save(stream);
 		pdf = stream.toByteArray();
