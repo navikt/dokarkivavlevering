@@ -1,6 +1,6 @@
 FROM navikt/java:11
 USER root
-RUN apt-get update && apt-get install -y libfreetype6
+RUN apt-get update && apt-get install -y libfreetype6 fontconfig
 USER apprunner
 COPY app/target/app.jar /app/app.jar
 COPY export-vault-secrets.sh /init-scripts/50-export-vault-secrets.sh
