@@ -42,7 +42,7 @@ public class AsposeService {
 		logStream = new ByteArrayOutputStream();
 
 		Document doc = new Document(pdf);
-		doc.convert("test", PdfFormat.PDF_A_1A, ConvertErrorAction.Delete);
+		doc.convert(logStream, PdfFormat.PDF_A_1A, ConvertErrorAction.Delete);
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		doc.save(stream);
 		pdf = stream.toByteArray();
