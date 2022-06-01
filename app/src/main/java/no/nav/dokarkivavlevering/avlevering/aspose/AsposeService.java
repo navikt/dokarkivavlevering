@@ -5,6 +5,7 @@ import com.aspose.pdf.Document;
 import com.aspose.pdf.License;
 import com.aspose.pdf.PdfFormat;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.dokarkivavlevering.avlevering.pdfValidation.PDFAValidatorResponse;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.ByteArrayOutputStream;
@@ -44,16 +45,21 @@ public class AsposeService {
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		doc.save(stream);
 		pdf = stream.toByteArray();
-		if(isValidPdf(pdf, dokumentInfoId)){
-			log.info("DokumentInfoId: {} er en gyldig PDF etter konvertering!");
-		} else {
-			log.error("DokumentInfoId: {} er IKKE en gyldig PDF etter konvertering!");
-
+		PDFAValidatorResponse response = null;
+		try {
+			response = validatePDFA(pdf);
+			if(response.isValidPdf()){
+				log.info("dokumentInfo {} er en gyldig pdf/a etter konvertering!", dokumentInfoId);
+			} else{
+				log.warn("dokumentInfo {} er ikke en gyldig PDF/A etter konvertering. Feilmeldinger: {}", dokumentInfoId, response.getAssertionResults());
+			}
+		} catch (Exception e){
+			//Bare for test
 		}
 		return pdf;
 	}
 
-	private static boolean isValidPdf(byte[] pdf, String dokumentInfoId){
+	private static boolean isValidPdf(byte[] pdf){
 		try {
 			if (validatePDFA(pdf).isValidPdf()) {
 				return true;
