@@ -28,7 +28,7 @@ public class AsposeService {
 
 	public static ByteArrayOutputStream convertToPDFA(InputStream pdf) {
 		Document doc = new Document(pdf);
-		doc.convert("test", PdfFormat.PDF_A_2U, ConvertErrorAction.Delete);
+		doc.convert("test", PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		doc.save(stream);
 		return stream;
@@ -36,27 +36,30 @@ public class AsposeService {
 
 	public static byte[] convertToPDFA(byte[] pdf, String dokumentInfoId) {
 
-		if(isValidPdf(pdf)){
-			log.info("dokumentInfoId: {} er allerede en gyldig PDF/A!", dokumentInfoId);
-			return pdf;
-		}
+		validatePDF(pdf, dokumentInfoId, "FØR");
+
 		Document doc = new Document(pdf);
 		doc.convert("test", PdfFormat.PDF_A_2U, ConvertErrorAction.Delete);
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		doc.save(stream);
 		pdf = stream.toByteArray();
-		PDFAValidatorResponse response = null;
+
+		validatePDF(pdf, dokumentInfoId, "ETTER");
+
+		return pdf;
+	}
+
+	private static void validatePDF(byte[] pdf, String dokumentInfoId, String tidspunkt){
 		try {
-			response = validatePDFA(pdf);
+			PDFAValidatorResponse response = response = validatePDFA(pdf);
 			if(response.isValidPdf()){
-				log.info("dokumentInfo {} er en gyldig pdf/a etter konvertering!", dokumentInfoId);
+				log.info("dokumentInfo {} er en gyldig pdf/a {} konvertering! Format:{}", dokumentInfoId, tidspunkt, response.getPdfVersion());
 			} else{
-				log.warn("dokumentInfo {} er ikke en gyldig PDF/A etter konvertering. Feilmeldinger: {}", dokumentInfoId, response.getAssertionResults());
+				log.warn("dokumentInfo {} er ikke en gyldig PDF/A {} konvertering! Format: {} \n Feilmeldinger: {}", dokumentInfoId, tidspunkt, response.getPdfVersion(), response.getAssertionResults());
 			}
 		} catch (Exception e){
 			//Bare for test
 		}
-		return pdf;
 	}
 
 	private static boolean isValidPdf(byte[] pdf){
