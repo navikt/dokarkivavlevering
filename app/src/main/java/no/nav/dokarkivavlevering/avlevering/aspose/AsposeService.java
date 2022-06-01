@@ -50,13 +50,14 @@ public class AsposeService {
 		if(response.isValidPdf()){
 		} else{
 			try {
-				log.warn("dokumentInfo {} er ikke en gyldig PDF/A etter konvertering! Format: {} \n Aspose feilmeldinger: {}, Feilmeldinger: {}", dokumentInfoId, response.getPdfVersion(), logstream.toString(Charset. "UTF-8"), response.getAssertionResults());
+				log.warn("dokumentInfo {} er ikke en gyldig PDF/A etter konvertering! Format: {} \n Aspose feilmeldinger: {}, Feilmeldinger: {}", dokumentInfoId, response.getPdfVersion(), logstream.toString("UTF-8"), response.getAssertionResults());
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
 		}
 	}
 
-	private static boolean isValidPdf(byte[] pdf){
+	private static boolean isValidPdf(byte[] pdf) {
 		return safeValidatePDFA(pdf).isValidPdf() ? true : false;
+	}
 }
