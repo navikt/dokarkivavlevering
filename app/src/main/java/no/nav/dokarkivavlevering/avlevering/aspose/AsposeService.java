@@ -45,7 +45,7 @@ public class AsposeService {
 
 	private static void validatePDF(byte[] pdf, String dokumentInfoId, ByteArrayOutputStream logstream){
 		PDFAValidatorResponse response = safeValidatePDFA(pdf);
-		if(response.isValidPdf()){
+		if(!response.isValidPdf()){
 			try {
 				log.warn("dokumentInfo {} er ikke en gyldig PDF/A etter konvertering! Format: {} \n Aspose feilmeldinger: {} \n, Feilmeldinger: {}", dokumentInfoId, response.getPdfVersion(), logstream.toString("UTF-8"), response.getAssertionResults());
 			} catch (UnsupportedEncodingException e) {
