@@ -15,6 +15,10 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.verapdf</groupId>
+            <artifactId>validation-model</artifactId>
+        </dependency>
+        <dependency>
             <groupId>no.nav.dokarkivavlevering</groupId>
             <artifactId>arkivverket-schemas</artifactId>
         </dependency>
@@ -109,6 +113,10 @@
         <dependency>
             <groupId>io.reactivex.rxjava3</groupId>
             <artifactId>rxjava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.aspose</groupId>
+            <artifactId>aspose-pdf</artifactId>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

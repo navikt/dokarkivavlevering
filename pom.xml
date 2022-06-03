@@ -23,6 +23,7 @@
 
 	<properties>
 		<camel.version>3.6.0</camel.version>
+		<java.version>11</java.version>
 		<logstash-logback-encoder.version>6.4</logstash-logback-encoder.version>
 		<oracle-database.version>12.2.0.1</oracle-database.version>
 		<simpleflatmapper.version>8.2.3</simpleflatmapper.version>
@@ -31,10 +32,32 @@
 		<jaxb2-commons.version>0.6.5</jaxb2-commons.version>
 		<commons-io.version>2.8.0</commons-io.version>
 		<rxjava.version>3.0.7</rxjava.version>
+		<verapdf.version>1.20.1</verapdf.version>
 	</properties>
+
+	<repositories>
+		<repository>
+			<id>AsposeJavaAPI</id>
+			<name>Aspose Java API</name>
+			<url>https://repository.aspose.com/repo/</url>
+		</repository>
+	</repositories>
 
 	<dependencyManagement>
 		<dependencies>
+			<!--pdf validator-->
+			<dependency>
+				<groupId>org.verapdf</groupId>
+				<artifactId>validation-model</artifactId>
+				<version>${verapdf.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>javax.activation</groupId>
+						<artifactId>javax.activation-api</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<!--/pdf validator-->
 			<!-- https://mvnrepository.com/artifact/org.jvnet.jaxb2.maven2/maven-jaxb2-plugin -->
 			<dependency>
 				<groupId>org.jvnet.jaxb2.maven2</groupId>
@@ -89,9 +112,13 @@
 				<version>${lombok.version}</version>
 				<scope>provided</scope>
 			</dependency>
+			<dependency>
+				<groupId>com.aspose</groupId>
+				<artifactId>aspose-pdf</artifactId>
+				<version>22.4</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
 	<build>
 		<plugins>
 			<plugin>

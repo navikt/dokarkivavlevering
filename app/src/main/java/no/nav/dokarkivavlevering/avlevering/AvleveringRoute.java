@@ -16,6 +16,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
+import static no.nav.dokarkivavlevering.avlevering.AvleveringTemaRoute.BEHANDLE_TEMA;
+
 
 @Slf4j
 @Component
@@ -53,7 +55,7 @@ public class AvleveringRoute extends RouteBuilder {
 				.setBody(constant(avleveringProperties.getTema()))
 				.split(body())
 				.setProperty(PROPERTY_TEMA, body())
-				.to("direct:behandle_tema")
+				.to(BEHANDLE_TEMA)
 				.end()
 				.to(AvleveringStatiskRoute.AVLEVERING_STATIC)
 				.to(AvleveringArkivstrukturRoute.GENERER_ARKIVSTRUKTUR)
