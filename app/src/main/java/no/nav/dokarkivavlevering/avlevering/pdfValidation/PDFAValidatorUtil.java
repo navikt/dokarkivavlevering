@@ -29,8 +29,8 @@ import static org.verapdf.pdfa.flavours.PDFAFlavour.PDFA_2_U;
 public class PDFAValidatorUtil {
 
 	private static final List<PDFAFlavour> validPdfas = Arrays.asList(PDFA_1_A, PDFA_1_B, PDFA_2_A, PDFA_2_B, PDFA_2_U);
-	public static final Set NOT_A_PDFA = new HashSet<>(Arrays.asList("Dokumentet er ikke en PDFA"));
-	public static final Set NON_VALID_PDFA_VERSION = new HashSet<>(Arrays.asList("Dokumentet er ikke på et av de lovlige formatene"));
+	public static final Set NOT_A_PDFA = Collections.singleton("Dokumentet er ikke en PDFA");
+	public static final Set NON_VALID_PDFA_VERSION = Collections.singleton("Dokumentet er ikke på et av de lovlige formatene");
 
 	//Static init to initialize the FoundryProvider
 	static {
@@ -40,10 +40,10 @@ public class PDFAValidatorUtil {
 	/*
 	 * Validering er mest for convenience. Ønsker ikke at den ødelegger for resten av logikken
 	 */
-	public static PDFAValidatorResponse safeValidatePDFA(byte[] fil){
+	public static PDFAValidatorResponse safeValidatePDFA(byte[] fil) {
 		try {
 			return validatePDFA(fil);
-		} catch (Exception e){
+		} catch (Exception e) {
 			log.warn("VeraPDF kunne ikke validere PDF'en! Feilmelding: " + e.getMessage(), e.getStackTrace());
 			return new PDFAValidatorResponse(false, false, null, null);
 		}

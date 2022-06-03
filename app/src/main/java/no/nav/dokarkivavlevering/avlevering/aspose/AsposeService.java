@@ -46,11 +46,10 @@ public class AsposeService {
 	private static void validatePDF(byte[] pdf, String dokumentInfoId, ByteArrayOutputStream logstream){
 		PDFAValidatorResponse response = safeValidatePDFA(pdf);
 		if(response.isValidPdf()){
-		} else{
 			try {
-				log.warn("dokumentInfo {} er ikke en gyldig PDF/A etter konvertering! Format: {} \n Aspose feilmeldinger: {}, Feilmeldinger: {}", dokumentInfoId, response.getPdfVersion(), logstream.toString("UTF-8"), response.getAssertionResults());
+				log.warn("dokumentInfo {} er ikke en gyldig PDF/A etter konvertering! Format: {} \n Aspose feilmeldinger: {} \n, Feilmeldinger: {}", dokumentInfoId, response.getPdfVersion(), logstream.toString("UTF-8"), response.getAssertionResults());
 			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
+				log.error("Feil ved uthenting av charset UTF-8", e.getMessage());
 			}
 		}
 	}
