@@ -55,6 +55,10 @@ public class AvleveringUtils {
 		}
 	}
 
+	public static boolean isStringTemaAvleverMedDokumenter(String tema){
+		return Tema.valueOf(tema.toUpperCase()).isAvleverDokumenter();
+	}
+
 	public static boolean isNav(String journalpostType) {
 		return "I".equalsIgnoreCase(journalpostType) | "U".equalsIgnoreCase(journalpostType);
 	}

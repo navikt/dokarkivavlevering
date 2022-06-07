@@ -48,12 +48,12 @@ class SaksmappeMapperTest {
 		assertEquals(saksmappe.getSaksaar().toString(), "2019");
 		assertEquals(saksmappe.getSakssekvensnummer().toString(), "1234567011");
 		assertEquals(saksmappe.getSaksdato(), TestUtils.toXmlGregCalendar("2019-10-28 11:41:36"));
-		assertEquals(saksmappe.getAdministrativEnhet(), "NAV Medlemskap og avgift");
+		assertEquals(saksmappe.getAdministrativEnhet(), "NAV Kontroll");
 		assertEquals(saksmappe.getSaksansvarlig(), "Bjarne Betjent");
 		assertEquals(saksmappe.getSaksstatus(), "Under behandling");
 		assertEquals(saksmappe.getSystemID().getValue().isEmpty(), false);
 		assertEquals(saksmappe.getMappeID(), "1234567011");
-		assertEquals(saksmappe.getTittel(), "Medlemskap");
+		assertEquals(saksmappe.getTittel(), "Kontroll");
 		assertEquals(saksmappe.getOpprettetDato(), TestUtils.toXmlGregCalendar("2019-10-28 11:41:36"));
 		assertEquals(saksmappe.getOpprettetAv(), "Automatisk jobb");
 		assertEquals(saksmappe.getReferanseArkivdels().size(), 1);
@@ -127,7 +127,7 @@ class SaksmappeMapperTest {
 		assertEquals(dokObjekt.getFormat(), "PDF/A");
 		assertEquals(dokObjekt.getOpprettetDato(), TestUtils.toXmlGregCalendar("2020-11-10 16:04:43"));
 		assertEquals(dokObjekt.getOpprettetAv(), "Automatisk jobb");
-		assertEquals(dokObjekt.getReferanseDokumentfil(), "DOKUMENTER/MED/453637481_55c39cdb-f052-4f4e-a9a5-900b455ca915.pdf");
+		assertEquals(dokObjekt.getReferanseDokumentfil(), "DOKUMENTER/KTR/453637481_55c39cdb-f052-4f4e-a9a5-900b455ca915.pdf");
 		assertEquals(dokObjekt.getSjekksum(), "a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e");
 		assertEquals(dokObjekt.getSjekksumAlgoritme(), "SHA-256");
 		assertEquals(dokObjekt.getFilstoerrelse(), toBigInteger(FIL.length()));
@@ -141,7 +141,7 @@ class SaksmappeMapperTest {
 
 	private void assertDokumentBeskrivelse(Dokumentbeskrivelse dok) throws Exception {
 		assertEquals(dok.getSystemID().getValue().isEmpty(), false);
-		assertEquals(dok.getDokumenttype(), "SED");
+		assertEquals(dok.getDokumenttype(), "OPP");
 		assertEquals(dok.getDokumentstatus(), "Dokumentet er ferdigstilt");
 		assertEquals(dok.getTittel(), "Legg til ny institusjon");
 		assertEquals(dok.getOpprettetDato(), TestUtils.toXmlGregCalendar("2020-11-10 16:04:43"));
@@ -162,7 +162,7 @@ class SaksmappeMapperTest {
 	private Sak generateSak() throws Exception {
 		return Sak.builder()
 				.id((long) 1234567011)
-				.tema("MED")
+				.tema("KTR")
 				.bruker(generaterBruker())
 				.opprettetAv("srvmelosys")
 				.opprettetTidspunkt(formatter.parse("2019-10-28 11:41:36.673"))
@@ -206,7 +206,7 @@ class SaksmappeMapperTest {
 				.relDatoOpprettet(formatter.parse("2020-11-10 16:04:43.343"))
 				.relOpprettetAv("srvmelosys")
 				.relOpprettetAvBeriketNavn("Automatisk jobb")
-				.kategori("SED")
+				.kategori("OPP")
 				.status("FERDIGSTILT")
 				.tittel("Legg til ny institusjon")
 				.datoOpprettet(formatter.parse("2020-11-10 16:04:43.342"))

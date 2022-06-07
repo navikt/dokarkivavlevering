@@ -25,6 +25,7 @@ import java.util.UUID;
 
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.dateToXMLGregorianCalendar;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.getYear;
+import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.isStringTemaAvleverMedDokumenter;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.temaNavnDecode;
 import static org.apache.camel.converter.ObjectConverter.toBigInteger;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -143,8 +144,10 @@ public class SaksmappeMapper {
 		dokumentbeskrivelse.setTilknyttetDato(dateToXMLGregorianCalendar(dokumentInfo.getRelDatoOpprettet()));
 		dokumentbeskrivelse.setTilknyttetAv(dokumentInfo.getRelOpprettetAvBeriketNavn());
 
-		for (FilDetaljer filDetaljer : dokumentInfo.getFd()) {
-			dokumentbeskrivelse.getDokumentobjekts().add(mapDokumentobjekt(filDetaljer, tema, journalpostId));
+		if(isStringTemaAvleverMedDokumenter(tema)) {
+			for (FilDetaljer filDetaljer : dokumentInfo.getFd()) {
+				dokumentbeskrivelse.getDokumentobjekts().add(mapDokumentobjekt(filDetaljer, tema, journalpostId));
+			}
 		}
 		return dokumentbeskrivelse;
 	}
