@@ -59,6 +59,42 @@ public class AvleveringSakBerikerMapper {
 				.build();
 	}
 
+	Sak berikUtenDokument(final Sak sak, final Map<String, String> navAnsatteNavn, Map<String, Bruker> pdlHentIdenterBolks, Map<String, Bruker> eregOrganisasjonBolk) {
+		return sak.toBuilder()
+				.bruker(mapBruker(sak.getBruker(), pdlHentIdenterBolks, eregOrganisasjonBolk))
+				.opprettetAvBeriketNavn(utledNavn(sak.getOpprettetAv(), navAnsatteNavn))
+				.jp(sak.getJp().stream().map(journalpost -> {
+					return journalpost.toBuilder()
+							.opprettetAvBeriketNavn(utledNavn(journalpost.getOpprettetAv(), navAnsatteNavn))
+							.endretAvBeriketNavn(utledNavn(journalpost.getEndretAv(), navAnsatteNavn))
+							.dok(journalpost.getDok().stream()
+									.map(dokumentInfo -> {
+										return dokumentInfo.toBuilder()
+												.opprettetAvBeriketNavn(utledNavn(dokumentInfo.getOpprettetAv(), navAnsatteNavn))
+												.relOpprettetAvBeriketNavn(utledNavn(dokumentInfo.getRelOpprettetAv(), navAnsatteNavn))
+												.fd(null)
+												.ae(dokumentInfo.getAe().stream()
+														.map(arkivendring -> {
+															return arkivendring.toBuilder()
+																	.utfoertAvBeriketNavn(utledNavn(arkivendring.getUtfoertAv(), navAnsatteNavn))
+																	.build();
+														})
+														.collect(Collectors.toList()))
+												.build();
+									})
+									.collect(Collectors.toList()))
+							.ae(journalpost.getAe().stream()
+									.map(arkivendring -> {
+										return arkivendring.toBuilder()
+												.utfoertAvBeriketNavn(utledNavn(arkivendring.getUtfoertAv(), navAnsatteNavn))
+												.build();
+									})
+									.collect(Collectors.toList()))
+							.build();
+				}).collect(Collectors.toList()))
+				.build();
+	}
+
 	private Bruker mapBruker(Bruker bruker, Map<String, Bruker> pdlHentIdenterBolks, Map<String, Bruker> eregOrganisasjonBolk) {
 		final String brukerId = bruker.getId();
 		if (bruker.isPerson()) {

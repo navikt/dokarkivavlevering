@@ -58,7 +58,15 @@ public class AvleveringRepository {
 		return namedParameterJdbcTemplate.queryForList(SqlQueries.FINN_SAK_PAGE, paramMap, Long.class);
 	}
 
-	public List<Sak> findSaker(final List<Long> sakIds) {
+	public List<Sak> findSakerUtenDokumenter(final List<Long> sakIds) {
+		return doFindSaker(sakIds, false);
+	}
+
+	public List<Sak> findSakerMedDokumenter(final List<Long> sakIds) {
+		return doFindSaker(sakIds, true);
+	}
+
+	private List<Sak> doFindSaker(final List<Long> sakIds, boolean hentDokumenter){
 		if (sakIds.isEmpty()) {
 			return new ArrayList<>();
 		} else if (sakIds.size() > ORACLE_MAX_IN) {
@@ -69,7 +77,12 @@ public class AvleveringRepository {
 		paramMap.put("sakIds", sakIds.stream().map(Object::toString).collect(Collectors.toList()));
 		paramMap.put("startdato", Timestamp.valueOf(avleveringProperties.getPeriode().getStartdato().atStartOfDay()));
 		paramMap.put("sluttdato", Timestamp.valueOf(avleveringProperties.getPeriode().getSluttdato().atStartOfDay()));
-		return namedParameterJdbcTemplate.query(SqlQueries.FINN_SAKER_SQL, paramMap, SAK_RESULTSET_EXTRACTOR);
+		if(hentDokumenter) {
+			return namedParameterJdbcTemplate.query(SqlQueries.FINN_SAKER_SQL, paramMap, SAK_RESULTSET_EXTRACTOR);
+		} else {
+			return namedParameterJdbcTemplate.query(SqlQueries.FINN_SAKER_UTEN_DOKUMENTER_SQL, paramMap, SAK_RESULTSET_EXTRACTOR);
+
+		}
 	}
 
 	public IdRange findJournalpostIdRange(@Body final Tema tema) {
