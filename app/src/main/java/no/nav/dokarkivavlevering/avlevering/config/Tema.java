@@ -14,7 +14,8 @@ public enum Tema {
 	TRK("TRK", "Trekkhåndtering", false, "", "NAV Økonomi Stønad", false),
 	FUL("FUL", "Fullmakt", false, "Ikke fagsystem", "Alle enheter", false),
 	GEN("GEN", "Generell", false, "Ikke fagsystem", "Alle enheter", false),
-	MED("MED", "Medlemskap", true, "", "NAV Medlemskap og avgift", false),
+	//TODO: ENDRE TILBAKE TIL TRUE PÅ AVLEVER_M_DOKUMENTER. Skrudd av for lettere test
+	MED("MED", "Medlemskap", false, "", "NAV Medlemskap og avgift", false),
 	UFM("UFM", "Unntak fra medlemskap", true, "", "NAV Medlemskap og avgift", false),
 	TRY("TRY", "Trygdeavgift", false, "", "NAV Medlemskap og avgift", false),
 	SER("SER", "Serviceklager", false, "Ikke fagsystem", "Alle enheter", false),
