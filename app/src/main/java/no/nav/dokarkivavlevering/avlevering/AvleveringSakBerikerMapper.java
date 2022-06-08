@@ -32,11 +32,12 @@ public class AvleveringSakBerikerMapper {
 												.relOpprettetAvBeriketNavn(utledNavn(dokumentInfo.getRelOpprettetAv(), navAnsatteNavn))
 												.fd(dokumentInfo.getFd().stream()
 														.map(filDetaljer -> {
+															byte[] PDFA_fil = convertToPDFA(filDetaljer.getFil(), dokumentInfo.getId());
 															return filDetaljer.toBuilder()
 																	.opprettetAvBeriketNavn(utledNavn(filDetaljer.getOpprettetAv(), navAnsatteNavn))
 																	.filstorrelseBeriket(filDetaljer.getFil().length)
-																	.fil(convertToPDFA(filDetaljer.getFil(), dokumentInfo.getId()))
-																	.sha256hashBeriket(DigestUtils.sha256Hex(filDetaljer.getFil()))
+																	.fil(PDFA_fil)
+																	.sha256hashBeriket(DigestUtils.sha256Hex(PDFA_fil))
 																	.build();
 														})
 														.collect(Collectors.toList()))
