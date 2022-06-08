@@ -24,7 +24,7 @@ public class PdfaKonvertering {
 		//sjekk at PDF'en vi tester ikke er gyldig før konvertering
 		assertThat(safeValidatePDFA(getPdfStream(UGYLDIG_PDF_PATH).readAllBytes()).isValidPdf()).isEqualTo(false);
 
-		byte[] result = convertToPDFA(getPdfStream(UGYLDIG_PDF_PATH).readAllBytes(), "test-dokument");
+		byte[] result = convertToPDFA(getPdfStream(UGYLDIG_PDF_PATH).readAllBytes(), 23423);
 
 		PDFAValidatorResponse pdfaValidatorResponse = safeValidatePDFA(result);
 		assertThat(pdfaValidatorResponse.isValidPdf()).isEqualTo(true);

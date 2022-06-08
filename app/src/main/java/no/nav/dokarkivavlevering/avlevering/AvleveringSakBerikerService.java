@@ -77,7 +77,7 @@ public class AvleveringSakBerikerService {
 					final Map<String, Bruker> eregOrganisasjonBolk = eregService.hentOrganisasjonBrukere(unikeOrgnr);
 					if(avleverDokumenter) {
 						return saks.stream()
-								.map(sak -> avleveringSakBerikerMapper.berik(sak, navAnsatteNavn, pdlHentIdenterBolks, eregOrganisasjonBolk))
+								.map(sak -> avleveringSakBerikerMapper.berikMedDokumenter(sak, navAnsatteNavn, pdlHentIdenterBolks, eregOrganisasjonBolk))
 								.collect(Collectors.toList());
 					} else {
 						return saks.stream()

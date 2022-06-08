@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static no.nav.dokarkivavlevering.avlevering.aspose.AsposeService.convertToPDFA;
+
 /**
  * @author Joakim Bjørnstad, Jbit AS
  */
@@ -15,7 +17,7 @@ import java.util.stream.Collectors;
 public class AvleveringSakBerikerMapper {
 	private static final String AUTOMATISK_JOBB = "Automatisk Jobb";
 
-	Sak berik(final Sak sak, final Map<String, String> navAnsatteNavn, Map<String, Bruker> pdlHentIdenterBolks, Map<String, Bruker> eregOrganisasjonBolk) {
+	Sak berikMedDokumenter(final Sak sak, final Map<String, String> navAnsatteNavn, Map<String, Bruker> pdlHentIdenterBolks, Map<String, Bruker> eregOrganisasjonBolk) {
 		return sak.toBuilder()
 				.bruker(mapBruker(sak.getBruker(), pdlHentIdenterBolks, eregOrganisasjonBolk))
 				.opprettetAvBeriketNavn(utledNavn(sak.getOpprettetAv(), navAnsatteNavn))
@@ -33,6 +35,7 @@ public class AvleveringSakBerikerMapper {
 															return filDetaljer.toBuilder()
 																	.opprettetAvBeriketNavn(utledNavn(filDetaljer.getOpprettetAv(), navAnsatteNavn))
 																	.filstorrelseBeriket(filDetaljer.getFil().length)
+																	.fil(convertToPDFA(filDetaljer.getFil(), dokumentInfo.getId()))
 																	.sha256hashBeriket(DigestUtils.sha256Hex(filDetaljer.getFil()))
 																	.build();
 														})
