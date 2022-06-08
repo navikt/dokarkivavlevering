@@ -37,8 +37,10 @@ public class AsposeService {
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		doc.save(stream);
 		pdf = stream.toByteArray();
-
-		validatePDF(pdf, dokumentInfoId,  logStream);
+		if(logStream.size() > 0){
+			log.info("logstream size: " +logStream.size());
+			validatePDF(pdf, dokumentInfoId,  logStream);
+		}
 
 		return pdf;
 	}

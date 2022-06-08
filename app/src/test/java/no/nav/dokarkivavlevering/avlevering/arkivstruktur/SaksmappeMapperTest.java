@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 import static no.nav.dokarkivavlevering.avlevering.testUtils.TestUtils.formatter;
@@ -41,7 +42,7 @@ class SaksmappeMapperTest {
 		SystemID sakSystemID = new SystemID();
 		sakSystemID.setValue(UUID.randomUUID().toString());
 
-		Sak sak = generateSak();
+		Sak sak = generateSak("KTR");
 
 		final Saksmappe saksmappe = saksmappeMapper.map(sak);
 		//saksmappe
@@ -64,6 +65,18 @@ class SaksmappeMapperTest {
 		assertPart(saksmappe.getParts().get(0));
 
 		assertRegistrering((no.arkivverket.standarder.noark5.arkivstruktur.Journalpost) saksmappe.getRegistrerings().get(0));
+	}
+
+	@Test
+	void shouldMapWithoutDokument() throws Exception {
+		SystemID sakSystemID = new SystemID();
+		sakSystemID.setValue(UUID.randomUUID().toString());
+
+		Sak sak = generateSak("VEN");
+
+		final Saksmappe saksmappe = saksmappeMapper.map(sak);
+		List<Dokumentobjekt> dokument = saksmappe.getRegistrerings().get(0).getDokumentbeskrivelses().get(0).getDokumentobjekts();
+		assertEquals(dokument.size(), 0);
 	}
 
 	@Test
@@ -160,9 +173,13 @@ class SaksmappeMapperTest {
 	}
 
 	private Sak generateSak() throws Exception {
+		return generateSak("KTR");
+	}
+
+	private Sak generateSak(String tema) throws Exception {
 		return Sak.builder()
 				.id((long) 1234567011)
-				.tema("KTR")
+				.tema(tema)
 				.bruker(generaterBruker())
 				.opprettetAv("srvmelosys")
 				.opprettetTidspunkt(formatter.parse("2019-10-28 11:41:36.673"))
