@@ -28,6 +28,7 @@ public class AvleveringTemaRoute extends RouteBuilder {
 	public static final String BEHANDLE_TEMA = "direct:behandle_tema";
 	public static final String BEHANDLE_TEMA_PAGE_MED_DOKUMENTER = "direct:behandle_tema_page_med_dokumenter";
 	public static final String BEHANDLE_TEMA_PAGE_UTEN_DOKUMENTER = "direct:behandle_tema_page_uten_dokumenter";
+	public static final String DETERMINE_AVLEVER_DOKUMENTER = "direct:determine_avlever_dokumenter";
 	public static final String HEADER_AVLEVERING_TEMA_SIZE = "AvleveringTemaSize";
 	public static final String HEADER_LAST_SAK_ID = "AvleveringLastSakId";
 	public static final String HEADER_TEMA_SKIP = "AvleveringTemaSkip";
@@ -80,11 +81,7 @@ public class AvleveringTemaRoute extends RouteBuilder {
 						.setHeader(HEADER_TEMA_SKIP, constant(true))
 						.setBody(exchangeProperty(PROPERTY_TEMA))
 					.otherwise()
-						.choice().when(exchangeProperty(PROPERTY_AVLEVER_MED_DOKUMENTER))
-								.to(BEHANDLE_TEMA_PAGE_MED_DOKUMENTER)
-						.otherwise()
-							.to(BEHANDLE_TEMA_PAGE_UTEN_DOKUMENTER)
-						.end()// end choice
+						.to(DETERMINE_AVLEVER_DOKUMENTER)
 					.end()// end choice
 				.end() // end loop
 				.choice().when(header(HEADER_TEMA_SKIP).isEqualTo(constant(true)))
@@ -93,6 +90,13 @@ public class AvleveringTemaRoute extends RouteBuilder {
 					.to(AvleveringArkivstrukturRoute.GENERER_KLASSE)
 				.end()
 				.log(INFO, log, "Ferdig behandlet tema=${exchangeProperty.AvleveringTema}");
+
+		from(DETERMINE_AVLEVER_DOKUMENTER)
+				.choice().when(exchangeProperty(PROPERTY_AVLEVER_MED_DOKUMENTER))
+					.to(BEHANDLE_TEMA_PAGE_MED_DOKUMENTER)
+				.otherwise()
+					.to(BEHANDLE_TEMA_PAGE_UTEN_DOKUMENTER)
+				.end();// end choice
 
 		from(BEHANDLE_TEMA_PAGE_MED_DOKUMENTER)
 				.routeId("behandle_tema_page_med_dokumenter")
