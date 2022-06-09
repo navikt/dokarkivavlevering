@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static no.nav.dokarkivavlevering.avlevering.AvleveringRoute.PROPERTY_TEMA;
+import static org.apache.camel.LoggingLevel.INFO;
 
 /**
  * @author Joakim Bjørnstad, Jbit AS
@@ -53,7 +54,7 @@ public class AvleveringTemaRoute extends RouteBuilder {
 				.routeId("behandle_tema")
 				.removeHeaders("*")
 				.removeProperty(PROPERTY_TEMA_IDRANGE)
-				.log(LoggingLevel.INFO, log, "Dokarkivavlevering behandler tema=${exchangeProperty.AvleveringTema}")
+				.log(INFO, log, "Dokarkivavlevering behandler tema=${exchangeProperty.AvleveringTema}")
 				.process(exchange -> {
 					final Tema tema = exchange.getIn().getBody(Tema.class);
 					final IdRange idRange = avleveringRepository.findJournalpostIdRange(tema);
@@ -68,35 +69,39 @@ public class AvleveringTemaRoute extends RouteBuilder {
 						final Long avleveringTemaSize = exchange.getIn().getHeader(HEADER_AVLEVERING_TEMA_SIZE, Long.class);
 						return avleveringTemaSize >= avleveringProperties.getBatchsize();
 					})
-					.log(LoggingLevel.INFO, log,
+					.log(INFO, log,
 							"Henter de neste ${header.AvleveringTemaSize} sakIds for tema=${exchangeProperty.AvleveringTema} før sakId=${header.AvleveringLastSakId}, " +
 									"loop=${header.CamelLoopIndex}")
 					.bean(avleveringRepository, "findSakIdsPagination")
+					.log(INFO, "fikk hentet saker")
 					.choice().when(simple("${body.size} == 0 && ${header.CamelLoopIndex} == 0"))
-						.log(LoggingLevel.INFO, log, "Ingen sakIds funnet for tema=${exchangeProperty.AvleveringTema}")
+						.log(INFO, log, "Ingen sakIds funnet for tema=${exchangeProperty.AvleveringTema}")
 						.setHeader(HEADER_AVLEVERING_TEMA_SIZE, simple("${body.size}"))
 						.setHeader(HEADER_TEMA_SKIP, constant(true))
 						.setBody(exchangeProperty(PROPERTY_TEMA))
 					.otherwise()
-						.choice().when(exchangeProperty(PROPERTY_AVLEVER_MED_DOKUMENTER))
-							.to(BEHANDLE_TEMA_PAGE_MED_DOKUMENTER)
+						.choice()
+							.when(exchangeProperty(PROPERTY_AVLEVER_MED_DOKUMENTER))
+								.log(INFO, "AVLEVERER MED DOKUMENTER")
+								.to(BEHANDLE_TEMA_PAGE_MED_DOKUMENTER)
 						.otherwise()
+							.log(INFO, "AVLEVERER UTEN DOKUMENTER")
 							.to(BEHANDLE_TEMA_PAGE_UTEN_DOKUMENTER)
 						.end()// end choice
 					.end()// end choice
 				.end() // end loop
 				.choice().when(header(HEADER_TEMA_SKIP).isEqualTo(constant(true)))
-					.log(LoggingLevel.INFO, log, "Ingenting å avlevere for tema=${exchangeProperty.AvleveringTema}")
+					.log(INFO, log, "Ingenting å avlevere for tema=${exchangeProperty.AvleveringTema}")
 				.otherwise()
 					.to(AvleveringArkivstrukturRoute.GENERER_KLASSE)
 				.end()
-				.log(LoggingLevel.INFO, log, "Ferdig behandlet tema=${exchangeProperty.AvleveringTema}");
+				.log(INFO, log, "Ferdig behandlet tema=${exchangeProperty.AvleveringTema}");
 
 		from(BEHANDLE_TEMA_PAGE_MED_DOKUMENTER)
 				.routeId("behandle_tema_page_med_dokumenter")
 				.setHeader(HEADER_LAST_SAK_ID, simple("${body[last]}"))
 				.setHeader(HEADER_AVLEVERING_TEMA_SIZE, simple("${body.size}"))
-				.log(LoggingLevel.INFO, log,
+				.log(INFO, log,
 						"Behandler ${header.AvleveringTemaSize} sakId for tema=${exchangeProperty.AvleveringTema}, " +
 								"lastSakId=${header.AvleveringLastSakId}, loop=${header.CamelLoopIndex}")
 				.bean(avleveringRepository, "findSakerMedDokumenter")
@@ -123,7 +128,7 @@ public class AvleveringTemaRoute extends RouteBuilder {
 				.routeId("behandle_tema_page_uten_dokumenter")
 				.setHeader(HEADER_LAST_SAK_ID, simple("${body[last]}"))
 				.setHeader(HEADER_AVLEVERING_TEMA_SIZE, simple("${body.size}"))
-				.log(LoggingLevel.INFO, log,
+				.log(INFO, log,
 						"Behandler ${header.AvleveringTemaSize} sakId for tema=${exchangeProperty.AvleveringTema}, " +
 								"lastSakId=${header.AvleveringLastSakId}, loop=${header.CamelLoopIndex}")
 				.bean(avleveringRepository, "findSakerUtenDokumenter")

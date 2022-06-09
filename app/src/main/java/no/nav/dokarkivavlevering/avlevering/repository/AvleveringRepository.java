@@ -1,5 +1,6 @@
 package no.nav.dokarkivavlevering.avlevering.repository;
 
+import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avlevering.AvleveringTemaRoute;
 import no.nav.dokarkivavlevering.avlevering.arkivstruktur.IdRange;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
  * @author Joakim Bjørnstad, Jbit AS
  */
 @Repository
+@Slf4j
 public class AvleveringRepository {
 	private static final ResultSetExtractor<List<Sak>> SAK_RESULTSET_EXTRACTOR = JdbcTemplateMapperFactory.newInstance()
 			.addKeys("id",
@@ -50,7 +52,9 @@ public class AvleveringRepository {
 		final HashMap<String, Object> paramMap = new HashMap<>();
 		paramMap.put("batchsize", avleveringProperties.getBatchsize());
 		paramMap.put("lastSakId", lastSakId);
+		log.info("Prøver å hente temakode for: " + tema);
 		paramMap.put("tema", tema.getTemakode());
+		log.info("Hentet temakode for: " + tema);
 		paramMap.put("minJournalpostId", idRange.getJournalpostIdMin());
 		paramMap.put("maxJournalpostId", idRange.getJournalpostIdMax());
 		paramMap.put("startdato", Timestamp.valueOf(avleveringProperties.getPeriode().getStartdato().atStartOfDay()));
