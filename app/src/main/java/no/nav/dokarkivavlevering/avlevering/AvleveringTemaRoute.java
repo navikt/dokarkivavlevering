@@ -73,19 +73,16 @@ public class AvleveringTemaRoute extends RouteBuilder {
 							"Henter de neste ${header.AvleveringTemaSize} sakIds for tema=${exchangeProperty.AvleveringTema} før sakId=${header.AvleveringLastSakId}, " +
 									"loop=${header.CamelLoopIndex}")
 					.bean(avleveringRepository, "findSakIdsPagination")
-					.log(INFO, "fikk hentet saker")
+					.log(INFO, log,"fikk hentet saker")
 					.choice().when(simple("${body.size} == 0 && ${header.CamelLoopIndex} == 0"))
 						.log(INFO, log, "Ingen sakIds funnet for tema=${exchangeProperty.AvleveringTema}")
 						.setHeader(HEADER_AVLEVERING_TEMA_SIZE, simple("${body.size}"))
 						.setHeader(HEADER_TEMA_SKIP, constant(true))
 						.setBody(exchangeProperty(PROPERTY_TEMA))
 					.otherwise()
-						.choice()
-							.when(exchangeProperty(PROPERTY_AVLEVER_MED_DOKUMENTER))
-								.log(INFO, "AVLEVERER MED DOKUMENTER")
+						.choice().when(exchangeProperty(PROPERTY_AVLEVER_MED_DOKUMENTER))
 								.to(BEHANDLE_TEMA_PAGE_MED_DOKUMENTER)
 						.otherwise()
-							.log(INFO, "AVLEVERER UTEN DOKUMENTER")
 							.to(BEHANDLE_TEMA_PAGE_UTEN_DOKUMENTER)
 						.end()// end choice
 					.end()// end choice
@@ -102,7 +99,7 @@ public class AvleveringTemaRoute extends RouteBuilder {
 				.setHeader(HEADER_LAST_SAK_ID, simple("${body[last]}"))
 				.setHeader(HEADER_AVLEVERING_TEMA_SIZE, simple("${body.size}"))
 				.log(INFO, log,
-						"Behandler ${header.AvleveringTemaSize} sakId for tema=${exchangeProperty.AvleveringTema}, " +
+						"behandle_tema_page_med_dokumenter behandler ${header.AvleveringTemaSize} sakId for tema=${exchangeProperty.AvleveringTema}, " +
 								"lastSakId=${header.AvleveringLastSakId}, loop=${header.CamelLoopIndex}")
 				.bean(avleveringRepository, "findSakerMedDokumenter")
 				.bean(avleveringSakBerikerService, "berikSakerMedDokumenter")
@@ -129,7 +126,7 @@ public class AvleveringTemaRoute extends RouteBuilder {
 				.setHeader(HEADER_LAST_SAK_ID, simple("${body[last]}"))
 				.setHeader(HEADER_AVLEVERING_TEMA_SIZE, simple("${body.size}"))
 				.log(INFO, log,
-						"Behandler ${header.AvleveringTemaSize} sakId for tema=${exchangeProperty.AvleveringTema}, " +
+						"behandle_tema_page_uten_dokumenter behandler ${header.AvleveringTemaSize} sakId for tema=${exchangeProperty.AvleveringTema}, " +
 								"lastSakId=${header.AvleveringLastSakId}, loop=${header.CamelLoopIndex}")
 				.bean(avleveringRepository, "findSakerUtenDokumenter")
 				.bean(avleveringSakBerikerService, "berikSakerUtenDokumenter")

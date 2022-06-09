@@ -55,7 +55,7 @@ public class AvleveringSakBerikerService {
 		return doBerikSaker(saker, tema, false);
 	}
 
-	private List<Sak> doBerikSaker(@Body final List<Sak> saker, @ExchangeProperty(AvleveringRoute.PROPERTY_TEMA) final Tema tema, boolean avleverDokumenter){
+	private List<Sak> doBerikSaker(List<Sak> saker, final Tema tema, boolean avleverDokumenter){
 		// hent metadata og berik modellen
 		log.info("Beriker metadata for {} saker med tema={}", saker.size(), tema);
 		return Flowable.fromIterable(saker)
