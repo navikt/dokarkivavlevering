@@ -21,10 +21,10 @@ spec:
           image: {{image}}
           resources:
             requests:
-              memory: "256Mi"
+              memory: "512Mi"
               cpu: "100m"
             limits:
-              memory: "4096Mi"
+              memory: "6144Mi"
               cpu: "4000m"
           volumeMounts:
             - mountPath: /var/run/secrets/nais.io/vault
