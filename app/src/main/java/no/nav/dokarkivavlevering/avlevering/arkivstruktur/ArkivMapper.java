@@ -54,8 +54,8 @@ public class ArkivMapper {
 	private Arkivdel mapArkivdel() {
 		Arkivdel arkivdel = new Arkivdel();
 		arkivdel.setSystemID(mapSystemID(arkivConfig.getArkivdelConfig().getSystemID()));
-		arkivdel.setTittel("RPO");
-		arkivdel.setBeskrivelse("Arkivdel for saksbehandling av RPO");
+		arkivdel.setTittel("UFM");
+		arkivdel.setBeskrivelse("Arkivdel for saksbehandling av UFM");
 		arkivdel.setArkivdelstatus("Aktiv periode");
 		/*arkivdel.setTittel("Fellessystem for samhandling - fagsystemet Gosys");
 		arkivdel.setBeskrivelse("Arkivdel for saksbehandling av de fagområdene som bare behandles i et felles fagsystem uten spesifikk saksbehandlingsstøtte - Gosys");
