@@ -103,7 +103,7 @@ public class SqlQueries {
 					"  and j.k_journal_s in ('J', 'FS', 'FL', 'E')\n" +
 					"  and (s.feilregistrert is null or s.feilregistrert = 0)\n" +
 					"  and (trunc(j.dato_opprettet) between :startdato and :sluttdato)\n" +
-					"  and d.k_dokument_s = 'FERDIGSTILT'\n" +
+					"  and (d.k_dokument_s is null or d.k_dokument_s = 'FERDIGSTILT')\n" +
 					"  and f.k_variant_format = 'ARKIV'\n" +
 					"order by sa.id desc, j.journalpost_id, r.k_tilkn_jp_som, r.dokument_info_id, f.fil_detaljer_id, aeej.arkiv_element_endring_id,\n" +
 					"         alj.tidspunkt, aeed.arkiv_element_endring_id, aeed.tidspunkt";
@@ -173,7 +173,7 @@ public class SqlQueries {
 					"  and j.k_journal_s in ('J', 'FS', 'FL', 'E')\n" +
 					"  and (s.feilregistrert is null or s.feilregistrert = 0)\n" +
 					"  and (trunc(j.dato_opprettet) between :startdato and :sluttdato)\n" +
-					"  and d.k_dokument_s = 'FERDIGSTILT'\n" +
+					"  and (d.k_dokument_s is null or d.k_dokument_s = 'FERDIGSTILT')\n" +
 					"  and f.k_variant_format = 'ARKIV'\n" +
 					"order by sa.id desc, j.journalpost_id, r.k_tilkn_jp_som, r.dokument_info_id, f.fil_detaljer_id, aeej.arkiv_element_endring_id,\n" +
 					"         alj.tidspunkt, aeed.arkiv_element_endring_id, aeed.tidspunkt";
