@@ -153,7 +153,7 @@ public class SaksmappeMapper {
 	}
 
 	private String mapDokumentstatus(DokumentInfo dokumentInfo) {
-		if(DOKUMENT_STATUS_FERDIGSTILT.equals(dokumentInfo.getStatus())) {
+		if(dokumentInfo.getStatus() == null || DOKUMENT_STATUS_FERDIGSTILT.equals(dokumentInfo.getStatus())) {
 			return "Dokumentet er ferdigstilt";
 		} else {
 			return "Dokumentet er under redigering";
