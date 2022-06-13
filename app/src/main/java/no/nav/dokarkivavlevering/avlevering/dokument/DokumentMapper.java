@@ -1,6 +1,5 @@
 package no.nav.dokarkivavlevering.avlevering.dokument;
 
-import no.nav.dokarkivavlevering.avlevering.aspose.AsposeService;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +17,7 @@ public class DokumentMapper {
 		return saker.stream().flatMap(sak -> sak.getJp().stream()
 				.flatMap(journalpost -> journalpost.getDok().stream()
 						.flatMap(dokumentInfo -> dokumentInfo.getFd().stream()
-								.map(fd -> new Dokument(journalpost.getId().toString(), fd.getFilUuid(), convertToPDFA(fd.getFil(), ""+dokumentInfo.getId()))))))
+								.map(fd -> new Dokument(journalpost.getId().toString(), fd.getFilUuid(), fd.getFil())))))
 				.collect(Collectors.toList());
 	}
 }

@@ -1,7 +1,6 @@
 package no.nav.dokarkivavlevering.avlevering.config;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,7 +52,7 @@ public enum Tema {
 
 	public static List<Tema> getAlleTemaMedDokument() {
 		return Arrays.stream(Tema.values().clone())
-				.filter(Tema::isAvlevDokumenter)
+				.filter(Tema::isAvleverDokumenter)
 				.collect(Collectors.toList());
 	}
 
@@ -65,7 +64,7 @@ public enum Tema {
 		return temanavn;
 	}
 
-	public boolean isAvlevDokumenter() {
+	public boolean isAvleverDokumenter() {
 		return avlevDokumenter;
 	}
 

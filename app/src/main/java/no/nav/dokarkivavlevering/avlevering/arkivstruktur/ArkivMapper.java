@@ -54,10 +54,13 @@ public class ArkivMapper {
 	private Arkivdel mapArkivdel() {
 		Arkivdel arkivdel = new Arkivdel();
 		arkivdel.setSystemID(mapSystemID(arkivConfig.getArkivdelConfig().getSystemID()));
-		arkivdel.setTittel("Fellessystem for samhandling - fagsystemet Gosys");
-		arkivdel.setBeskrivelse("Arkivdel for saksbehandling av de fagområdene som bare behandles i et felles fagsystem uten spesifikk saksbehandlingsstøtte - Gosys");
+		arkivdel.setTittel("Retting av personopplysninger");
+		arkivdel.setBeskrivelse("Arkivdel for saksbehandling av RPO");
 		arkivdel.setArkivdelstatus("Aktiv periode");
-		arkivdel.setOpprettetDato(mapXmlGregorianCalendar(DATE_TIME_FORMAT, "2010-02-18T12:00:00"));
+		/*arkivdel.setTittel("Fellessystem for samhandling - fagsystemet Gosys");
+		arkivdel.setBeskrivelse("Arkivdel for saksbehandling av de fagområdene som bare behandles i et felles fagsystem uten spesifikk saksbehandlingsstøtte - Gosys");
+		arkivdel.setArkivdelstatus("Aktiv periode");*/
+		arkivdel.setOpprettetDato(mapXmlGregorianCalendar(DATE_TIME_FORMAT, "2015-02-18T12:00:00"));
 		arkivdel.setOpprettetAv("Arbeids- og velferdsetaten");
 		arkivdel.setArkivperiodeStartDato(mapXmlGregorianCalendar(DATE_FORMAT, "2010-02-18"));
 		arkivdel.setSkjerming(mapSkjerming());

@@ -47,7 +47,15 @@ public class AvleveringSakBerikerService {
 		this.avleveringSakBerikerMapper = avleveringSakBerikerMapper;
 	}
 
-	public List<Sak> berikSaker(@Body final List<Sak> saker, @ExchangeProperty(AvleveringRoute.PROPERTY_TEMA) final Tema tema) {
+	public List<Sak> berikSakerMedDokumenter(@Body final List<Sak> saker, @ExchangeProperty(AvleveringRoute.PROPERTY_TEMA) final Tema tema) {
+		return doBerikSaker(saker, tema, true);
+	}
+
+	public List<Sak> berikSakerUtenDokumenter(@Body final List<Sak> saker, @ExchangeProperty(AvleveringRoute.PROPERTY_TEMA) final Tema tema) {
+		return doBerikSaker(saker, tema, false);
+	}
+
+	private List<Sak> doBerikSaker(List<Sak> saker, final Tema tema, boolean avleverDokumenter){
 		// hent metadata og berik modellen
 		log.info("Beriker metadata for {} saker med tema={}", saker.size(), tema);
 		return Flowable.fromIterable(saker)
@@ -67,9 +75,15 @@ public class AvleveringSakBerikerService {
 							.map(s -> s.getBruker().getId())
 							.collect(Collectors.toSet());
 					final Map<String, Bruker> eregOrganisasjonBolk = eregService.hentOrganisasjonBrukere(unikeOrgnr);
-					return saks.stream()
-							.map(sak -> avleveringSakBerikerMapper.berik(sak, navAnsatteNavn, pdlHentIdenterBolks, eregOrganisasjonBolk))
-							.collect(Collectors.toList());
+					if(avleverDokumenter) {
+						return saks.stream()
+								.map(sak -> avleveringSakBerikerMapper.berikMedDokumenter(sak, navAnsatteNavn, pdlHentIdenterBolks, eregOrganisasjonBolk))
+								.collect(Collectors.toList());
+					} else {
+						return saks.stream()
+								.map(sak -> avleveringSakBerikerMapper.berikUtenDokument(sak, navAnsatteNavn, pdlHentIdenterBolks, eregOrganisasjonBolk))
+								.collect(Collectors.toList());
+					}
 				})
 				.flatMapIterable(items -> items)
 				.sequential()

@@ -26,19 +26,20 @@ public class AsposeService {
 		}
 	}
 
-	public static byte[] convertToPDFA(byte[] pdf, String dokumentInfoId) {
+	public static byte[] convertToPDFA(byte[] pdf, long dokumentInfoId) {
 		if(isValidPdf(pdf)){
 			return pdf;
 		}
 
 		ByteArrayOutputStream logStream = new ByteArrayOutputStream();
 		Document doc = new Document(pdf);
-		doc.convert(logStream, PdfFormat.PDF_A_1A, ConvertErrorAction.Delete);
+		boolean couldConvert = doc.convert(logStream, PdfFormat.PDF_A_1A, ConvertErrorAction.Delete);
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		doc.save(stream);
 		pdf = stream.toByteArray();
-
-		validatePDF(pdf, dokumentInfoId,  logStream);
+		if(!couldConvert){
+			validatePDF(pdf, ""+dokumentInfoId,  logStream);
+		}
 
 		return pdf;
 	}

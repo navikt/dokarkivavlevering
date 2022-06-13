@@ -1,5 +1,6 @@
 package no.nav.dokarkivavlevering.avlevering.repository;
 
+import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avlevering.AvleveringTemaRoute;
 import no.nav.dokarkivavlevering.avlevering.arkivstruktur.IdRange;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
  * @author Joakim Bjørnstad, Jbit AS
  */
 @Repository
+@Slf4j
 public class AvleveringRepository {
 	private static final ResultSetExtractor<List<Sak>> SAK_RESULTSET_EXTRACTOR = JdbcTemplateMapperFactory.newInstance()
 			.addKeys("id",
@@ -50,7 +52,9 @@ public class AvleveringRepository {
 		final HashMap<String, Object> paramMap = new HashMap<>();
 		paramMap.put("batchsize", avleveringProperties.getBatchsize());
 		paramMap.put("lastSakId", lastSakId);
+		log.info("Prøver å hente temakode for: " + tema);
 		paramMap.put("tema", tema.getTemakode());
+		log.info("Hentet temakode for: " + tema);
 		paramMap.put("minJournalpostId", idRange.getJournalpostIdMin());
 		paramMap.put("maxJournalpostId", idRange.getJournalpostIdMax());
 		paramMap.put("startdato", Timestamp.valueOf(avleveringProperties.getPeriode().getStartdato().atStartOfDay()));
@@ -58,7 +62,15 @@ public class AvleveringRepository {
 		return namedParameterJdbcTemplate.queryForList(SqlQueries.FINN_SAK_PAGE, paramMap, Long.class);
 	}
 
-	public List<Sak> findSaker(final List<Long> sakIds) {
+	public List<Sak> findSakerUtenDokumenter(final List<Long> sakIds) {
+		return doFindSaker(sakIds, false);
+	}
+
+	public List<Sak> findSakerMedDokumenter(final List<Long> sakIds) {
+		return doFindSaker(sakIds, true);
+	}
+
+	private List<Sak> doFindSaker(final List<Long> sakIds, boolean hentDokumenter){
 		if (sakIds.isEmpty()) {
 			return new ArrayList<>();
 		} else if (sakIds.size() > ORACLE_MAX_IN) {
@@ -69,7 +81,12 @@ public class AvleveringRepository {
 		paramMap.put("sakIds", sakIds.stream().map(Object::toString).collect(Collectors.toList()));
 		paramMap.put("startdato", Timestamp.valueOf(avleveringProperties.getPeriode().getStartdato().atStartOfDay()));
 		paramMap.put("sluttdato", Timestamp.valueOf(avleveringProperties.getPeriode().getSluttdato().atStartOfDay()));
-		return namedParameterJdbcTemplate.query(SqlQueries.FINN_SAKER_SQL, paramMap, SAK_RESULTSET_EXTRACTOR);
+		if(hentDokumenter) {
+			return namedParameterJdbcTemplate.query(SqlQueries.FINN_SAKER_SQL, paramMap, SAK_RESULTSET_EXTRACTOR);
+		} else {
+			return namedParameterJdbcTemplate.query(SqlQueries.FINN_SAKER_UTEN_DOKUMENTER_SQL, paramMap, SAK_RESULTSET_EXTRACTOR);
+
+		}
 	}
 
 	public IdRange findJournalpostIdRange(@Body final Tema tema) {

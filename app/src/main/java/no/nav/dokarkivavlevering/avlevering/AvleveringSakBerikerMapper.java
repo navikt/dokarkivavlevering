@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static no.nav.dokarkivavlevering.avlevering.aspose.AsposeService.convertToPDFA;
+
 /**
  * @author Joakim Bjørnstad, Jbit AS
  */
@@ -15,7 +17,7 @@ import java.util.stream.Collectors;
 public class AvleveringSakBerikerMapper {
 	private static final String AUTOMATISK_JOBB = "Automatisk Jobb";
 
-	Sak berik(final Sak sak, final Map<String, String> navAnsatteNavn, Map<String, Bruker> pdlHentIdenterBolks, Map<String, Bruker> eregOrganisasjonBolk) {
+	Sak berikMedDokumenter(final Sak sak, final Map<String, String> navAnsatteNavn, Map<String, Bruker> pdlHentIdenterBolks, Map<String, Bruker> eregOrganisasjonBolk) {
 		return sak.toBuilder()
 				.bruker(mapBruker(sak.getBruker(), pdlHentIdenterBolks, eregOrganisasjonBolk))
 				.opprettetAvBeriketNavn(utledNavn(sak.getOpprettetAv(), navAnsatteNavn))
@@ -30,13 +32,51 @@ public class AvleveringSakBerikerMapper {
 												.relOpprettetAvBeriketNavn(utledNavn(dokumentInfo.getRelOpprettetAv(), navAnsatteNavn))
 												.fd(dokumentInfo.getFd().stream()
 														.map(filDetaljer -> {
+															byte[] PDFA_fil = convertToPDFA(filDetaljer.getFil(), dokumentInfo.getId());
 															return filDetaljer.toBuilder()
 																	.opprettetAvBeriketNavn(utledNavn(filDetaljer.getOpprettetAv(), navAnsatteNavn))
 																	.filstorrelseBeriket(filDetaljer.getFil().length)
-																	.sha256hashBeriket(DigestUtils.sha256Hex(filDetaljer.getFil()))
+																	.fil(PDFA_fil)
+																	.sha256hashBeriket(DigestUtils.sha256Hex(PDFA_fil))
 																	.build();
 														})
 														.collect(Collectors.toList()))
+												.ae(dokumentInfo.getAe().stream()
+														.map(arkivendring -> {
+															return arkivendring.toBuilder()
+																	.utfoertAvBeriketNavn(utledNavn(arkivendring.getUtfoertAv(), navAnsatteNavn))
+																	.build();
+														})
+														.collect(Collectors.toList()))
+												.build();
+									})
+									.collect(Collectors.toList()))
+							.ae(journalpost.getAe().stream()
+									.map(arkivendring -> {
+										return arkivendring.toBuilder()
+												.utfoertAvBeriketNavn(utledNavn(arkivendring.getUtfoertAv(), navAnsatteNavn))
+												.build();
+									})
+									.collect(Collectors.toList()))
+							.build();
+				}).collect(Collectors.toList()))
+				.build();
+	}
+
+	Sak berikUtenDokument(final Sak sak, final Map<String, String> navAnsatteNavn, Map<String, Bruker> pdlHentIdenterBolks, Map<String, Bruker> eregOrganisasjonBolk) {
+		return sak.toBuilder()
+				.bruker(mapBruker(sak.getBruker(), pdlHentIdenterBolks, eregOrganisasjonBolk))
+				.opprettetAvBeriketNavn(utledNavn(sak.getOpprettetAv(), navAnsatteNavn))
+				.jp(sak.getJp().stream().map(journalpost -> {
+					return journalpost.toBuilder()
+							.opprettetAvBeriketNavn(utledNavn(journalpost.getOpprettetAv(), navAnsatteNavn))
+							.endretAvBeriketNavn(utledNavn(journalpost.getEndretAv(), navAnsatteNavn))
+							.dok(journalpost.getDok().stream()
+									.map(dokumentInfo -> {
+										return dokumentInfo.toBuilder()
+												.opprettetAvBeriketNavn(utledNavn(dokumentInfo.getOpprettetAv(), navAnsatteNavn))
+												.relOpprettetAvBeriketNavn(utledNavn(dokumentInfo.getRelOpprettetAv(), navAnsatteNavn))
+												.fd(null)
 												.ae(dokumentInfo.getAe().stream()
 														.map(arkivendring -> {
 															return arkivendring.toBuilder()
