@@ -50,7 +50,7 @@ public class EndringsloggMapper {
 
 	@Getter
 	private enum JournalpostStatus {
-		J("J", "JOURNALFOERT"),
+		J("J", "JOURNALFØRT"),
 		M("M", "MOTTATT"),
 		U("U", "UTGAAR"),
 		D("D", "UNDER_ARBEID"),
