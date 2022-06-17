@@ -34,10 +34,10 @@ public class EndringsloggService {
 						endringer.add(endringsloggMapper.map(ae, ae.getElement().startsWith(SAKSRELASJON) ? sak.getUuid() : jp.getUuid()));
 					}
 				}
-				for (DokumentInfo di : jp.getDok()) {
-					for (Arkivendring ae : di.getAe()) {
+				for (DokumentInfo dokumentInfo : jp.getDok()) {
+					for (Arkivendring ae : dokumentInfo.getAe()) {
 						if (ae.getTidspunkt().after(jp.getDatoJournal())) {
-							endringer.add(endringsloggMapper.map(ae, di.getUuid()));
+							endringer.add(endringsloggMapper.map(ae, dokumentInfo.getUuid()));
 						}
 					}
 				}

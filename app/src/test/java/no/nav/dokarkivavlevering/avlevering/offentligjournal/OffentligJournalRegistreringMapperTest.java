@@ -96,7 +96,6 @@ class OffentligJournalRegistreringMapperTest {
 				.relDatoOpprettet(formatter.parse("2020-11-10 16:04:43.343"))
 				.relOpprettetAv("srvmelosys")
 				.relOpprettetAvBeriketNavn("Automatisk Jobb")
-				.kategori("SED")
 				.status("FERDIGSTILT")
 				.tittel("Legg til ny institusjon")
 				.datoOpprettet(formatter.parse("2020-11-10 16:04:43.342"))

@@ -66,7 +66,7 @@ public class SqlQueries {
 					"       r.dato_opprettet              as jp_dok_reldatoopprettet,\n" +
 					"       r.opprettet_av                as jp_dok_relopprettetav,\n" +
 					"       d.opprettet_av                as jp_dok_opprettetav,\n" +
-					"       d.k_kategori_t                as jp_dok_kategori,\n" +
+					"       k.dekode                      as jp_dok_kategoridecode,\n" +
 					"       d.k_dokument_s                as jp_dok_status,\n" +
 					"       d.tittel                      as jp_dok_tittel,\n" +
 					"       d.dato_opprettet              as jp_dok_datoopprettet,\n" +
@@ -93,6 +93,7 @@ public class SqlQueries {
 					"         join t_journalpost j on s.journalpost_id = j.journalpost_id\n" +
 					"         join t_jp_dok_info_rel r on j.journalpost_id = r.journalpost_id\n" +
 					"         join t_dokument_info d on r.dokument_info_id = d.dokument_info_id\n" +
+					"         join t_k_kategori_t k on k.k_kategori_t = d.k_kategori_t\n" +
 					"         join t_fil_detaljer f on d.dokument_info_id = f.dokument_info_id\n" +
 					"         join t_dokument_fil df on f.fil_uuid = df.fil_uuid\n" +
 					"         left join t_aksjonslogg alj on alj.journalpost_id = j.journalpost_id and alj.dokument_info_id is null\n" +
@@ -138,7 +139,7 @@ public class SqlQueries {
 					"       r.dato_opprettet              as jp_dok_reldatoopprettet,\n" +
 					"       r.opprettet_av                as jp_dok_relopprettetav,\n" +
 					"       d.opprettet_av                as jp_dok_opprettetav,\n" +
-					"       d.k_kategori_t                as jp_dok_kategori,\n" +
+					"       k.dekode                      as jp_dok_kategoridecode,\n" +
 					"       d.k_dokument_s                as jp_dok_status,\n" +
 					"       d.tittel                      as jp_dok_tittel,\n" +
 					"       d.dato_opprettet              as jp_dok_datoopprettet,\n" +
@@ -164,6 +165,7 @@ public class SqlQueries {
 					"         join t_journalpost j on s.journalpost_id = j.journalpost_id\n" +
 					"         join t_jp_dok_info_rel r on j.journalpost_id = r.journalpost_id\n" +
 					"         join t_dokument_info d on r.dokument_info_id = d.dokument_info_id\n" +
+					"         join t_k_kategori_t k on k.k_kategori_t = d.k_kategori_t\n" +
 					"         join t_fil_detaljer f on d.dokument_info_id = f.dokument_info_id\n" +
 					"         left join t_aksjonslogg alj on alj.journalpost_id = j.journalpost_id and alj.dokument_info_id is null\n" +
 					"         left join t_arkiv_element_endring aeej on alj.aksjonslogg_id = aeej.aksjonslogg_id\n" +

@@ -1,5 +1,6 @@
 package no.nav.dokarkivavlevering.avlevering.endringlogg;
 
+import lombok.Getter;
 import no.arkivverket.standarder.noark5.endringslogg.Endring;
 import no.nav.dokarkivavlevering.avlevering.domain.Arkivendring;
 import org.springframework.stereotype.Component;
@@ -12,21 +13,53 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 @Component
 public class EndringsloggMapper {
 
+	private static final String JOURNALPOST_JOURNALPOSTSTATUS = "Journalpost.journalpostStatus";
+
 	public Endring map(Arkivendring arkivendring, UUID uuid) {
 		Endring endring = new Endring();
 		endring.setReferanseArkivenhet(uuid.toString());
 		endring.setReferanseMetadata(arkivendring.getElement());
 		endring.setEndretDato(dateToXMLGregorianCalendar(arkivendring.getTidspunkt()));
 		endring.setEndretAv(arkivendring.getUtfoertAvBeriketNavn());
+
+
 		endring.setTidligereVerdi(mapTidligereVerdi(arkivendring));
-		endring.setNyVerdi(arkivendring.getTilVerdi());
+		endring.setNyVerdi(mapNyVerdi(arkivendring));
 		return endring;
+	}
+
+	private String mapNyVerdi(Arkivendring arkivendring){
+		return JOURNALPOST_JOURNALPOSTSTATUS.equals(arkivendring.getElement()) ?
+				journalpostStatusDecode(arkivendring.getTilVerdi()) : arkivendring.getTilVerdi();
 	}
 
 	private String mapTidligereVerdi(Arkivendring arkivendring) {
 		if(isBlank(arkivendring.getFraVerdi())) {
 			return Arkivendring.INGEN_VERDI;
+		} else if(JOURNALPOST_JOURNALPOSTSTATUS.equals(arkivendring.getElement())){
+			return journalpostStatusDecode(arkivendring.getFraVerdi());
 		}
 		return arkivendring.getFraVerdi();
+	}
+
+	private String journalpostStatusDecode(String journalpostStatus){
+		return JournalpostStatus.valueOf(journalpostStatus).getStatusDecode();
+	}
+
+	@Getter
+	private enum JournalpostStatus {
+		FL("FL", "FERDIGSTILT"),
+		FS("FS", "FERDIGSTILT"),
+		J("J", "JOURNALFØRT"),
+		E("E", "EKSPEDERT");
+
+		private final String statusCode;
+		private final String statusDecode;
+
+		JournalpostStatus(String statusCode, String statusDecode){
+			this.statusCode = statusCode;
+			this.statusDecode = statusDecode;
+		}
+
 	}
 }

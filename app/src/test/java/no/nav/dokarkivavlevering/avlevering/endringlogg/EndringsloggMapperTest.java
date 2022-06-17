@@ -43,6 +43,33 @@ class EndringsloggMapperTest {
 	}
 
 	@Test
+	void shouldMapJournalpostStatus() {
+		Date date = Date.from(Instant.now());
+		UUID uuid = UUID.randomUUID();
+
+		Arkivendring arkivendring = Arkivendring.builder()
+				.id(1L)
+				.element("Journalpost.journalpostStatus")
+				.tidspunkt(date)
+				.utfoertAv("B000000")
+				.utfoertAvBeriketNavn("JonBlund")
+				.fraVerdi("J")
+				.tilVerdi("FS")
+				.build();
+
+		final Endring endring = mapper.map(arkivendring, uuid);
+
+		SoftAssertions softly = new SoftAssertions();
+		softly.assertThat(endring.getReferanseArkivenhet()).isEqualTo(uuid.toString());
+		softly.assertThat(endring.getReferanseMetadata()).isEqualTo("Journalpost.journalpostStatus");
+		softly.assertThat(endring.getEndretDato()).isEqualTo(dateToXMLGregorianCalendar(arkivendring.getTidspunkt()));
+		softly.assertThat(endring.getEndretAv()).isEqualTo("JonBlund");
+		softly.assertThat(endring.getTidligereVerdi()).isEqualTo("JOURNALFØRT");
+		softly.assertThat(endring.getNyVerdi()).isEqualTo("FERDIGSTILT");
+		softly.assertAll();
+	}
+
+	@Test
 	void shouldMapIngenVerdiWhenFraVerdiIsNull() {
 		Date date = Date.from(Instant.now());
 		UUID uuid = UUID.randomUUID();

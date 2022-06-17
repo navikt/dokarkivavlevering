@@ -33,6 +33,8 @@ public class AvleveringStatiskRoute extends RouteBuilder {
 				.to(AvleveringSFTPRoute.SFTP)
 				.process(readFromClasspath("offentligJournal.xsd"))
 				.to(AvleveringSFTPRoute.SFTP)
+				.process(readFromClasspath("addml.xsd"))
+				.to(AvleveringSFTPRoute.SFTP)
 		;
 	}
 
