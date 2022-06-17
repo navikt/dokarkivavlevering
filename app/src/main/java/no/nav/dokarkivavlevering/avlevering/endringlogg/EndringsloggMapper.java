@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.dateToXMLGregorianCalendar;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @Component
 public class EndringsloggMapper {
@@ -43,16 +44,26 @@ public class EndringsloggMapper {
 	}
 
 	private String journalpostStatusDecode(String journalpostStatus){
-		return JournalpostStatus.valueOf(journalpostStatus).getStatusDecode();
+		return isEmpty(journalpostStatus) ?
+				JournalpostStatus.UKJENT_STATUS : JournalpostStatus.valueOf(journalpostStatus).getStatusDecode();
 	}
 
 	@Getter
 	private enum JournalpostStatus {
-		FL("FL", "FERDIGSTILT"),
+		J("J", "JOURNALFOERT"),
+		M("M", "MOTTATT"),
+		U("U", "UTGAAR"),
+		D("D", "UNDER_ARBEID"),
+		R("R", "RESERVERT"),
 		FS("FS", "FERDIGSTILT"),
-		J("J", "JOURNALFØRT"),
-		E("E", "EKSPEDERT");
+		FL("FL", "FERDIGSTILT"),
+		E("E", "EKSPEDERT"),
+		A("A", "AVBRUTT"),
+		MO("MO", "MOTTATT"),
+		UB("UB", "UKJENT_BRUKER"),
+		OD("OD", "OPPLASTING_DOKUMENT");
 
+		public static String UKJENT_STATUS = "UKJENT";
 		private final String statusCode;
 		private final String statusDecode;
 
