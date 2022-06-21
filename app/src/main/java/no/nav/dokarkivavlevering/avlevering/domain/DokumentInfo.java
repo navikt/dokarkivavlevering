@@ -23,7 +23,7 @@ public class DokumentInfo {
 	private final String relOpprettetAv;
 	@ToString.Exclude
 	private final String relOpprettetAvBeriketNavn;
-	private final String kategori;
+	private final String kategoriDecode;
 	private final String status;
 	@ToString.Exclude
 	private final String tittel;

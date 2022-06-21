@@ -134,7 +134,7 @@ public class SaksmappeMapper {
 	private Dokumentbeskrivelse mapDokumentBeskrivelse(DokumentInfo dokumentInfo, String tema, String journalpostId) {
 		Dokumentbeskrivelse dokumentbeskrivelse = new Dokumentbeskrivelse();
 		dokumentbeskrivelse.setSystemID(mapSystemID(dokumentInfo.getUuid()));
-		dokumentbeskrivelse.setDokumenttype(dokumentInfo.getKategori());
+		dokumentbeskrivelse.setDokumenttype(dokumentInfo.getKategoriDecode());
 		dokumentbeskrivelse.setDokumentstatus(mapDokumentstatus(dokumentInfo));
 		dokumentbeskrivelse.setTittel(dokumentInfo.getTittel());
 		dokumentbeskrivelse.setOpprettetDato(dateToXMLGregorianCalendar(dokumentInfo.getDatoOpprettet()));

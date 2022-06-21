@@ -154,7 +154,7 @@ class SaksmappeMapperTest {
 
 	private void assertDokumentBeskrivelse(Dokumentbeskrivelse dok) throws Exception {
 		assertEquals(dok.getSystemID().getValue().isEmpty(), false);
-		assertEquals(dok.getDokumenttype(), "OPP");
+		assertEquals(dok.getDokumenttype(), "Strukturert elektronisk dokument");
 		assertEquals(dok.getDokumentstatus(), "Dokumentet er ferdigstilt");
 		assertEquals(dok.getTittel(), "Legg til ny institusjon");
 		assertEquals(dok.getOpprettetDato(), TestUtils.toXmlGregCalendar("2020-11-10 16:04:43"));
@@ -223,7 +223,7 @@ class SaksmappeMapperTest {
 				.relDatoOpprettet(formatter.parse("2020-11-10 16:04:43.343"))
 				.relOpprettetAv("srvmelosys")
 				.relOpprettetAvBeriketNavn("Automatisk jobb")
-				.kategori("OPP")
+				.kategoriDecode("Strukturert elektronisk dokument")
 				.status("FERDIGSTILT")
 				.tittel("Legg til ny institusjon")
 				.datoOpprettet(formatter.parse("2020-11-10 16:04:43.342"))
