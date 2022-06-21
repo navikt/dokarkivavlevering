@@ -93,7 +93,7 @@ public class SqlQueries {
 					"         join t_journalpost j on s.journalpost_id = j.journalpost_id\n" +
 					"         join t_jp_dok_info_rel r on j.journalpost_id = r.journalpost_id\n" +
 					"         join t_dokument_info d on r.dokument_info_id = d.dokument_info_id\n" +
-					" 		  join t_k_journal_s st on j.k_journal_s = st.k_journal_s\n"+
+					"         join t_k_journal_s st on j.k_journal_s = st.k_journal_s\n"+
 					"         join t_fil_detaljer f on d.dokument_info_id = f.dokument_info_id\n" +
 					"         join t_dokument_fil df on f.fil_uuid = df.fil_uuid\n" +
 					"         left join t_aksjonslogg alj on alj.journalpost_id = j.journalpost_id and alj.dokument_info_id is null\n" +
@@ -165,7 +165,7 @@ public class SqlQueries {
 					"         join t_journalpost j on s.journalpost_id = j.journalpost_id\n" +
 					"         join t_jp_dok_info_rel r on j.journalpost_id = r.journalpost_id\n" +
 					"         join t_dokument_info d on r.dokument_info_id = d.dokument_info_id\n" +
-					" 		  join t_k_journal_s st on j.k_journal_s = st.k_journal_s\n"+
+					"         join t_k_journal_s st on j.k_journal_s = st.k_journal_s\n"+
 					"         join t_fil_detaljer f on d.dokument_info_id = f.dokument_info_id\n" +
 					"         left join t_aksjonslogg alj on alj.journalpost_id = j.journalpost_id and alj.dokument_info_id is null\n" +
 					"         left join t_arkiv_element_endring aeej on alj.aksjonslogg_id = aeej.aksjonslogg_id\n" +
