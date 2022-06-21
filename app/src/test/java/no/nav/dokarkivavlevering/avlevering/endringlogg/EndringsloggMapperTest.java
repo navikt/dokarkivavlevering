@@ -53,8 +53,8 @@ class EndringsloggMapperTest {
 				.tidspunkt(date)
 				.utfoertAv("B000000")
 				.utfoertAvBeriketNavn("JonBlund")
-				.fraVerdi("JOURNALFØRT")
-				.tilVerdi("FERDIGSTILT")
+				.fraVerdi("J")
+				.tilVerdi("FS")
 				.build();
 
 		final Endring endring = mapper.map(arkivendring, uuid);
