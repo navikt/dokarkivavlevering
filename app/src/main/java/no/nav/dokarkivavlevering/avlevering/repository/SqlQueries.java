@@ -7,25 +7,26 @@ public class SqlQueries {
 	static final String JOURNALPOST_ID_RANGE =
 			"select min(j.journalpost_id),\n" +
 					"       max(j.journalpost_id),\n" +
-					"       max(to_number(regexp_replace(s.sak_nr_fk, '[^0-9]', '')))\n" +
+					"       max(s.sak_id)\n" +
 					"from t_journalpost j\n" +
 					"         join t_saksrelasjon s on j.journalpost_id = s.journalpost_id\n" +
 					"where (s.feilregistrert is null or s.feilregistrert = 0)\n" +
 					"  and j.k_journal_s in ('J', 'FS', 'FL', 'E')\n" +
 					"  and (trunc(j.dato_opprettet) between :startdato and :sluttdato)\n" +
-					"  and s.sak_nr_fk in (\n" +
-					"    select to_char(sa.id)\n" +
+					"  and s.sak_id in (\n" +
+					"    select sa.id\n" +
 					"    from sak sa\n" +
 					"    where sa.tema = :tema\n" +
 					")\n" +
 					"  and s.k_fagsystem = 'FS22'";
+
 	static final String FINN_SAK_PAGE =
 			"select distinct sa.id\n" +
 					"from sak sa\n" +
 					"where sa.tema = :tema\n" +
 					"  and sa.id < :lastSakId\n" +
 					"  and sa.id in (\n" +
-					"    select to_number(regexp_replace(s.sak_nr_fk, '[^0-9]', ''))\n" +
+					"    select s.sak_id\n" +
 					"    from t_saksrelasjon s\n" +
 					"             join t_journalpost j on s.journalpost_id = j.journalpost_id\n" +
 					"    where (j.journalpost_id between :minJournalpostId and :maxJournalpostId)\n" +
@@ -89,7 +90,7 @@ public class SqlQueries {
 					"       aeed.fra_verdi                as jp_dok_ae_fraverdi,\n" +
 					"       aeed.til_verdi                as jp_dok_ae_tilverdi\n" +
 					"from sak sa\n" +
-					"         join t_saksrelasjon s on sa.id = to_number(regexp_replace(s.sak_nr_fk, '[^0-9]', ''))\n" +
+					"         join t_saksrelasjon s on sa.id = s.sak_id\n" +
 					"         join t_journalpost j on s.journalpost_id = j.journalpost_id\n" +
 					"         join t_jp_dok_info_rel r on j.journalpost_id = r.journalpost_id\n" +
 					"         join t_dokument_info d on r.dokument_info_id = d.dokument_info_id\n" +
@@ -100,7 +101,7 @@ public class SqlQueries {
 					"         left join t_arkiv_element_endring aeej on alj.aksjonslogg_id = aeej.aksjonslogg_id\n" +
 					"         left join t_aksjonslogg ald on ald.journalpost_id = j.journalpost_id and ald.dokument_info_id = d.dokument_info_id\n" +
 					"         left join t_arkiv_element_endring aeed on ald.aksjonslogg_id = aeed.aksjonslogg_id\n" +
-					"where s.sak_nr_fk in (:sakIds)\n" +
+					"where s.sak_id in (:sakIds)\n" +
 					"  and j.k_journal_s in ('J', 'FS', 'FL', 'E')\n" +
 					"  and (s.feilregistrert is null or s.feilregistrert = 0)\n" +
 					"  and (trunc(j.dato_opprettet) between :startdato and :sluttdato)\n" +
@@ -161,7 +162,7 @@ public class SqlQueries {
 					"       aeed.fra_verdi                as jp_dok_ae_fraverdi,\n" +
 					"       aeed.til_verdi                as jp_dok_ae_tilverdi\n" +
 					"from sak sa\n" +
-					"         join t_saksrelasjon s on sa.id = to_number(regexp_replace(s.sak_nr_fk, '[^0-9]', ''))\n" +
+					"         join t_saksrelasjon s on sa.id = s.sak_id,\n" +
 					"         join t_journalpost j on s.journalpost_id = j.journalpost_id\n" +
 					"         join t_jp_dok_info_rel r on j.journalpost_id = r.journalpost_id\n" +
 					"         join t_dokument_info d on r.dokument_info_id = d.dokument_info_id\n" +
@@ -171,7 +172,7 @@ public class SqlQueries {
 					"         left join t_arkiv_element_endring aeej on alj.aksjonslogg_id = aeej.aksjonslogg_id\n" +
 					"         left join t_aksjonslogg ald on ald.journalpost_id = j.journalpost_id and ald.dokument_info_id = d.dokument_info_id\n" +
 					"         left join t_arkiv_element_endring aeed on ald.aksjonslogg_id = aeed.aksjonslogg_id\n" +
-					"where s.sak_nr_fk in (:sakIds)\n" +
+					"where s.sak_id in (:sakIds)\n" +
 					"  and j.k_journal_s in ('J', 'FS', 'FL', 'E')\n" +
 					"  and (s.feilregistrert is null or s.feilregistrert = 0)\n" +
 					"  and (trunc(j.dato_opprettet) between :startdato and :sluttdato)\n" +
