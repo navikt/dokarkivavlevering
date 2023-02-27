@@ -26,6 +26,15 @@ spec:
             limits:
               memory: "4096Mi"
               cpu: "4000m"
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsUser: 10000
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+            capabilities:
+              drop:
+                - ALL
           volumeMounts:
             - mountPath: /var/run/secrets/nais.io/vault
               name: vault-secrets
