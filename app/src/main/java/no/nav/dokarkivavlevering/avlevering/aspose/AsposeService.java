@@ -5,28 +5,35 @@ import com.aspose.pdf.Document;
 import com.aspose.pdf.License;
 import com.aspose.pdf.PdfFormat;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.pdfValidation.PDFAValidatorResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Component;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 import static no.nav.dokarkivavlevering.avlevering.pdfValidation.PDFAValidatorUtil.safeValidatePDFA;
 
 @Slf4j
+@Component
 public class AsposeService {
+
+	@Value("license")
 	private static License lic;
 
-	static {
-		try {
-			lic = new License();
-			lic.setLicense(new ClassPathResource("aspose/Aspose.Total.Product.Family.lic").getInputStream());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	@Autowired
+	public AsposeService (AvleveringProperties avleveringProperties) throws Exception {
+		lic = new License();
+		lic.setLicense(avleveringProperties.getAsposeLicense());
 	}
 
-	public static byte[] convertToPDFA(byte[] pdf, long dokumentInfoId) {
+
+	public byte[] convertToPDFA(byte[] pdf, long dokumentInfoId) {
 		if(isValidPdf(pdf)){
 			return pdf;
 		}
@@ -44,7 +51,7 @@ public class AsposeService {
 		return pdf;
 	}
 
-	private static void validatePDF(byte[] pdf, String dokumentInfoId, ByteArrayOutputStream logstream){
+	private void validatePDF(byte[] pdf, String dokumentInfoId, ByteArrayOutputStream logstream){
 		PDFAValidatorResponse response = safeValidatePDFA(pdf);
 		if(!response.isValidPdf()){
 			try {
@@ -55,7 +62,7 @@ public class AsposeService {
 		}
 	}
 
-	private static boolean isValidPdf(byte[] pdf) {
+	private boolean isValidPdf(byte[] pdf) {
 		return safeValidatePDFA(pdf).isValidPdf() ? true : false;
 	}
 }

@@ -1,5 +1,6 @@
 package no.nav.dokarkivavlevering.avlevering;
 
+import no.nav.dokarkivavlevering.avlevering.aspose.AsposeService;
 import no.nav.dokarkivavlevering.avlevering.domain.Bruker;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -8,14 +9,17 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static no.nav.dokarkivavlevering.avlevering.aspose.AsposeService.convertToPDFA;
-
 /**
  * @author Joakim Bjørnstad, Jbit AS
  */
 @Component
 public class AvleveringSakBerikerMapper {
 	private static final String AUTOMATISK_JOBB = "Automatisk Jobb";
+	private final AsposeService asposeService;
+
+	public AvleveringSakBerikerMapper(AsposeService asposeService) {
+		this.asposeService = asposeService;
+	}
 
 	Sak berikMedDokumenter(final Sak sak, final Map<String, String> navAnsatteNavn, Map<String, Bruker> pdlHentIdenterBolks, Map<String, Bruker> eregOrganisasjonBolk) {
 		return sak.toBuilder()
@@ -32,7 +36,7 @@ public class AvleveringSakBerikerMapper {
 												.relOpprettetAvBeriketNavn(utledNavn(dokumentInfo.getRelOpprettetAv(), navAnsatteNavn))
 												.fd(dokumentInfo.getFd().stream()
 														.map(filDetaljer -> {
-															byte[] PDFA_fil = convertToPDFA(filDetaljer.getFil(), dokumentInfo.getId());
+															byte[] PDFA_fil = asposeService.convertToPDFA(filDetaljer.getFil(), dokumentInfo.getId());
 															return filDetaljer.toBuilder()
 																	.opprettetAvBeriketNavn(utledNavn(filDetaljer.getOpprettetAv(), navAnsatteNavn))
 																	.filstorrelseBeriket(filDetaljer.getFil().length)

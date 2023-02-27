@@ -36,6 +36,8 @@ public class AvleveringProperties {
 	private String pdlurl;
 	@NotEmpty
 	private String eregurl;
+	@NotEmpty
+	private String AsposeLicense;
 
 	/**
 	 * Brukes for å generere systemID for avlevering under oppstart. Referes til på forskjellige nivåer i arkivstruktur.xml.
