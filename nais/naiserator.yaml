@@ -19,13 +19,6 @@ spec:
       containers:
         - name: dokarkivavlevering
           image: {{image}}
-          resources:
-            requests:
-              memory: "512Mi"
-              cpu: "100m"
-            limits:
-              memory: "4096Mi"
-              cpu: "4000m"
           securityContext:
             allowPrivilegeEscalation: false
             runAsUser: 10000
@@ -35,6 +28,13 @@ spec:
             capabilities:
               drop:
                 - ALL
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "100m"
+            limits:
+              memory: "4096Mi"
+              cpu: "4000m"
           volumeMounts:
             - mountPath: /var/run/secrets/nais.io/vault
               name: vault-secrets
