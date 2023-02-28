@@ -42,6 +42,6 @@ spec:
       - kvPath: { { SRVDOKAVLEVERING } }
         mountPath: "/secrets/serviceuser/srvdokarkivavlevering"
       - kvPath: { { SRV_LINUX } }
-          mountPath: "/var/run/secrets/nais.io/ldap"
+        mountPath: "/var/run/secrets/nais.io/ldap"
       - kvPath: { { DOKARKIV_DS } }
         mountPath: "/var/run/secrets/nais.io/dokarkivDS"
