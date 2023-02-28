@@ -39,9 +39,9 @@ spec:
   vault:
     enabled: true
     paths:
-      - kvPath: { { SRVDOKAVLEVERING } }
-        mountPath: "/secrets/serviceuser/srvdokarkivavlevering"
-      - kvPath: { { SRV_LINUX } }
+      - kvPath: {{ SRVDOKAVLEVERING }}
+        mountPath: "/secrets/serviceuser/srvdokavlevering"
+      - kvPath: {{ SRV_LINUX }}
         mountPath: "/var/run/secrets/nais.io/ldap"
-      - kvPath: { { DOKARKIV_DS } }
+      - kvPath: {{ DOKARKIV_DS }}
         mountPath: "/var/run/secrets/nais.io/dokarkivDS"
