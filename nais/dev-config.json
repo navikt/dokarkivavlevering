@@ -1,5 +1,5 @@
 {
-  "SRVDOKAVLEVERING": "/serviceuser/data/dev/srvdokavlevering",
+  "SERVICEUSER_VAULT_PATH": "/serviceuser/data/dev/srvdokavlevering",
   "SRV_LINUX": "/serviceuser/data/dev/srvssolinux",
   "DOKARKIVAVLEVERING_DS": "/oracle/data/dev/creds/joark_q2-dokarkivavlevering",
   "VAULT_KV_PATH": "/kv/preprod/fss/dokarkivavlevering/teamdokumenthandtering",
