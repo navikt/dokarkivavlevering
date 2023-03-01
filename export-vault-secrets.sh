@@ -1,15 +1,15 @@
 #!/usr/bin/env sh
 
 # serviceuser
-if test -f /secrets/serviceuser/dokarkivavlevering/username;
+if test -f /secrets/serviceuser/dokavlevering/username;
 then
     echo "Setting AVLEVERING_SERVICEUSER_USERNAME"
-    export AVLEVERING_SERVICEUSER_USERNAME=$(cat /secrets/serviceuser/dokarkivavlevering/username)
+    export AVLEVERING_SERVICEUSER_USERNAME=$(cat /secrets/serviceuser/dokavlevering/username)
 fi
-if test -f /secrets/serviceuser/dokarkivavlevering/password;
+if test -f /secrets/serviceuser/dokavlevering/password;
 then
     echo "Setting AVLEVERING_SERVICEUSER_PASSWORD"
-    export AVLEVERING_SERVICEUSER_PASSWORD=$(cat /secrets/serviceuser/dokarkivavlevering/password)
+    export AVLEVERING_SERVICEUSER_PASSWORD=$(cat /secrets/serviceuser/dokavlevering/password)
 fi
 # database
 if test -f /var/run/secrets/nais.io/dokarkivavleveringDS/username;
