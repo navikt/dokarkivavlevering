@@ -1,7 +1,7 @@
 {
   "SRVDOKAVLEVERING": "/serviceuser/data/prod/srvdokavlevering",
   "SRV_LINUX": "/serviceuser/data/prod/srvssolinux",
-  "VAULT_DATABASE_CREDS": "/oracle/data/prod/creds/joark-dokarkivavlevering",
+  "DOKARKIVAVLEVERING_DS": "/oracle/data/prod/creds/joark-dokarkivavlevering",
   "VAULT_KV_PATH": "/kv/prod/fss/dokarkivavlevering/teamdokumenthandtering",
   "VAULT_K8S_LOGIN_PATH": "auth/kubernetes/prod/fss/login",
   "SPRING_DATASOURCE_URL": "jdbc:oracle:thin:@dm09-scan.adeo.no:1521/joark_ha",
