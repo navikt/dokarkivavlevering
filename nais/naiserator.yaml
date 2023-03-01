@@ -22,8 +22,6 @@ spec:
       value: "{{SPRING_LDAP_URLS}}"
     - name: SPRING_DATASOURCE_URL
       value: "{{SPRING_DATASOURCE_URL}}"
-    - name: VAULT_TOKEN_PATH
-      value: /var/run/secrets/nais.io/vault/vault_token
     - name: AVLEVERING_PDLURL
       value: "{{PDL_URL}}"
     - name: AVLEVERING_EREGURL
