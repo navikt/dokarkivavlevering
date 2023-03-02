@@ -27,7 +27,7 @@
 		<logstash-logback-encoder.version>7.2</logstash-logback-encoder.version>
 		<oracle.version>19.17.0.0</oracle.version>
 		<simpleflatmapper.version>8.2.3</simpleflatmapper.version>
-		<Saxon-HE.version>12.0</Saxon-HE.version>
+		<Saxon-HE.version>10.3</Saxon-HE.version>
 		<lombok.version>1.18.26</lombok.version>
 		<jaxb2-commons.version>0.6.5</jaxb2-commons.version>
 		<commons-io.version>2.11.0</commons-io.version>
