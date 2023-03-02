@@ -1,26 +1,26 @@
 #!/usr/bin/env sh
 
 # serviceuser
-if test -f /var/run/secrets/nais.io/service_user/username;
+if test -f /secrets/serviceuser/dokavlevering/username;
 then
     echo "Setting AVLEVERING_SERVICEUSER_USERNAME"
-    export AVLEVERING_SERVICEUSER_USERNAME=$(cat /var/run/secrets/nais.io/service_user/username)
+    export AVLEVERING_SERVICEUSER_USERNAME=$(cat /secrets/serviceuser/dokavlevering/username)
 fi
-if test -f /var/run/secrets/nais.io/service_user/password;
+if test -f /secrets/serviceuser/dokavlevering/password;
 then
     echo "Setting AVLEVERING_SERVICEUSER_PASSWORD"
-    export AVLEVERING_SERVICEUSER_PASSWORD=$(cat /var/run/secrets/nais.io/service_user/password)
+    export AVLEVERING_SERVICEUSER_PASSWORD=$(cat /secrets/serviceuser/dokavlevering/password)
 fi
 # database
-if test -f /var/run/secrets/nais.io/database_user/username;
+if test -f /var/run/secrets/nais.io/dokarkivavleveringDS/username;
 then
     echo "Setting SPRING_DATASOURCE_USERNAME"
-    export SPRING_DATASOURCE_USERNAME=$(cat /var/run/secrets/nais.io/database_user/username)
+    export SPRING_DATASOURCE_USERNAME=$(cat /var/run/secrets/nais.io/dokarkivavleveringDS/username)
 fi
-if test -f /var/run/secrets/nais.io/database_user/password;
+if test -f /var/run/secrets/nais.io/dokarkivavleveringDS/password;
 then
     echo "Setting SPRING_DATASOURCE_PASSWORD"
-    export SPRING_DATASOURCE_PASSWORD=$(cat /var/run/secrets/nais.io/database_user/password)
+    export SPRING_DATASOURCE_PASSWORD=$(cat /var/run/secrets/nais.io/dokarkivavleveringDS/password)
 fi
 # sftp
 if test -f /var/run/secrets/nais.io/vault/privateKeyFile;
@@ -38,13 +38,13 @@ then
     echo "Setting aspose license"
     export AVLEVERING_ASPOSELICENSE=$(cat /var/run/secrets/nais.io/vault/asposeLicense)
 fi
-if test -f /var/run/secrets/nais.io/service_user_linux/username;
+if test -f /var/run/secrets/nais.io/ldap/username;
 then
     echo "Setting SPRING_LDAP_USERNAME"
-    export  SPRING_LDAP_USERNAME=$(cat /var/run/secrets/nais.io/service_user_linux/username)
+    export  SPRING_LDAP_USERNAME=$(cat /var/run/secrets/nais.io/ldap/username)
 fi
-if test -f /var/run/secrets/nais.io/service_user_linux/password;
+if test -f /var/run/secrets/nais.io/ldap/password;
 then
     echo "Setting SPRING_LDAP_PASSWORD"
-    export  SPRING_LDAP_PASSWORD=$(cat /var/run/secrets/nais.io/service_user_linux/password)
+    export  SPRING_LDAP_PASSWORD=$(cat /var/run/secrets/nais.io/ldap/password)
 fi

@@ -1,10 +1,8 @@
 package no.nav.dokarkivavlevering.avlevering;
 
-import no.nav.dokarkivavlevering.avlevering.aspose.AsposeService;
 import no.nav.dokarkivavlevering.avlevering.pdfValidation.PDFAValidatorResponse;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
@@ -20,10 +18,10 @@ public class PdfaKonvertering {
 
 	private static final String UGYLDIG_PDF_PATH = "pdf/notPdfa.pdf";
 
-	@Autowired
-	private AsposeService asposeService;
 
-	@Test
+	//For manuell testing av validering.
+	//Hent license fra vault for testing
+/*	@Test
 	public void convertPdfToPdfa() throws Exception {
 		//sjekk at PDF'en vi tester ikke er gyldig før konvertering
 		assertThat(safeValidatePDFA(getPdfStream(UGYLDIG_PDF_PATH).readAllBytes()).isValidPdf()).isEqualTo(false);
@@ -33,7 +31,7 @@ public class PdfaKonvertering {
 		PDFAValidatorResponse pdfaValidatorResponse = safeValidatePDFA(result);
 		assertThat(pdfaValidatorResponse.isValidPdf()).isEqualTo(true);
 		assertThat(pdfaValidatorResponse.getPdfVersion()).isEqualTo(PDFA_1_A);
-	}
+	}*/
 
 	private InputStream getPdfStream(String path) throws IOException {
 		return classpathToInputStream(path);
@@ -43,7 +41,7 @@ public class PdfaKonvertering {
 	 * For å lagre testfiler som filer man kan åpne lokalt.
 	 * Gjør testing lettere
 	 */
-	private void writePdfToFileForInspection(byte[] result){
+	private void writePdfToFileForInspection(byte[] result) {
 		File tempOutput = null;
 		try {
 			tempOutput = Files.createTempFile(null, ".pdf").getFileName().toFile();
