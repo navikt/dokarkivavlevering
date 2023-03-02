@@ -28,12 +28,12 @@
 		<oracle.version>19.17.0.0</oracle.version>
 		<simpleflatmapper.version>8.2.3</simpleflatmapper.version>
 		<Saxon-HE.version>10.3</Saxon-HE.version>
-		<lombok.version>1.18.26</lombok.version>
 		<jaxb2-commons.version>0.6.5</jaxb2-commons.version>
 		<commons-io.version>2.11.0</commons-io.version>
 		<rxjava.version>3.1.6</rxjava.version>
 		<verapdf.version>1.22.2</verapdf.version>
 		<aspose-pdf.version>23.1</aspose-pdf.version>
+		<jaxb-runtime-glassfish.version>2.3.7</jaxb-runtime-glassfish.version>
 	</properties>
 
 	<repositories>
@@ -118,6 +118,11 @@
 				<artifactId>aspose-pdf</artifactId>
 				<version>${aspose-pdf.version}</version>
 			</dependency>
+				<dependency>
+					<groupId>org.glassfish.jaxb</groupId>
+					<artifactId>jaxb-runtime</artifactId>
+					<version>${jaxb-runtime-glassfish.version}</version>
+				</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<build>
