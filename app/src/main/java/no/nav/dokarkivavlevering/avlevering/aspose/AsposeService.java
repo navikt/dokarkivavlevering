@@ -16,6 +16,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 import static no.nav.dokarkivavlevering.avlevering.pdfValidation.PDFAValidatorUtil.safeValidatePDFA;
 
@@ -23,13 +24,11 @@ import static no.nav.dokarkivavlevering.avlevering.pdfValidation.PDFAValidatorUt
 @Component
 public class AsposeService {
 
-	@Value("license")
-	private static License lic;
+	private static final License lic = new License();
 
 	@Autowired
 	public AsposeService (AvleveringProperties avleveringProperties) throws Exception {
-		lic = new License();
-		lic.setLicense(avleveringProperties.getAsposeLicense());
+		lic.setLicense(new ByteArrayInputStream(avleveringProperties.getAsposeLicense().getBytes(StandardCharsets.UTF_8)));
 	}
 
 
