@@ -36,6 +36,7 @@ public class AvleveringProperties {
 	private String pdlurl;
 	@NotEmpty
 	private String eregurl;
+	@ToString.Exclude
 	@NotEmpty
 	private String AsposeLicense;
 
