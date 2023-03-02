@@ -8,6 +8,9 @@ on:
       periodeSlutt:
         description: 'Periode slutt (t.o.m) for avlevering. YYYY-MM-DD'
         required: true
+      tema:
+        description: 'Tema for avlevering'
+        required: true
 
 env:
   IMAGE: docker.pkg.github.com/${{ github.repository }}/dokarkivavlevering:${{ github.sha }}

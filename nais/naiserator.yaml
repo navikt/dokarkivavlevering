@@ -34,6 +34,8 @@ spec:
       value: "{{periodestart}}"
     - name: AVLEVERING_PERIODE_SLUTTDATO
       value: "{{periodeslutt}}"
+    - name: AVLEVERING_TEMA
+      value: "{{tema}}"
   vault:
     enabled: true
     paths:
