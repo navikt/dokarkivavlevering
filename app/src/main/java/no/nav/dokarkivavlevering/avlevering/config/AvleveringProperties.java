@@ -26,7 +26,7 @@ public class AvleveringProperties {
 
 	private final String avleveringId = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm"));
 	@NotEmpty
-	private Set<Tema> tema;
+	private String tema;
 	@NotNull
 	@Max(1000) // max IN query i Oracle
 	private Long batchsize;
@@ -36,6 +36,9 @@ public class AvleveringProperties {
 	private String pdlurl;
 	@NotEmpty
 	private String eregurl;
+	@ToString.Exclude
+	@NotEmpty
+	private String AsposeLicense;
 
 	/**
 	 * Brukes for å generere systemID for avlevering under oppstart. Referes til på forskjellige nivåer i arkivstruktur.xml.

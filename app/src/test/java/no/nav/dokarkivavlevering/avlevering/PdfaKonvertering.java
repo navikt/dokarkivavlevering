@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 
-import static no.nav.dokarkivavlevering.avlevering.aspose.AsposeService.convertToPDFA;
 import static no.nav.dokarkivavlevering.avlevering.pdfValidation.PDFAValidatorUtil.safeValidatePDFA;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.verapdf.pdfa.flavours.PDFAFlavour.PDFA_1_A;
@@ -19,17 +18,20 @@ public class PdfaKonvertering {
 
 	private static final String UGYLDIG_PDF_PATH = "pdf/notPdfa.pdf";
 
-	@Test
+
+	//For manuell testing av validering.
+	//Hent license fra vault for testing
+/*	@Test
 	public void convertPdfToPdfa() throws Exception {
 		//sjekk at PDF'en vi tester ikke er gyldig før konvertering
 		assertThat(safeValidatePDFA(getPdfStream(UGYLDIG_PDF_PATH).readAllBytes()).isValidPdf()).isEqualTo(false);
 
-		byte[] result = convertToPDFA(getPdfStream(UGYLDIG_PDF_PATH).readAllBytes(), 23423);
+		byte[] result = asposeService.convertToPDFA(getPdfStream(UGYLDIG_PDF_PATH).readAllBytes(), 23423);
 
 		PDFAValidatorResponse pdfaValidatorResponse = safeValidatePDFA(result);
 		assertThat(pdfaValidatorResponse.isValidPdf()).isEqualTo(true);
 		assertThat(pdfaValidatorResponse.getPdfVersion()).isEqualTo(PDFA_1_A);
-	}
+	}*/
 
 	private InputStream getPdfStream(String path) throws IOException {
 		return classpathToInputStream(path);
@@ -39,7 +41,7 @@ public class PdfaKonvertering {
 	 * For å lagre testfiler som filer man kan åpne lokalt.
 	 * Gjør testing lettere
 	 */
-	private void writePdfToFileForInspection(byte[] result){
+	private void writePdfToFileForInspection(byte[] result) {
 		File tempOutput = null;
 		try {
 			tempOutput = Files.createTempFile(null, ".pdf").getFileName().toFile();

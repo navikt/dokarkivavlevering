@@ -1,9 +1,9 @@
 package no.nav.dokarkivavlevering.avlevering.consumer.ereg;
 
 import lombok.extern.slf4j.Slf4j;
-import net.logstash.logback.encoder.org.apache.commons.lang3.StringUtils;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.consumer.sts.StsRestConsumer;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.MediaType;
@@ -22,7 +22,7 @@ import java.util.Optional;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
-import static net.logstash.logback.encoder.org.apache.commons.lang3.StringUtils.trimToEmpty;
+import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 
 @Slf4j
 @Component

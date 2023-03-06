@@ -6,8 +6,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static no.nav.dokarkivavlevering.avlevering.aspose.AsposeService.convertToPDFA;
-
 /**
  * @author Joakim Bjørnstad, Jbit AS
  */

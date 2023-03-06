@@ -8,6 +8,9 @@ on:
       periodeSlutt:
         description: 'Periode slutt (t.o.m) for avlevering. YYYY-MM-DD'
         required: true
+      tema:
+        description: 'Tema for avlevering'
+        required: true
 
 env:
   IMAGE: docker.pkg.github.com/${{ github.repository }}/dokarkivavlevering:${{ github.sha }}
@@ -18,12 +21,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v1
-      - uses: actions/setup-java@v1
+        uses: actions/checkout@v3
         with:
-          java-version: '11.x'
+          fetch-depth: 0
+      - uses: actions/setup-java@v3
+        with:
+          java-version: '17.x'
+          distribution: 'temurin'
       - name: Cache Maven packages
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
@@ -41,7 +47,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
       - name: Deploy job to NAIS dev-fss
         uses: nais/deploy/actions/deploy@v1
         env:
@@ -49,5 +55,5 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-fss
           RESOURCE: nais/naiserator.yaml
-          VAR: periodestart=${{github.event.inputs.periodeStart}},periodeslutt=${{github.event.inputs.periodeSlutt}}
+          VAR: periodestart=${{github.event.inputs.periodeStart}},periodeslutt=${{github.event.inputs.periodeSlutt}},tema=${{github.event.inputs.tema}}
           VARS: nais/dev-config.json

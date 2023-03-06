@@ -1,9 +1,7 @@
 {
-  "SRVDOKAVLEVERING": "/serviceuser/data/dev/srvdokavlevering",
+  "SERVICEUSER_VAULT_PATH": "/serviceuser/data/dev/srvdokavlevering",
   "SRV_LINUX": "/serviceuser/data/dev/srvssolinux",
-  "VAULT_DATABASE_CREDS": "/oracle/data/dev/creds/joark_q2-dokarkivavlevering",
-  "VAULT_KV_PATH": "/kv/preprod/fss/dokarkivavlevering/teamdokumenthandtering",
-  "VAULT_K8S_LOGIN_PATH": "auth/kubernetes/preprod/fss/login",
+  "DOKARKIVAVLEVERING_DS": "/oracle/data/dev/creds/joark_q2-dokarkivavlevering",
   "SPRING_DATASOURCE_URL": "jdbc:oracle:thin:@a01dbfl033.adeo.no:1521/joark_q2",
   "SECURITY_TOKEN_SERVICE_TOKEN_URL": "https://security-token-service.dev.adeo.no/rest/v1/sts/token",
   "PDL_URL": "https://pdl-api.dev.adeo.no/graphql",
