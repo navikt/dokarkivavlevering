@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.consumer.sts.StsRestConsumer;
 import no.nav.dokarkivavlevering.avlevering.domain.Bruker;
+import no.nav.dokarkivavlevering.avlevering.domain.BrukerMedNavnedata;
+import no.nav.dokarkivavlevering.avlevering.domain.NavnMedGyldighet;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -21,14 +23,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
 /**
  * https://navikt.github.io/pdl
- *
- * @author Joakim Bjørnstad, Jbit AS
  */
 @Slf4j
 @Component
@@ -52,7 +53,7 @@ public class PdlGraphQLConsumer {
 	}
 
 	@Retryable(include = HttpServerErrorException.class)
-	public Map<String, Bruker> hentPersonBolk(final Set<String> aktoerIds, final String tema) {
+	public Map<String, BrukerMedNavnedata> hentPersonBolk(final Set<String> aktoerIds, final String tema) {
 		if(aktoerIds.isEmpty()) {
 			return new HashMap<>();
 		}
@@ -79,9 +80,9 @@ public class PdlGraphQLConsumer {
 		}
 	}
 
-	private Map<String, Bruker> createResponseAsMap(List<PdlHentPersonBolkResponse.PdlHentPersonBolk> hentPersonBolk) {
+	private Map<String, BrukerMedNavnedata> createResponseAsMap(List<PdlHentPersonBolkResponse.PdlHentPersonBolk> hentPersonBolk) {
 		return hentPersonBolk.stream().collect(Collectors.toMap(PdlHentPersonBolkResponse.PdlHentPersonBolk::getIdent,
-				pdlHentPersonBolk -> new Bruker(pdlHentPersonBolk.getFolkeregisterIdent(), pdlHentPersonBolk.getFulltnavn())));
+				PdlHentPersonBolkResponse.PdlHentPersonBolk::toBrukerMedNavnedata));
 	}
 
 	private PdlRequest mapRequest(final Set<String> aktoerIds) {
@@ -99,6 +100,15 @@ public class PdlGraphQLConsumer {
 						"        fornavn\n" +
 						"        mellomnavn\n" +
 						"        etternavn\n" +
+						"        folkeregistermetadata {\n" +
+						"          gyldighetstidspunkt\n" +
+						"          opphoerstidspunkt\n" +
+						"          sekvens\n" +
+						"        }\n" +
+						"        metadata {\n" +
+						"          opplysningsId\n" +
+						"          historisk\n" +
+						"        }\n" +
 						"      }\n" +
 						"    }\n" +
 						"    code\n" +

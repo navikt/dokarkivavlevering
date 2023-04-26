@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
-import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.dateToXMLGregorianCalendar;
+import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.mapXmlGregorianCalendar;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -20,7 +20,7 @@ public class EndringsloggMapper {
 		Endring endring = new Endring();
 		endring.setReferanseArkivenhet(uuid.toString());
 		endring.setReferanseMetadata(arkivendring.getElement());
-		endring.setEndretDato(dateToXMLGregorianCalendar(arkivendring.getTidspunkt()));
+		endring.setEndretDato(mapXmlGregorianCalendar(arkivendring.getTidspunkt()));
 		endring.setEndretAv(arkivendring.getUtfoertAvBeriketNavn());
 
 

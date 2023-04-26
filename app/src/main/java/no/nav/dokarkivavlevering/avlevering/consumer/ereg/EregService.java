@@ -1,8 +1,11 @@
 package no.nav.dokarkivavlevering.avlevering.consumer.ereg;
 
 import no.nav.dokarkivavlevering.avlevering.domain.Bruker;
+import no.nav.dokarkivavlevering.avlevering.domain.BrukerMedNavnedata;
+import no.nav.dokarkivavlevering.avlevering.domain.NavnMedGyldighet;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,11 +22,11 @@ public class EregService {
 		this.eregConsumer = eregConsumer;
 	}
 
-	public Map<String, Bruker> hentOrganisasjonBrukere(final Set<String> organisasjonsnummer) {
+	public Map<String, BrukerMedNavnedata> hentOrganisasjonBrukere(final Set<String> organisasjonsnummer) {
 		return organisasjonsnummer.stream()
 				.map(orgnr -> {
 					final String navn = eregConsumer.hentNavn(orgnr);
-					return new Bruker(orgnr, navn);
-				}).collect(Collectors.toMap(Bruker::getId, bruker -> bruker));
+					return new BrukerMedNavnedata(orgnr, Collections.singletonList(new NavnMedGyldighet(null, null, navn)));
+				}).collect(Collectors.toMap(BrukerMedNavnedata::getId, bruker -> bruker));
 	}
 }

@@ -10,16 +10,25 @@ import no.arkivverket.standarder.noark5.arkivstruktur.SystemID;
 import no.nav.dokarkivavlevering.avlevering.common.JournaldatoMapper;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.domain.Bruker;
+import no.nav.dokarkivavlevering.avlevering.domain.BrukerMedNavnedata;
 import no.nav.dokarkivavlevering.avlevering.domain.DokumentInfo;
 import no.nav.dokarkivavlevering.avlevering.domain.FilDetaljer;
 import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
+import no.nav.dokarkivavlevering.avlevering.domain.NavnMedGyldighet;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import no.nav.dokarkivavlevering.avlevering.testUtils.TestUtils;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,6 +43,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class SaksmappeMapperTest {
 
 	public static final String FIL = "Hello World";
+	public static final String BRUKER_ID = "12345678911";
+	public static final ZonedDateTime SAK_OPPRETTET_TIDSPUNKT = LocalDateTime.from(DateTimeFormatter.ISO_LOCAL_DATE_TIME.parse("2019-10-28T11:41:36.673")).atZone(ZoneId.of("Europe/Oslo"));
 	private final AvleveringProperties avleveringProperties = new AvleveringProperties();
 	private final SaksmappeMapper saksmappeMapper = new SaksmappeMapper(new JournaldatoMapper(), avleveringProperties);
 
@@ -180,18 +191,19 @@ class SaksmappeMapperTest {
 		return Sak.builder()
 				.id((long) 1234567011)
 				.tema(tema)
-				.bruker(generaterBruker())
+				.bruker(new Bruker(BRUKER_ID, null))
+				.brukerMedNavnedata(generateBrukerMedNavnedata())
 				.opprettetAv("srvmelosys")
-				.opprettetTidspunkt(formatter.parse("2019-10-28 11:41:36.673"))
+				.opprettetTidspunkt(Date.from(SAK_OPPRETTET_TIDSPUNKT.toInstant()))
 				.opprettetAvBeriketNavn("Automatisk jobb")
 				.jp(Arrays.asList(generateJournalpost())).build();
 	}
 
-	private Bruker generaterBruker() {
-		return new Bruker(
-				"12345678911",
-				"Frank"
-		);
+	private BrukerMedNavnedata generateBrukerMedNavnedata() {
+		return new BrukerMedNavnedata(BRUKER_ID, List.of(
+				new NavnMedGyldighet(SAK_OPPRETTET_TIDSPUNKT.minusYears(10), SAK_OPPRETTET_TIDSPUNKT.minusYears(2), "Foreldet"),
+				new NavnMedGyldighet(SAK_OPPRETTET_TIDSPUNKT.minusYears(2), SAK_OPPRETTET_TIDSPUNKT.plusMonths(2), "Frank"),
+				new NavnMedGyldighet(SAK_OPPRETTET_TIDSPUNKT.plusMonths(2), null, "For nytt")));
 	}
 
 	private Journalpost generateJournalpost() throws Exception {

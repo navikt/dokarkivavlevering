@@ -5,22 +5,22 @@ import no.arkivverket.standarder.noark5.arkivstruktur.Arkivdel;
 import no.arkivverket.standarder.noark5.arkivstruktur.Arkivskaper;
 import no.arkivverket.standarder.noark5.arkivstruktur.Klassifikasjonssystem;
 import no.arkivverket.standarder.noark5.arkivstruktur.Skjerming;
-import no.arkivverket.standarder.noark5.arkivstruktur.SystemID;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
+import no.nav.dokarkivavlevering.avlevering.domain.Fagomrade;
+import no.nav.dokarkivavlevering.avlevering.domain.Sak;
+import no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils;
 import org.apache.camel.Handler;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
-import java.util.UUID;
+import java.time.LocalDate;
 
-import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.DATE_FORMAT;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.DATE_TIME_FORMAT;
+import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.getFagomradeBeskrivelse;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.mapXmlGregorianCalendar;
+import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.truncateToDate;
 
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 @Component
 public class ArkivMapper {
 
@@ -31,16 +31,16 @@ public class ArkivMapper {
 	}
 
 	@Handler
-	public Arkiv map() {
+	public Arkiv map(Sak sak) {
 		Arkiv arkiv = new Arkiv();
-		arkiv.setSystemID(mapSystemID(arkivConfig.getSystemID()));
+		arkiv.setSystemID(AvleveringUtils.mapSystemID(arkivConfig.getSystemID()));
 		arkiv.setTittel("NAV Fagarkiv");
 		arkiv.setBeskrivelse("Fagarkivet dokumenterer behandlingen av enkeltsaker knyttet til en bruker – person eller organisasjon – som etter lov om arbeids- og velferdsforvaltningen har satt fram søknad om ytelser, tiltak og oppfølging for Arbeids- og velferdsetaten");
 		arkiv.setDokumentmedium("Elektronisk arkiv");
 		arkiv.setOpprettetDato(mapXmlGregorianCalendar(DATE_TIME_FORMAT, "2008-12-01T12:00:00"));
 		arkiv.setOpprettetAv("Arbeids- og velferdsetaten");
 		arkiv.getArkivskapers().add(mapArkivskaper());
-		arkiv.getArkivdels().add(mapArkivdel());
+		arkiv.getArkivdels().add(mapArkivdel(sak));
 		return arkiv;
 	}
 
@@ -51,21 +51,26 @@ public class ArkivMapper {
 		return arkivskaper;
 	}
 
-	private Arkivdel mapArkivdel() {
+	private Arkivdel mapArkivdel(Sak sak) {
 		Arkivdel arkivdel = new Arkivdel();
-		arkivdel.setSystemID(mapSystemID(arkivConfig.getArkivdelConfig().getSystemID()));
-		arkivdel.setTittel("Retting av personopplysninger");
-		arkivdel.setBeskrivelse("Arkivdel for saksbehandling av RPO");
-		arkivdel.setArkivdelstatus("Aktiv periode");
-		/*arkivdel.setTittel("Fellessystem for samhandling - fagsystemet Gosys");
-		arkivdel.setBeskrivelse("Arkivdel for saksbehandling av de fagområdene som bare behandles i et felles fagsystem uten spesifikk saksbehandlingsstøtte - Gosys");
-		arkivdel.setArkivdelstatus("Aktiv periode");*/
-		arkivdel.setOpprettetDato(mapXmlGregorianCalendar(DATE_TIME_FORMAT, "2015-02-18T12:00:00"));
+		arkivdel.setSystemID(AvleveringUtils.mapSystemID(arkivConfig.getArkivdelConfig().getSystemID()));
+		Fagomrade fagomrade = sak.getFagomrade();
+		arkivdel.setTittel(fagomrade.getDekode());
+		arkivdel.setBeskrivelse(getFagomradeBeskrivelse(fagomrade.getFagomrade()));
+		arkivdel.setArkivdelstatus(getArkivdelstatus(fagomrade));
+		arkivdel.setOpprettetDato(mapXmlGregorianCalendar(fagomrade.getDatoOpprettet()));
 		arkivdel.setOpprettetAv("Arbeids- og velferdsetaten");
-		arkivdel.setArkivperiodeStartDato(mapXmlGregorianCalendar(DATE_FORMAT, "2010-02-18"));
+		arkivdel.setArkivperiodeStartDato(truncateToDate(mapXmlGregorianCalendar(fagomrade.getDatoOpprettet())));
 		arkivdel.setSkjerming(mapSkjerming());
 		arkivdel.getKlassifikasjonssystems().add(mapKlassifikasjonssystem(arkivdel));
 		return arkivdel;
+	}
+
+	private static String getArkivdelstatus(Fagomrade fagomrade) {
+		if (!fagomrade.erGyldig() && fagomrade.getDatoTom() != null && LocalDate.now().isAfter(fagomrade.getDatoTom())) {
+			return "Avsluttet periode";
+		}
+		return "Aktiv periode";
 	}
 
 	private Skjerming mapSkjerming() {
@@ -82,18 +87,12 @@ public class ArkivMapper {
 
 	private Klassifikasjonssystem mapKlassifikasjonssystem(Arkivdel arkivdel) {
 		Klassifikasjonssystem klassifikasjonssystem = new Klassifikasjonssystem();
-		klassifikasjonssystem.setSystemID(mapSystemID(UUID.randomUUID().toString()));
-		klassifikasjonssystem.setKlassifikasjonstype("Fagområder i Gosys");
-		klassifikasjonssystem.setTittel("Navn på fagområder i Gosys");
-		klassifikasjonssystem.setBeskrivelse("Fagområdene som har sak i Gosys");
-		klassifikasjonssystem.setOpprettetDato(mapXmlGregorianCalendar(DATE_TIME_FORMAT, "2010-02-18T12:00:00"));
+		klassifikasjonssystem.setSystemID(AvleveringUtils.generateSystemId());
+		klassifikasjonssystem.setKlassifikasjonstype("Fagområder i NAV");
+		klassifikasjonssystem.setTittel("Fagområder i NAV");
+		klassifikasjonssystem.setOpprettetDato(arkivdel.getOpprettetDato());
 		klassifikasjonssystem.setOpprettetAv("Arbeids- og velferdsetaten");
 		return klassifikasjonssystem;
 	}
 
-	private SystemID mapSystemID(final String value) {
-		SystemID systemID = new SystemID();
-		systemID.setValue(value);
-		return systemID;
-	}
 }

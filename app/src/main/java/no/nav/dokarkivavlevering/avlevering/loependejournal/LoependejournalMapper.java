@@ -6,7 +6,7 @@ import no.arkivverket.standarder.noark5.loependejournal.LoependeJournal;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import org.springframework.stereotype.Component;
 
-import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.dateTimeToXMLGregorianCalendar;
+import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.mapXmlGregorianCalendar;
 import static org.apache.camel.converter.ObjectConverter.toBigInteger;
 
 @Component
@@ -27,8 +27,8 @@ public class LoependejournalMapper {
 
 	private Journalhode mapJournalHode() {
 		Journalhode journalHode = new Journalhode();
-		journalHode.setJournalStartDato(dateTimeToXMLGregorianCalendar(periode.getStartdato()));
-		journalHode.setJournalSluttDato(dateTimeToXMLGregorianCalendar(periode.getSluttdato()));
+		journalHode.setJournalStartDato(mapXmlGregorianCalendar(periode.getStartdato()));
+		journalHode.setJournalSluttDato(mapXmlGregorianCalendar(periode.getSluttdato()));
 		journalHode.setSeleksjon("journaldato");
 		journalHode.setAntallJournalposter(toBigInteger("-1"));
 		journalHode.getArkivskapers().add(mapArkivSkaper());

@@ -16,6 +16,6 @@ public class TestUtils {
 		Date d = formatter.parse(dateString);
 		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Oslo"));
 		cal.setTime(d);
-		return AvleveringUtils.dateToXMLGregorianCalendar(d);
+		return AvleveringUtils.mapXmlGregorianCalendar(d);
 	}
 }

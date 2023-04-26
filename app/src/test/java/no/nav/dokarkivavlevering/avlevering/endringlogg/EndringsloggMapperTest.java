@@ -9,7 +9,7 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
 
-import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.dateToXMLGregorianCalendar;
+import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.mapXmlGregorianCalendar;
 
 class EndringsloggMapperTest {
 
@@ -35,7 +35,7 @@ class EndringsloggMapperTest {
 		SoftAssertions softly = new SoftAssertions();
 		softly.assertThat(endring.getReferanseArkivenhet()).isEqualTo(uuid.toString());
 		softly.assertThat(endring.getReferanseMetadata()).isEqualTo("Saksrelasjon.sakId");
-		softly.assertThat(endring.getEndretDato()).isEqualTo(dateToXMLGregorianCalendar(arkivendring.getTidspunkt()));
+		softly.assertThat(endring.getEndretDato()).isEqualTo(mapXmlGregorianCalendar(arkivendring.getTidspunkt()));
 		softly.assertThat(endring.getEndretAv()).isEqualTo("JonBlund");
 		softly.assertThat(endring.getTidligereVerdi()).isEqualTo("123");
 		softly.assertThat(endring.getNyVerdi()).isEqualTo("1234");
@@ -62,7 +62,7 @@ class EndringsloggMapperTest {
 		SoftAssertions softly = new SoftAssertions();
 		softly.assertThat(endring.getReferanseArkivenhet()).isEqualTo(uuid.toString());
 		softly.assertThat(endring.getReferanseMetadata()).isEqualTo("Journalpost.journalpostStatus");
-		softly.assertThat(endring.getEndretDato()).isEqualTo(dateToXMLGregorianCalendar(arkivendring.getTidspunkt()));
+		softly.assertThat(endring.getEndretDato()).isEqualTo(mapXmlGregorianCalendar(arkivendring.getTidspunkt()));
 		softly.assertThat(endring.getEndretAv()).isEqualTo("JonBlund");
 		softly.assertThat(endring.getTidligereVerdi()).isEqualTo("JOURNALFØRT");
 		softly.assertThat(endring.getNyVerdi()).isEqualTo("FERDIGSTILT");

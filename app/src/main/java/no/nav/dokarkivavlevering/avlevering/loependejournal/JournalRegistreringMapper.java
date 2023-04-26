@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 import java.util.UUID;
 
-import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.dateToXMLGregorianCalendar;
+import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.mapXmlGregorianCalendar;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.getYear;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.isNav;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.mapKorrespondansepartType;
@@ -61,11 +61,11 @@ public class JournalRegistreringMapper {
 		tilJournalpost.setJournalsekvensnummer(toBigInteger(fraJournalpost.getId()));
 		tilJournalpost.setJournalpostnummer(toBigInteger(fraJournalpost.getId()));
 		tilJournalpost.setTittel(fraJournalpost.getInnhold());
-		tilJournalpost.setJournaldato(dateToXMLGregorianCalendar(journaldato));
+		tilJournalpost.setJournaldato(mapXmlGregorianCalendar(journaldato));
 		tilJournalpost.getKorrespondanseparts().add(mapKorrespondansepart(fraJournalpost));
 
 		if (fraJournalpost.getDatoDokument() != null) {
-			tilJournalpost.setDokumentetsDato(dateToXMLGregorianCalendar(fraJournalpost.getDatoDokument()));
+			tilJournalpost.setDokumentetsDato(mapXmlGregorianCalendar(fraJournalpost.getDatoDokument()));
 		}
 		return tilJournalpost;
 	}
