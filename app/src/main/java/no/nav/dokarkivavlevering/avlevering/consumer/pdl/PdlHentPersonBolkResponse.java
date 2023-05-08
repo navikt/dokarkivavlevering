@@ -35,26 +35,6 @@ public class PdlHentPersonBolkResponse {
 		private String code;
 		private PdlPerson person;
 
-		String getFolkeregisterIdent() {
-			if (CODE_OK.equals(code) && !person.getFolkeregisteridentifikator().isEmpty()) {
-				return person.getFolkeregisteridentifikator().get(0).getIdentifikasjonsnummer();
-			} else {
-				return ident;
-			}
-		}
-
-		String getFulltnavn() {
-			if (CODE_OK.equals(code)) {
-				return person.getNavn().stream()
-						.filter(navn -> !navn.getMetadata().historisk)
-						.map(PdlNavn::fulltnavn)
-						.findFirst()
-						.orElse(Bruker.UKJENT_PERSON);
-			} else {
-				return Bruker.UKJENT_PERSON;
-			}
-		}
-
 		public List<NavnMedGyldighet> getNavnMedGyldighet() {
 			return person.getNavn().stream()
 					.map(PdlNavn::toNavnMedGyldighet)

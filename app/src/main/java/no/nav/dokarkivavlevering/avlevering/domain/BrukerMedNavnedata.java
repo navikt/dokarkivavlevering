@@ -2,13 +2,11 @@ package no.nav.dokarkivavlevering.avlevering.domain;
 
 import lombok.ToString;
 import lombok.Value;
-import no.nav.dokarkivavlevering.avlevering.consumer.pdl.PdlHentPersonBolkResponse;
 
 import java.time.ZonedDateTime;
-import java.util.Collections;
 import java.util.List;
 
-import static org.apache.commons.lang3.StringUtils.isNumeric;
+import static java.util.Collections.singletonList;
 
 @Value
 public class BrukerMedNavnedata {
@@ -19,20 +17,12 @@ public class BrukerMedNavnedata {
 	@ToString.Exclude
 	private final List<NavnMedGyldighet> navn;
 
-	public boolean isPerson() {
-		return !isOrganisasjon();
-	}
-
-	public boolean isOrganisasjon() {
-		return isNumeric(id) && id.length() == 9;
-	}
-
 	public static BrukerMedNavnedata ukjentOrganisasjon(final String id) {
-		return new BrukerMedNavnedata(id, Collections.singletonList(new SimpleNavn(UKJENT_ORGANISASJON)));
+		return new BrukerMedNavnedata(id, singletonList(new SimpleNavn(UKJENT_ORGANISASJON)));
 	}
 
 	public static BrukerMedNavnedata ukjentPerson(final String id) {
-		return new BrukerMedNavnedata(id, Collections.singletonList(new SimpleNavn(UKJENT_PERSON)));
+		return new BrukerMedNavnedata(id, singletonList(new SimpleNavn(UKJENT_PERSON)));
 	}
 
 	public String getFulltnavn(ZonedDateTime historiskTidspunkt) {
