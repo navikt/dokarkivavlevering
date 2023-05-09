@@ -8,7 +8,6 @@ import no.nav.dokarkivavlevering.avlevering.consumer.activedirectory.NavActiveDi
 import no.nav.dokarkivavlevering.avlevering.consumer.ereg.EregService;
 import no.nav.dokarkivavlevering.avlevering.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokarkivavlevering.avlevering.domain.Arkivendring;
-import no.nav.dokarkivavlevering.avlevering.domain.Bruker;
 import no.nav.dokarkivavlevering.avlevering.domain.BrukerMedNavnedata;
 import no.nav.dokarkivavlevering.avlevering.domain.DokumentInfo;
 import no.nav.dokarkivavlevering.avlevering.domain.FilDetaljer;
@@ -26,9 +25,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 @Slf4j
 @Service
 public class AvleveringSakBerikerService {

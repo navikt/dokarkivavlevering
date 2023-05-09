@@ -3,9 +3,7 @@ package no.nav.dokarkivavlevering.avlevering.consumer.pdl;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.consumer.sts.StsRestConsumer;
-import no.nav.dokarkivavlevering.avlevering.domain.Bruker;
 import no.nav.dokarkivavlevering.avlevering.domain.BrukerMedNavnedata;
-import no.nav.dokarkivavlevering.avlevering.domain.NavnMedGyldighet;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -23,10 +21,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
+import static no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties.BEHANDLINGSNUMMER;
 
 /**
  * https://navikt.github.io/pdl
@@ -36,10 +35,11 @@ import static java.util.Objects.requireNonNull;
 public class PdlGraphQLConsumer {
 	private static final String HEADER_PDL_NAV_CONSUMER_TOKEN = "Nav-Consumer-Token";
 	private static final String HEADER_PDL_TEMA = "Tema";
+	private static final String HEADER_PDL_BEHANDLINGSNUMMER = "Behandlingsnummer";
 
 	private final RestTemplate restTemplate;
 	private final StsRestConsumer stsConsumer;
-	private final String pdlUrl;
+	private final AvleveringProperties avleveringProperties;
 
 	public PdlGraphQLConsumer(RestTemplateBuilder restTemplateBuilder,
 							  StsRestConsumer stsConsumer,
@@ -49,16 +49,16 @@ public class PdlGraphQLConsumer {
 				.setReadTimeout(Duration.ofSeconds(20))
 				.build();
 		this.stsConsumer = stsConsumer;
-		this.pdlUrl = avleveringProperties.getPdlurl();
+		this.avleveringProperties = avleveringProperties;
 	}
 
 	@Retryable(include = HttpServerErrorException.class)
-	public Map<String, BrukerMedNavnedata> hentPersonBolk(final Set<String> aktoerIds, final String tema) {
+	public Map<String, BrukerMedNavnedata> hentPersonBolk(Set<String> aktoerIds, String tema) {
 		if(aktoerIds.isEmpty()) {
-			return new HashMap<>();
+			return emptyMap();
 		}
 		try {
-			final UriComponents uri = UriComponentsBuilder.fromHttpUrl(pdlUrl).build();
+			final UriComponents uri = UriComponentsBuilder.fromHttpUrl(avleveringProperties.getPdlurl()).build();
 			final String serviceuserToken = "Bearer " + stsConsumer.getStsToken().getAccess_token();
 			final RequestEntity<PdlRequest> requestEntity = RequestEntity.post(uri.toUri())
 					.accept(MediaType.APPLICATION_JSON)
@@ -66,6 +66,7 @@ public class PdlGraphQLConsumer {
 					.header(HttpHeaders.AUTHORIZATION, serviceuserToken)
 					.header(HEADER_PDL_NAV_CONSUMER_TOKEN, serviceuserToken)
 					.header(HEADER_PDL_TEMA, tema)
+					.header(HEADER_PDL_BEHANDLINGSNUMMER, BEHANDLINGSNUMMER)
 					.body(mapRequest(aktoerIds));
 			log.debug("Henter fødselsnummer og navn for {} aktørIds", aktoerIds.size());
 			final PdlHentPersonBolkResponse pdlHentPersonBolkResponse = requireNonNull(restTemplate.exchange(requestEntity, PdlHentPersonBolkResponse.class).getBody());
@@ -89,31 +90,33 @@ public class PdlGraphQLConsumer {
 		final HashMap<String, Object> variables = new HashMap<>();
 		variables.put("identer", aktoerIds);
 		return PdlRequest.builder()
-				.query("query hentIdenterBolk($identer: [ID!]!) {\n" +
-						"  hentPersonBolk(identer: $identer) {\n" +
-						"    ident\n" +
-						"    person {\n" +
-						"      folkeregisteridentifikator {\n" +
-						"        identifikasjonsnummer\n" +
-						"      }\n" +
-						"      navn {\n" +
-						"        fornavn\n" +
-						"        mellomnavn\n" +
-						"        etternavn\n" +
-						"        folkeregistermetadata {\n" +
-						"          gyldighetstidspunkt\n" +
-						"          opphoerstidspunkt\n" +
-						"          sekvens\n" +
-						"        }\n" +
-						"        metadata {\n" +
-						"          opplysningsId\n" +
-						"          historisk\n" +
-						"        }\n" +
-						"      }\n" +
-						"    }\n" +
-						"    code\n" +
-						"  }\n" +
-						"}\n")
+				.query("""
+						query hentIdenterBolk($identer: [ID!]!) {
+						  hentPersonBolk(identer: $identer) {
+							ident
+							person {
+							  folkeregisteridentifikator {
+								identifikasjonsnummer
+							  }
+							  navn {
+								fornavn
+								mellomnavn
+								etternavn
+								folkeregistermetadata {
+								  gyldighetstidspunkt
+								  opphoerstidspunkt
+								  sekvens
+								}
+								metadata {
+								  opplysningsId
+								  historisk
+								}
+							  }
+							}
+							code
+						  }
+						}
+						""")
 				.variables(variables)
 				.build();
 	}

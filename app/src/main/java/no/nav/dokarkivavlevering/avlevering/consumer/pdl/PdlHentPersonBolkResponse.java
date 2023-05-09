@@ -2,7 +2,6 @@ package no.nav.dokarkivavlevering.avlevering.consumer.pdl;
 
 import lombok.Data;
 import lombok.ToString;
-import no.nav.dokarkivavlevering.avlevering.domain.Bruker;
 import no.nav.dokarkivavlevering.avlevering.domain.BrukerMedNavnedata;
 import no.nav.dokarkivavlevering.avlevering.domain.NavnMedGyldighet;
 
@@ -12,7 +11,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -61,7 +59,7 @@ public class PdlHentPersonBolkResponse {
 		private String mellomnavn;
 		@ToString.Exclude
 		private String etternavn;
-        private PdlFolkeregistermetadata pdlFolkeregistermetadata;
+		private PdlFolkeregistermetadata pdlFolkeregistermetadata;
 		private PdlNavnMetadata metadata;
 
 		String fulltnavn() {
@@ -75,7 +73,8 @@ public class PdlHentPersonBolkResponse {
 		}
 
 		private NavnMedGyldighet toNavnMedGyldighet() {
-			return new NavnMedGyldighet(parseZonedDateTime(getPdlFolkeregistermetadata().gyldighetstidspunkt), parseZonedDateTime(getPdlFolkeregistermetadata().gyldighetstidspunkt), fulltnavn());
+			return new NavnMedGyldighet(parseZonedDateTime(getPdlFolkeregistermetadata().gyldighetstidspunkt),
+					parseZonedDateTime(getPdlFolkeregistermetadata().gyldighetstidspunkt), fulltnavn());
 		}
 	}
 

@@ -13,32 +13,30 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Set;
 import java.util.UUID;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 @Data
 @Validated
 @ConfigurationProperties("avlevering")
 public class AvleveringProperties {
 
+	public static final String BEHANDLINGSNUMMER = "B524";
+
 	private final String avleveringId = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm"));
 	@NotEmpty
-	private String tema;
+	String tema;
 	@NotNull
 	@Max(1000) // max IN query i Oracle
-	private Long batchsize;
+	Long batchsize;
 	@NotEmpty
-	private String ststokenurl;
+	String ststokenurl;
 	@NotEmpty
-	private String pdlurl;
+	String pdlurl;
 	@NotEmpty
-	private String eregurl;
+	String eregurl;
 	@ToString.Exclude
 	@NotEmpty
-	private String AsposeLicense;
+	String AsposeLicense;
 
 	/**
 	 * Brukes for å generere systemID for avlevering under oppstart. Referes til på forskjellige nivåer i arkivstruktur.xml.
