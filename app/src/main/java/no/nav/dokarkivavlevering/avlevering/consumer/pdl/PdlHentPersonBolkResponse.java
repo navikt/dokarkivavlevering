@@ -69,12 +69,15 @@ public class PdlHentPersonBolkResponse {
 		}
 
 		private static ZonedDateTime parseZonedDateTime(String tidspunkt) {
+			if (tidspunkt == null) {
+				return null;
+			}
 			return LocalDateTime.from(DateTimeFormatter.ISO_DATE_TIME.parse(tidspunkt)).atZone(OSLO);
 		}
 
 		private NavnMedGyldighet toNavnMedGyldighet() {
 			return new NavnMedGyldighet(parseZonedDateTime(getPdlFolkeregistermetadata().gyldighetstidspunkt),
-					parseZonedDateTime(getPdlFolkeregistermetadata().gyldighetstidspunkt), fulltnavn());
+					parseZonedDateTime(getPdlFolkeregistermetadata().opphoerstidspunkt), fulltnavn());
 		}
 	}
 
