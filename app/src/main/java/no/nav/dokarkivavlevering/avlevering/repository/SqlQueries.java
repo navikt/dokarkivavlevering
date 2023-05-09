@@ -105,7 +105,7 @@ public class SqlQueries {
 					         join t_k_kategori_t k on k.k_kategori_t = d.k_kategori_t
 					         join t_fil_detaljer f on d.dokument_info_id = f.dokument_info_id
 					         join t_dokument_fil df on f.fil_uuid = df.fil_uuid
-					         join t_k_fagomrade fo on s.tema = fo.k_fagomrade
+					         join t_k_fagomrade fo on sa.tema = fo.k_fagomrade
 					         left join t_aksjonslogg alj on alj.journalpost_id = j.journalpost_id and alj.dokument_info_id is null
 					         left join t_arkiv_element_endring aeej on alj.aksjonslogg_id = aeej.aksjonslogg_id
 					         left join t_aksjonslogg ald on ald.journalpost_id = j.journalpost_id and ald.dokument_info_id = d.dokument_info_id
@@ -187,7 +187,7 @@ public class SqlQueries {
 					         join t_dokument_info d on r.dokument_info_id = d.dokument_info_id
 					         join t_k_kategori_t k on k.k_kategori_t = d.k_kategori_t
 					         join t_fil_detaljer f on d.dokument_info_id = f.dokument_info_id
-					         join t_k_fagomrade fo on s.tema = fo.k_fagomrade
+					         join t_k_fagomrade fo on sa.tema = fo.k_fagomrade
 					         left join t_aksjonslogg alj on alj.journalpost_id = j.journalpost_id and alj.dokument_info_id is null
 					         left join t_arkiv_element_endring aeej on alj.aksjonslogg_id = aeej.aksjonslogg_id
 					         left join t_aksjonslogg ald on ald.journalpost_id = j.journalpost_id and ald.dokument_info_id = d.dokument_info_id
