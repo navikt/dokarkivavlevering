@@ -7,7 +7,6 @@ import no.arkivverket.standarder.noark5.arkivstruktur.Skjerming;
 import no.arkivverket.standarder.noark5.arkivstruktur.SystemID;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.domain.Fagomrade;
-import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils;
 import org.springframework.stereotype.Component;
 
@@ -48,7 +47,7 @@ public class ArkivdelMapper {
 	}
 
 	private static String getArkivdelstatus(Fagomrade fagomrade) {
-		if (!fagomrade.erGyldig() && fagomrade.getDatoTom() != null && LocalDate.now().isAfter(fagomrade.getDatoTom())) {
+		if (!fagomrade.erGyldigForDato(LocalDate.now())) {
 			return "Avsluttet periode";
 		}
 		return "Aktiv periode";

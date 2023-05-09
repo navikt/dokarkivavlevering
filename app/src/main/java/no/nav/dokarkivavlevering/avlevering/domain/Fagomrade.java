@@ -8,7 +8,6 @@ import lombok.Value;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 @Value
 @AllArgsConstructor
@@ -28,8 +27,8 @@ public class Fagomrade {
 	@Getter(AccessLevel.NONE)
 	String erGyldig;
 
-	public boolean erGyldig() {
-		return "1".equalsIgnoreCase(erGyldig);
+	public boolean erGyldigForDato(LocalDate when) {
+		return "1".equalsIgnoreCase(erGyldig) && (datoTom == null || datoTom.isAfter(when));
 	}
 
 }
