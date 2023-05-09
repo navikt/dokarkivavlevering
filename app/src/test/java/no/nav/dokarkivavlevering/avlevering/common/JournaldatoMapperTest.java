@@ -5,49 +5,46 @@ import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
-import java.time.ZoneOffset;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Collections;
-import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 class JournaldatoMapperTest {
-	private static final String DATO_JOURNAL = "2020-12-01";
-	private static final String DATO_DOKUMENT = "2020-12-02";
-	private static final String DATO_DOKUMENT_FERDIG = "2020-12-03";
-	private static final String DATO_ENDRET = "2020-12-04";
+	private static final LocalDate DATO_JOURNAL = LocalDate.parse("2020-12-01");
+	private static final LocalDate DATO_DOKUMENT = LocalDate.parse("2020-12-02");
+	private static final LocalDate DATO_DOKUMENT_FERDIG = LocalDate.parse("2020-12-03");
+	private static final LocalDate DATO_ENDRET = LocalDate.parse("2020-12-04");
 
 	private final JournaldatoMapper mapper = new JournaldatoMapper();
 
 	@Test
 	void shouldMapJournaldatoWhenJournalDatoNotNull() {
-		Date journalDato = mapper.mapJournaldato(baseJournalpostBuilder().build());
-		assertThat(journalDato).isEqualToIgnoringHours(DATO_JOURNAL);
+		LocalDateTime journalDato = mapper.mapJournaldato(baseJournalpostBuilder().build());
+		assertThat(journalDato.toLocalDate()).isEqualTo(DATO_JOURNAL);
 	}
 
 	@Test
 	void shouldMapDokumentDatoWhenJournalDatoNull() {
-		Date journalDato = mapper.mapJournaldato(baseJournalpostBuilder()
+		LocalDateTime journalDato = mapper.mapJournaldato(baseJournalpostBuilder()
 				.datoJournal(null)
 				.build());
-		assertThat(journalDato).isEqualToIgnoringHours(DATO_DOKUMENT);
+		assertThat(journalDato.toLocalDate()).isEqualTo(DATO_DOKUMENT);
 	}
 
 	@Test
 	void shouldMapDokumentFerdigDatoWhenDokumentDatoNull() {
-		Date journalDato = mapper.mapJournaldato(baseJournalpostBuilder()
+		LocalDateTime journalDato = mapper.mapJournaldato(baseJournalpostBuilder()
 				.datoJournal(null)
 				.datoDokument(null)
 				.build());
-		assertThat(journalDato).isEqualToIgnoringHours(DATO_DOKUMENT_FERDIG);
+		assertThat(journalDato.toLocalDate()).isEqualTo(DATO_DOKUMENT_FERDIG);
 	}
 
 	@Test
 	void shouldMapEndretDatoWhenDokumentFerdigDatoNull() {
-		Date journalDato = mapper.mapJournaldato(baseJournalpostBuilder()
+		LocalDateTime journalDato = mapper.mapJournaldato(baseJournalpostBuilder()
 				.datoJournal(null)
 				.datoDokument(null)
 				.dok(Collections.singletonList(DokumentInfo.builder()
@@ -55,21 +52,21 @@ class JournaldatoMapperTest {
 						.datoFerdig(null)
 						.build()))
 				.build());
-		assertThat(journalDato).isEqualToIgnoringHours(DATO_ENDRET);
+		assertThat(journalDato.toLocalDate()).isEqualTo(DATO_ENDRET);
 	}
 
 	private Journalpost.JournalpostBuilder baseJournalpostBuilder() {
 		return Journalpost.builder()
-				.datoJournal(mapToDate(DATO_JOURNAL))
-				.datoDokument(mapToDate(DATO_DOKUMENT))
-				.datoEndret(mapToDate(DATO_ENDRET))
+				.datoJournal(mapToLocalDateTime(DATO_JOURNAL))
+				.datoDokument(mapToLocalDateTime(DATO_DOKUMENT))
+				.datoEndret(mapToLocalDateTime(DATO_ENDRET))
 				.dok(Collections.singletonList(DokumentInfo.builder()
 						.relTilknyttetSom("HOVEDDOKUMENT")
-						.datoFerdig(mapToDate(DATO_DOKUMENT_FERDIG))
+						.datoFerdig(mapToLocalDateTime(DATO_DOKUMENT_FERDIG))
 						.build()));
 	}
 
-	private Date mapToDate(final String date) {
-		return Date.from(LocalDate.parse(date).atStartOfDay().toInstant(ZoneOffset.UTC));
+	private LocalDateTime mapToLocalDateTime(final LocalDate date) {
+		return LocalDateTime.from(date.atStartOfDay(ZoneId.of("Europe/Oslo")));
 	}
 }

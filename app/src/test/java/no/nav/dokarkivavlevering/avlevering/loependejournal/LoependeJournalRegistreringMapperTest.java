@@ -8,13 +8,13 @@ import no.nav.dokarkivavlevering.avlevering.common.JournaldatoMapper;
 import no.nav.dokarkivavlevering.avlevering.domain.DokumentInfo;
 import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
-import no.nav.dokarkivavlevering.avlevering.testUtils.TestUtils;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-import static no.nav.dokarkivavlevering.avlevering.testUtils.TestUtils.formatter;
+import static no.nav.dokarkivavlevering.avlevering.testUtils.TestUtils.toLocalDateTime;
 import static org.apache.camel.converter.ObjectConverter.toBigInteger;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class LoependeJournalRegistreringMapperTest {
@@ -36,13 +36,13 @@ class LoependeJournalRegistreringMapperTest {
 	}
 
 	private void assertJournalpost(no.arkivverket.standarder.noark5.loependejournal.Journalpost jp) throws Exception {
-		assertEquals(jp.getSystemID().getValue().isEmpty(), false);
+		assertThat(jp.getSystemID().getValue()).isNotEmpty();
 		assertEquals(jp.getJournalaar(), toBigInteger(2020));
 		assertEquals(jp.getTittel(), "Legg til ny institusjon");
 		assertEquals(jp.getJournalsekvensnummer(), toBigInteger(453637481));
 		assertEquals(jp.getJournalpostnummer(), toBigInteger(453637481));
-		assertEquals(jp.getJournaldato(), TestUtils.toXmlGregCalendar("2020-11-10 16:04:43"));
-		assertEquals(jp.getDokumentetsDato(), TestUtils.toXmlGregCalendar("2020-11-10 16:05:43"));
+		assertEquals(jp.getJournaldato(), toLocalDateTime("2020-11-10 16:04:43").toLocalDate());
+		assertEquals(jp.getDokumentetsDato(), toLocalDateTime("2020-11-10 16:05:43").toLocalDate());
 		assertKorrespondanseParts(jp.getKorrespondanseparts().get(0));
 	}
 
@@ -62,7 +62,7 @@ class LoependeJournalRegistreringMapperTest {
 				.id((long) 1234567011)
 				.tema("MED")
 				.opprettetAv("srvmelosys")
-				.opprettetTidspunkt(formatter.parse("2019-10-28 11:41:36.673"))
+				.opprettetTidspunkt(toLocalDateTime("2019-10-28 11:41:36.673"))
 				.jp(Arrays.asList(generateJournalPost())).build();
 	}
 
@@ -74,9 +74,9 @@ class LoependeJournalRegistreringMapperTest {
 				.innhold("Legg til ny institusjon")
 				.avsenderMottaker("Arena")
 				.datoMottatt(null)
-				.datoDokument(formatter.parse("2020-11-10 16:05:43.332"))
-				.datoJournal(formatter.parse("2020-11-10 16:04:43.35"))
-				.datoOpprettet(formatter.parse("2020-11-10 16:04:43.338"))
+				.datoDokument(toLocalDateTime("2020-11-10 16:05:43.332"))
+				.datoJournal(toLocalDateTime("2020-11-10 16:04:43.35"))
+				.datoOpprettet(toLocalDateTime("2020-11-10 16:04:43.338"))
 				.datoEkspedert(null)
 				.datoSendtPrint(null)
 				.opprettetAv("srvmelosys")
@@ -92,12 +92,12 @@ class LoependeJournalRegistreringMapperTest {
 		return DokumentInfo.builder()
 				.id((long) 454017976)
 				.relTilknyttetSom("HOVEDDOKUMENT")
-				.relDatoOpprettet(formatter.parse("2020-11-10 16:04:43.343"))
+				.relDatoOpprettet(toLocalDateTime("2020-11-10 16:04:43.343"))
 				.relOpprettetAv("srvmelosys")
 				.relOpprettetAvBeriketNavn("Automatisk Jobb")
 				.status("FERDIGSTILT")
 				.tittel("Legg til ny institusjon")
-				.datoOpprettet(formatter.parse("2020-11-10 16:04:43.342"))
+				.datoOpprettet(toLocalDateTime("2020-11-10 16:04:43.342"))
 				.opprettetAv("srvmelosys")
 				.opprettetAvBeriketNavn("Automatisk Jobb")
 				.build();

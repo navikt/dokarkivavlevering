@@ -17,14 +17,13 @@ import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.mapXmlGregorianCalendar;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.getYear;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.isStringTemaAvleverMedDokumenter;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.temaNavnDecode;
@@ -47,14 +46,14 @@ public class SaksmappeMapper {
 		Saksmappe mappe = new Saksmappe();
 		mappe.setSystemID(mapSystemID(sak.getUuid()));
 		mappe.setMappeID(sak.getId().toString());
-		mappe.setOpprettetDato(mapXmlGregorianCalendar(sak.getOpprettetTidspunkt()));
+		mappe.setOpprettetDato(sak.getOpprettetTidspunkt());
 		mappe.setOpprettetAv(sak.getOpprettetAvBeriketNavn());
 		mappe.setTittel(temaNavnDecode(sak.getTema()));
 		mappe.getReferanseArkivdels().add(arkivConfig.getArkivdelConfig().getSystemID());
 		mappe.getParts().add(mapPart(sak));
 		mappe.setSaksaar(toBigInteger(getYear(sak.getOpprettetTidspunkt())));
 		mappe.setSakssekvensnummer(toBigInteger(sak.getId()));
-		mappe.setSaksdato(mapXmlGregorianCalendar(sak.getOpprettetTidspunkt()));
+		mappe.setSaksdato(sak.getOpprettetTidspunkt().toLocalDate());
 		mappe.setAdministrativEnhet(getAdministrativEnhetFromTema((sak.getTema())));
 		mappe.setSaksansvarlig(getSaksAnsvarlig(sak.getJp()));
 		mappe.setSaksstatus("Under behandling");
@@ -68,16 +67,16 @@ public class SaksmappeMapper {
 		Part part = new Part();
 		part.setPartRolle("Bruker");
 		part.setPartID(sak.getBruker().getId());
-		part.setPartNavn(sak.getBrukerMedNavnedata().getFulltnavn(sak.getOpprettetTidspunkt().toInstant().atZone(ZoneId.of("Europe/Oslo"))));
+		part.setPartNavn(sak.getBrukerMedNavnedata().getFulltnavn(sak.getOpprettetTidspunkt().atZone(ZoneId.of("Europe/Oslo"))));
 		return part;
 	}
 
 	private Registrering mapRegistrering(Journalpost journalpost, String tema) {
-		final Date journaldato = journaldatoMapper.mapJournaldato(journalpost);
+		final LocalDateTime journaldato = journaldatoMapper.mapJournaldato(journalpost);
 		final Long journalpostId = journalpost.getId();
 		no.arkivverket.standarder.noark5.arkivstruktur.Journalpost registrering = new no.arkivverket.standarder.noark5.arkivstruktur.Journalpost();
 		registrering.setSystemID(mapSystemID(journalpost.getUuid()));
-		registrering.setOpprettetDato(mapXmlGregorianCalendar(journalpost.getDatoOpprettet()));
+		registrering.setOpprettetDato(journalpost.getDatoOpprettet());
 		registrering.setOpprettetAv(mapOpprettetAvNavn(journalpost));
 		registrering.setRegistreringsID(journalpostId.toString());
 		registrering.setTittel(journalpost.getInnhold());
@@ -85,8 +84,8 @@ public class SaksmappeMapper {
 		registrering.setJournalsekvensnummer(toBigInteger(journalpostId));
 		registrering.setJournalpostnummer(toBigInteger(journalpostId));
 		registrering.setJournalposttype(determineJournalPostType(journalpost.getType()));
-		registrering.setJournaldato(mapXmlGregorianCalendar(journaldato));
-		registrering.setSendtDato(mapXmlGregorianCalendar(determineSendtDato(journalpost, journaldato)));
+		registrering.setJournaldato(journaldato.toLocalDate());
+		registrering.setSendtDato(determineSendtDato(journalpost, journaldato));
 		registrering.setRegistreringsID(journalpostId.toString());
 		registrering.setTittel(journalpost.getInnhold());
 		registrering.setJournalstatus("Arkivert");
@@ -97,11 +96,11 @@ public class SaksmappeMapper {
 		}
 		//Skal kun settes om journalpost.getDatoDokument() != null
 		if (journalpost.getDatoDokument() != null) {
-			registrering.setDokumentetsDato(mapXmlGregorianCalendar(journalpost.getDatoDokument()));
+			registrering.setDokumentetsDato(journalpost.getDatoDokument().toLocalDate());
 		}
 		//Skal kun settes om journalpost.getDatoMottatt() != null && journalpostType == "I"
 		if ("I".equals(journalpost.getType()) && journalpost.getDatoMottatt() != null) {
-			registrering.setMottattDato(mapXmlGregorianCalendar(journalpost.getDatoMottatt()));
+			registrering.setMottattDato(journalpost.getDatoMottatt());
 		}
 		for (DokumentInfo dokumentInfo : journalpost.getDok()) {
 			registrering.getDokumentbeskrivelses().add(mapDokumentBeskrivelse(dokumentInfo, tema, journalpostId.toString()));
@@ -135,11 +134,11 @@ public class SaksmappeMapper {
 		dokumentbeskrivelse.setDokumenttype(dokumentInfo.getKategoriDecode());
 		dokumentbeskrivelse.setDokumentstatus(mapDokumentstatus(dokumentInfo));
 		dokumentbeskrivelse.setTittel(dokumentInfo.getTittel());
-		dokumentbeskrivelse.setOpprettetDato(mapXmlGregorianCalendar(dokumentInfo.getDatoOpprettet()));
+		dokumentbeskrivelse.setOpprettetDato(dokumentInfo.getDatoOpprettet());
 		dokumentbeskrivelse.setOpprettetAv(dokumentInfo.getOpprettetAvBeriketNavn());
 		dokumentbeskrivelse.setTilknyttetRegistreringSom(dokumentInfo.getRelTilknyttetSom());
 		dokumentbeskrivelse.setDokumentnummer(toBigInteger(dokumentInfo.getId()));
-		dokumentbeskrivelse.setTilknyttetDato(mapXmlGregorianCalendar(dokumentInfo.getRelDatoOpprettet()));
+		dokumentbeskrivelse.setTilknyttetDato(dokumentInfo.getRelDatoOpprettet());
 		dokumentbeskrivelse.setTilknyttetAv(dokumentInfo.getRelOpprettetAvBeriketNavn());
 
 		if(isStringTemaAvleverMedDokumenter(tema)) {
@@ -164,7 +163,7 @@ public class SaksmappeMapper {
 		dokumentobjekt.setVersjonsnummer(toBigInteger(1));
 		dokumentobjekt.setVariantformat("Arkivformat");
 		dokumentobjekt.setFormat("PDF/A");
-		dokumentobjekt.setOpprettetDato(mapXmlGregorianCalendar(filDetaljer.getDatoOpprettet()));
+		dokumentobjekt.setOpprettetDato(filDetaljer.getDatoOpprettet());
 		dokumentobjekt.setOpprettetAv(filDetaljer.getOpprettetAvBeriketNavn());
 		dokumentobjekt.setReferanseDokumentfil("DOKUMENTER/" + tema + "/" + journalpostId + "_" + filDetaljer.getFilUuid() + ".pdf");
 		dokumentobjekt.setSjekksum(filDetaljer.getSha256hashBeriket());
@@ -193,7 +192,7 @@ public class SaksmappeMapper {
 		}
 	}
 
-	private Date determineSendtDato(Journalpost journalpost, Date journaldato) {
+	private LocalDateTime determineSendtDato(Journalpost journalpost, LocalDateTime journaldato) {
 		switch (journalpost.getStatus()) {
 			case "E":
 				if (journalpost.getDatoEkspedert() != null)

@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.ToString;
 import lombok.Value;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,7 +20,7 @@ public class Sak {
 	String opprettetAv;
 	@ToString.Exclude
 	String opprettetAvBeriketNavn;
-	Date opprettetTidspunkt;
+	LocalDateTime opprettetTidspunkt;
 	Fagomrade fagomrade;
 
 	@ToString.Exclude

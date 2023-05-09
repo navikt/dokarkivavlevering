@@ -14,8 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.sql.Date;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -35,7 +34,7 @@ class EndringsloggServiceTest {
 	@InjectMocks
 	private EndringsloggService endringsloggService;
 
-	private final LocalDate journalfoeringsDato = LocalDate.now().minusDays(3);
+	private final LocalDateTime journalfoeringsDato = LocalDateTime.now().minusDays(3);
 
 	@Test
 	void shouldMapEndringerAfterJournalDato() {
@@ -48,9 +47,9 @@ class EndringsloggServiceTest {
 
 		SoftAssertions softly = new SoftAssertions();
 		softly.assertThat(endringer.size()).isEqualTo(2);
-		softly.assertThat(utvalgteArkivendringerListe.get(0).getTidspunkt()).isAfter(Date.valueOf(journalfoeringsDato));
+		softly.assertThat(utvalgteArkivendringerListe.get(0).getTidspunkt()).isAfter(journalfoeringsDato);
 		softly.assertThat(utvalgteArkivendringerListe.get(0).getElement()).isEqualTo("Test1");
-		softly.assertThat(utvalgteArkivendringerListe.get(1).getTidspunkt()).isAfter(Date.valueOf(journalfoeringsDato));
+		softly.assertThat(utvalgteArkivendringerListe.get(1).getTidspunkt()).isAfter(journalfoeringsDato);
 		softly.assertThat(utvalgteArkivendringerListe.get(1).getElement()).isEqualTo("Test4");
 		softly.assertAll();
 	}
@@ -63,7 +62,7 @@ class EndringsloggServiceTest {
 
 	private List<Journalpost> opprettJournalpost() {
 		return asList(Journalpost.builder()
-				.datoJournal(Date.valueOf(journalfoeringsDato))
+				.datoJournal(journalfoeringsDato)
 				.ae(opprettArkivendring())
 				.dok(opprettDokumentInfo())
 				.build());
@@ -71,11 +70,11 @@ class EndringsloggServiceTest {
 
 	private List<Arkivendring> opprettArkivendring() {
 		return asList(Arkivendring.builder()
-						.tidspunkt(Date.valueOf(LocalDate.now()))
+						.tidspunkt(LocalDateTime.now())
 						.element("Test1")
 						.build(),
 				Arkivendring.builder()
-						.tidspunkt(Date.valueOf(LocalDate.now().minusDays(10)))
+						.tidspunkt(LocalDateTime.now().minusDays(10))
 						.element("Test2")
 						.build());
 	}
@@ -84,11 +83,11 @@ class EndringsloggServiceTest {
 		return asList(DokumentInfo.builder()
 				.ae(asList(
 						Arkivendring.builder()
-								.tidspunkt(Date.valueOf(LocalDate.now().minusDays(7)))
+								.tidspunkt(LocalDateTime.now().minusDays(7))
 								.element("Test3")
 								.build(),
 						Arkivendring.builder()
-								.tidspunkt(Date.valueOf(LocalDate.now().minusDays(1)))
+								.tidspunkt(LocalDateTime.now().minusDays(1))
 								.element("Test4")
 								.build())
 				).build()

@@ -4,37 +4,34 @@ import lombok.Builder;
 import lombok.ToString;
 import lombok.Value;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 @Value
 @Builder(toBuilder = true)
 public class DokumentInfo {
 
-	private final UUID uuid = UUID.randomUUID();
-	private final Long id;
-	private final String relTilknyttetSom;
-	private final Date relDatoOpprettet;
+	UUID uuid = UUID.randomUUID();
+	Long id;
+	String relTilknyttetSom;
+	LocalDateTime relDatoOpprettet;
 	@ToString.Exclude
-	private final String relOpprettetAv;
+	String relOpprettetAv;
 	@ToString.Exclude
-	private final String relOpprettetAvBeriketNavn;
-	private final String kategoriDecode;
-	private final String status;
+	String relOpprettetAvBeriketNavn;
+	String kategoriDecode;
+	String status;
 	@ToString.Exclude
-	private final String tittel;
-	private final Date datoOpprettet;
+	String tittel;
+	LocalDateTime datoOpprettet;
 	@ToString.Exclude
-	private final String opprettetAv;
-	private final Date datoFerdig;
+	String opprettetAv;
+	LocalDateTime datoFerdig;
 	@ToString.Exclude
-	private final String opprettetAvBeriketNavn;
-	private final List<FilDetaljer> fd;
-	private final List<Arkivendring> ae;
+	String opprettetAvBeriketNavn;
+	List<FilDetaljer> fd;
+	List<Arkivendring> ae;
 
 	public String getOpprettetAv() {
 		return opprettetAv;

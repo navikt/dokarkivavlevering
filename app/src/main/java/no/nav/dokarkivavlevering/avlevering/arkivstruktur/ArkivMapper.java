@@ -14,15 +14,16 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.DATE_TIME_FORMAT;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.getFagomradeBeskrivelse;
-import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.mapXmlGregorianCalendar;
-import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.truncateToDate;
 
 
 @Component
 public class ArkivMapper {
+
+	public static final LocalDateTime ARKIV_OPPRETTET_TIDSPUNKT = LocalDateTime.from(DATE_TIME_FORMAT.parse("2008-12-01T12:00:00"));
 
 	private final AvleveringProperties.ArkivConfig arkivConfig;
 
@@ -37,7 +38,7 @@ public class ArkivMapper {
 		arkiv.setTittel("NAV Fagarkiv");
 		arkiv.setBeskrivelse("Fagarkivet dokumenterer behandlingen av enkeltsaker knyttet til en bruker – person eller organisasjon – som etter lov om arbeids- og velferdsforvaltningen har satt fram søknad om ytelser, tiltak og oppfølging for Arbeids- og velferdsetaten");
 		arkiv.setDokumentmedium("Elektronisk arkiv");
-		arkiv.setOpprettetDato(mapXmlGregorianCalendar(DATE_TIME_FORMAT, "2008-12-01T12:00:00"));
+		arkiv.setOpprettetDato(ARKIV_OPPRETTET_TIDSPUNKT);
 		arkiv.setOpprettetAv("Arbeids- og velferdsetaten");
 		arkiv.getArkivskapers().add(mapArkivskaper());
 		arkiv.getArkivdels().add(mapArkivdel(sak));
@@ -58,9 +59,9 @@ public class ArkivMapper {
 		arkivdel.setTittel(fagomrade.getDekode());
 		arkivdel.setBeskrivelse(getFagomradeBeskrivelse(fagomrade.getFagomrade()));
 		arkivdel.setArkivdelstatus(getArkivdelstatus(fagomrade));
-		arkivdel.setOpprettetDato(mapXmlGregorianCalendar(fagomrade.getDatoOpprettet()));
+		arkivdel.setOpprettetDato(fagomrade.getDatoOpprettet());
 		arkivdel.setOpprettetAv("Arbeids- og velferdsetaten");
-		arkivdel.setArkivperiodeStartDato(truncateToDate(mapXmlGregorianCalendar(fagomrade.getDatoOpprettet())));
+		arkivdel.setArkivperiodeStartDato(fagomrade.getDatoOpprettet().toLocalDate());
 		arkivdel.setSkjerming(mapSkjerming());
 		arkivdel.getKlassifikasjonssystems().add(mapKlassifikasjonssystem(arkivdel));
 		return arkivdel;

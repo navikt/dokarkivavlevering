@@ -1,6 +1,5 @@
 package no.nav.dokarkivavlevering.avlevering.arkivstruktur;
 
-import no.arkivverket.standarder.noark5.arkivstruktur.Arkivdel;
 import no.arkivverket.standarder.noark5.arkivstruktur.Klasse;
 import no.arkivverket.standarder.noark5.arkivstruktur.Mappe;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
@@ -9,7 +8,6 @@ import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils;
 import org.springframework.stereotype.Component;
 
-import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.mapXmlGregorianCalendar;
 
 @Component
 public class KlasseMapper {
@@ -26,7 +24,7 @@ public class KlasseMapper {
 		klasse.setKlasseID(fagomrade.getFagomrade());
 		klasse.setTittel(fagomrade.getDekode());
 		klasse.setBeskrivelse("Klasse for saksbehandling av " + fagomrade.getDekode());
-		klasse.setOpprettetDato(mapXmlGregorianCalendar(fagomrade.getDatoOpprettet()));
+		klasse.setOpprettetDato(fagomrade.getDatoOpprettet());
 		klasse.setOpprettetAv(fagomrade.getOpprettetAv());
 		klasse.getMappes().add(mapMappe(sak));
 		return klasse;
@@ -37,7 +35,7 @@ public class KlasseMapper {
 		mappe.setSystemID(AvleveringUtils.generateSystemId());
 		mappe.setMappeID(String.valueOf(sak.getId()));
 		mappe.setTittel(sak.getFagomrade().getDekode());
-		mappe.setOpprettetDato(mapXmlGregorianCalendar(sak.getOpprettetTidspunkt()));
+		mappe.setOpprettetDato(sak.getOpprettetTidspunkt());
 		mappe.setOpprettetAv(getOpprettetAv(sak));
 		mappe.getReferanseArkivdels().add(AvleveringUtils.mapSystemID(arkivConfig.getArkivdelConfig().getSystemID()).getValue());
 		return mappe;

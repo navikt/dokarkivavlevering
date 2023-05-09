@@ -6,5 +6,9 @@
                jaxb:extensionBindingPrefixes="xjc annox">
     <jaxb:globalBindings>
         <xjc:simple/>
+          <xjc:javaType name="java.time.LocalDateTime" xmlType="xs:dateTime"
+          adapter="no.nav.dokarkivavlevering.adapter.LocalDateTimeAdapter"/>
+      <xjc:javaType name="java.time.LocalDate" xmlType="xs:date"
+          adapter="no.nav.dokarkivavlevering.adapter.LocalDateAdapter"/>
     </jaxb:globalBindings>
 </jaxb:bindings>

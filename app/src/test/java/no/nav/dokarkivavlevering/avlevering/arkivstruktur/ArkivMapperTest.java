@@ -14,17 +14,15 @@ import no.nav.dokarkivavlevering.avlevering.domain.NavnMedGyldighet;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import org.junit.jupiter.api.Test;
 
-import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.List;
 
 import static java.util.Collections.emptyList;
-import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.DATE_FORMAT;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.DATE_TIME_FORMAT;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,7 +31,7 @@ class ArkivMapperTest {
 	public static final Tema SAK_TEMA = Tema.IAR;
 	private final ArkivMapper arkivMapper = new ArkivMapper(new AvleveringProperties());
 
-	private final Sak TEST_SAK = new Sak(1L, SAK_TEMA.name(), "NAV", "NAV", new Date(),
+	private final Sak TEST_SAK = new Sak(1L, SAK_TEMA.name(), "NAV", "NAV", LocalDateTime.now(),
 			new Fagomrade(SAK_TEMA.name(), SAK_TEMA.getTemanavn(), LocalDate.of(2008,12,1),
 					LocalDate.now().plusYears(2), LocalDateTime.of(2010, 2, 18, 12, 0, 0), "NAV",
 					LocalDateTime.now().minus(3, ChronoUnit.YEARS), "NAV", "1"),
@@ -95,11 +93,11 @@ class ArkivMapperTest {
 		assertThat(skjerming.getSkjermingsvarighet()).isEqualTo(new BigInteger("60"));
 	}
 
-	private String toDateString(final XMLGregorianCalendar xmlGregorianCalendar) {
-		return DATE_FORMAT.format(xmlGregorianCalendar.toGregorianCalendar().getTime());
+	private String toDateString(LocalDate localDate) {
+		return DateTimeFormatter.ISO_LOCAL_DATE.format(localDate);
 	}
 
-	private String toDateTimeString(final XMLGregorianCalendar xmlGregorianCalendar) {
-		return DATE_TIME_FORMAT.format(xmlGregorianCalendar.toGregorianCalendar().getTime());
+	private String toDateTimeString(LocalDateTime localDateTime) {
+		return DATE_TIME_FORMAT.format(localDateTime);
 	}
 }
