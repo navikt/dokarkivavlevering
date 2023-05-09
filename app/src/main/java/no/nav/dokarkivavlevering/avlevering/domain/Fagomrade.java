@@ -27,8 +27,8 @@ public class Fagomrade {
 	@Getter(AccessLevel.NONE)
 	String erGyldig;
 
-	public boolean erGyldigForDato(LocalDate when) {
-		return "1".equalsIgnoreCase(erGyldig) && (datoTom == null || datoTom.isAfter(when));
+	public boolean erGyldigAkkuratNaa() {
+		return "1".equalsIgnoreCase(erGyldig) && (datoTom == null || datoTom.isAfter(LocalDate.now()));
 	}
 
 }

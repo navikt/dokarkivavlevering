@@ -5,13 +5,11 @@ import no.arkivverket.standarder.noark5.arkivstruktur.Klassifikasjonssystem;
 import no.arkivverket.standarder.noark5.arkivstruktur.Saksmappe;
 import no.arkivverket.standarder.noark5.arkivstruktur.Skjerming;
 import no.arkivverket.standarder.noark5.arkivstruktur.SystemID;
-import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.domain.Fagomrade;
 import no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,12 +18,6 @@ import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.mapSyst
 
 @Component
 public class ArkivdelMapper {
-
-	private final AvleveringProperties.ArkivConfig arkivConfig;
-
-	public ArkivdelMapper(AvleveringProperties avleveringProperties) {
-		this.arkivConfig = avleveringProperties.getArkivConfig();
-	}
 
 	public Arkivdel map(Fagomrade fagomrade, List<Saksmappe> saksmapper) {
 		Arkivdel arkivdel = new Arkivdel();
@@ -47,10 +39,10 @@ public class ArkivdelMapper {
 	}
 
 	private static String getArkivdelstatus(Fagomrade fagomrade) {
-		if (!fagomrade.erGyldigForDato(LocalDate.now())) {
-			return "Avsluttet periode";
+		if (fagomrade.erGyldigAkkuratNaa()) {
+			return "Aktiv periode";
 		}
-		return "Aktiv periode";
+		return "Avsluttet periode";
 	}
 
 	private static Skjerming mapSkjerming() {
