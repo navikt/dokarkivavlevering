@@ -18,21 +18,14 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.List;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 @Component
 public class AvleveringArkivstrukturRoute extends RouteBuilder {
 
 	public static final String HEADER_XSL_PARAM_KLASSE_XML = "klasse_xml";
-	public static final String HEADER_XSL_PARAM_SAKSMAPPE_XML = "saksmappe_xml";
 	public static final String GENERER_ARKIVSTRUKTUR = "direct:generer_arkivstruktur";
 	public static final String OPPRETT_ARKIVSTRUKTUR_PRE = "direct:opprett_arkivstruktur_pre";
 	public static final String FLETT_KLASSE_ARKIVSTRUKTUR = "direct:flett_klasse_arkivstruktur";
 	public static final String ARKIVSTRUKTUR = "direct:arkivstruktur";
-	public static final String GENERER_KLASSE = "direct:generer_klasse";
-	public static final String OPPRETT_KLASSE_PRE = "direct:opprett_klasse_pre";
-	public static final String FLETT_SAKSMAPPE_KLASSE = "direct:flett_saksmappe_klasse";
 
 	private final AvleveringArkivstrukturService avleveringArkivstrukturService;
 	private final ArkivMapper arkivMapper;
@@ -103,34 +96,5 @@ public class AvleveringArkivstrukturRoute extends RouteBuilder {
 				.to("file://{{avlevering.filomraade.work}}?fileExist=Append")
 				.log(LoggingLevel.INFO, log, "Behandlet ferdig saksmapper for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelLoopIndex}");
 
-		/*
-		from(GENERER_KLASSE)
-				.routeId("generer_klasse")
-				.log(LoggingLevel.INFO, log, "Starter generering av klasse_${exchangeProperty.AvleveringTema}.xml.")
-				// .to(OPPRETT_KLASSE_PRE)::
-				.to(FLETT_SAKSMAPPE_KLASSE)
-				.log(LoggingLevel.INFO, log, "Ferdig med å generere arkivstruktur.xml.");
-
-		from(OPPRETT_KLASSE_PRE)
-				.routeId("opprett_klasse_pre")
-				.bean(klasseMapper)
-				.setHeader(JaxbConstants.JAXB_PART_NAMESPACE, simple("{http://www.arkivverket.no/standarder/noark5/arkivstruktur}klasse"))
-				.marshal(klasseArkivstrukturJaxb())
-				.setHeader(Exchange.FILE_NAME, simple("${exchangeProperty.AvleveringId}/pre_klasse_${exchangeProperty.AvleveringTema}.xml"))
-				.to("file://{{avlevering.filomraade.work}}?fileExist=Override")
-				.log(LoggingLevel.INFO, log, "Genererte pre_klasse til ${header.CamelFileNameProduced}");
-
-		from(FLETT_SAKSMAPPE_KLASSE)
-				.routeId("flett_saksmappe_klasse")
-				.process(exchange -> {
-					// Fra opprett_klasse_pre
-					InputStream inputStream = FileUtils.openInputStream(Paths.get(exchange.getIn().getHeader(Exchange.FILE_NAME_PRODUCED, String.class)).toFile());
-					exchange.getIn().setBody(inputStream);
-				})
-				.setHeader(HEADER_XSL_PARAM_SAKSMAPPE_XML, simple("file:///{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/?select=saksmappe_${exchangeProperty.AvleveringTema}_*.xml"))
-				.setHeader(Exchange.XSLT_FILE_NAME, simple("{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/klasse_${exchangeProperty.AvleveringTema}.xml"))
-				.to("xslt:classpath:arkivstruktur/embed_saksmappe_into_klasse.xsl?output=file")
-				.log(LoggingLevel.INFO, log, "Genererte klasse til ${header.CamelXsltFileName}");
-		 */
 	}
 }
