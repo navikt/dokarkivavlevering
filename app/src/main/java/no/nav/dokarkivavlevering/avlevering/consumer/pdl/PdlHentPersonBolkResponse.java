@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.ToString;
 import no.nav.dokarkivavlevering.avlevering.domain.BrukerMedNavnedata;
 import no.nav.dokarkivavlevering.avlevering.domain.NavnMedGyldighet;
+import no.nav.dokarkivavlevering.avlevering.domain.SimpleNavn;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -76,6 +77,9 @@ public class PdlHentPersonBolkResponse {
 		}
 
 		private NavnMedGyldighet toNavnMedGyldighet() {
+			if (getPdlFolkeregistermetadata() == null) {
+				return new SimpleNavn(fulltnavn());
+			}
 			return new NavnMedGyldighet(parseZonedDateTime(getPdlFolkeregistermetadata().gyldighetstidspunkt),
 					parseZonedDateTime(getPdlFolkeregistermetadata().opphoerstidspunkt), fulltnavn());
 		}
