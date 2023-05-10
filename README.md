@@ -33,6 +33,8 @@ Kjør kommando: `mvn clean package`
 
 ### Lokal kjøring og test:
 
+Dette fungerer ikke på naisdevice.
+
 Jobben vil gjøre en avlevering fra Q2 miljøet basert på properties i `application-local.properties`.
 
 Kjør `Application.java` i IntelliJ med VM-options fra: https://vault.adeo.no/ui/vault/secrets/secret/show/dokument/dokarkivavlevering

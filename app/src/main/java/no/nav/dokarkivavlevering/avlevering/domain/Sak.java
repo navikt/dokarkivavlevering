@@ -13,7 +13,7 @@ import java.util.UUID;
 @Builder(toBuilder = true)
 @AllArgsConstructor
 public class Sak implements MedOpprettetAv {
-	private final UUID uuid = UUID.randomUUID();
+	UUID uuid = UUID.randomUUID();
 	Long id;
 	String tema;
 	@ToString.Exclude

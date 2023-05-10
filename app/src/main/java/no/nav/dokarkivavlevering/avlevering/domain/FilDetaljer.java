@@ -15,7 +15,6 @@ public class FilDetaljer implements MedOpprettetAv {
 	LocalDateTime datoOpprettet;
 	@ToString.Exclude
 	String opprettetAv;
-	UUID uuid = UUID.randomUUID();
 	@ToString.Exclude
 	String opprettetAvBeriketNavn;
 	byte[] fil;

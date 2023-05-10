@@ -7,7 +7,6 @@ import no.arkivverket.standarder.noark5.arkivstruktur.Part;
 import no.arkivverket.standarder.noark5.arkivstruktur.Registrering;
 import no.arkivverket.standarder.noark5.arkivstruktur.Saksmappe;
 import no.nav.dokarkivavlevering.avlevering.common.JournaldatoMapper;
-import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.domain.Bruker;
 import no.nav.dokarkivavlevering.avlevering.domain.BrukerMedNavnedata;
 import no.nav.dokarkivavlevering.avlevering.domain.DokumentInfo;
@@ -35,8 +34,7 @@ class SaksmappeMapperTest {
 	public static final String FIL = "Hello World";
 	public static final String BRUKER_ID = "12345678911";
 	public static final ZonedDateTime SAK_OPPRETTET_TIDSPUNKT = LocalDateTime.from(DateTimeFormatter.ISO_LOCAL_DATE_TIME.parse("2019-10-28T11:41:36.673")).atZone(ZoneId.of("Europe/Oslo"));
-	private final AvleveringProperties avleveringProperties = new AvleveringProperties();
-	private final SaksmappeMapper saksmappeMapper = new SaksmappeMapper(new JournaldatoMapper(), avleveringProperties);
+	private final SaksmappeMapper saksmappeMapper = new SaksmappeMapper(new JournaldatoMapper());
 
 	@Test
 	void shouldMap() throws Exception {
@@ -57,9 +55,6 @@ class SaksmappeMapperTest {
 		assertEquals(saksmappe.getOpprettetAv(), "Automatisk jobb");
 		assertEquals(saksmappe.getParts().size(), 1);
 		assertEquals(saksmappe.getRegistrerings().size(), 1);
-		// mappes opp senere i løpet nå:
-		// assertEquals(saksmappe.getReferanseArkivdels().size(), 1);
-		// assertThat(saksmappe.getReferanseArkivdels()).contains(avleveringProperties.getArkivConfig().getArkivdelConfig().getSystemID());
 		//saksmappe/part
 		assertPart(saksmappe.getParts().get(0));
 

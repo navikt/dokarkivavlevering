@@ -38,11 +38,9 @@ public class SaksmappeMapper {
 
 	public static final String DOKUMENT_STATUS_FERDIGSTILT = "FERDIGSTILT";
 	private final JournaldatoMapper journaldatoMapper;
-	private final AvleveringProperties.ArkivConfig arkivConfig;
 
-	public SaksmappeMapper(JournaldatoMapper journaldatoMapper, AvleveringProperties avleveringProperties) {
+	public SaksmappeMapper(JournaldatoMapper journaldatoMapper) {
 		this.journaldatoMapper = journaldatoMapper;
-		this.arkivConfig = avleveringProperties.getArkivConfig();
 	}
 
 	public Saksmappe map(Sak sak) {
@@ -151,7 +149,7 @@ public class SaksmappeMapper {
 
 	private Dokumentobjekt mapDokumentobjekt(FilDetaljer filDetaljer, String tema, String journalpostId) {
 		Dokumentobjekt dokumentobjekt = new Dokumentobjekt();
-		dokumentobjekt.setSystemID(AvleveringUtils.mapSystemID(UUID.randomUUID()));
+		dokumentobjekt.setSystemID(AvleveringUtils.generateSystemID());
 		dokumentobjekt.setVersjonsnummer(toBigInteger(1));
 		dokumentobjekt.setVariantformat("Arkivformat");
 		dokumentobjekt.setFormat("PDF/A");
