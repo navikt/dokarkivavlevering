@@ -88,8 +88,8 @@ public class AvleveringTemaRoute extends RouteBuilder {
 				.choice()
 					.when(header(HEADER_TEMA_SKIP).isEqualTo(constant(true)))
 						.log(INFO, log, "Ingenting å avlevere for tema=${exchangeProperty.AvleveringTema}")
-					.otherwise()
-						.to(AvleveringArkivstrukturRoute.GENERER_KLASSE)
+					// .otherwise()
+						// .to(AvleveringArkivstrukturRoute.GENERER_KLASSE)
 					.end()
 				.log(INFO, log, "Ferdig behandlet tema=${exchangeProperty.AvleveringTema}");
 
