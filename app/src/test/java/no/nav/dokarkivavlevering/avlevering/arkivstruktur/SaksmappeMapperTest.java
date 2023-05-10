@@ -6,7 +6,6 @@ import no.arkivverket.standarder.noark5.arkivstruktur.Korrespondansepart;
 import no.arkivverket.standarder.noark5.arkivstruktur.Part;
 import no.arkivverket.standarder.noark5.arkivstruktur.Registrering;
 import no.arkivverket.standarder.noark5.arkivstruktur.Saksmappe;
-import no.arkivverket.standarder.noark5.arkivstruktur.SystemID;
 import no.nav.dokarkivavlevering.avlevering.common.JournaldatoMapper;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.domain.Bruker;
@@ -26,7 +25,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 import static no.nav.dokarkivavlevering.avlevering.testUtils.TestUtils.toLocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,9 +40,6 @@ class SaksmappeMapperTest {
 
 	@Test
 	void shouldMap() throws Exception {
-		SystemID sakSystemID = new SystemID();
-		sakSystemID.setValue(UUID.randomUUID().toString());
-
 		Sak sak = generateSak("KTR");
 
 		final Saksmappe saksmappe = saksmappeMapper.map(sak);
@@ -60,10 +55,11 @@ class SaksmappeMapperTest {
 		assertEquals(saksmappe.getTittel(), "Kontroll");
 		assertThat(saksmappe.getOpprettetDato()).isEqualToIgnoringNanos(toLocalDateTime("2019-10-28 11:41:36"));
 		assertEquals(saksmappe.getOpprettetAv(), "Automatisk jobb");
-		assertEquals(saksmappe.getReferanseArkivdels().size(), 1);
 		assertEquals(saksmappe.getParts().size(), 1);
 		assertEquals(saksmappe.getRegistrerings().size(), 1);
-		assertThat(saksmappe.getReferanseArkivdels()).contains(avleveringProperties.getArkivConfig().getArkivdelConfig().getSystemID());
+		// mappes opp senere i løpet nå:
+		// assertEquals(saksmappe.getReferanseArkivdels().size(), 1);
+		// assertThat(saksmappe.getReferanseArkivdels()).contains(avleveringProperties.getArkivConfig().getArkivdelConfig().getSystemID());
 		//saksmappe/part
 		assertPart(saksmappe.getParts().get(0));
 
@@ -72,9 +68,6 @@ class SaksmappeMapperTest {
 
 	@Test
 	void shouldMapWithoutDokument() throws Exception {
-		SystemID sakSystemID = new SystemID();
-		sakSystemID.setValue(UUID.randomUUID().toString());
-
 		Sak sak = generateSak("VEN");
 
 		final Saksmappe saksmappe = saksmappeMapper.map(sak);

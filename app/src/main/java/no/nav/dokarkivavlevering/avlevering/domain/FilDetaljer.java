@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Value
 @Builder(toBuilder = true)
-public class FilDetaljer {
+public class FilDetaljer implements MedOpprettetAv {
 	Long id;
 	String filUuid;
 	LocalDateTime datoOpprettet;

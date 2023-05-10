@@ -36,13 +36,10 @@ public class AvleveringArkivstrukturRoute extends RouteBuilder {
 
 	private final AvleveringArkivstrukturService avleveringArkivstrukturService;
 	private final ArkivMapper arkivMapper;
-	private final KlasseMapper klasseMapper;
-
 
 	public AvleveringArkivstrukturRoute(AvleveringArkivstrukturService avleveringArkivstrukturService, ArkivMapper arkivMapper, KlasseMapper klasseMapper) {
 		this.avleveringArkivstrukturService = avleveringArkivstrukturService;
 		this.arkivMapper = arkivMapper;
-		this.klasseMapper = klasseMapper;
 	}
 
 	private JaxbDataFormat klasseArkivstrukturJaxb() {
@@ -113,6 +110,7 @@ public class AvleveringArkivstrukturRoute extends RouteBuilder {
 				.to(FLETT_SAKSMAPPE_KLASSE)
 				.log(LoggingLevel.INFO, log, "Ferdig med å generere arkivstruktur.xml.");
 
+		/*
 		from(OPPRETT_KLASSE_PRE)
 				.routeId("opprett_klasse_pre")
 				.bean(klasseMapper)
@@ -121,6 +119,7 @@ public class AvleveringArkivstrukturRoute extends RouteBuilder {
 				.setHeader(Exchange.FILE_NAME, simple("${exchangeProperty.AvleveringId}/pre_klasse_${exchangeProperty.AvleveringTema}.xml"))
 				.to("file://{{avlevering.filomraade.work}}?fileExist=Override")
 				.log(LoggingLevel.INFO, log, "Genererte pre_klasse til ${header.CamelFileNameProduced}");
+		 */
 
 		from(FLETT_SAKSMAPPE_KLASSE)
 				.routeId("flett_saksmappe_klasse")

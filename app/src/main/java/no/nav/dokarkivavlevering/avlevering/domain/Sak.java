@@ -12,7 +12,7 @@ import java.util.UUID;
 @Value
 @Builder(toBuilder = true)
 @AllArgsConstructor
-public class Sak {
+public class Sak implements MedOpprettetAv {
 	private final UUID uuid = UUID.randomUUID();
 	Long id;
 	String tema;

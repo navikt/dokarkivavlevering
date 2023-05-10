@@ -16,7 +16,7 @@ import java.util.function.BiFunction;
 
 @Component
 public class AvleveringSakBerikerMapper {
-	private static final String AUTOMATISK_JOBB = "Automatisk Jobb";
+	public static final String AUTOMATISK_JOBB = "Automatisk Jobb";
 	private final AsposeService asposeService;
 
 	public AvleveringSakBerikerMapper(AsposeService asposeService) {

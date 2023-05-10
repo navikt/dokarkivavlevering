@@ -1,8 +1,8 @@
 package no.nav.dokarkivavlevering.avlevering.arkivstruktur;
 
 import no.arkivverket.standarder.noark5.arkivstruktur.Arkivdel;
+import no.arkivverket.standarder.noark5.arkivstruktur.Klasse;
 import no.arkivverket.standarder.noark5.arkivstruktur.Klassifikasjonssystem;
-import no.arkivverket.standarder.noark5.arkivstruktur.Saksmappe;
 import no.arkivverket.standarder.noark5.arkivstruktur.Skjerming;
 import no.arkivverket.standarder.noark5.arkivstruktur.SystemID;
 import no.nav.dokarkivavlevering.avlevering.domain.Fagomrade;
@@ -10,22 +10,20 @@ import no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
-import java.util.List;
-import java.util.UUID;
 
+import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.generateSystemID;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.getFagomradeBeskrivelse;
-import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.mapSystemID;
 
 @Component
 public class ArkivdelMapper {
 
-	public Arkivdel map(Fagomrade fagomrade, List<Saksmappe> saksmapper) {
+	public Arkivdel map(Fagomrade fagomrade, Klasse klasse) {
 		Arkivdel arkivdel = new Arkivdel();
 
-		SystemID systemID = mapSystemID(UUID.randomUUID().toString());
-		arkivdel.setSystemID(systemID);
-		saksmapper.forEach(mappe -> mappe.getReferanseArkivdels().add(systemID.getValue()));
-		arkivdel.getMappes().addAll(saksmapper);
+		SystemID arkivdelSystemID = generateSystemID();
+		arkivdel.setSystemID(arkivdelSystemID);
+		klasse.getMappes().forEach(mappe ->
+				mappe.getReferanseArkivdels().add(arkivdelSystemID.getValue()));
 
 		arkivdel.setTittel(fagomrade.getDekode());
 		arkivdel.setBeskrivelse(getFagomradeBeskrivelse(fagomrade.getFagomrade()));
@@ -34,7 +32,7 @@ public class ArkivdelMapper {
 		arkivdel.setOpprettetAv("Arbeids- og velferdsetaten");
 		arkivdel.setArkivperiodeStartDato(fagomrade.getDatoOpprettet().toLocalDate());
 		arkivdel.setSkjerming(mapSkjerming());
-		arkivdel.getKlassifikasjonssystems().add(mapKlassifikasjonssystem(arkivdel));
+		arkivdel.getKlassifikasjonssystems().add(mapKlassifikasjonssystem(fagomrade, klasse));
 		return arkivdel;
 	}
 
@@ -57,13 +55,14 @@ public class ArkivdelMapper {
 		return skjerming;
 	}
 
-	private Klassifikasjonssystem mapKlassifikasjonssystem(Arkivdel arkivdel) {
+	private Klassifikasjonssystem mapKlassifikasjonssystem(Fagomrade fagomrade, Klasse klasse) {
 		Klassifikasjonssystem klassifikasjonssystem = new Klassifikasjonssystem();
-		klassifikasjonssystem.setSystemID(AvleveringUtils.generateSystemId());
+		klassifikasjonssystem.setSystemID(AvleveringUtils.generateSystemID());
 		klassifikasjonssystem.setKlassifikasjonstype("Fagområder i NAV");
 		klassifikasjonssystem.setTittel("Fagområder i NAV");
-		klassifikasjonssystem.setOpprettetDato(arkivdel.getOpprettetDato());
+		klassifikasjonssystem.setOpprettetDato(fagomrade.getDatoOpprettet());
 		klassifikasjonssystem.setOpprettetAv("Arbeids- og velferdsetaten");
+		klassifikasjonssystem.getKlasses().add(klasse);
 		return klassifikasjonssystem;
 	}
 

@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Value
 @Builder(toBuilder = true)
-public class Journalpost {
+public class Journalpost implements MedOpprettetAvNavn {
 	UUID uuid = UUID.randomUUID();
 	Long id;
 	String type;

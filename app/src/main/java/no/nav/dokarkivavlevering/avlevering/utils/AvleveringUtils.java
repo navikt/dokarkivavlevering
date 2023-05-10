@@ -85,9 +85,12 @@ public class AvleveringUtils {
 		return fagomradeBeskrivelseLookup.get(fagomrade);
 	}
 
-	public static SystemID generateSystemId() {
-		String value = UUID.randomUUID().toString();
-		return mapSystemID(value);
+	public static SystemID generateSystemID() {
+		return mapSystemID(UUID.randomUUID());
+	}
+
+	public static SystemID mapSystemID(UUID uuid) {
+		return mapSystemID(uuid.toString());
 	}
 
 	public static SystemID mapSystemID(String value) {

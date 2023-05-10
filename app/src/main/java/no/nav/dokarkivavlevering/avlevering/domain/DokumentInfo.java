@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Value
 @Builder(toBuilder = true)
-public class DokumentInfo {
+public class DokumentInfo implements MedOpprettetAv {
 
 	UUID uuid = UUID.randomUUID();
 	Long id;
