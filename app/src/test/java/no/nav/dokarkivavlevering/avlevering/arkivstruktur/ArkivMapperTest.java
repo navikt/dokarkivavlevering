@@ -13,6 +13,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.DATE_TIME_FORMAT;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,7 +25,7 @@ class ArkivMapperTest {
 
 	@Test
 	void shouldMap() {
-		final Arkiv arkiv = arkivMapper.map();
+		final Arkiv arkiv = arkivMapper.map(Collections.emptyList());
 		assertThat(arkiv.getSystemID().getValue()).isNotEmpty();
 		assertThat(arkiv.getTittel()).isEqualTo("NAV Fagarkiv");
 		assertThat(arkiv.getBeskrivelse()).isEqualTo("Fagarkivet dokumenterer behandlingen av enkeltsaker knyttet til en bruker – person eller organisasjon – som etter lov om arbeids- og velferdsforvaltningen har satt fram søknad om ytelser, tiltak og oppfølging for Arbeids- og velferdsetaten");
@@ -32,7 +33,6 @@ class ArkivMapperTest {
 		assertThat(toDateTimeString(arkiv.getOpprettetDato())).isEqualTo("2008-12-01T12:00:00");
 		assertThat(arkiv.getOpprettetAv()).isEqualTo("Arbeids- og velferdsetaten");
 		assertArkivskaper(arkiv);
-		// assertArkivdel(arkiv);
 	}
 
 	private void assertArkivskaper(Arkiv arkiv) {

@@ -1,6 +1,7 @@
 package no.nav.dokarkivavlevering.avlevering.arkivstruktur;
 
 import no.arkivverket.standarder.noark5.arkivstruktur.Arkiv;
+import no.arkivverket.standarder.noark5.arkivstruktur.Arkivdel;
 import no.arkivverket.standarder.noark5.arkivstruktur.Arkivskaper;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils;
@@ -8,6 +9,7 @@ import org.apache.camel.Handler;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.DATE_TIME_FORMAT;
 
@@ -24,7 +26,7 @@ public class ArkivMapper {
 	}
 
 	@Handler
-	public Arkiv map() {
+	public Arkiv map(List<Arkivdel> arkivdelList) {
 		Arkiv arkiv = new Arkiv();
 		arkiv.setSystemID(AvleveringUtils.mapSystemID(arkivConfig.getSystemID()));
 		arkiv.setTittel("NAV Fagarkiv");
@@ -33,6 +35,7 @@ public class ArkivMapper {
 		arkiv.setOpprettetDato(ARKIV_OPPRETTET_TIDSPUNKT);
 		arkiv.setOpprettetAv("Arbeids- og velferdsetaten");
 		arkiv.getArkivskapers().add(mapArkivskaper());
+		arkiv.getArkivdels().addAll(arkivdelList);
 		return arkiv;
 	}
 

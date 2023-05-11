@@ -58,7 +58,6 @@ public class AvleveringRoute extends RouteBuilder {
 				.to(BEHANDLE_TEMA)
 				.end()
 				.to(AvleveringStatiskRoute.AVLEVERING_STATIC)
-				.to(AvleveringArkivstrukturRoute.GENERER_ARKIVSTRUKTUR)
 				.to(AvleveringLoependeJournalRoute.GENERER_LOEPENDEJOURNAL)
 				.to(AvleveringEndringsloggRoute.GENERER_ENDRINGSLOGG)
 				.to(AvleveringOffentligJournalRoute.GENERER_OFFENTLIGJOURNAL)

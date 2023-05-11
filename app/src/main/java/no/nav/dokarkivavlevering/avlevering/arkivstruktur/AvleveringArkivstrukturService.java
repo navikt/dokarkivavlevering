@@ -1,6 +1,6 @@
 package no.nav.dokarkivavlevering.avlevering.arkivstruktur;
 
-import no.arkivverket.standarder.noark5.arkivstruktur.Arkivdel;
+import no.arkivverket.standarder.noark5.arkivstruktur.Arkiv;
 import no.nav.dokarkivavlevering.avlevering.domain.Fagomrade;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import org.apache.camel.Body;
@@ -15,16 +15,19 @@ public class AvleveringArkivstrukturService {
 	private final SaksmappeMapper saksmappeMapper;
 	private final KlasseMapper klasseMapper;
 	private final ArkivdelMapper arkivdelMapper;
+	private final ArkivMapper arkivMapper;
 
-	public AvleveringArkivstrukturService(SaksmappeMapper saksmappeMapper, KlasseMapper klasseMapper, ArkivdelMapper arkivdelMapper) {
+	public AvleveringArkivstrukturService(SaksmappeMapper saksmappeMapper, KlasseMapper klasseMapper, ArkivdelMapper arkivdelMapper, ArkivMapper arkivMapper) {
 		this.saksmappeMapper = saksmappeMapper;
 		this.klasseMapper = klasseMapper;
 		this.arkivdelMapper = arkivdelMapper;
+		this.arkivMapper = arkivMapper;
 	}
 
 	@Handler
-	public List<Arkivdel> avlevering(@Body final List<Sak> saker) {
-		return saker.stream()
+	public Arkiv avlevering(@Body final List<Sak> saker) {
+		return arkivMapper.map(
+				saker.stream()
 				.collect(Collectors.groupingBy(sak -> sak.getFagomrade().getFagomrade()))
 				.values()
 				.stream()
@@ -33,6 +36,6 @@ public class AvleveringArkivstrukturService {
 					return arkivdelMapper.map(fagomradeForPartition,
 							klasseMapper.map(fagomradeForPartition,
 									sakerPerTema.stream().map(saksmappeMapper::map).toList()));
-				}).toList();
+				}).toList());
 	}
 }
