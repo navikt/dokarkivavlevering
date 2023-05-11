@@ -1,5 +1,6 @@
 package no.nav.dokarkivavlevering.avlevering.arkivstruktur;
 
+import no.arkivverket.standarder.noark5.arkivstruktur.Arkivdel;
 import no.arkivverket.standarder.noark5.arkivstruktur.Klasse;
 import no.arkivverket.standarder.noark5.arkivstruktur.ObjectFactory;
 import no.nav.dokarkivavlevering.avlevering.sftp.AvleveringSFTPRoute;
@@ -39,7 +40,7 @@ public class AvleveringArkivstrukturRoute extends RouteBuilder {
 		JaxbDataFormat jaxbDataFormat = new JaxbDataFormat(ObjectFactory.class.getPackage().getName());
 		jaxbDataFormat.setEncoding(StandardCharsets.UTF_8.toString());
 		jaxbDataFormat.setFragment(true);
-		jaxbDataFormat.setPartClass(Klasse.class);
+		jaxbDataFormat.setPartClass(Arkivdel.class);
 		return jaxbDataFormat;
 	}
 
@@ -71,30 +72,25 @@ public class AvleveringArkivstrukturRoute extends RouteBuilder {
 		from(FLETT_KLASSE_ARKIVSTRUKTUR)
 				.routeId("flett_klasse_arkivstruktur")
 				.process(exchange -> {
-					InputStream inputStream = FileUtils.openInputStream(Paths.get(exchange.getIn().getHeader(Exchange.FILE_NAME_PRODUCED, String.class)).toFile());
+					InputStream inputStream = FileUtils.openInputStream(Paths.get(exchange.getIn().getHeader(Exchange.FILE_NAME_PRODUCED, String.class)).toFile());  // konverter filnavn-header til body
 					exchange.getIn().setBody(inputStream);
 				})
-				.setHeader(HEADER_XSL_PARAM_KLASSE_XML, simple("file:///{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}?select=klasse_*.xml"))
+				.setHeader(HEADER_XSL_PARAM_KLASSE_XML, simple("file:///{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}?select=arkivdel_*.xml"))
 				.setHeader(Exchange.XSLT_FILE_NAME, simple("{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/arkivstruktur.xml"))
 				.to("xslt:classpath:arkivstruktur/embed_klasse_into_arkivstruktur.xsl?output=file")
 				.setHeader(AvleveringSFTPRoute.HEADER_FILNAVN, simple("arkivstruktur.xml"))
 				.to(AvleveringSFTPRoute.SFTP);
 
+		// denne kjører parallellt med de tre over, og har ingen direkte kobling - den blir matet med data fra db + beriket data, og skriver til disk. Den over leser resultatet fra disk og mater det sammen sammen med arkiv-delen
 		from(ARKIVSTRUKTUR)
 				.routeId("arkivstruktur")
-				.log(LoggingLevel.INFO, log, "Behandler saksmapper for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelLoopIndex}")
+				.log(LoggingLevel.INFO, log, "Behandler arkivdeler for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelLoopIndex}")
 				.bean(avleveringArkivstrukturService)
-				.process(exchange -> {
-					// Dummy struktur slik at xml blir well-formed. Dvs at <mappe> ligger under <klasse>
-					Klasse klasse = new Klasse();
-					klasse.getMappes().addAll(exchange.getIn().getBody(List.class));
-					exchange.getIn().setBody(klasse);
-				})
-				.setHeader(JaxbConstants.JAXB_PART_NAMESPACE, simple("{http://www.arkivverket.no/standarder/noark5/arkivstruktur}klasse"))
+				.setHeader(JaxbConstants.JAXB_PART_NAMESPACE, simple("{http://www.arkivverket.no/standarder/noark5/arkivstruktur}arkivdel"))
 				.marshal(klasseArkivstrukturJaxb())
 				.setHeader(Exchange.FILE_NAME, simple("${exchangeProperty.AvleveringId}/saksmappe_${exchangeProperty.AvleveringTema}_${header.CamelLoopIndex}.xml"))
 				.to("file://{{avlevering.filomraade.work}}?fileExist=Append")
-				.log(LoggingLevel.INFO, log, "Behandlet ferdig saksmapper for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelLoopIndex}");
+				.log(LoggingLevel.INFO, log, "Behandlet ferdig arkivdeler for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelLoopIndex}");
 
 	}
 }

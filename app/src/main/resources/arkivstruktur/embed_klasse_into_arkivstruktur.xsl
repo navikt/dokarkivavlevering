@@ -4,7 +4,7 @@
 		xmlns:ark="http://www.arkivverket.no/standarder/noark5/arkivstruktur"
 		version="2.0">
 	<xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes"/>
-	<xsl:param name="klasse_xml"/>
+	<xsl:param name="arkivdel_xml"/>
 
 	<xsl:template match="node()|@*" name="identity">
 		<xsl:copy>
@@ -12,10 +12,10 @@
 		</xsl:copy>
 	</xsl:template>
 
-	<xsl:template match="//ark:klassifikasjonssystem">
+	<xsl:template match="//ark:arkivdel">
 		<xsl:copy>
 			<xsl:apply-templates select="@*|node()"/>
-			<xsl:apply-templates select="collection($klasse_xml)"/>
+			<xsl:apply-templates select="collection($arkivdel_xml)"/>
 		</xsl:copy>
 	</xsl:template>
 </xsl:stylesheet>
