@@ -30,13 +30,13 @@ public class EndringsloggService {
 		for (Sak sak : saker) {
 			for (Journalpost jp : sak.getJp()) {
 				for (Arkivendring ae : jp.getAe()) {
-					if (ae.getTidspunkt().after(jp.getDatoJournal())) {
+					if (ae.getTidspunkt().isAfter(jp.getDatoJournal())) {
 						endringer.add(endringsloggMapper.map(ae, ae.getElement().startsWith(SAKSRELASJON) ? sak.getUuid() : jp.getUuid()));
 					}
 				}
 				for (DokumentInfo dokumentInfo : jp.getDok()) {
 					for (Arkivendring ae : dokumentInfo.getAe()) {
-						if (ae.getTidspunkt().after(jp.getDatoJournal())) {
+						if (ae.getTidspunkt().isAfter(jp.getDatoJournal())) {
 							endringer.add(endringsloggMapper.map(ae, dokumentInfo.getUuid()));
 						}
 					}

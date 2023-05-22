@@ -20,15 +20,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
+import static java.util.Collections.emptyList;
+
 @Repository
 @Slf4j
 public class AvleveringRepository {
 	private static final ResultSetExtractor<List<Sak>> SAK_RESULTSET_EXTRACTOR = JdbcTemplateMapperFactory.newInstance()
 			.addKeys("id",
 					"bruker_id",
+					"fagomrade_fagomrade",
 					"jp_id",
 					"jp_dok_id",
 					"jp_dok_fd_id",
@@ -72,13 +72,13 @@ public class AvleveringRepository {
 
 	private List<Sak> doFindSaker(final List<Long> sakIds, boolean hentDokumenter){
 		if (sakIds.isEmpty()) {
-			return new ArrayList<>();
+			return emptyList();
 		} else if (sakIds.size() > ORACLE_MAX_IN) {
 			throw new UnsupportedOperationException("Støtter ikke å hente flere enn " + ORACLE_MAX_IN + " saker om gangen.");
 		}
 
 		final HashMap<String, Object> paramMap = new HashMap<>();
-		paramMap.put("sakIds", sakIds.stream().map(Object::toString).collect(Collectors.toList()));
+		paramMap.put("sakIds", sakIds.stream().map(Object::toString).toList());
 		paramMap.put("startdato", Timestamp.valueOf(avleveringProperties.getPeriode().getStartdato().atStartOfDay()));
 		paramMap.put("sluttdato", Timestamp.valueOf(avleveringProperties.getPeriode().getSluttdato().atStartOfDay()));
 		if(hentDokumenter) {

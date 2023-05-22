@@ -6,7 +6,6 @@ import no.arkivverket.standarder.noark5.arkivstruktur.Korrespondansepart;
 import no.arkivverket.standarder.noark5.arkivstruktur.Part;
 import no.arkivverket.standarder.noark5.arkivstruktur.Registrering;
 import no.arkivverket.standarder.noark5.arkivstruktur.Saksmappe;
-import no.arkivverket.standarder.noark5.arkivstruktur.SystemID;
 import no.nav.dokarkivavlevering.avlevering.common.JournaldatoMapper;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.config.Tema;
@@ -14,49 +13,47 @@ import no.nav.dokarkivavlevering.avlevering.domain.Bruker;
 import no.nav.dokarkivavlevering.avlevering.domain.DokumentInfo;
 import no.nav.dokarkivavlevering.avlevering.domain.FilDetaljer;
 import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
+import no.nav.dokarkivavlevering.avlevering.domain.MedOpprettetAv;
+import no.nav.dokarkivavlevering.avlevering.domain.MedOpprettetAvNavn;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
+import no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.dateToXMLGregorianCalendar;
+import static no.nav.dokarkivavlevering.avlevering.AvleveringSakBerikerMapper.AUTOMATISK_JOBB;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.getYear;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.isStringTemaAvleverMedDokumenter;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.temaNavnDecode;
 import static org.apache.camel.converter.ObjectConverter.toBigInteger;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 @Component
 public class SaksmappeMapper {
 
 	public static final String DOKUMENT_STATUS_FERDIGSTILT = "FERDIGSTILT";
 	private final JournaldatoMapper journaldatoMapper;
-	private final AvleveringProperties.ArkivConfig arkivConfig;
 
-	public SaksmappeMapper(JournaldatoMapper journaldatoMapper, AvleveringProperties avleveringProperties) {
+	public SaksmappeMapper(JournaldatoMapper journaldatoMapper) {
 		this.journaldatoMapper = journaldatoMapper;
-		this.arkivConfig = avleveringProperties.getArkivConfig();
 	}
 
 	public Saksmappe map(Sak sak) {
 		Saksmappe mappe = new Saksmappe();
-		mappe.setSystemID(mapSystemID(sak.getUuid()));
+		mappe.setSystemID(AvleveringUtils.mapSystemID(sak.getUuid()));
 		mappe.setMappeID(sak.getId().toString());
-		mappe.setOpprettetDato(dateToXMLGregorianCalendar(sak.getOpprettetTidspunkt()));
-		mappe.setOpprettetAv(sak.getOpprettetAvBeriketNavn());
+		mappe.setOpprettetDato(sak.getOpprettetTidspunkt());
+		mappe.setOpprettetAv(resolveOpprettetAv(sak));
 		mappe.setTittel(temaNavnDecode(sak.getTema()));
-		mappe.getReferanseArkivdels().add(arkivConfig.getArkivdelConfig().getSystemID());
 		mappe.getParts().add(mapPart(sak));
 		mappe.setSaksaar(toBigInteger(getYear(sak.getOpprettetTidspunkt())));
 		mappe.setSakssekvensnummer(toBigInteger(sak.getId()));
-		mappe.setSaksdato(dateToXMLGregorianCalendar(sak.getOpprettetTidspunkt()));
+		mappe.setSaksdato(sak.getOpprettetTidspunkt().toLocalDate());
 		mappe.setAdministrativEnhet(getAdministrativEnhetFromTema((sak.getTema())));
 		mappe.setSaksansvarlig(getSaksAnsvarlig(sak.getJp()));
 		mappe.setSaksstatus("Under behandling");
@@ -70,25 +67,25 @@ public class SaksmappeMapper {
 		Part part = new Part();
 		part.setPartRolle("Bruker");
 		part.setPartID(sak.getBruker().getId());
-		part.setPartNavn(sak.getBruker().getNavn());
+		part.setPartNavn(sak.getBrukerMedNavnedata().getFulltnavn(sak.getOpprettetTidspunkt().atZone(ZoneId.of("Europe/Oslo"))));
 		return part;
 	}
 
 	private Registrering mapRegistrering(Journalpost journalpost, String tema) {
-		final Date journaldato = journaldatoMapper.mapJournaldato(journalpost);
+		final LocalDateTime journaldato = journaldatoMapper.mapJournaldato(journalpost);
 		final Long journalpostId = journalpost.getId();
 		no.arkivverket.standarder.noark5.arkivstruktur.Journalpost registrering = new no.arkivverket.standarder.noark5.arkivstruktur.Journalpost();
-		registrering.setSystemID(mapSystemID(journalpost.getUuid()));
-		registrering.setOpprettetDato(dateToXMLGregorianCalendar(journalpost.getDatoOpprettet()));
-		registrering.setOpprettetAv(mapOpprettetAvNavn(journalpost));
+		registrering.setSystemID(AvleveringUtils.mapSystemID(journalpost.getUuid()));
+		registrering.setOpprettetDato(journalpost.getDatoOpprettet());
+		registrering.setOpprettetAv(resolveOpprettetAvNavn(journalpost));
 		registrering.setRegistreringsID(journalpostId.toString());
 		registrering.setTittel(journalpost.getInnhold());
 		registrering.setJournalaar(toBigInteger(getYear(journaldato)));
 		registrering.setJournalsekvensnummer(toBigInteger(journalpostId));
 		registrering.setJournalpostnummer(toBigInteger(journalpostId));
 		registrering.setJournalposttype(determineJournalPostType(journalpost.getType()));
-		registrering.setJournaldato(dateToXMLGregorianCalendar(journaldato));
-		registrering.setSendtDato(dateToXMLGregorianCalendar(determineSendtDato(journalpost, journaldato)));
+		registrering.setJournaldato(journaldato.toLocalDate());
+		registrering.setSendtDato(determineSendtDato(journalpost, journaldato));
 		registrering.setRegistreringsID(journalpostId.toString());
 		registrering.setTittel(journalpost.getInnhold());
 		registrering.setJournalstatus("Arkivert");
@@ -99,11 +96,11 @@ public class SaksmappeMapper {
 		}
 		//Skal kun settes om journalpost.getDatoDokument() != null
 		if (journalpost.getDatoDokument() != null) {
-			registrering.setDokumentetsDato(dateToXMLGregorianCalendar(journalpost.getDatoDokument()));
+			registrering.setDokumentetsDato(journalpost.getDatoDokument().toLocalDate());
 		}
 		//Skal kun settes om journalpost.getDatoMottatt() != null && journalpostType == "I"
 		if ("I".equals(journalpost.getType()) && journalpost.getDatoMottatt() != null) {
-			registrering.setMottattDato(dateToXMLGregorianCalendar(journalpost.getDatoMottatt()));
+			registrering.setMottattDato(journalpost.getDatoMottatt());
 		}
 		for (DokumentInfo dokumentInfo : journalpost.getDok()) {
 			registrering.getDokumentbeskrivelses().add(mapDokumentBeskrivelse(dokumentInfo, tema, journalpostId.toString()));
@@ -112,36 +109,26 @@ public class SaksmappeMapper {
 		return registrering;
 	}
 
-	private String mapOpprettetAvNavn(Journalpost journalpost) {
-		if(isBlank(journalpost.getOpprettetAvNavn())) {
-			if(isBlank(journalpost.getOpprettetAv())) {
-				return Bruker.UKJENT_PERSON;
-			}
-			return journalpost.getOpprettetAvBeriketNavn();
-		}
-		return journalpost.getOpprettetAvNavn();
-	}
-
 
 	private Korrespondansepart mapKorrespondansePart(Journalpost journalpost) {
 		Korrespondansepart korrespondansepart = new Korrespondansepart();
 		korrespondansepart.setKorrespondanseparttype(mapKorrespondanseParttype(journalpost.getType()));
 		korrespondansepart.setKorrespondansepartNavn(journalpost.getAvsenderMottaker());
-		korrespondansepart.setSaksbehandler(mapOpprettetAvNavn(journalpost));
+		korrespondansepart.setSaksbehandler(resolveOpprettetAvNavn(journalpost));
 		return korrespondansepart;
 	}
 
 	private Dokumentbeskrivelse mapDokumentBeskrivelse(DokumentInfo dokumentInfo, String tema, String journalpostId) {
 		Dokumentbeskrivelse dokumentbeskrivelse = new Dokumentbeskrivelse();
-		dokumentbeskrivelse.setSystemID(mapSystemID(dokumentInfo.getUuid()));
+		dokumentbeskrivelse.setSystemID(AvleveringUtils.mapSystemID(dokumentInfo.getUuid()));
 		dokumentbeskrivelse.setDokumenttype(dokumentInfo.getKategoriDecode());
 		dokumentbeskrivelse.setDokumentstatus(mapDokumentstatus(dokumentInfo));
 		dokumentbeskrivelse.setTittel(dokumentInfo.getTittel());
-		dokumentbeskrivelse.setOpprettetDato(dateToXMLGregorianCalendar(dokumentInfo.getDatoOpprettet()));
-		dokumentbeskrivelse.setOpprettetAv(dokumentInfo.getOpprettetAvBeriketNavn());
+		dokumentbeskrivelse.setOpprettetDato(dokumentInfo.getDatoOpprettet());
+		dokumentbeskrivelse.setOpprettetAv(resolveOpprettetAv(dokumentInfo));
 		dokumentbeskrivelse.setTilknyttetRegistreringSom(dokumentInfo.getRelTilknyttetSom());
 		dokumentbeskrivelse.setDokumentnummer(toBigInteger(dokumentInfo.getId()));
-		dokumentbeskrivelse.setTilknyttetDato(dateToXMLGregorianCalendar(dokumentInfo.getRelDatoOpprettet()));
+		dokumentbeskrivelse.setTilknyttetDato(dokumentInfo.getRelDatoOpprettet());
 		dokumentbeskrivelse.setTilknyttetAv(dokumentInfo.getRelOpprettetAvBeriketNavn());
 
 		if(isStringTemaAvleverMedDokumenter(tema)) {
@@ -162,12 +149,12 @@ public class SaksmappeMapper {
 
 	private Dokumentobjekt mapDokumentobjekt(FilDetaljer filDetaljer, String tema, String journalpostId) {
 		Dokumentobjekt dokumentobjekt = new Dokumentobjekt();
-		dokumentobjekt.setSystemID(mapSystemID(filDetaljer.getUuid()));
+		dokumentobjekt.setSystemID(AvleveringUtils.generateSystemID());
 		dokumentobjekt.setVersjonsnummer(toBigInteger(1));
 		dokumentobjekt.setVariantformat("Arkivformat");
 		dokumentobjekt.setFormat("PDF/A");
-		dokumentobjekt.setOpprettetDato(dateToXMLGregorianCalendar(filDetaljer.getDatoOpprettet()));
-		dokumentobjekt.setOpprettetAv(filDetaljer.getOpprettetAvBeriketNavn());
+		dokumentobjekt.setOpprettetDato(filDetaljer.getDatoOpprettet());
+		dokumentobjekt.setOpprettetAv(resolveOpprettetAv(filDetaljer));
 		dokumentobjekt.setReferanseDokumentfil("DOKUMENTER/" + tema + "/" + journalpostId + "_" + filDetaljer.getFilUuid() + ".pdf");
 		dokumentobjekt.setSjekksum(filDetaljer.getSha256hashBeriket());
 		dokumentobjekt.setSjekksumAlgoritme("SHA-256");
@@ -195,7 +182,7 @@ public class SaksmappeMapper {
 		}
 	}
 
-	private Date determineSendtDato(Journalpost journalpost, Date journaldato) {
+	private LocalDateTime determineSendtDato(Journalpost journalpost, LocalDateTime journaldato) {
 		switch (journalpost.getStatus()) {
 			case "E":
 				if (journalpost.getDatoEkspedert() != null)
@@ -212,15 +199,29 @@ public class SaksmappeMapper {
 		return "I".equalsIgnoreCase(journalpost_t) ? "Avsender" : "Mottaker";
 	}
 
-	private SystemID mapSystemID(final UUID value) {
-		SystemID systemID = new SystemID();
-		systemID.setValue(value.toString());
-		return systemID;
-	}
-
 	private String getAdministrativEnhetFromTema(String tema) {
 		return Tema.valueOf(tema).getAdminEnhet();
 	}
 
+	private static String resolveOpprettetAvNavn(MedOpprettetAvNavn aktoer) {
+		if (aktoer.getOpprettetAvNavn() != null) {
+			return aktoer.getOpprettetAvNavn();
+		}
+		return resolveOpprettetAv(aktoer);
+	}
+
+	private static String resolveOpprettetAv(MedOpprettetAv aktoer) {
+		if (aktoer.getOpprettetAv() == null && aktoer.getOpprettetAvBeriketNavn() == null) {
+			return "Ukjent";
+		}
+		if (erSystembruker(aktoer.getOpprettetAv())) {
+			return "Automatisk jobb";
+		}
+		return aktoer.getOpprettetAvBeriketNavn();
+	}
+
+	private static boolean erSystembruker(String opprettetAv) {
+		return "9999".equalsIgnoreCase(opprettetAv) || AUTOMATISK_JOBB.equalsIgnoreCase(opprettetAv);
+	}
 
 }

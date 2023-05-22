@@ -1,21 +1,12 @@
 package no.nav.dokarkivavlevering.avlevering.testUtils;
 
-import no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils;
-
-import javax.xml.datatype.XMLGregorianCalendar;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class TestUtils {
-	public static SimpleDateFormat formatter = new SimpleDateFormat("yyy-MM-dd hh:mm:ss");
+	private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuu-MM-dd k:mm:ss[.SSS][.SS]");
 
-
-	public static XMLGregorianCalendar toXmlGregCalendar(String dateString) throws Exception{
-		Date d = formatter.parse(dateString);
-		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Oslo"));
-		cal.setTime(d);
-		return AvleveringUtils.dateToXMLGregorianCalendar(d);
+	public static LocalDateTime toLocalDateTime(String dato) {
+		return LocalDateTime.parse(dato, formatter);
 	}
 }

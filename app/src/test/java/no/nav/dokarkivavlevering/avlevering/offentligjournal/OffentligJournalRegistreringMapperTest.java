@@ -11,14 +11,14 @@ import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import no.nav.dokarkivavlevering.avlevering.testUtils.TestUtils;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-
-import static no.nav.dokarkivavlevering.avlevering.testUtils.TestUtils.formatter;
+import static java.util.Collections.singletonList;
+import static no.nav.dokarkivavlevering.avlevering.testUtils.TestUtils.toLocalDateTime;
 import static org.apache.camel.converter.ObjectConverter.toBigInteger;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class OffentligJournalRegistreringMapperTest {
-	private OffentligJournalRegistreringMapper mapper = new OffentligJournalRegistreringMapper(new JournaldatoMapper());
+	private final OffentligJournalRegistreringMapper mapper = new OffentligJournalRegistreringMapper(new JournaldatoMapper());
 
 	@Test
 	void testMapping() throws Exception {
@@ -35,13 +35,13 @@ class OffentligJournalRegistreringMapperTest {
 	}
 
 	private void assertJournalpost(no.arkivverket.standarder.noark5.offentligjournal.Journalpost jp) throws Exception {
-		assertEquals(jp.getSystemID().getValue().isEmpty(), false);
+		assertThat(jp.getSystemID().getValue()).isNotEmpty();
 		assertEquals(jp.getJournalaar(), toBigInteger(2020));
 		assertEquals(jp.getJournalsekvensnummer(), toBigInteger(453637481));
 		assertEquals(jp.getJournalpostnummer(), toBigInteger(453637481));
 		assertEquals(jp.getOffentligTittel(), "Legg til ny institusjon");
-		assertEquals(jp.getJournaldato(), TestUtils.toXmlGregCalendar("2020-11-10 16:04:43"));
-		assertEquals(jp.getDokumentetsDato(), TestUtils.toXmlGregCalendar("2020-11-10 16:05:43"));
+		assertEquals(jp.getJournaldato(), TestUtils.toLocalDateTime("2020-11-10 16:04:43").toLocalDate());
+		assertEquals(jp.getDokumentetsDato(), TestUtils.toLocalDateTime("2020-11-10 16:05:43").toLocalDate());
 		assertEquals(jp.getSkjermingMetadata(), "Skjerming navn mottaker");
 		assertEquals(jp.getSkjermingshjemmel(), "Offentleglova § 13");
 		assertKorrespondanseParts(jp.getKorrespondanseparts().get(0));
@@ -63,8 +63,8 @@ class OffentligJournalRegistreringMapperTest {
 				.id((long) 1234567011)
 				.tema("MED")
 				.opprettetAv("srvmelosys")
-				.opprettetTidspunkt(formatter.parse("2019-10-28 11:41:36.673"))
-				.jp(Arrays.asList(generateJournalPost())).build();
+				.opprettetTidspunkt(toLocalDateTime("2019-10-28 11:41:36.673"))
+				.jp(singletonList(generateJournalPost())).build();
 	}
 
 	private Journalpost generateJournalPost() throws Exception {
@@ -75,9 +75,9 @@ class OffentligJournalRegistreringMapperTest {
 				.innhold("Legg til ny institusjon")
 				.avsenderMottaker("Arena")
 				.datoMottatt(null)
-				.datoDokument(formatter.parse("2020-11-10 16:05:43.332"))
-				.datoJournal(formatter.parse("2020-11-10 16:04:43.35"))
-				.datoOpprettet(formatter.parse("2020-11-10 16:04:43.338"))
+				.datoDokument(toLocalDateTime("2020-11-10 16:05:43.332"))
+				.datoJournal(toLocalDateTime("2020-11-10 16:04:43.35"))
+				.datoOpprettet(toLocalDateTime("2020-11-10 16:04:43.338"))
 				.datoEkspedert(null)
 				.datoSendtPrint(null)
 				.opprettetAv("srvmelosys")
@@ -85,7 +85,7 @@ class OffentligJournalRegistreringMapperTest {
 				.opprettetAvNavn("srvmelosys")
 				.endretAv("srvmelosys")
 				.endretAvBeriketNavn(null)
-				.dok(Arrays.asList(generateDokumentInfo()))
+				.dok(singletonList(generateDokumentInfo()))
 				.build();
 	}
 
@@ -93,12 +93,12 @@ class OffentligJournalRegistreringMapperTest {
 		return DokumentInfo.builder()
 				.id((long) 454017976)
 				.relTilknyttetSom("HOVEDDOKUMENT")
-				.relDatoOpprettet(formatter.parse("2020-11-10 16:04:43.343"))
+				.relDatoOpprettet(toLocalDateTime("2020-11-10 16:04:43.343"))
 				.relOpprettetAv("srvmelosys")
 				.relOpprettetAvBeriketNavn("Automatisk Jobb")
 				.status("FERDIGSTILT")
 				.tittel("Legg til ny institusjon")
-				.datoOpprettet(formatter.parse("2020-11-10 16:04:43.342"))
+				.datoOpprettet(toLocalDateTime("2020-11-10 16:04:43.342"))
 				.opprettetAv("srvmelosys")
 				.opprettetAvBeriketNavn("Automatisk Jobb")
 				.build();

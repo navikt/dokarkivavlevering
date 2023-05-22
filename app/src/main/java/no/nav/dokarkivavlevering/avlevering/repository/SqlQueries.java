@@ -1,8 +1,5 @@
 package no.nav.dokarkivavlevering.avlevering.repository;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 public class SqlQueries {
 	static final String JOURNALPOST_ID_RANGE = """
 			select min(j.journalpost_id),
@@ -79,6 +76,12 @@ public class SqlQueries {
 					       f.dato_opprettet              as jp_dok_fd_datoopprettet,
 					       f.opprettet_av                as jp_dok_fd_opprettetav,
 					       df.fil                        as jp_dok_fd_fil,
+					       fo.k_fagomrade                as fagomrade_fagomrade,
+					       fo.dekode                     as fagomrade_dekode,
+					       fo.dato_tom                   as fagomrade_dato_tom,
+					       fo.er_gyldig                  as fagomrade_er_gyldig,
+					       fo.dato_opprettet             as fagomrade_dato_opprettet,
+					       fo.opprettet_av               as fagomrade_opprettet_av,
 					       aeej.arkiv_element_endring_id as jp_ae_id,
 					       aeej.arkiv_element            as jp_ae_element,
 					       alj.tidspunkt                 as jp_ae_tidspunkt,
@@ -99,6 +102,7 @@ public class SqlQueries {
 					         join t_k_kategori_t k on k.k_kategori_t = d.k_kategori_t
 					         join t_fil_detaljer f on d.dokument_info_id = f.dokument_info_id
 					         join t_dokument_fil df on f.fil_uuid = df.fil_uuid
+					         join t_k_fagomrade fo on sa.tema = fo.k_fagomrade
 					         left join t_aksjonslogg alj on alj.journalpost_id = j.journalpost_id and alj.dokument_info_id is null
 					         left join t_arkiv_element_endring aeej on alj.aksjonslogg_id = aeej.aksjonslogg_id
 					         left join t_aksjonslogg ald on ald.journalpost_id = j.journalpost_id and ald.dokument_info_id = d.dokument_info_id
@@ -152,6 +156,12 @@ public class SqlQueries {
 					       f.fil_uuid                    as jp_dok_fd_filuuid,
 					       f.dato_opprettet              as jp_dok_fd_datoopprettet,
 					       f.opprettet_av                as jp_dok_fd_opprettetav,
+					       fo.k_fagomrade                as fagomrade_fagomrade,
+					       fo.dekode                     as fagomrade_dekode,
+					       fo.dato_tom                   as fagomrade_dato_tom,
+					       fo.er_gyldig                  as fagomrade_er_gyldig,
+					       fo.dato_opprettet             as fagomrade_dato_opprettet,
+					       fo.opprettet_av               as fagomrade_opprettet_av,
 					       aeej.arkiv_element_endring_id as jp_ae_id,
 					       aeej.arkiv_element            as jp_ae_element,
 					       alj.tidspunkt                 as jp_ae_tidspunkt,
@@ -171,6 +181,7 @@ public class SqlQueries {
 					         join t_dokument_info d on r.dokument_info_id = d.dokument_info_id
 					         join t_k_kategori_t k on k.k_kategori_t = d.k_kategori_t
 					         join t_fil_detaljer f on d.dokument_info_id = f.dokument_info_id
+					         join t_k_fagomrade fo on sa.tema = fo.k_fagomrade
 					         left join t_aksjonslogg alj on alj.journalpost_id = j.journalpost_id and alj.dokument_info_id is null
 					         left join t_arkiv_element_endring aeej on alj.aksjonslogg_id = aeej.aksjonslogg_id
 					         left join t_aksjonslogg ald on ald.journalpost_id = j.journalpost_id and ald.dokument_info_id = d.dokument_info_id

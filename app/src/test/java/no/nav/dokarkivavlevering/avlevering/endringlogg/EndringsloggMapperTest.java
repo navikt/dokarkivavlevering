@@ -5,11 +5,8 @@ import no.nav.dokarkivavlevering.avlevering.domain.Arkivendring;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
 
-import java.time.Instant;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
-
-import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.dateToXMLGregorianCalendar;
 
 class EndringsloggMapperTest {
 
@@ -17,7 +14,7 @@ class EndringsloggMapperTest {
 
 	@Test
 	void shouldMap() {
-		Date date = Date.from(Instant.now());
+		LocalDateTime date = LocalDateTime.now();
 		UUID uuid = UUID.randomUUID();
 
 		Arkivendring arkivendring = Arkivendring.builder()
@@ -35,7 +32,7 @@ class EndringsloggMapperTest {
 		SoftAssertions softly = new SoftAssertions();
 		softly.assertThat(endring.getReferanseArkivenhet()).isEqualTo(uuid.toString());
 		softly.assertThat(endring.getReferanseMetadata()).isEqualTo("Saksrelasjon.sakId");
-		softly.assertThat(endring.getEndretDato()).isEqualTo(dateToXMLGregorianCalendar(arkivendring.getTidspunkt()));
+		softly.assertThat(endring.getEndretDato()).isEqualTo(arkivendring.getTidspunkt());
 		softly.assertThat(endring.getEndretAv()).isEqualTo("JonBlund");
 		softly.assertThat(endring.getTidligereVerdi()).isEqualTo("123");
 		softly.assertThat(endring.getNyVerdi()).isEqualTo("1234");
@@ -44,7 +41,7 @@ class EndringsloggMapperTest {
 
 	@Test
 	void shouldMapJournalpostStatus() {
-		Date date = Date.from(Instant.now());
+		LocalDateTime date = LocalDateTime.now();
 		UUID uuid = UUID.randomUUID();
 
 		Arkivendring arkivendring = Arkivendring.builder()
@@ -62,7 +59,7 @@ class EndringsloggMapperTest {
 		SoftAssertions softly = new SoftAssertions();
 		softly.assertThat(endring.getReferanseArkivenhet()).isEqualTo(uuid.toString());
 		softly.assertThat(endring.getReferanseMetadata()).isEqualTo("Journalpost.journalpostStatus");
-		softly.assertThat(endring.getEndretDato()).isEqualTo(dateToXMLGregorianCalendar(arkivendring.getTidspunkt()));
+		softly.assertThat(endring.getEndretDato()).isEqualTo(arkivendring.getTidspunkt());
 		softly.assertThat(endring.getEndretAv()).isEqualTo("JonBlund");
 		softly.assertThat(endring.getTidligereVerdi()).isEqualTo("JOURNALFØRT");
 		softly.assertThat(endring.getNyVerdi()).isEqualTo("FERDIGSTILT");
@@ -71,7 +68,7 @@ class EndringsloggMapperTest {
 
 	@Test
 	void shouldMapIngenVerdiWhenFraVerdiIsNull() {
-		Date date = Date.from(Instant.now());
+		LocalDateTime date = LocalDateTime.now();
 		UUID uuid = UUID.randomUUID();
 
 		Arkivendring arkivendring = Arkivendring.builder()

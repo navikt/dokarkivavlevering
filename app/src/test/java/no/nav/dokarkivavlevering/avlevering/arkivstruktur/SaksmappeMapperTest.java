@@ -6,61 +6,55 @@ import no.arkivverket.standarder.noark5.arkivstruktur.Korrespondansepart;
 import no.arkivverket.standarder.noark5.arkivstruktur.Part;
 import no.arkivverket.standarder.noark5.arkivstruktur.Registrering;
 import no.arkivverket.standarder.noark5.arkivstruktur.Saksmappe;
-import no.arkivverket.standarder.noark5.arkivstruktur.SystemID;
 import no.nav.dokarkivavlevering.avlevering.common.JournaldatoMapper;
-import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.domain.Bruker;
+import no.nav.dokarkivavlevering.avlevering.domain.BrukerMedNavnedata;
 import no.nav.dokarkivavlevering.avlevering.domain.DokumentInfo;
 import no.nav.dokarkivavlevering.avlevering.domain.FilDetaljer;
 import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
+import no.nav.dokarkivavlevering.avlevering.domain.NavnMedGyldighet;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
-import no.nav.dokarkivavlevering.avlevering.testUtils.TestUtils;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
-import static no.nav.dokarkivavlevering.avlevering.testUtils.TestUtils.formatter;
+import static no.nav.dokarkivavlevering.avlevering.testUtils.TestUtils.toLocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 
 class SaksmappeMapperTest {
 
 	public static final String FIL = "Hello World";
-	private final AvleveringProperties avleveringProperties = new AvleveringProperties();
-	private final SaksmappeMapper saksmappeMapper = new SaksmappeMapper(new JournaldatoMapper(), avleveringProperties);
+	public static final String BRUKER_ID = "12345678911";
+	public static final ZonedDateTime SAK_OPPRETTET_TIDSPUNKT = LocalDateTime.from(DateTimeFormatter.ISO_LOCAL_DATE_TIME.parse("2019-10-28T11:41:36.673")).atZone(ZoneId.of("Europe/Oslo"));
+	private final SaksmappeMapper saksmappeMapper = new SaksmappeMapper(new JournaldatoMapper());
 
 	@Test
 	void shouldMap() throws Exception {
-		SystemID sakSystemID = new SystemID();
-		sakSystemID.setValue(UUID.randomUUID().toString());
-
 		Sak sak = generateSak("KTR");
 
 		final Saksmappe saksmappe = saksmappeMapper.map(sak);
 		//saksmappe
 		assertEquals(saksmappe.getSaksaar().toString(), "2019");
 		assertEquals(saksmappe.getSakssekvensnummer().toString(), "1234567011");
-		assertEquals(saksmappe.getSaksdato(), TestUtils.toXmlGregCalendar("2019-10-28 11:41:36"));
+		assertEquals(saksmappe.getSaksdato(), toLocalDateTime("2019-10-28 11:41:36").toLocalDate());
 		assertEquals(saksmappe.getAdministrativEnhet(), "NAV Kontroll");
 		assertEquals(saksmappe.getSaksansvarlig(), "Bjarne Betjent");
 		assertEquals(saksmappe.getSaksstatus(), "Under behandling");
-		assertEquals(saksmappe.getSystemID().getValue().isEmpty(), false);
+		assertThat(saksmappe.getSystemID().getValue()).isNotEmpty();
 		assertEquals(saksmappe.getMappeID(), "1234567011");
 		assertEquals(saksmappe.getTittel(), "Kontroll");
-		assertEquals(saksmappe.getOpprettetDato(), TestUtils.toXmlGregCalendar("2019-10-28 11:41:36"));
+		assertThat(saksmappe.getOpprettetDato()).isEqualToIgnoringNanos(toLocalDateTime("2019-10-28 11:41:36"));
 		assertEquals(saksmappe.getOpprettetAv(), "Automatisk jobb");
-		assertEquals(saksmappe.getReferanseArkivdels().size(), 1);
 		assertEquals(saksmappe.getParts().size(), 1);
 		assertEquals(saksmappe.getRegistrerings().size(), 1);
-		assertThat(saksmappe.getReferanseArkivdels()).contains(avleveringProperties.getArkivConfig().getArkivdelConfig().getSystemID());
 		//saksmappe/part
 		assertPart(saksmappe.getParts().get(0));
 
@@ -69,9 +63,6 @@ class SaksmappeMapperTest {
 
 	@Test
 	void shouldMapWithoutDokument() throws Exception {
-		SystemID sakSystemID = new SystemID();
-		sakSystemID.setValue(UUID.randomUUID().toString());
-
 		Sak sak = generateSak("VEN");
 
 		final Saksmappe saksmappe = saksmappeMapper.map(sak);
@@ -119,10 +110,10 @@ class SaksmappeMapperTest {
 		assertEquals(registrering.getJournalpostnummer().toString(), "453637481");
 		assertEquals(registrering.getJournalposttype(), "Utgående dokument");
 		assertEquals(registrering.getJournalstatus(), "Arkivert");
-		assertEquals(registrering.getJournaldato(), TestUtils.toXmlGregCalendar("2020-11-10 16:04:43"));
-		assertEquals(registrering.getDokumentetsDato(), TestUtils.toXmlGregCalendar("2020-11-10 16:05:43"));
-		assertEquals(registrering.getSystemID().getValue().isEmpty(), false);
-		assertEquals(registrering.getOpprettetDato(), TestUtils.toXmlGregCalendar("2020-11-10 16:04:43"));
+		assertEquals(registrering.getJournaldato(), toLocalDateTime("2020-11-10 16:04:43").toLocalDate());
+		assertEquals(registrering.getDokumentetsDato(), toLocalDateTime("2020-11-10 16:05:43").toLocalDate());
+		assertThat(registrering.getSystemID().getValue()).isNotEmpty();
+		assertThat(registrering.getOpprettetDato()).isEqualToIgnoringNanos(toLocalDateTime("2020-11-10 16:04:43"));
 		assertEquals(registrering.getOpprettetAv(), "srvmelosys");
 		assertEquals(registrering.getRegistreringsID(), "453637481");
 		assertEquals(registrering.getTittel(), "Legg til ny institusjon");
@@ -138,7 +129,7 @@ class SaksmappeMapperTest {
 		assertEquals(dokObjekt.getVersjonsnummer(), toBigInteger(1));
 		assertEquals(dokObjekt.getVariantformat(), "Arkivformat");
 		assertEquals(dokObjekt.getFormat(), "PDF/A");
-		assertEquals(dokObjekt.getOpprettetDato(), TestUtils.toXmlGregCalendar("2020-11-10 16:04:43"));
+		assertThat(dokObjekt.getOpprettetDato()).isEqualToIgnoringNanos(toLocalDateTime("2020-11-10 16:04:43"));
 		assertEquals(dokObjekt.getOpprettetAv(), "Automatisk jobb");
 		assertEquals(dokObjekt.getReferanseDokumentfil(), "DOKUMENTER/KTR/453637481_55c39cdb-f052-4f4e-a9a5-900b455ca915.pdf");
 		assertEquals(dokObjekt.getSjekksum(), "a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e");
@@ -157,11 +148,11 @@ class SaksmappeMapperTest {
 		assertEquals(dok.getDokumenttype(), "Strukturert elektronisk dokument");
 		assertEquals(dok.getDokumentstatus(), "Dokumentet er ferdigstilt");
 		assertEquals(dok.getTittel(), "Legg til ny institusjon");
-		assertEquals(dok.getOpprettetDato(), TestUtils.toXmlGregCalendar("2020-11-10 16:04:43"));
+		assertThat(dok.getOpprettetDato()).isEqualToIgnoringNanos(toLocalDateTime("2020-11-10 16:04:43"));
 		assertEquals(dok.getOpprettetAv(), "Automatisk jobb");
 		assertEquals(dok.getTilknyttetRegistreringSom(), "HOVEDDOKUMENT");
 		assertEquals(dok.getDokumentnummer(), toBigInteger(454017976));
-		assertEquals(dok.getTilknyttetDato(), TestUtils.toXmlGregCalendar("2020-11-10 16:04:43"));
+		assertThat(dok.getTilknyttetDato()).isEqualToIgnoringNanos(toLocalDateTime("2020-11-10 16:04:43"));
 		assertEquals(dok.getTilknyttetAv(), "Automatisk jobb");
 		assertEquals(dok.getDokumentobjekts().size(), 1);
 
@@ -180,18 +171,19 @@ class SaksmappeMapperTest {
 		return Sak.builder()
 				.id((long) 1234567011)
 				.tema(tema)
-				.bruker(generaterBruker())
+				.bruker(new Bruker(BRUKER_ID, null))
+				.brukerMedNavnedata(generateBrukerMedNavnedata())
 				.opprettetAv("srvmelosys")
-				.opprettetTidspunkt(formatter.parse("2019-10-28 11:41:36.673"))
+				.opprettetTidspunkt(SAK_OPPRETTET_TIDSPUNKT.toLocalDateTime())
 				.opprettetAvBeriketNavn("Automatisk jobb")
 				.jp(Arrays.asList(generateJournalpost())).build();
 	}
 
-	private Bruker generaterBruker() {
-		return new Bruker(
-				"12345678911",
-				"Frank"
-		);
+	private BrukerMedNavnedata generateBrukerMedNavnedata() {
+		return new BrukerMedNavnedata(BRUKER_ID, List.of(
+				new NavnMedGyldighet(SAK_OPPRETTET_TIDSPUNKT.minusYears(10), SAK_OPPRETTET_TIDSPUNKT.minusYears(2), "Foreldet"),
+				new NavnMedGyldighet(SAK_OPPRETTET_TIDSPUNKT.minusYears(2), SAK_OPPRETTET_TIDSPUNKT.plusMonths(2), "Frank"),
+				new NavnMedGyldighet(SAK_OPPRETTET_TIDSPUNKT.plusMonths(2), null, "For nytt")));
 	}
 
 	private Journalpost generateJournalpost() throws Exception {
@@ -202,9 +194,9 @@ class SaksmappeMapperTest {
 				.innhold("Legg til ny institusjon")
 				.avsenderMottaker("Bruker Brukersen")
 				.datoMottatt(null)
-				.datoDokument(formatter.parse("2020-11-10 16:05:43.332"))
-				.datoJournal(formatter.parse("2020-11-10 16:04:43.35"))
-				.datoOpprettet(formatter.parse("2020-11-10 16:04:43.338"))
+				.datoDokument(toLocalDateTime("2020-11-10 16:05:43.332"))
+				.datoJournal(toLocalDateTime("2020-11-10 16:04:43.35"))
+				.datoOpprettet(toLocalDateTime("2020-11-10 16:04:43.338"))
 				.datoEkspedert(null)
 				.datoSendtPrint(null)
 				.opprettetAv("srvmelosys")
@@ -212,7 +204,7 @@ class SaksmappeMapperTest {
 				.opprettetAvNavn("srvmelosys")
 				.endretAv("srvmelosys")
 				.endretAvBeriketNavn("Bjarne Betjent")
-				.dok(Arrays.asList(generateDokumentInfo()))
+				.dok(Collections.singletonList(generateDokumentInfo()))
 				.build();
 	}
 
@@ -220,13 +212,13 @@ class SaksmappeMapperTest {
 		return DokumentInfo.builder()
 				.id((long) 454017976)
 				.relTilknyttetSom("HOVEDDOKUMENT")
-				.relDatoOpprettet(formatter.parse("2020-11-10 16:04:43.343"))
+				.relDatoOpprettet(toLocalDateTime("2020-11-10 16:04:43.343"))
 				.relOpprettetAv("srvmelosys")
 				.relOpprettetAvBeriketNavn("Automatisk jobb")
 				.kategoriDecode("Strukturert elektronisk dokument")
 				.status("FERDIGSTILT")
 				.tittel("Legg til ny institusjon")
-				.datoOpprettet(formatter.parse("2020-11-10 16:04:43.342"))
+				.datoOpprettet(toLocalDateTime("2020-11-10 16:04:43.342"))
 				.opprettetAv("srvmelosys")
 				.opprettetAvBeriketNavn("Automatisk jobb")
 				.fd(Arrays.asList(generateFilDetaljer()))
@@ -240,7 +232,7 @@ class SaksmappeMapperTest {
 				.fil(FIL.getBytes())
 				.filstorrelseBeriket(FIL.length())
 				.sha256hashBeriket("a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e")
-				.datoOpprettet(formatter.parse("2020-11-10 16:04:43.343"))
+				.datoOpprettet(toLocalDateTime("2020-11-10 16:04:43.343"))
 				.opprettetAv("srvRuting")
 				.opprettetAvBeriketNavn("Automatisk jobb")
 				.build();

@@ -75,20 +75,20 @@ public class AvleveringTemaRoute extends RouteBuilder {
 									"loop=${header.CamelLoopIndex}")
 					.bean(avleveringRepository, "findSakIdsPagination")
 					.log(INFO, log,"fikk hentet saker")
-					.choice().when(simple("${body.size} == 0 && ${header.CamelLoopIndex} == 0"))
-						.log(INFO, log, "Ingen sakIds funnet for tema=${exchangeProperty.AvleveringTema}")
-						.setHeader(HEADER_AVLEVERING_TEMA_SIZE, simple("${body.size}"))
-						.setHeader(HEADER_TEMA_SKIP, constant(true))
-						.setBody(exchangeProperty(PROPERTY_TEMA))
-					.otherwise()
-						.to(DETERMINE_AVLEVER_DOKUMENTER)
-					.end()// end choice
+					.choice()
+						.when(simple("${body.size} == 0 && ${header.CamelLoopIndex} == 0"))
+							.log(INFO, log, "Ingen sakIds funnet for tema=${exchangeProperty.AvleveringTema}")
+							.setHeader(HEADER_AVLEVERING_TEMA_SIZE, simple("${body.size}"))
+							.setHeader(HEADER_TEMA_SKIP, constant(true))
+							.setBody(exchangeProperty(PROPERTY_TEMA))
+						.otherwise()
+							.to(DETERMINE_AVLEVER_DOKUMENTER)
+						.end()// end choice
 				.end() // end loop
-				.choice().when(header(HEADER_TEMA_SKIP).isEqualTo(constant(true)))
-					.log(INFO, log, "Ingenting å avlevere for tema=${exchangeProperty.AvleveringTema}")
-				.otherwise()
-					.to(AvleveringArkivstrukturRoute.GENERER_KLASSE)
-				.end()
+				.choice()
+					.when(header(HEADER_TEMA_SKIP).isEqualTo(constant(true)))
+						.log(INFO, log, "Ingenting å avlevere for tema=${exchangeProperty.AvleveringTema}")
+					.end()
 				.log(INFO, log, "Ferdig behandlet tema=${exchangeProperty.AvleveringTema}");
 
 		from(DETERMINE_AVLEVER_DOKUMENTER)

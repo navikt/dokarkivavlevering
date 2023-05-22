@@ -1,35 +1,26 @@
 package no.nav.dokarkivavlevering.avlevering.arkivstruktur;
 
 import no.arkivverket.standarder.noark5.arkivstruktur.Klasse;
-import no.arkivverket.standarder.noark5.arkivstruktur.SystemID;
-import no.nav.dokarkivavlevering.avlevering.config.Tema;
+import no.arkivverket.standarder.noark5.arkivstruktur.Saksmappe;
+import no.nav.dokarkivavlevering.avlevering.domain.Fagomrade;
+import no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils;
 import org.springframework.stereotype.Component;
 
-import java.util.UUID;
+import java.util.List;
 
-import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.DATE_TIME_FORMAT;
-import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.mapXmlGregorianCalendar;
 
 @Component
 public class KlasseMapper {
 
-	//Denne er bare halvtenkt
-	public Klasse map(Tema tema) {
+	public Klasse map(Fagomrade fagomrade, List<Saksmappe> mapper) {
 		Klasse klasse = new Klasse();
-		klasse.setSystemID(generateSystemId());
-		klasse.setKlasseID(tema.getTemakode());
-		klasse.setTittel(tema.getTemanavn());
-		klasse.setBeskrivelse("Klassene representerer de av NAVs fagområder som registreres i fagsystemet Gosys");
-		klasse.setOpprettetDato(mapXmlGregorianCalendar(DATE_TIME_FORMAT, "2010-02-18T12:00:00"));
-		klasse.setOpprettetAv("Arbeids- og velferdsetaten");
+		klasse.setSystemID(AvleveringUtils.generateSystemID());
+		klasse.setKlasseID(fagomrade.getFagomrade());
+		klasse.setTittel(fagomrade.getDekode());
+		klasse.setBeskrivelse("Klasse for saksbehandling av " + fagomrade.getDekode());
+		klasse.setOpprettetDato(fagomrade.getDatoOpprettet());
+		klasse.setOpprettetAv(fagomrade.getOpprettetAv());
+		klasse.getMappes().addAll(mapper);
 		return klasse;
 	}
-
-	private SystemID generateSystemId() {
-		UUID uuid = UUID.randomUUID();
-		SystemID systemID = new SystemID();
-		systemID.setValue(uuid.toString());
-		return systemID;
-	}
-
 }

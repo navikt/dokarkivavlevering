@@ -4,24 +4,20 @@ import lombok.Builder;
 import lombok.ToString;
 import lombok.Value;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 @Value
 @Builder(toBuilder = true)
-public class FilDetaljer {
-	private final Long id;
-	private final String filUuid;
-	private final Date datoOpprettet;
+public class FilDetaljer implements MedOpprettetAv {
+	Long id;
+	String filUuid;
+	LocalDateTime datoOpprettet;
 	@ToString.Exclude
-	private final String opprettetAv;
-	private final UUID uuid = UUID.randomUUID();
+	String opprettetAv;
 	@ToString.Exclude
-	private final String opprettetAvBeriketNavn;
-	private final byte[] fil;
-	private final int filstorrelseBeriket;
-	private final String sha256hashBeriket;
+	String opprettetAvBeriketNavn;
+	byte[] fil;
+	int filstorrelseBeriket;
+	String sha256hashBeriket;
 }
