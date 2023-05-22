@@ -195,7 +195,7 @@ class SaksmappeMapperTest {
 				.avsenderMottaker("Bruker Brukersen")
 				.datoMottatt(null)
 				.datoDokument(toLocalDateTime("2020-11-10 16:05:43.332"))
-				.datoJournal(toLocalDateTime(	"2020-11-10 16:04:43.35"))
+				.datoJournal(toLocalDateTime("2020-11-10 16:04:43.35"))
 				.datoOpprettet(toLocalDateTime("2020-11-10 16:04:43.338"))
 				.datoEkspedert(null)
 				.datoSendtPrint(null)

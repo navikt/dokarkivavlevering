@@ -23,15 +23,21 @@ public class AvleveringSakBerikerMapper {
 		this.asposeService = asposeService;
 	}
 
-	Sak berikMedDokumenter(final Sak sak, final Map<String, String> navAnsatteNavn, Map<String, BrukerMedNavnedata> pdlHentIdenterBolks, Map<String, BrukerMedNavnedata> eregOrganisasjonBolk) {
+	Sak berikMedDokumenter(Sak sak, Map<String, String> navAnsatteNavn,
+						   Map<String, BrukerMedNavnedata> pdlHentIdenterBolks,
+						   Map<String, BrukerMedNavnedata> eregOrganisasjonBolk) {
 		return berikMedSpesifisertOperasjonForDokument(sak, navAnsatteNavn, pdlHentIdenterBolks, eregOrganisasjonBolk, this::berikMedFil);
 	}
 
-	Sak berikUtenDokument(final Sak sak, final Map<String, String> navAnsatteNavn, Map<String, BrukerMedNavnedata> pdlHentIdenterBolks, Map<String, BrukerMedNavnedata> eregOrganisasjonBolk) {
+	Sak berikUtenDokument(Sak sak, Map<String, String> navAnsatteNavn,
+						  Map<String, BrukerMedNavnedata> pdlHentIdenterBolks,
+						  Map<String, BrukerMedNavnedata> eregOrganisasjonBolk) {
 		return berikMedSpesifisertOperasjonForDokument(sak, navAnsatteNavn, pdlHentIdenterBolks, eregOrganisasjonBolk, (__, ___) -> null);
 	}
 
-	private Sak berikMedSpesifisertOperasjonForDokument(Sak sak, Map<String, String> navAnsatteNavn, Map<String, BrukerMedNavnedata> pdlHentIdenterBolks, Map<String, BrukerMedNavnedata> eregOrganisasjonBolk,
+	private Sak berikMedSpesifisertOperasjonForDokument(Sak sak, Map<String, String> navAnsatteNavn,
+														Map<String, BrukerMedNavnedata> pdlHentIdenterBolks,
+														Map<String, BrukerMedNavnedata> eregOrganisasjonBolk,
 														BiFunction<Map<String,String>,DokumentInfo,List<FilDetaljer>> berikDokumentOperasjon) {
 		return sak.toBuilder()
 				.brukerMedNavnedata(mapBruker(sak.getBruker(), pdlHentIdenterBolks, eregOrganisasjonBolk))
