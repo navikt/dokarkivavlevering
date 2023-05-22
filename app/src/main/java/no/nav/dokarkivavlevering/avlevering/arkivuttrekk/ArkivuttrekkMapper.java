@@ -81,13 +81,14 @@ public class ArkivuttrekkMapper {
 	}
 
 	private String countElements(String fileName, String element) {
-		Document doc = null;
 		try {
-			doc = DocumentBuilderFactory.newInstance()
+			Document doc = DocumentBuilderFactory.newInstance()
 					.newDocumentBuilder().parse(avleveringProperties.getFilomraade().getWork() + "/" + avleveringProperties.getAvleveringId() + "/" + fileName);
+			Objects.requireNonNull(doc);
+			return String.valueOf(doc.getElementsByTagName(element).getLength());
 		} catch (Exception e) {
 			log.error(e.getMessage());
 		}
-		return String.valueOf(Objects.requireNonNull(doc).getElementsByTagName(element).getLength());
+		return "-1";
 	}
 }
