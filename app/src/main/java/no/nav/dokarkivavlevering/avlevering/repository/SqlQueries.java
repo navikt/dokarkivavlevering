@@ -175,7 +175,7 @@ public class SqlQueries {
 					       aeed.fra_verdi                as jp_dok_ae_fraverdi,
 					       aeed.til_verdi                as jp_dok_ae_tilverdi
 					from sak sa
-					         join t_saksrelasjon s on sa.id = s.sak_id,
+					         join t_saksrelasjon s on sa.id = s.sak_id
 					         join t_journalpost j on s.journalpost_id = j.journalpost_id
 					         join t_jp_dok_info_rel r on j.journalpost_id = r.journalpost_id
 					         join t_dokument_info d on r.dokument_info_id = d.dokument_info_id
