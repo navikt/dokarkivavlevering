@@ -83,6 +83,12 @@
 				<scope>import</scope>
 			</dependency>
 			<dependency>
+				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-test-spring-junit5</artifactId>
+				<version>${camel.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
 				<groupId>net.sf.saxon</groupId>
 				<artifactId>Saxon-HE</artifactId>
 				<version>${Saxon-HE.version}</version>

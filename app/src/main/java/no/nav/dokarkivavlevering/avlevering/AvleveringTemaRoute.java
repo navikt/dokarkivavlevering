@@ -10,7 +10,6 @@ import no.nav.dokarkivavlevering.avlevering.endringlogg.AvleveringEndringsloggRo
 import no.nav.dokarkivavlevering.avlevering.loependejournal.AvleveringLoependeJournalRoute;
 import no.nav.dokarkivavlevering.avlevering.offentligjournal.AvleveringOffentligJournalRoute;
 import no.nav.dokarkivavlevering.avlevering.repository.AvleveringRepository;
-import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -18,9 +17,6 @@ import org.springframework.stereotype.Component;
 import static no.nav.dokarkivavlevering.avlevering.AvleveringRoute.PROPERTY_TEMA;
 import static org.apache.camel.LoggingLevel.INFO;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 @Slf4j
 @Component
 public class AvleveringTemaRoute extends RouteBuilder {
@@ -33,7 +29,7 @@ public class AvleveringTemaRoute extends RouteBuilder {
 	public static final String HEADER_LAST_SAK_ID = "AvleveringLastSakId";
 	public static final String HEADER_TEMA_SKIP = "AvleveringTemaSkip";
 	public static final String PROPERTY_TEMA_IDRANGE = "AvleveringIdRange";
-	public static final String PROPERTY_AVLEVER_MED_DOKUMENTER ="AvleverMedDokumenter";
+	public static final String PROPERTY_AVLEVER_MED_DOKUMENTER = "AvleverMedDokumenter";
 	private final AvleveringProperties avleveringProperties;
 	private final AvleveringRepository avleveringRepository;
 	private final AvleveringSakBerikerService avleveringSakBerikerService;
@@ -74,7 +70,7 @@ public class AvleveringTemaRoute extends RouteBuilder {
 							"Henter de neste ${header.AvleveringTemaSize} sakIds for tema=${exchangeProperty.AvleveringTema} før sakId=${header.AvleveringLastSakId}, " +
 									"loop=${header.CamelLoopIndex}")
 					.bean(avleveringRepository, "findSakIdsPagination")
-					.log(INFO, log,"fikk hentet saker")
+					.log(INFO, log, "fikk hentet saker")
 					.choice()
 						.when(simple("${body.size} == 0 && ${header.CamelLoopIndex} == 0"))
 							.log(INFO, log, "Ingen sakIds funnet for tema=${exchangeProperty.AvleveringTema}")
@@ -83,19 +79,20 @@ public class AvleveringTemaRoute extends RouteBuilder {
 							.setBody(exchangeProperty(PROPERTY_TEMA))
 						.otherwise()
 							.to(DETERMINE_AVLEVER_DOKUMENTER)
-						.end()// end choice
+					.end()// end choice
 				.end() // end loop
 				.choice()
 					.when(header(HEADER_TEMA_SKIP).isEqualTo(constant(true)))
 						.log(INFO, log, "Ingenting å avlevere for tema=${exchangeProperty.AvleveringTema}")
-					.end()
+				.end()
 				.log(INFO, log, "Ferdig behandlet tema=${exchangeProperty.AvleveringTema}");
 
 		from(DETERMINE_AVLEVER_DOKUMENTER)
-				.choice().when(exchangeProperty(PROPERTY_AVLEVER_MED_DOKUMENTER))
-					.to(BEHANDLE_TEMA_PAGE_MED_DOKUMENTER)
-				.otherwise()
-					.to(BEHANDLE_TEMA_PAGE_UTEN_DOKUMENTER)
+				.choice()
+					.when(exchangeProperty(PROPERTY_AVLEVER_MED_DOKUMENTER))
+						.to(BEHANDLE_TEMA_PAGE_MED_DOKUMENTER)
+					.otherwise()
+						.to(BEHANDLE_TEMA_PAGE_UTEN_DOKUMENTER)
 				.end();// end choice
 
 		from(BEHANDLE_TEMA_PAGE_MED_DOKUMENTER)
@@ -117,7 +114,7 @@ public class AvleveringTemaRoute extends RouteBuilder {
 				})
 				.parallelProcessing()
 				.to(
-						AvleveringArkivstrukturRoute.ARKIVSTRUKTUR,
+						AvleveringArkivstrukturRoute.SAKSMAPPE,
 						AvleveringEndringsloggRoute.ENDRINGSLOGG,
 						AvleveringLoependeJournalRoute.LOEPENDEJOURNAL,
 						AvleveringOffentligJournalRoute.OFFENTLIGJOURNAL,
@@ -144,7 +141,7 @@ public class AvleveringTemaRoute extends RouteBuilder {
 				})
 				.parallelProcessing()
 				.to(
-						AvleveringArkivstrukturRoute.ARKIVSTRUKTUR,
+						AvleveringArkivstrukturRoute.SAKSMAPPE,
 						AvleveringEndringsloggRoute.ENDRINGSLOGG,
 						AvleveringLoependeJournalRoute.LOEPENDEJOURNAL,
 						AvleveringOffentligJournalRoute.OFFENTLIGJOURNAL

@@ -48,6 +48,16 @@ public class AvleveringRoute extends RouteBuilder {
 				.logExhaustedMessageHistory(false));
 
 		from("timer://runOnce?repeatCount=1&delay=1000")
+				.routeId("start_everything")
+				.to("direct:start_intermediate");
+
+		// denne oppdelingen fremstår umiddelbart som omstendelig og meningsløs,
+		// men er nødvendig for stabil mocking i test
+		from("direct:start_intermediate")
+				.routeId("start_everything_actual")
+				.to("direct:start_avlevering");
+
+		from("direct:start_avlevering")
 				.routeId("start_avlevering")
 				.setProperty(PROPERTY_AVLEVERING_ID, constant(avleveringProperties.getAvleveringId()))
 				.log(LoggingLevel.INFO, log, "Dokarkivavlevering starter avlevering=${exchangeProperty.AvleveringId}.")
@@ -56,6 +66,7 @@ public class AvleveringRoute extends RouteBuilder {
 				.split(body())
 				.setProperty(PROPERTY_TEMA, body())
 				.to(BEHANDLE_TEMA)
+				.to(AvleveringArkivstrukturRoute.ARKIV)
 				.end()
 				.to(AvleveringStatiskRoute.AVLEVERING_STATIC)
 				.to(AvleveringLoependeJournalRoute.GENERER_LOEPENDEJOURNAL)
