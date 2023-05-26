@@ -69,7 +69,7 @@ public class AvleveringArkivstrukturRoute extends RouteBuilder {
 				.bean(avleveringRepository, "getFagomradeForTema")
 				.bean(avleveringArkivstrukturService)
 				.marshal(arkivstrukturJaxbFormat())
-				.setHeader(Exchange.FILE_NAME, simple("${exchangeProperty.AvleveringId}/arkiv_tema.xml"))
+				.setHeader(Exchange.FILE_NAME, simple("${exchangeProperty.AvleveringId}/arkivstruktur_tmp.xml"))
 				.to("file://{{avlevering.filomraade.work}}/?fileExist=Override")
 				.to(ARKIVSTRUKTUR)
 				.log(LoggingLevel.INFO, log, "Ferdig med å generere overordnet arkivstruktur for tema ${exchangeProperty.AvleveringTema}");
