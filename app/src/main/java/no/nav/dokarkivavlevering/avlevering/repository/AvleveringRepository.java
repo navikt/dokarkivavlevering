@@ -5,6 +5,7 @@ import no.nav.dokarkivavlevering.avlevering.AvleveringTemaRoute;
 import no.nav.dokarkivavlevering.avlevering.arkivstruktur.IdRange;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.config.Tema;
+import no.nav.dokarkivavlevering.avlevering.domain.Fagomrade;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import org.apache.camel.Body;
 import org.apache.camel.ExchangeProperty;
@@ -15,10 +16,9 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 import static java.util.Collections.emptyList;
 
@@ -35,6 +35,10 @@ public class AvleveringRepository {
 					"jp_ae_id",
 					"jp_dok_ae_id")
 			.newResultSetExtractor(Sak.class);
+
+	private static final ResultSetExtractor<List<Fagomrade>> FAGOMRADE_RESULTSET_EXTRACTOR = JdbcTemplateMapperFactory.newInstance()
+			.addKeys("faromrade_fagomrade")
+			.newResultSetExtractor(Fagomrade.class);
 	public static final int ORACLE_MAX_IN = 1000;
 
 	private final AvleveringProperties avleveringProperties;
@@ -44,6 +48,11 @@ public class AvleveringRepository {
 								NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
 		this.avleveringProperties = avleveringProperties;
 		this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+	}
+
+	public Fagomrade getFagomradeForTema(@Body Tema tema) {
+		return namedParameterJdbcTemplate.query(SqlQueries.FINN_FAGOMRADE, Map.of("tema", tema.getTemakode()), FAGOMRADE_RESULTSET_EXTRACTOR)
+				.stream().findFirst().orElseThrow();
 	}
 
 	// Keyset pagination
@@ -70,7 +79,7 @@ public class AvleveringRepository {
 		return doFindSaker(sakIds, true);
 	}
 
-	private List<Sak> doFindSaker(final List<Long> sakIds, boolean hentDokumenter){
+	private List<Sak> doFindSaker(final List<Long> sakIds, boolean hentDokumenter) {
 		if (sakIds.isEmpty()) {
 			return emptyList();
 		} else if (sakIds.size() > ORACLE_MAX_IN) {
@@ -81,7 +90,7 @@ public class AvleveringRepository {
 		paramMap.put("sakIds", sakIds.stream().map(Object::toString).toList());
 		paramMap.put("startdato", Timestamp.valueOf(avleveringProperties.getPeriode().getStartdato().atStartOfDay()));
 		paramMap.put("sluttdato", Timestamp.valueOf(avleveringProperties.getPeriode().getSluttdato().atStartOfDay()));
-		if(hentDokumenter) {
+		if (hentDokumenter) {
 			return namedParameterJdbcTemplate.query(SqlQueries.FINN_SAKER_SQL, paramMap, SAK_RESULTSET_EXTRACTOR);
 		} else {
 			return namedParameterJdbcTemplate.query(SqlQueries.FINN_SAKER_UTEN_DOKUMENTER_SQL, paramMap, SAK_RESULTSET_EXTRACTOR);
