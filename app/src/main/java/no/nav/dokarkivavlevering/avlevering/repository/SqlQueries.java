@@ -3,12 +3,12 @@ package no.nav.dokarkivavlevering.avlevering.repository;
 public class SqlQueries {
 	public static final String FINN_FAGOMRADE = """
 			select
-			    fo.k_fagomrade                as fagomrade_fagomrade,
-			    fo.dekode                     as fagomrade_dekode,
-			    fo.dato_tom                   as fagomrade_dato_tom,
-			    fo.er_gyldig                  as fagomrade_er_gyldig,
-			    fo.dato_opprettet             as fagomrade_dato_opprettet,
-			    fo.opprettet_av               as fagomrade_opprettet_av
+			    fo.k_fagomrade                as fagomrade,
+			    fo.dekode                     as dekode,
+			    fo.dato_tom                   as dato_tom,
+			    fo.er_gyldig                  as er_gyldig,
+			    fo.dato_opprettet             as dato_opprettet,
+			    fo.opprettet_av               as opprettet_av
 			from t_k_fagomrade fo
 			where fo.k_fagomrade = :tema
 			""";
