@@ -83,6 +83,8 @@ public class AvleveringArkivstrukturRoute extends RouteBuilder {
 				.setHeader(HEADER_XSL_PARAM_SAKSMAPPE_XML, simple("file:///{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/?select=saksmapper_*.xml"))
 				.setHeader(Exchange.XSLT_FILE_NAME, simple("{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/klasse_${exchangeProperty.AvleveringTema}.xml"))
 				.to("xslt:classpath:arkivstruktur/embed_saksmappe_into_klasse.xsl?output=file")
+				.setHeader(Exchange.FILE_NAME, simple("${exchangeProperty.AvleveringId}/arkivstruktur.xml"))
+				.to("file://{{avlevering.filomraade.work}}/?fileExist=Override")
 				.setHeader(AvleveringSFTPRoute.HEADER_FILNAVN, simple("arkivstruktur.xml"))
 				.to(AvleveringSFTPRoute.SFTP)
 				.log(LoggingLevel.INFO, log, "Ferdig med å generere arkivstruktur.xml.");
