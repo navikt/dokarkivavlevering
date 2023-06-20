@@ -63,12 +63,13 @@ public class AvleveringTemaRoute extends RouteBuilder {
 				})
 				.setHeader(HEADER_AVLEVERING_TEMA_SIZE, constant(avleveringProperties.getBatchsize())) // init paginering
 				.loopDoWhile(exchange -> {
-						final Long avleveringTemaSize = exchange.getIn().getHeader(HEADER_AVLEVERING_TEMA_SIZE, Long.class);
-						return avleveringTemaSize >= avleveringProperties.getBatchsize();
-					})
+					final Long avleveringTemaSize = exchange.getIn().getHeader(HEADER_AVLEVERING_TEMA_SIZE, Long.class);
+					return avleveringTemaSize >= avleveringProperties.getBatchsize();
+				})
 					.log(INFO, log,
-							"Henter de neste ${header.AvleveringTemaSize} sakIds for tema=${exchangeProperty.AvleveringTema} før sakId=${header.AvleveringLastSakId}, " +
-									"loop=${header.CamelLoopIndex}")
+				"Henter de neste ${header.AvleveringTemaSize} sakIds for tema=${exchangeProperty.AvleveringTema} før sakId=${header.AvleveringLastSakId}, " +
+						"loop=${header.CamelLoopIndex}")
+					.log(INFO, log, "Kaller findSakIdsPagination")
 					.bean(avleveringRepository, "findSakIdsPagination")
 					.log(INFO, log, "fikk hentet saker")
 					.choice()
@@ -129,8 +130,12 @@ public class AvleveringTemaRoute extends RouteBuilder {
 				.log(INFO, log,
 						"behandle_tema_page_uten_dokumenter behandler ${header.AvleveringTemaSize} sakId for tema=${exchangeProperty.AvleveringTema}, " +
 								"lastSakId=${header.AvleveringLastSakId}, loop=${header.CamelLoopIndex}")
+				.log(INFO, log, "findSakerUtenDokumenter start")
 				.bean(avleveringRepository, "findSakerUtenDokumenter")
+				.log(INFO, log, "findSakerUtenDokumenter end")
+				.log(INFO, log, "berikSakerUtenDokumenter start")
 				.bean(avleveringSakBerikerService, "berikSakerUtenDokumenter")
+				.log(INFO, log, "berikSakerUtenDokumenter end")
 				.multicast((oldExchange, newExchange) -> {
 					if (oldExchange == null) {
 						// Setter denne på body da den er input til loopen. Data på body etter aggregeringen blir da slettet fra minne.

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
+import static no.nav.dokarkivavlevering.avlevering.domain.Arkivendring.INGEN_VERDI;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -29,12 +30,13 @@ public class EndringsloggMapper {
 
 	private String mapNyVerdi(Arkivendring arkivendring){
 		return JOURNALPOST_JOURNALPOSTSTATUS.equals(arkivendring.getElement()) ?
-				journalpostStatusDecode(arkivendring.getTilVerdi()) : arkivendring.getTilVerdi();
+				journalpostStatusDecode(arkivendring.getTilVerdi()) :
+					isBlank(arkivendring.getTilVerdi()) ? INGEN_VERDI :  arkivendring.getTilVerdi();
 	}
 
 	private String mapTidligereVerdi(Arkivendring arkivendring) {
 		if(isBlank(arkivendring.getFraVerdi())) {
-			return Arkivendring.INGEN_VERDI;
+			return INGEN_VERDI;
 		} else if(JOURNALPOST_JOURNALPOSTSTATUS.equals(arkivendring.getElement())){
 			return journalpostStatusDecode(arkivendring.getFraVerdi());
 		}
