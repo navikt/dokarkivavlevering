@@ -8,13 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.pdfValidation.PDFAValidatorResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
@@ -27,36 +24,44 @@ public class AsposeService {
 	private static final License lic = new License();
 
 	@Autowired
-	public AsposeService (AvleveringProperties avleveringProperties) throws Exception {
+	public AsposeService(AvleveringProperties avleveringProperties) throws Exception {
 		lic.setLicense(new ByteArrayInputStream(avleveringProperties.getAsposeLicense().getBytes(StandardCharsets.UTF_8)));
 	}
 
-
-	public byte[] convertToPDFA(byte[] pdf, long dokumentInfoId) {
-		if(isValidPdf(pdf)){
-			return pdf;
+	public byte[] convertToPDFA(byte[] inputPdf, long dokumentInfoId) {
+		if (isValidPdf(inputPdf)) {
+			return inputPdf;
 		}
 
+		boolean couldConvert;
 		ByteArrayOutputStream logStream = new ByteArrayOutputStream();
-		Document doc = new Document(pdf);
-		boolean couldConvert = doc.convert(logStream, PdfFormat.PDF_A_1A, ConvertErrorAction.Delete);
+		Document doc = new Document(inputPdf);
+		try {
+			couldConvert = doc.convert(logStream, PdfFormat.PDF_A_1A, ConvertErrorAction.Delete);
+		} catch (Exception e) {
+			log.warn(String.format("Klarte ikke konvertere dokumentInfoId=%s. Feilmelding:%s", dokumentInfoId, e.getMessage()));
+			return inputPdf;
+		}
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		doc.save(stream);
-		pdf = stream.toByteArray();
-		if(!couldConvert){
-			validatePDF(pdf, ""+dokumentInfoId,  logStream);
+		byte[] outputPdf = stream.toByteArray();
+
+		//Denne er unødvendig - aspose gjør selv en validering etter konvertering.
+		//Venter med refaktor til etter ferien
+		if (!couldConvert) {
+			validatePDF(outputPdf, String.valueOf(dokumentInfoId), logStream);
 		}
 
-		return pdf;
+		return outputPdf;
 	}
 
-	private void validatePDF(byte[] pdf, String dokumentInfoId, ByteArrayOutputStream logstream){
+	private void validatePDF(byte[] pdf, String dokumentInfoId, ByteArrayOutputStream logstream) {
 		PDFAValidatorResponse response = safeValidatePDFA(pdf);
-		if(!response.isValidPdf()){
+		if (!response.isValidPdf()) {
 			try {
 				log.warn("dokumentInfo {} er ikke en gyldig PDF/A etter konvertering! Format: {} \n Aspose feilmeldinger: {} \n, Feilmeldinger: {}", dokumentInfoId, response.getPdfVersion(), logstream.toString("UTF-8"), response.getAssertionResults());
 			} catch (UnsupportedEncodingException e) {
-				log.error("Feil ved uthenting av charset UTF-8", e.getMessage());
+				log.error(String.format("Feil ved uthenting av charset UTF-8. Feilmelding:%s", e.getMessage()));
 			}
 		}
 	}
