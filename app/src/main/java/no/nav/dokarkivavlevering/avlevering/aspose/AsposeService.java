@@ -45,9 +45,7 @@ public class AsposeService {
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		doc.save(stream);
 		byte[] outputPdf = stream.toByteArray();
-
-		//Denne er unødvendig - aspose gjør selv en validering etter konvertering.
-		//Venter med refaktor til etter ferien
+		
 		if (!couldConvert) {
 			validatePDF(outputPdf, String.valueOf(dokumentInfoId), logStream);
 		}
