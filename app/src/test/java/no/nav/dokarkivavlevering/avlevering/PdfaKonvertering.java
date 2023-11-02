@@ -1,8 +1,6 @@
 package no.nav.dokarkivavlevering.avlevering;
 
-import no.nav.dokarkivavlevering.avlevering.pdfValidation.PDFAValidatorResponse;
 import org.apache.commons.io.FileUtils;
-import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
@@ -10,9 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 
-import static no.nav.dokarkivavlevering.avlevering.pdfValidation.PDFAValidatorUtil.safeValidatePDFA;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.verapdf.pdfa.flavours.PDFAFlavour.PDFA_1_A;
 
 public class PdfaKonvertering {
 
