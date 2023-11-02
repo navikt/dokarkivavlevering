@@ -17,6 +17,9 @@ env:
 
 jobs:
   build:
+    permissions:
+      contents: read
+      packages: write
     name: Checkout code and build docker image
     runs-on: ubuntu-latest
     steps:
