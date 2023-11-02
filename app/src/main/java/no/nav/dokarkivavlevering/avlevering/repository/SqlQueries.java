@@ -14,7 +14,7 @@ public class SqlQueries {
 			""";
 
 	public static final String FINN_SAKID_SQL = """
-			SELECT distinct s.sak_id as sakId
+			SELECT /*+ PARALLEL */ distinct s.sak_id as sakId
 			from t_saksrelasjon s
 			join t_journalpost j on s.journalpost_id = j.journalpost_id
 			where s.k_fagsystem = 'FS22' and ( s.feilregistrert IS NULL OR s.feilregistrert = '0' )
@@ -27,7 +27,7 @@ public class SqlQueries {
 			            sa.tema = :tema
 			)
 			    AND j.k_journal_s IN ( 'J', 'FS', 'FL', 'E' )
-			    AND j.dato_opprettet BETWEEN :startdato and :sluttdato;
+			    AND j.dato_opprettet BETWEEN :startdato and :sluttdato
 			""";
 
 	static final String FINN_SAKER_SQL ="""

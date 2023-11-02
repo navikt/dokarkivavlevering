@@ -80,7 +80,6 @@ public class AvleveringRepository {
 		return doFindSaker(sakIds, true);
 	}
 
-
 	private List<Sak> doFindSaker(final List<Long> sakIds, boolean hentDokumenter) {
 		if (sakIds.isEmpty()) {
 			return emptyList();
