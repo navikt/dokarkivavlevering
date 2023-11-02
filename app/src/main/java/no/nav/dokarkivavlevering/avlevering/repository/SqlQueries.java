@@ -14,7 +14,7 @@ public class SqlQueries {
 			""";
 
 	public static final String FINN_SAKID_SQL = """
-			SELECT /*+ PARALLEL */ distinct s.sak_id as sakId
+			SELECT distinct s.sak_id as sakId
 			from t_saksrelasjon s
 			join t_journalpost j on s.journalpost_id = j.journalpost_id
 			where s.k_fagsystem = 'FS22' and ( s.feilregistrert IS NULL OR s.feilregistrert = '0' )

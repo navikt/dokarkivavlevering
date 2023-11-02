@@ -77,7 +77,6 @@ public class AvleveringRepository {
 	}
 
 	public List<Sak> findSakerMedDokumenter(final List<Long> sakIds) {
-		log.info("Finner saker");
 		return doFindSaker(sakIds, true);
 	}
 

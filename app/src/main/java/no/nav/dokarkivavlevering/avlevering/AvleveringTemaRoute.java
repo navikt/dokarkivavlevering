@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 import static no.nav.dokarkivavlevering.avlevering.AvleveringRoute.PROPERTY_TEMA;
-import static org.apache.camel.Exchange.LOOP_INDEX;
 import static org.apache.camel.LoggingLevel.INFO;
 
 @Slf4j
@@ -144,33 +143,4 @@ public class AvleveringTemaRoute extends RouteBuilder {
 		//@formatter:on
 
 	}
-
-
-				/*.loopDoWhile(exchange -> {
-					final Integer antallSaker = exchange.getProperty(PROPERTY_ANTALL_BATCHED_SAKIDS, Integer.class);
-					final Integer camelLoopIndex = exchange.getProperty(LOOP_INDEX, Integer.class);
-					return antallSaker >= camelLoopIndex;
-				})
-					.log(INFO, log,
-				"Henter de neste ${header.AvleveringTemaSize} sakIds for tema=${exchangeProperty.AvleveringTema} før sakId=${header.AvleveringLastSakId}, " +
-						"loop=${header.CamelSplitIndex}")
-					.process(exchange -> {
-						int currentLoop = exchange.getProperty(LOOP_INDEX, Integer.class);
-						List<List<Long>> sakIdsBatched = exchange.getProperty(PROPERTY_SAKIDS_BATCHED, List.class);
-						exchange.getIn().setBody(sakIdsBatched.get(currentLoop));
-					})
-					.choice()
-						.when(simple("${body.size} == 0 && ${header.CamelLoopIndex} == 0"))
-							.log(INFO, log, "Ingen sakIds funnet for tema=${exchangeProperty.AvleveringTema}")
-							.setHeader(HEADER_TEMA_SKIP, constant(true))
-							.setBody(exchangeProperty(PROPERTY_TEMA))
-						.otherwise()
-							.to(DETERMINE_AVLEVER_DOKUMENTER)
-					.end()// end choice
-				.end() // end loop
-				.choice()
-					.when(header(HEADER_TEMA_SKIP).isEqualTo(constant(true)))
-						.log(INFO, log, "Ingenting å avlevere for tema=${exchangeProperty.AvleveringTema}")
-				.end()
-				.log(INFO, log, "Ferdig behandlet tema=${exchangeProperty.AvleveringTema}");*/
 }
