@@ -92,7 +92,7 @@ public class AvleveringTemaRoute extends RouteBuilder {
 		from(BEHANDLE_TEMA_PAGE_MED_DOKUMENTER)
 				.routeId("behandle_tema_page_med_dokumenter")
 				.log(INFO, log,
-						"behandle_tema_page_med_dokumenter behandler neste batch med sakId'er, loop=${header.CamelSplitIndex}")
+						"behandle_tema_page_med_dokumenter behandler neste batch med sakId'er for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelSplitIndex}")
 				.bean(avleveringRepository, "findSakerMedDokumenter")
 				.bean(avleveringSakBerikerService, "berikSakerMedDokumenter")
 				.multicast((oldExchange, newExchange) -> {
@@ -116,7 +116,7 @@ public class AvleveringTemaRoute extends RouteBuilder {
 		from(BEHANDLE_TEMA_PAGE_UTEN_DOKUMENTER)
 				.routeId("behandle_tema_page_uten_dokumenter")
 				.log(INFO, log,
-						"behandle_tema_page_uten_dokumenter behandler ${header.AvleveringTemaSize} sakId for tema=${exchangeProperty.AvleveringTema}, " +
+						"behandle_tema_page_uten_dokumenter behandler neste batch med sakId'er for tema=${exchangeProperty.AvleveringTema}, " +
 								"lastSakId=${header.AvleveringLastSakId}, loop=${header.CamelSplitIndex}")
 				.log(INFO, log, "findSakerUtenDokumenter start")
 				.bean(avleveringRepository, "findSakerUtenDokumenter")
