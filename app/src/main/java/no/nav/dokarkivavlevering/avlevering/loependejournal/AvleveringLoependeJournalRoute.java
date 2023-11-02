@@ -80,7 +80,7 @@ public class AvleveringLoependeJournalRoute extends RouteBuilder {
 
 		from(LOEPENDEJOURNAL)
 				.routeId("loependeJournal")
-				.log(LoggingLevel.INFO, log, "Behandler loependeJournal.xml for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelLoopIndex}")
+				.log(LoggingLevel.INFO, log, "Behandler loependeJournal.xml for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelSplitIndex}")
 				.bean(loependeJournalregistreringService)
 				.process(exchange -> {
 					LoependeJournal journal = new LoependeJournal();
@@ -90,6 +90,6 @@ public class AvleveringLoependeJournalRoute extends RouteBuilder {
 				.marshal(marshalJaxbFormat())
 				.setHeader(Exchange.FILE_NAME, simple("${exchangeProperty.AvleveringId}/loependejournal_${exchangeProperty.AvleveringTema}_${header.CamelLoopIndex}.xml"))
 				.to("file://{{avlevering.filomraade.work}}?fileExist=Append")
-				.log(LoggingLevel.INFO, log, "Behandlet ferdig ${header.CamelFilenameProduced} for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelLoopIndex}");
+				.log(LoggingLevel.INFO, log, "Behandlet ferdig ${header.CamelFilenameProduced} for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelSplitIndex}");
 	}
 }

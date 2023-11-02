@@ -1,15 +1,11 @@
 package no.nav.dokarkivavlevering.avlevering.repository;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.dokarkivavlevering.avlevering.AvleveringTemaRoute;
-import no.nav.dokarkivavlevering.avlevering.arkivstruktur.IdRange;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.config.Tema;
 import no.nav.dokarkivavlevering.avlevering.domain.Fagomrade;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import org.apache.camel.Body;
-import org.apache.camel.ExchangeProperty;
-import org.apache.camel.Header;
 import org.simpleflatmapper.jdbc.spring.JdbcTemplateMapperFactory;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -21,6 +17,10 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Collections.emptyList;
+import static no.nav.dokarkivavlevering.avlevering.repository.SqlQueries.FINN_FAGOMRADE;
+import static no.nav.dokarkivavlevering.avlevering.repository.SqlQueries.FINN_SAKER_SQL;
+import static no.nav.dokarkivavlevering.avlevering.repository.SqlQueries.FINN_SAKER_UTEN_DOKUMENTER_SQL;
+import static no.nav.dokarkivavlevering.avlevering.repository.SqlQueries.FINN_SAKID_SQL;
 
 @Repository
 @Slf4j
@@ -39,6 +39,12 @@ public class AvleveringRepository {
 	private static final ResultSetExtractor<List<Fagomrade>> FAGOMRADE_RESULTSET_EXTRACTOR = JdbcTemplateMapperFactory.newInstance()
 			.addKeys("faromrade_fagomrade")
 			.newResultSetExtractor(Fagomrade.class);
+
+
+	private static final ResultSetExtractor<List<Long>> SAKID_RESULTSET_EXTRACTOR = JdbcTemplateMapperFactory.newInstance()
+			.addKeys("sakId")
+			.newResultSetExtractor(Long.class);
+
 	public static final int ORACLE_MAX_IN = 1000;
 
 	private final AvleveringProperties avleveringProperties;
@@ -50,25 +56,20 @@ public class AvleveringRepository {
 		this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
 	}
 
-	public Fagomrade getFagomradeForTema(@Body Tema tema) {
-		return namedParameterJdbcTemplate.query(SqlQueries.FINN_FAGOMRADE, Map.of("tema", tema.getTemakode()), FAGOMRADE_RESULTSET_EXTRACTOR)
-				.stream().findFirst().orElseThrow();
-	}
 
-	// Keyset pagination
-	public List<Long> findSakIdsPagination(@Body final Tema tema, @Header(AvleveringTemaRoute.HEADER_LAST_SAK_ID) final Long lastSakId,
-										   @ExchangeProperty(AvleveringTemaRoute.PROPERTY_TEMA_IDRANGE) final IdRange idRange) {
+	public List<Long> findSakIds(@Body final Tema tema){
 		final HashMap<String, Object> paramMap = new HashMap<>();
-		paramMap.put("batchsize", avleveringProperties.getBatchsize());
-		paramMap.put("lastSakId", lastSakId);
-		log.info("Prøver å hente temakode for: " + tema);
 		paramMap.put("tema", tema.getTemakode());
-		log.info("Hentet temakode for: " + tema);
-		paramMap.put("minJournalpostId", idRange.getJournalpostIdMin());
-		paramMap.put("maxJournalpostId", idRange.getJournalpostIdMax());
 		paramMap.put("startdato", Timestamp.valueOf(avleveringProperties.getPeriode().getStartdato().atStartOfDay()));
 		paramMap.put("sluttdato", Timestamp.valueOf(avleveringProperties.getPeriode().getSluttdato().atStartOfDay()));
-		return namedParameterJdbcTemplate.queryForList(SqlQueries.FINN_SAK_PAGE, paramMap, Long.class);
+
+		return namedParameterJdbcTemplate.query(FINN_SAKID_SQL, paramMap, SAKID_RESULTSET_EXTRACTOR);
+
+	}
+
+	public Fagomrade getFagomradeForTema(@Body Tema tema) {
+		return namedParameterJdbcTemplate.query(FINN_FAGOMRADE, Map.of("tema", tema.getTemakode()), FAGOMRADE_RESULTSET_EXTRACTOR)
+				.stream().findFirst().orElseThrow();
 	}
 
 	public List<Sak> findSakerUtenDokumenter(final List<Long> sakIds) {
@@ -76,8 +77,10 @@ public class AvleveringRepository {
 	}
 
 	public List<Sak> findSakerMedDokumenter(final List<Long> sakIds) {
+		log.info("Finner saker");
 		return doFindSaker(sakIds, true);
 	}
+
 
 	private List<Sak> doFindSaker(final List<Long> sakIds, boolean hentDokumenter) {
 		if (sakIds.isEmpty()) {
@@ -91,19 +94,10 @@ public class AvleveringRepository {
 		paramMap.put("startdato", Timestamp.valueOf(avleveringProperties.getPeriode().getStartdato().atStartOfDay()));
 		paramMap.put("sluttdato", Timestamp.valueOf(avleveringProperties.getPeriode().getSluttdato().atStartOfDay()));
 		if (hentDokumenter) {
-			return namedParameterJdbcTemplate.query(SqlQueries.FINN_SAKER_SQL, paramMap, SAK_RESULTSET_EXTRACTOR);
+			return namedParameterJdbcTemplate.query(FINN_SAKER_SQL, paramMap, SAK_RESULTSET_EXTRACTOR);
 		} else {
-			return namedParameterJdbcTemplate.query(SqlQueries.FINN_SAKER_UTEN_DOKUMENTER_SQL, paramMap, SAK_RESULTSET_EXTRACTOR);
+			return namedParameterJdbcTemplate.query(FINN_SAKER_UTEN_DOKUMENTER_SQL, paramMap, SAK_RESULTSET_EXTRACTOR);
 
 		}
-	}
-
-	public IdRange findJournalpostIdRange(@Body final Tema tema) {
-		final HashMap<String, Object> paramMap = new HashMap<>();
-		paramMap.put("tema", tema.getTemakode());
-		paramMap.put("startdato", Timestamp.valueOf(avleveringProperties.getPeriode().getStartdato().atStartOfDay()));
-		paramMap.put("sluttdato", Timestamp.valueOf(avleveringProperties.getPeriode().getSluttdato().atStartOfDay()));
-		return namedParameterJdbcTemplate.queryForObject(SqlQueries.JOURNALPOST_ID_RANGE, paramMap,
-				(rs, rowNum) -> new IdRange(rs.getLong(1), rs.getLong(2), rs.getLong(3)));
 	}
 }

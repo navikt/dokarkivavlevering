@@ -34,6 +34,7 @@
 		<verapdf.version>1.22.2</verapdf.version>
 		<aspose-pdf.version>23.1</aspose-pdf.version>
 		<jaxb-runtime-glassfish.version>2.3.7</jaxb-runtime-glassfish.version>
+		<guava.version>32.1.0-jre</guava.version>
 	</properties>
 
 	<repositories>
@@ -118,6 +119,11 @@
 				<artifactId>lombok</artifactId>
 				<version>${lombok.version}</version>
 				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>${guava.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.aspose</groupId>
