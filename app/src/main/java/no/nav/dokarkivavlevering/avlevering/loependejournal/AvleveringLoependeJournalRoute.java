@@ -88,7 +88,7 @@ public class AvleveringLoependeJournalRoute extends RouteBuilder {
 					exchange.getIn().setBody(journal);
 				})
 				.marshal(marshalJaxbFormat())
-				.setHeader(Exchange.FILE_NAME, simple("${exchangeProperty.AvleveringId}/loependejournal_${exchangeProperty.AvleveringTema}_${header.camelSplitIndex}.xml"))
+				.setHeader(Exchange.FILE_NAME, simple("${exchangeProperty.AvleveringId}/loependejournal_${exchangeProperty.AvleveringTema}_${header.CamelSplitIndex}.xml"))
 				.to("file://{{avlevering.filomraade.work}}?fileExist=Append")
 				.log(LoggingLevel.INFO, log, "Behandlet ferdig ${header.CamelFilenameProduced} for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelSplitIndex}");
 	}

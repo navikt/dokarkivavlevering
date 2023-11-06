@@ -61,7 +61,7 @@ public class AvleveringArkivstrukturRoute extends RouteBuilder {
 				.bean(avleveringArkivstrukturKlasseService)
 				.setHeader(JaxbConstants.JAXB_PART_NAMESPACE, simple("{http://www.arkivverket.no/standarder/noark5/arkivstruktur}klasse"))
 				.marshal(klasseArkivstrukturJaxb())
-				.setHeader(Exchange.FILE_NAME, simple("${exchangeProperty.AvleveringId}/saksmapper_${header.camelSplitIndex}.xml"))
+				.setHeader(Exchange.FILE_NAME, simple("${exchangeProperty.AvleveringId}/saksmapper_${header.CamelSplitIndex}.xml"))
 				.to("file://{{avlevering.filomraade.work}}/?fileExist=Append");
 
 		from(ARKIV)
