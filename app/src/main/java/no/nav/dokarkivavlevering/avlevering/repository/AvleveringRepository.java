@@ -40,7 +40,6 @@ public class AvleveringRepository {
 			.addKeys("faromrade_fagomrade")
 			.newResultSetExtractor(Fagomrade.class);
 
-
 	private static final ResultSetExtractor<List<Long>> SAKID_RESULTSET_EXTRACTOR = JdbcTemplateMapperFactory.newInstance()
 			.addKeys("sakId")
 			.newResultSetExtractor(Long.class);
@@ -64,7 +63,6 @@ public class AvleveringRepository {
 		paramMap.put("sluttdato", Timestamp.valueOf(avleveringProperties.getPeriode().getSluttdato().atStartOfDay()));
 
 		return namedParameterJdbcTemplate.query(FINN_SAKID_SQL, paramMap, SAKID_RESULTSET_EXTRACTOR);
-
 	}
 
 	public Fagomrade getFagomradeForTema(@Body Tema tema) {

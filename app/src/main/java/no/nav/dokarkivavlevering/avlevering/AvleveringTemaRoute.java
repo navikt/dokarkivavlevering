@@ -29,8 +29,6 @@ public class AvleveringTemaRoute extends RouteBuilder {
 	public static final String DETERMINE_AVLEVER_DOKUMENTER = "direct:determine_avlever_dokumenter";
 	public static final String HEADER_TEMA_SKIP = "AvleveringTemaSkip";
 	public static final String PROPERTY_AVLEVER_MED_DOKUMENTER = "AvleverMedDokumenter";
-	public static final String PROPERTY_ANTALL_BATCHED_SAKIDS = "BatchedSakIds";
-	public static final String PROPERTY_SAKIDS_BATCHED = "sakdIdsBatched";
 	private final AvleveringProperties avleveringProperties;
 	private final AvleveringRepository avleveringRepository;
 	private final AvleveringSakBerikerService avleveringSakBerikerService;
@@ -56,10 +54,7 @@ public class AvleveringTemaRoute extends RouteBuilder {
 					final Tema tema = exchange.getIn().getBody(Tema.class);
 					exchange.setProperty(PROPERTY_AVLEVER_MED_DOKUMENTER, tema.isAvleverDokumenter());
 					List<Long> sakIds = avleveringRepository.findSakIds(tema);
-					List<List<Long>> sakIdsBatched = Lists.partition(sakIds, avleveringProperties.getBatchsize());
-					exchange.setProperty(PROPERTY_SAKIDS_BATCHED, sakIdsBatched);
-					exchange.setProperty(PROPERTY_ANTALL_BATCHED_SAKIDS, sakIdsBatched.size());
-					exchange.getIn().setBody(sakIdsBatched);
+					exchange.getIn().setBody(Lists.partition(sakIds, avleveringProperties.getBatchsize()));
 					log.info("Tema={} har {} saker som skal avleveres", tema, sakIds.size());
 				})
 				.split(body())
@@ -79,7 +74,6 @@ public class AvleveringTemaRoute extends RouteBuilder {
 				//Tema er input i neste part av routen
 				.process(exchange -> exchange.getIn().setBody(exchange.getProperty(PROPERTY_TEMA)))
 				.log(INFO, log, "Ferdig behandlet tema=${exchangeProperty.AvleveringTema}");
-
 
 		from(DETERMINE_AVLEVER_DOKUMENTER)
 				.choice()
