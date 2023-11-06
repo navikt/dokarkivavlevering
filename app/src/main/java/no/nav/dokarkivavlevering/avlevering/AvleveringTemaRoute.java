@@ -59,7 +59,7 @@ public class AvleveringTemaRoute extends RouteBuilder {
 				})
 				.split(body())
 					.choice()
-						.when(simple("${body.size} == 0 && ${header.CamelLoopIndex} == 0"))
+						.when(simple("${body.size} == 0 && ${header.camelSplitIndex} == 0"))
 							.log(INFO, log, "Ingen sakIds funnet for tema=${exchangeProperty.AvleveringTema}")
 							.setHeader(HEADER_TEMA_SKIP, constant(true))
 							.setBody(exchangeProperty(PROPERTY_TEMA))
