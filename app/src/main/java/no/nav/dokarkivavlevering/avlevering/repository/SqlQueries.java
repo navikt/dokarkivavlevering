@@ -12,40 +12,23 @@ public class SqlQueries {
 			from t_k_fagomrade fo
 			where fo.k_fagomrade = :tema
 			""";
-	static final String JOURNALPOST_ID_RANGE = """
-			select min(j.journalpost_id),
-					       max(j.journalpost_id),
-					       max(s.sak_id)
-					from t_journalpost j
-					         join t_saksrelasjon s on j.journalpost_id = s.journalpost_id
-					where (s.feilregistrert is null or s.feilregistrert = 0)
-					  and j.k_journal_s in ('J', 'FS', 'FL', 'E')
-					  and (trunc(j.dato_opprettet) between :startdato and :sluttdato)
-					  and s.sak_id in (
-					    select sa.id
-					    from sak sa
-					    where sa.tema = :tema
-					)
-					  and s.k_fagsystem = 'FS22'
-					  """;
 
-	static final String FINN_SAK_PAGE = """
-			select distinct sa.id
-					from sak sa
-					where sa.tema = :tema
-					  and sa.id < :lastSakId
-					  and sa.id in (
-					    select s.sak_id
-					    from t_saksrelasjon s
-					             join t_journalpost j on s.journalpost_id = j.journalpost_id
-					    where (j.journalpost_id between :minJournalpostId and :maxJournalpostId)
-					      and (s.feilregistrert is null or s.feilregistrert = 0)
-					      and j.k_journal_s in ('J', 'FS', 'FL', 'E')
-					      and (trunc(j.dato_opprettet) between :startdato and :sluttdato)
-					)
-					order by sa.id desc
-					    fetch first :batchsize rows only
-					    """;
+	public static final String FINN_SAKID_SQL = """
+			SELECT /*+ PARALLEL */ distinct s.sak_id as sakId
+			from t_saksrelasjon s
+			join t_journalpost j on s.journalpost_id = j.journalpost_id
+			where s.k_fagsystem = 'FS22' and ( s.feilregistrert IS NULL OR s.feilregistrert = '0' )
+			and s.sak_id in(
+			        SELECT
+			            sa.id
+			        FROM
+			            sak sa
+			        WHERE
+			            sa.tema = :tema
+			)
+			    AND j.k_journal_s IN ( 'J', 'FS', 'FL', 'E' )
+			    AND j.dato_opprettet BETWEEN :startdato and :sluttdato
+			""";
 
 	static final String FINN_SAKER_SQL ="""
 			select sa.id                         as id,
@@ -119,9 +102,6 @@ public class SqlQueries {
 					         left join t_aksjonslogg ald on ald.journalpost_id = j.journalpost_id and ald.dokument_info_id = d.dokument_info_id
 					         left join t_arkiv_element_endring aeed on ald.aksjonslogg_id = aeed.aksjonslogg_id
 					where s.sak_id in (:sakIds)
-					  and j.k_journal_s in ('J', 'FS', 'FL', 'E')
-					  and (s.feilregistrert is null or s.feilregistrert = 0)
-					  and (trunc(j.dato_opprettet) between :startdato and :sluttdato)
 					  and (d.k_dokument_s is null or d.k_dokument_s = 'FERDIGSTILT')
 					  and f.k_variant_format = 'ARKIV'
 					order by sa.id desc, j.journalpost_id, r.k_tilkn_jp_som, r.dokument_info_id, f.fil_detaljer_id, aeej.arkiv_element_endring_id,
@@ -200,7 +180,7 @@ public class SqlQueries {
 					where s.sak_id in (:sakIds)
 					  and j.k_journal_s in ('J', 'FS', 'FL', 'E')
 					  and (s.feilregistrert is null or s.feilregistrert = 0)
-					  and (trunc(j.dato_opprettet) between :startdato and :sluttdato)
+					  and (j.dato_opprettet between :startdato and :sluttdato)
 					  and (d.k_dokument_s is null or d.k_dokument_s = 'FERDIGSTILT')
 					  and f.k_variant_format = 'ARKIV'
 					order by sa.id desc, j.journalpost_id, r.k_tilkn_jp_som, r.dokument_info_id, f.fil_detaljer_id, aeej.arkiv_element_endring_id,

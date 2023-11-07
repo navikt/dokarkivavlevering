@@ -27,7 +27,7 @@ public class AvleveringProperties {
 	String tema;
 	@NotNull
 	@Max(1000) // max IN query i Oracle
-	Long batchsize;
+	int batchsize;
 	@NotEmpty
 	String ststokenurl;
 	@NotEmpty

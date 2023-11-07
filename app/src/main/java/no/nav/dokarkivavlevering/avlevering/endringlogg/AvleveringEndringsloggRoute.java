@@ -73,15 +73,15 @@ public class AvleveringEndringsloggRoute extends RouteBuilder {
 
 		from(ENDRINGSLOGG)
 				.routeId("endringslogg")
-				.log(LoggingLevel.INFO, log, "Behandler endringslogg.xml for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelLoopIndex}")
+				.log(LoggingLevel.INFO, log, "Behandler endringslogg.xml for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelSplitIndex}")
 				.bean(endringsloggService)
 				.process(exchange -> {
 					Endringslogg endringslogg = new Endringslogg();
 					endringslogg.getEndrings().addAll(exchange.getIn().getBody(List.class));
 					exchange.getIn().setBody(endringslogg);
 				})
-				.setHeader(Exchange.FILE_NAME, simple("${exchangeProperty.AvleveringId}/endring_${exchangeProperty.AvleveringTema}_${header.CamelLoopIndex}.xml"))
+				.setHeader(Exchange.FILE_NAME, simple("${exchangeProperty.AvleveringId}/endring_${exchangeProperty.AvleveringTema}_${header.CamelSplitIndex}.xml"))
 				.to("file://{{avlevering.filomraade.work}}?fileExist=Override")
-				.log(LoggingLevel.INFO, log, "Behandlet ferdig ${header.CamelFilenameProduced} for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelLoopIndex}");
+				.log(LoggingLevel.INFO, log, "Behandlet ferdig ${header.CamelFilenameProduced} for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelSplitIndex}");
 	}
 }

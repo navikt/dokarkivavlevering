@@ -2,10 +2,10 @@ package no.nav.dokarkivavlevering.avlevering.pdfValidation;
 
 import lombok.extern.slf4j.Slf4j;
 import org.verapdf.core.ModelParsingException;
+import org.verapdf.gf.foundry.VeraGreenfieldFoundryProvider;
 import org.verapdf.pdfa.Foundries;
 import org.verapdf.pdfa.PDFAParser;
 import org.verapdf.pdfa.PDFAValidator;
-import org.verapdf.gf.foundry.VeraGreenfieldFoundryProvider;
 import org.verapdf.pdfa.flavours.PDFAFlavour;
 import org.verapdf.pdfa.results.TestAssertion;
 import org.verapdf.pdfa.results.ValidationResult;
@@ -13,7 +13,6 @@ import org.verapdf.pdfa.results.ValidationResult;
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -40,12 +39,12 @@ public class PDFAValidatorUtil {
 	/*
 	 * Validering er mest for convenience. Ønsker ikke at den ødelegger for resten av logikken
 	 */
-	public static PDFAValidatorResponse safeValidatePDFA(byte[] fil) {
+	public static boolean isValidPdfa(byte[] fil) {
 		try {
-			return validatePDFA(fil);
+			return validatePDFA(fil).isValidPdf();
 		} catch (Exception e) {
 			log.warn("VeraPDF kunne ikke validere PDF'en! Feilmelding: " + e.getMessage(), e.getStackTrace());
-			return new PDFAValidatorResponse(false, false, null, null);
+			return false;
 		}
 	}
 

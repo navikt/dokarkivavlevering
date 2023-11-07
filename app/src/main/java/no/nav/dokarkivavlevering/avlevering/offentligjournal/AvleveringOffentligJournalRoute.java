@@ -79,7 +79,7 @@ public class AvleveringOffentligJournalRoute extends RouteBuilder {
 		from(OFFENTLIGJOURNAL)
 				.routeId("offentligJournal")
 				.log(LoggingLevel.INFO, log, "RouteID: offentligjournal")
-				.log(LoggingLevel.INFO, log, "Behandler offentligjournal.xml for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelLoopIndex}")
+				.log(LoggingLevel.INFO, log, "Behandler offentligjournal.xml for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelSplitIndex}")
 				.bean(journalregistreringService)
 				.process(exchange -> {
 					OffentligJournal journal = new OffentligJournal();
@@ -87,8 +87,8 @@ public class AvleveringOffentligJournalRoute extends RouteBuilder {
 					exchange.getIn().setBody(journal);
 				})
 				.marshal(marshalJaxbFormat())
-				.setHeader(Exchange.FILE_NAME, simple("${exchangeProperty.AvleveringId}/offentligjournal_${exchangeProperty.AvleveringTema}_${header.CamelLoopIndex}.xml"))
+				.setHeader(Exchange.FILE_NAME, simple("${exchangeProperty.AvleveringId}/offentligjournal_${exchangeProperty.AvleveringTema}_${header.CamelSplitIndex}.xml"))
 				.to("file://{{avlevering.filomraade.work}}?fileExist=Append")
-				.log(LoggingLevel.INFO, log, "Behandlet ferdig ${header.CamelFilenameProduced} for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelLoopIndex}");
+				.log(LoggingLevel.INFO, log, "Behandlet ferdig ${header.CamelFilenameProduced} for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelSplitIndex}");
 	}
 }

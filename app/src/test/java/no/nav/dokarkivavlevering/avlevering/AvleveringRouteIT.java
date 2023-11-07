@@ -1,6 +1,5 @@
 package no.nav.dokarkivavlevering.avlevering;
 
-import no.nav.dokarkivavlevering.avlevering.arkivstruktur.IdRange;
 import no.nav.dokarkivavlevering.avlevering.arkivuttrekk.AvleveringArkivuttrekkRoute;
 import no.nav.dokarkivavlevering.avlevering.aspose.AsposeService;
 import no.nav.dokarkivavlevering.avlevering.config.Tema;
@@ -92,11 +91,9 @@ public class AvleveringRouteIT {
 		List<Long> page2 = sakIder.subList(10, ANTALL_SAKER);
 
 		when(avleveringRepositoryMock.getFagomradeForTema(any())).thenAnswer(args -> getFagomrade(args.getArgument(0)));
-		when(avleveringRepositoryMock.findJournalpostIdRange(any())).thenReturn(new IdRange(1L, 2000L, 1999L));
-		when(avleveringRepositoryMock.findSakIdsPagination(eq(TEMA), any(), any())).thenReturn(page1).thenReturn(page2).thenReturn(Collections.emptyList());
+		when(avleveringRepositoryMock.findSakIds(any())).thenReturn(sakIder);
 		when(avleveringRepositoryMock.findSakerMedDokumenter(eq(page1))).thenReturn(page1.stream().map(id -> newSakWithId(id, TEMA)).toList());
 		when(avleveringRepositoryMock.findSakerMedDokumenter(eq(page2))).thenReturn(page2.stream().map(id -> newSakWithId(id, TEMA)).toList());
-
 		when(asposeServiceMock.convertToPDFA(any(), anyLong())).thenReturn("%PDF-1.5\n%âãÏÓ\n1 0 obj".getBytes());
 	}
 
