@@ -15,6 +15,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static no.nav.dokarkivavlevering.avlevering.domain.BrukerMedNavnedata.UKJENT_PERSON;
+
 @Data
 public class PdlHentPersonBolkResponse {
 	public static final String CODE_OK = "ok";
@@ -35,6 +37,9 @@ public class PdlHentPersonBolkResponse {
 		private PdlPerson person;
 
 		public List<NavnMedGyldighet> getNavnMedGyldighet() {
+			if(person == null){
+				return List.of(new NavnMedGyldighet(null, null, UKJENT_PERSON));
+			}
 			return person.getNavn().stream()
 					.map(PdlNavn::toNavnMedGyldighet)
 					.toList();
