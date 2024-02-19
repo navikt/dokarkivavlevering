@@ -1,6 +1,5 @@
 package no.nav.dokarkivavlevering.avlevering.arkivuttrekk;
 
-
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import org.apache.camel.Handler;
@@ -14,11 +13,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.Objects;
 
 import static org.apache.commons.io.FileUtils.readFileToByteArray;
-import static org.apache.tomcat.util.http.fileupload.util.Streams.asString;
 
 @Slf4j
 @Component
@@ -52,7 +51,8 @@ public class ArkivuttrekkMapper {
 	public String insertValues() throws Exception {
 		final InputStream resourceInputStream = this.getClass().getClassLoader().getResourceAsStream("arkivuttrekk/arkivuttrekk_template.xml");
 
-		return asString(resourceInputStream)
+		assert resourceInputStream != null;
+		return IOUtils.toString(resourceInputStream, StandardCharsets.UTF_8)
 				.replace(AVLEVERING_SLUTTDATO, avleveringProperties.getPeriode().getSluttdato().toString())
 				.replace(AVLEVERING_ANTALLDOKUMENTER, countElements("arkivstruktur.xml", "dokumentobjekt")) // FIXME: Er dette en grei nok måte å sjekke dette på ?
 				.replace(METADATAKATALOG_XSD_SJEKKSUM, generateSHA256("metadatakatalog.xsd"))

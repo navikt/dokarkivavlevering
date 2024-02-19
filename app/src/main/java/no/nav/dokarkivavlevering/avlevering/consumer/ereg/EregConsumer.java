@@ -4,9 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.consumer.sts.StsRestConsumer;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpHeaders;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Retryable;
@@ -23,6 +21,10 @@ import java.util.Optional;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
 @Component
@@ -44,7 +46,7 @@ public class EregConsumer {
 		this.eregUrl = avleveringProperties.getEregurl();
 	}
 
-	@Retryable(include = HttpServerErrorException.class)
+	@Retryable(retryFor = HttpServerErrorException.class)
 	public String hentNavn(final String orgnr) {
 		if (isValidOrgnrFormat(orgnr)) {
 			try {
@@ -52,9 +54,9 @@ public class EregConsumer {
 				final String serviceuserToken = "Bearer " + stsRestConsumer.getStsToken().getAccess_token();
 
 				final RequestEntity<Void> requestEntity = RequestEntity.get(uri)
-						.accept(MediaType.APPLICATION_JSON)
-						.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-						.header(HttpHeaders.AUTHORIZATION, serviceuserToken)
+						.accept(APPLICATION_JSON)
+						.header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.header(AUTHORIZATION, serviceuserToken)
 						.header(NAV_CONSUMER_TOKEN, serviceuserToken)
 						.build();
 

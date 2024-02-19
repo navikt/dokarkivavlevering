@@ -1,6 +1,6 @@
 package no.nav.dokarkivavlevering.adapter;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import java.time.LocalDateTime;
 
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
@@ -8,12 +8,12 @@ import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 public class LocalDateTimeAdapter extends XmlAdapter<String, LocalDateTime> {
 
 	@Override
-	public LocalDateTime unmarshal(String s) throws Exception {
+	public LocalDateTime unmarshal(String s) {
 		return LocalDateTime.from(ISO_LOCAL_DATE_TIME.parse(s));
 	}
 
 	@Override
-	public String marshal(LocalDateTime localDateTime) throws Exception {
+	public String marshal(LocalDateTime localDateTime) {
 		return ISO_LOCAL_DATE_TIME.format(localDateTime);
 	}
 }

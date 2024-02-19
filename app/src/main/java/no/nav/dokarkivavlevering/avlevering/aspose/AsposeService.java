@@ -12,14 +12,11 @@ import org.springframework.stereotype.Component;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static no.nav.dokarkivavlevering.avlevering.pdfValidation.PDFAValidatorUtil.isValidPdfa;
 
 @Slf4j
 @Component
@@ -33,9 +30,9 @@ public class AsposeService {
 	}
 
 	public byte[] convertToPDFA(byte[] inputPdf, long dokumentInfoId) {
-		if (isValidPdfa(inputPdf)) {
-			return inputPdf;
-		}
+//		if (isValidPdfa(inputPdf)) {
+//			return inputPdf;
+//		}
 
 		ExecutorService executorService = Executors.newSingleThreadExecutor();
 		Future<byte[]> task = executorService.submit(() -> doConvertToPDFA(inputPdf, dokumentInfoId));

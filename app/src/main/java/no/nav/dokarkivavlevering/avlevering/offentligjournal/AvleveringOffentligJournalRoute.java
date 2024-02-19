@@ -1,5 +1,7 @@
 package no.nav.dokarkivavlevering.avlevering.offentligjournal;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
 import no.arkivverket.standarder.noark5.offentligjournal.Journalregistrering;
 import no.arkivverket.standarder.noark5.offentligjournal.ObjectFactory;
 import no.arkivverket.standarder.noark5.offentligjournal.OffentligJournal;
@@ -11,8 +13,6 @@ import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
@@ -70,7 +70,7 @@ public class AvleveringOffentligJournalRoute extends RouteBuilder {
 				})
 				.setHeader(HEADER_XSL_PARAM_OFFENTLIGJOURNAL_XML, simple("file:///{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/?select=offentligjournal_*.xml"))
 				.setHeader(Exchange.XSLT_FILE_NAME, simple("{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/offentligJournal.xml"))
-				.to("xslt:classpath:offentligjournal/embed_registrering_into_offentligjournal.xsl?output=file")
+				.to("xslt-saxon:classpath:offentligjournal/embed_registrering_into_offentligjournal.xsl?output=file")
 				.setHeader(AvleveringSFTPRoute.HEADER_FILNAVN, simple("offentligJournal.xml"))
 				.to(AvleveringSFTPRoute.SFTP)
 				.log(LoggingLevel.INFO, log, "Genererte offentligjournal til ${header.CamelXsltFileName}");

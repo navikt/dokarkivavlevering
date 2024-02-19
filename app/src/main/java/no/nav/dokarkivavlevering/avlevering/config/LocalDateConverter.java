@@ -6,9 +6,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 @Component
 @ConfigurationPropertiesBinding
 public class LocalDateConverter implements Converter<String, LocalDate> {

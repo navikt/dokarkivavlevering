@@ -1,5 +1,7 @@
 package no.nav.dokarkivavlevering.avlevering.endringlogg;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
 import no.arkivverket.standarder.noark5.endringslogg.Endringslogg;
 import no.arkivverket.standarder.noark5.endringslogg.ObjectFactory;
 import no.nav.dokarkivavlevering.avlevering.sftp.AvleveringSFTPRoute;
@@ -10,8 +12,6 @@ import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
@@ -67,7 +67,7 @@ public class AvleveringEndringsloggRoute extends RouteBuilder {
 				})
 				.setHeader(HEADER_XSL_PARAM_ENDRING_XML, simple("file:///{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}?select=endring_*.xml"))
 				.setHeader(Exchange.XSLT_FILE_NAME, simple("{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/endringslogg.xml"))
-				.to("xslt:classpath:endringslogg/embed_arkivendring_into_endringslogg.xsl?output=file")
+				.to("xslt-saxon:classpath:endringslogg/embed_arkivendring_into_endringslogg.xsl?output=file")
 				.setHeader(AvleveringSFTPRoute.HEADER_FILNAVN, simple("endringslogg.xml"))
 				.to(AvleveringSFTPRoute.SFTP);
 

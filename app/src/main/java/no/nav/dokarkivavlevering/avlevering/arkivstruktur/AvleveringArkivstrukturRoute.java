@@ -1,5 +1,7 @@
 package no.nav.dokarkivavlevering.avlevering.arkivstruktur;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
 import no.arkivverket.standarder.noark5.arkivstruktur.Klasse;
 import no.arkivverket.standarder.noark5.arkivstruktur.ObjectFactory;
 import no.nav.dokarkivavlevering.avlevering.repository.AvleveringRepository;
@@ -12,8 +14,6 @@ import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
@@ -82,7 +82,7 @@ public class AvleveringArkivstrukturRoute extends RouteBuilder {
 				})
 				.setHeader(HEADER_XSL_PARAM_SAKSMAPPE_XML, simple("file:///{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/?select=saksmapper_*.xml"))
 				.setHeader(Exchange.XSLT_FILE_NAME, simple("{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/klasse_${exchangeProperty.AvleveringTema}.xml"))
-				.to("xslt:classpath:arkivstruktur/embed_saksmappe_into_klasse.xsl?output=file")
+				.to("xslt-saxon:classpath:arkivstruktur/embed_saksmappe_into_klasse.xsl?output=file")
 				.setHeader(Exchange.FILE_NAME, simple("${exchangeProperty.AvleveringId}/arkivstruktur.xml"))
 				.to("file://{{avlevering.filomraade.work}}/?fileExist=Override")
 				.setHeader(AvleveringSFTPRoute.HEADER_FILNAVN, simple("arkivstruktur.xml"))

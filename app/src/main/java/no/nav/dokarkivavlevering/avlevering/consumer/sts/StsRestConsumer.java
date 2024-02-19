@@ -36,7 +36,7 @@ public class StsRestConsumer {
 				.build();
 	}
 
-	@Retryable(include = StsException.class)
+	@Retryable(retryFor = StsException.class)
 	@Cacheable(REST_STS_CACHE)
 	public StsResponse getStsToken() {
 		try {

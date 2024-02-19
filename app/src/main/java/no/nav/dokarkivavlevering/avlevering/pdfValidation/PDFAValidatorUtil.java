@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.singleton;
 import static org.verapdf.pdfa.flavours.PDFAFlavour.NO_FLAVOUR;
 import static org.verapdf.pdfa.flavours.PDFAFlavour.PDFA_1_A;
 import static org.verapdf.pdfa.flavours.PDFAFlavour.PDFA_1_B;
@@ -28,8 +29,8 @@ import static org.verapdf.pdfa.flavours.PDFAFlavour.PDFA_2_U;
 public class PDFAValidatorUtil {
 
 	private static final List<PDFAFlavour> validPdfas = Arrays.asList(PDFA_1_A, PDFA_1_B, PDFA_2_A, PDFA_2_B, PDFA_2_U);
-	public static final Set NOT_A_PDFA = Collections.singleton("Dokumentet er ikke en PDFA");
-	public static final Set NON_VALID_PDFA_VERSION = Collections.singleton("Dokumentet er ikke på et av de lovlige formatene");
+	public static final Set NOT_A_PDFA = singleton("Dokumentet er ikke en PDFA");
+	public static final Set NON_VALID_PDFA_VERSION = singleton("Dokumentet er ikke på et av de lovlige formatene");
 
 	//Static init to initialize the FoundryProvider
 	static {
@@ -43,7 +44,7 @@ public class PDFAValidatorUtil {
 		try {
 			return validatePDFA(fil).isValidPdf();
 		} catch (Exception e) {
-			log.warn("VeraPDF kunne ikke validere PDF'en! Feilmelding: " + e.getMessage(), e.getStackTrace());
+			log.warn("VeraPDF kunne ikke validere PDF'en! Feilmelding: " + e.getMessage(), e);
 			return false;
 		}
 	}
@@ -69,8 +70,6 @@ public class PDFAValidatorUtil {
 
 		} catch (ModelParsingException e) {
 			return returnNotAPdfValidatorResponse();
-		} catch (Exception e) {
-			throw new Exception("Feil under validering av PDF/A", e);
 		}
 	}
 
@@ -79,7 +78,7 @@ public class PDFAValidatorUtil {
 	}
 
 	private static PDFAValidatorResponse returnNonCompliantValidatorResponse(boolean isValidPdf, ValidationResult result, List<TestAssertion> assertions) {
-		Set<String> reasonsForFailing = assertions.stream().map(assertion -> assertion.getMessage()).collect(Collectors.toSet());
+		Set<String> reasonsForFailing = assertions.stream().map(TestAssertion::getMessage).collect(Collectors.toSet());
 		return new PDFAValidatorResponse(isValidPdf, false, result.getPDFAFlavour(), reasonsForFailing);
 	}
 

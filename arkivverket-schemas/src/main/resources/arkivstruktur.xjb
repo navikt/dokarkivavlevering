@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<jaxb:bindings xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-               xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-               xsi:schemaLocation="http://java.sun.com/xml/ns/jaxb http://java.sun.com/xml/ns/jaxb/bindingschema_2_0.xsd"
-               version="2.1"
-               jaxb:extensionBindingPrefixes="xjc annox">
+<jaxb:bindings version="3.0"
+               xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"
+               xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="https://jakarta.ee/xml/ns/jaxb https://jakarta.ee/xml/ns/jaxb/bindingschema_3_0.xsd">
     <jaxb:globalBindings>
         <xjc:simple/>
-          <xjc:javaType name="java.time.LocalDateTime" xmlType="xs:dateTime"
-          adapter="no.nav.dokarkivavlevering.adapter.LocalDateTimeAdapter"/>
-      <xjc:javaType name="java.time.LocalDate" xmlType="xs:date"
-          adapter="no.nav.dokarkivavlevering.adapter.LocalDateAdapter"/>
+        <xjc:javaType name="java.time.LocalDateTime" xmlType="xs:dateTime" adapter="no.nav.dokarkivavlevering.adapter.LocalDateTimeAdapter"/>
+        <xjc:javaType name="java.time.LocalDate" xmlType="xs:date" adapter="no.nav.dokarkivavlevering.adapter.LocalDateAdapter"/>
     </jaxb:globalBindings>
 </jaxb:bindings>
