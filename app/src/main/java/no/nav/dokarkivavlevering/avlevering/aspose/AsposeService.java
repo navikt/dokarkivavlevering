@@ -30,9 +30,6 @@ public class AsposeService {
 	}
 
 	public byte[] convertToPDFA(byte[] inputPdf, long dokumentInfoId) {
-//		if (isValidPdfa(inputPdf)) {
-//			return inputPdf;
-//		}
 
 		ExecutorService executorService = Executors.newSingleThreadExecutor();
 		Future<byte[]> task = executorService.submit(() -> doConvertToPDFA(inputPdf, dokumentInfoId));

@@ -28,12 +28,12 @@
 		<simpleflatmapper.version>8.2.3</simpleflatmapper.version>
 		<commons-io.version>2.15.1</commons-io.version>
 		<rxjava.version>3.1.8</rxjava.version>
-		<verapdf.version>1.24.1</verapdf.version>
 		<guava.version>33.0.0-jre</guava.version>
 		<!-- aspose-pdf kan ikke oppdateres til en versjon > 23.5 (på grunn av lisens) -->
 		<aspose-pdf.version>23.5</aspose-pdf.version>
 
 		<hisrc-higherjaxb40-maven-plugin.version>2.2.0</hisrc-higherjaxb40-maven-plugin.version>
+		<maven-toolchains-plugin.version>3.1.0</maven-toolchains-plugin.version>
 	</properties>
 
 	<repositories>
@@ -55,22 +55,6 @@
 				<groupId>no.nav.dokarkivavlevering</groupId>
 				<artifactId>arkivverket-schemas</artifactId>
 				<version>${project.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.verapdf</groupId>
-				<artifactId>validation-model</artifactId>
-				<version>${verapdf.version}</version>
-<!--				<exclusions>-->
-<!--					<exclusion>-->
-<!--						<groupId>javax.activation</groupId>-->
-<!--						<artifactId>javax.activation-api</artifactId>-->
-<!--					</exclusion>-->
-<!--					<exclusion>-->
-<!--						<groupId>javax.xml.bind</groupId>-->
-<!--						<artifactId>jaxb-api</artifactId>-->
-<!--					</exclusion>-->
-<!--				</exclusions>-->
 			</dependency>
 
 			<dependency>
@@ -131,7 +115,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-toolchains-plugin</artifactId>
-				<version>3.1.0</version>
+				<version>${maven-toolchains-plugin.version}</version>
 			</plugin>
 		</plugins>
 	</build>
