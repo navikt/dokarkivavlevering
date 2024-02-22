@@ -2,10 +2,10 @@ package no.nav.dokarkivavlevering.avlevering.arkivuttrekk;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
+import no.nav.dokarkivavlevering.avlevering.exception.AvleveringFunctionalException;
 import org.apache.camel.Handler;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 
@@ -13,10 +13,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.Objects;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.io.FileUtils.readFileToByteArray;
 
 @Slf4j
@@ -42,7 +42,6 @@ public class ArkivuttrekkMapper {
 
 	private final AvleveringProperties avleveringProperties;
 
-	@Autowired
 	public ArkivuttrekkMapper(AvleveringProperties avleveringProperties) {
 		this.avleveringProperties = avleveringProperties;
 	}
@@ -51,8 +50,11 @@ public class ArkivuttrekkMapper {
 	public String insertValues() throws Exception {
 		final InputStream resourceInputStream = this.getClass().getClassLoader().getResourceAsStream("arkivuttrekk/arkivuttrekk_template.xml");
 
-		assert resourceInputStream != null;
-		return IOUtils.toString(resourceInputStream, StandardCharsets.UTF_8)
+		if (resourceInputStream == null) {
+			throw new AvleveringFunctionalException("Fant ikke fil 'arkivuttrekk/arkivuttrekk_template.xml'");
+		}
+
+		return IOUtils.toString(resourceInputStream, UTF_8)
 				.replace(AVLEVERING_SLUTTDATO, avleveringProperties.getPeriode().getSluttdato().toString())
 				.replace(AVLEVERING_ANTALLDOKUMENTER, countElements("arkivstruktur.xml", "dokumentobjekt")) // FIXME: Er dette en grei nok måte å sjekke dette på ?
 				.replace(METADATAKATALOG_XSD_SJEKKSUM, generateSHA256("metadatakatalog.xsd"))
