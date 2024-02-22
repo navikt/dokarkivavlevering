@@ -60,3 +60,5 @@ jobs:
           RESOURCE: nais/naiserator.yaml
           VAR: periodestart=${{github.event.inputs.periodeStart}},periodeslutt=${{github.event.inputs.periodeSlutt}},tema=${{github.event.inputs.tema}}
           VARS: nais/prod-config.json
+          WAIT: true
+          TIMEOUT: 3h
