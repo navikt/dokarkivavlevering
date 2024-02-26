@@ -52,7 +52,7 @@ public class PdlGraphQLConsumer {
 		this.avleveringProperties = avleveringProperties;
 	}
 
-	@Retryable(include = HttpServerErrorException.class)
+	@Retryable(retryFor = HttpServerErrorException.class)
 	public Map<String, BrukerMedNavnedata> hentPersonBolk(Set<String> aktoerIds, String tema) {
 		if(aktoerIds.isEmpty()) {
 			return emptyMap();

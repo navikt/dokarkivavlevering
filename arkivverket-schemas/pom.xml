@@ -11,25 +11,20 @@
 	</parent>
 
 	<artifactId>arkivverket-schemas</artifactId>
-	<packaging>jar</packaging>
 
 	<dependencies>
 		<dependency>
 			<groupId>jakarta.xml.bind</groupId>
 			<artifactId>jakarta.xml.bind-api</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.glassfish.jaxb</groupId>
-			<artifactId>jaxb-runtime</artifactId>
-		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.jvnet.jaxb2.maven2</groupId>
-				<artifactId>maven-jaxb2-plugin</artifactId>
-				<version>0.14.0</version>
+				<groupId>org.patrodyne.jvnet</groupId>
+				<artifactId>hisrc-higherjaxb40-maven-plugin</artifactId>
+				<version>${hisrc-higherjaxb40-maven-plugin.version}</version>
 				<executions>
 					<execution>
 						<id>generate-jaxb-noark5-arkivstruktur</id>
@@ -49,21 +44,6 @@
 							<generateDirectory>${project.build.directory}/generated-sources/arkivstruktur
 							</generateDirectory>
 							<strict>false</strict>
-							<plugins>
-								<plugin>
-									<groupId>org.jvnet.jaxb2_commons</groupId>
-									<artifactId>jaxb2-basics</artifactId>
-									<version>${jaxb2-commons.version}</version>
-								</plugin>
-								<plugin>
-									<groupId>org.jvnet.jaxb2_commons</groupId>
-									<artifactId>jaxb2-basics-annotate</artifactId>
-									<version>${jaxb2-commons.version}</version>
-								</plugin>
-							</plugins>
-							<args>
-								<arg>-Xannotate</arg>
-							</args>
 						</configuration>
 					</execution>
 					<execution>
@@ -77,25 +57,9 @@
 							<schemaIncludes>
 								<include>endringslogg.xsd</include>
 							</schemaIncludes>
-							<bindingDirectory>${project.basedir}/src/main/resources/</bindingDirectory>
 							<generateDirectory>${project.build.directory}/generated-sources/endringslogg
 							</generateDirectory>
 							<strict>false</strict>
-							<plugins>
-								<plugin>
-									<groupId>org.jvnet.jaxb2_commons</groupId>
-									<artifactId>jaxb2-basics</artifactId>
-									<version>${jaxb2-commons.version}</version>
-								</plugin>
-								<plugin>
-									<groupId>org.jvnet.jaxb2_commons</groupId>
-									<artifactId>jaxb2-basics-annotate</artifactId>
-									<version>${jaxb2-commons.version}</version>
-								</plugin>
-							</plugins>
-							<args>
-								<arg>-Xannotate</arg>
-							</args>
 						</configuration>
 					</execution>
 					<execution>
@@ -109,25 +73,9 @@
 							<schemaIncludes>
 								<include>loependeJournal.xsd</include>
 							</schemaIncludes>
-							<bindingDirectory>${project.basedir}/src/main/resources/</bindingDirectory>
 							<generateDirectory>${project.build.directory}/generated-sources/loependejournal
 							</generateDirectory>
 							<strict>false</strict>
-							<plugins>
-								<plugin>
-									<groupId>org.jvnet.jaxb2_commons</groupId>
-									<artifactId>jaxb2-basics</artifactId>
-									<version>${jaxb2-commons.version}</version>
-								</plugin>
-								<plugin>
-									<groupId>org.jvnet.jaxb2_commons</groupId>
-									<artifactId>jaxb2-basics-annotate</artifactId>
-									<version>${jaxb2-commons.version}</version>
-								</plugin>
-							</plugins>
-							<args>
-								<arg>-Xannotate</arg>
-							</args>
 						</configuration>
 					</execution>
 					<execution>
@@ -141,35 +89,12 @@
 							<schemaIncludes>
 								<include>offentligJournal.xsd</include>
 							</schemaIncludes>
-							<bindingDirectory>${project.basedir}/src/main/resources/</bindingDirectory>
 							<generateDirectory>${project.build.directory}/generated-sources/offentligjournal
 							</generateDirectory>
 							<strict>false</strict>
-							<plugins>
-								<plugin>
-									<groupId>org.jvnet.jaxb2_commons</groupId>
-									<artifactId>jaxb2-basics</artifactId>
-									<version>${jaxb2-commons.version}</version>
-								</plugin>
-								<plugin>
-									<groupId>org.jvnet.jaxb2_commons</groupId>
-									<artifactId>jaxb2-basics-annotate</artifactId>
-									<version>${jaxb2-commons.version}</version>
-								</plugin>
-							</plugins>
-							<args>
-								<arg>-Xannotate</arg>
-							</args>
 						</configuration>
 					</execution>
 				</executions>
-				<dependencies>
-					<dependency>
-						<groupId>org.glassfish.jaxb</groupId>
-						<artifactId>jaxb-runtime</artifactId>
-						<version>${jaxb-runtime-glassfish.version}</version>
-					</dependency>
-				</dependencies>
 			</plugin>
 		</plugins>
 	</build>

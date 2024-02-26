@@ -8,33 +8,32 @@
 	<artifactId>dokarkivavlevering</artifactId>
 	<packaging>pom</packaging>
 	<version>1.0-SNAPSHOT</version>
-	<name>dokarkivavlevering</name>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.7.8</version>
+		<version>3.2.2</version>
 	</parent>
 
 	<modules>
 		<module>app</module>
-        <module>arkivverket-schemas</module>
-    </modules>
+		<module>arkivverket-schemas</module>
+	</modules>
 
 	<properties>
-		<camel.version>3.20.2</camel.version>
 		<java.version>17</java.version>
-		<logstash-logback-encoder.version>7.2</logstash-logback-encoder.version>
-		<oracle.version>19.17.0.0</oracle.version>
+
+		<camel.version>4.4.0</camel.version>
+		<logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
 		<simpleflatmapper.version>8.2.3</simpleflatmapper.version>
-		<Saxon-HE.version>10.3</Saxon-HE.version>
-		<jaxb2-commons.version>0.6.5</jaxb2-commons.version>
-		<commons-io.version>2.11.0</commons-io.version>
-		<rxjava.version>3.1.6</rxjava.version>
-		<verapdf.version>1.22.2</verapdf.version>
-		<aspose-pdf.version>23.1</aspose-pdf.version>
-		<jaxb-runtime-glassfish.version>2.3.7</jaxb-runtime-glassfish.version>
-		<guava.version>32.1.0-jre</guava.version>
+		<commons-io.version>2.15.1</commons-io.version>
+		<rxjava.version>3.1.8</rxjava.version>
+		<guava.version>33.0.0-jre</guava.version>
+		<!-- aspose-pdf kan ikke oppdateres til en versjon > 23.5 (på grunn av lisens) -->
+		<aspose-pdf.version>23.5</aspose-pdf.version>
+
+		<hisrc-higherjaxb40-maven-plugin.version>2.2.0</hisrc-higherjaxb40-maven-plugin.version>
+		<maven-toolchains-plugin.version>3.1.0</maven-toolchains-plugin.version>
 	</properties>
 
 	<repositories>
@@ -47,25 +46,6 @@
 
 	<dependencyManagement>
 		<dependencies>
-			<!--pdf validator-->
-			<dependency>
-				<groupId>org.verapdf</groupId>
-				<artifactId>validation-model</artifactId>
-				<version>${verapdf.version}</version>
-				<exclusions>
-					<exclusion>
-						<groupId>javax.activation</groupId>
-						<artifactId>javax.activation-api</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-			<!--/pdf validator-->
-			<!-- https://mvnrepository.com/artifact/org.jvnet.jaxb2.maven2/maven-jaxb2-plugin -->
-			<dependency>
-				<groupId>org.jvnet.jaxb2.maven2</groupId>
-				<artifactId>maven-jaxb2-plugin</artifactId>
-				<version>${jaxb2-commons.version}</version>
-			</dependency>
 			<dependency>
 				<groupId>no.nav.dokarkivavlevering</groupId>
 				<artifactId>app</artifactId>
@@ -76,23 +56,13 @@
 				<artifactId>arkivverket-schemas</artifactId>
 				<version>${project.version}</version>
 			</dependency>
+
 			<dependency>
 				<groupId>org.apache.camel.springboot</groupId>
 				<artifactId>camel-spring-boot-dependencies</artifactId>
 				<version>${camel.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.camel</groupId>
-				<artifactId>camel-test-spring-junit5</artifactId>
-				<version>${camel.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>net.sf.saxon</groupId>
-				<artifactId>Saxon-HE</artifactId>
-				<version>${Saxon-HE.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-io</groupId>
@@ -130,19 +100,22 @@
 				<artifactId>aspose-pdf</artifactId>
 				<version>${aspose-pdf.version}</version>
 			</dependency>
-				<dependency>
-					<groupId>org.glassfish.jaxb</groupId>
-					<artifactId>jaxb-runtime</artifactId>
-					<version>${jaxb-runtime-glassfish.version}</version>
-				</dependency>
+
+			<dependency>
+				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-test-spring-junit5</artifactId>
+				<version>${camel.version}</version>
+				<scope>test</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
+
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-toolchains-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>${maven-toolchains-plugin.version}</version>
 			</plugin>
 		</plugins>
 	</build>

@@ -1,15 +1,15 @@
 package no.nav.dokarkivavlevering.avlevering.config;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.ToString;
 import lombok.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -55,14 +55,14 @@ public class AvleveringProperties {
 	@Value
 	@Valid
 	public static class ArkivConfig {
-		private final String systemID = UUID.randomUUID().toString();
-		private final ArkivdelConfig arkivdelConfig = new ArkivdelConfig();
+		String systemID = UUID.randomUUID().toString();
+		ArkivdelConfig arkivdelConfig = new ArkivdelConfig();
 	}
 
 	@Value
 	@Valid
 	public static class ArkivdelConfig {
-		private final String systemID = UUID.randomUUID().toString();
+		String systemID = UUID.randomUUID().toString();
 	}
 
 	@Data
