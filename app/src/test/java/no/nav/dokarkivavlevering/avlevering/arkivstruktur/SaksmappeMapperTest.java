@@ -40,7 +40,7 @@ class SaksmappeMapperTest {
 	private final SaksmappeMapper saksmappeMapper = new SaksmappeMapper(new JournaldatoMapper());
 
 	@Test
-	void shouldMap() throws Exception {
+	void shouldMap() {
 		Sak sak = generateSak("KTR");
 
 		final Saksmappe saksmappe = saksmappeMapper.map(sak);
@@ -82,14 +82,13 @@ class SaksmappeMapperTest {
 	}
 
 	@Test
-	void shouldMapWithoutDokument() throws Exception {
+	void shouldMapWithoutDokument() {
 		Sak sak = generateSak("VEN");
 
 		final Saksmappe saksmappe = saksmappeMapper.map(sak);
 		List<Dokumentobjekt> dokument = saksmappe.getRegistrerings().get(0).getDokumentbeskrivelses().get(0).getDokumentobjekts();
 		assertEquals(dokument.size(), 0);
 	}
-
 
 	@Test
 	void shouldMapOpprettetAvToBeriketNavnWhenOpprettetAvNavnIsNull() throws Exception {
@@ -184,7 +183,7 @@ class SaksmappeMapperTest {
 		return new BigInteger(String.valueOf(smallInteger));
 	}
 
-	private Sak generateSak() throws Exception {
+	private Sak generateSak() {
 		return generateSak("KTR");
 	}
 
