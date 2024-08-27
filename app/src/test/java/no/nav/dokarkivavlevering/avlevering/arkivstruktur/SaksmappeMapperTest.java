@@ -21,13 +21,16 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import static no.nav.dokarkivavlevering.avlevering.testUtils.TestUtils.toLocalDateTime;
+import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.INNGAAENDE;
+import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.UTGAAENDE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class SaksmappeMapperTest {
 
@@ -62,6 +65,23 @@ class SaksmappeMapperTest {
 	}
 
 	@Test
+	void shouldNotMapSendDatoWhenJournalpostTypeIsNotU() throws Exception {
+		final Sak sak = generateSak().toBuilder().jp(Collections.singletonList(
+				generateJournalpost(INNGAAENDE).toBuilder()
+						.opprettetAv(null)
+						.opprettetAvNavn(null)
+						.opprettetAvBeriketNavn(null)
+						.dok(Collections.singletonList(generateDokumentInfo()))
+						.build())).build();
+
+		final Saksmappe saksmappe = saksmappeMapper.map(sak);
+		List<Dokumentobjekt> dokument = saksmappe.getRegistrerings().get(0).getDokumentbeskrivelses().get(0).getDokumentobjekts();
+		no.arkivverket.standarder.noark5.arkivstruktur.Journalpost journalpost = (no.arkivverket.standarder.noark5.arkivstruktur.Journalpost) saksmappe.getRegistrerings().get(0);
+		assertEquals(dokument.size(), 1);
+		assertNull(journalpost.getSendtDato());
+	}
+
+	@Test
 	void shouldMapWithoutDokument() throws Exception {
 		Sak sak = generateSak("VEN");
 
@@ -70,10 +90,11 @@ class SaksmappeMapperTest {
 		assertEquals(dokument.size(), 0);
 	}
 
+
 	@Test
 	void shouldMapOpprettetAvToBeriketNavnWhenOpprettetAvNavnIsNull() throws Exception {
 		final Sak sak = generateSak().toBuilder().jp(Collections.singletonList(
-				generateJournalpost().toBuilder()
+				generateJournalpost(UTGAAENDE).toBuilder()
 						.opprettetAv("A000000")
 						.opprettetAvNavn(null)
 						.opprettetAvBeriketNavn("Saksbehandler Sakbehandlerstad")
@@ -87,7 +108,7 @@ class SaksmappeMapperTest {
 	@Test
 	void shouldMapOpprettetAvUkjentWhenOpprettetAvIsNull() throws Exception {
 		final Sak sak = generateSak().toBuilder().jp(Collections.singletonList(
-				generateJournalpost().toBuilder()
+				generateJournalpost(UTGAAENDE).toBuilder()
 						.opprettetAv(null)
 						.opprettetAvNavn(null)
 						.opprettetAvBeriketNavn(null)
@@ -104,7 +125,7 @@ class SaksmappeMapperTest {
 		assertEquals(part.getPartRolle(), "Bruker");
 	}
 
-	private void assertRegistrering(no.arkivverket.standarder.noark5.arkivstruktur.Journalpost registrering) throws Exception {
+	private void assertRegistrering(no.arkivverket.standarder.noark5.arkivstruktur.Journalpost registrering) {
 		assertEquals(registrering.getJournalaar().toString(), "2020");
 		assertEquals(registrering.getJournalsekvensnummer().toString(), "453637481");
 		assertEquals(registrering.getJournalpostnummer().toString(), "453637481");
@@ -124,8 +145,8 @@ class SaksmappeMapperTest {
 		assertDokumentBeskrivelse(registrering.getDokumentbeskrivelses().get(0));
 	}
 
-	private void assertDokumentObjekt(Dokumentobjekt dokObjekt) throws Exception {
-		assertEquals(dokObjekt.getSystemID().getValue().isEmpty(), false);
+	private void assertDokumentObjekt(Dokumentobjekt dokObjekt) {
+		assertFalse(dokObjekt.getSystemID().getValue().isEmpty());
 		assertEquals(dokObjekt.getVersjonsnummer(), toBigInteger(1));
 		assertEquals(dokObjekt.getVariantformat(), "Arkivformat");
 		assertEquals(dokObjekt.getFormat(), "PDF/A");
@@ -143,8 +164,8 @@ class SaksmappeMapperTest {
 		assertEquals(korrPart.getSaksbehandler(), "srvmelosys");
 	}
 
-	private void assertDokumentBeskrivelse(Dokumentbeskrivelse dok) throws Exception {
-		assertEquals(dok.getSystemID().getValue().isEmpty(), false);
+	private void assertDokumentBeskrivelse(Dokumentbeskrivelse dok) {
+		assertFalse(dok.getSystemID().getValue().isEmpty());
 		assertEquals(dok.getDokumenttype(), "Strukturert elektronisk dokument");
 		assertEquals(dok.getDokumentstatus(), "Dokumentet er ferdigstilt");
 		assertEquals(dok.getTittel(), "Legg til ny institusjon");
@@ -167,7 +188,7 @@ class SaksmappeMapperTest {
 		return generateSak("KTR");
 	}
 
-	private Sak generateSak(String tema) throws Exception {
+	private Sak generateSak(String tema) {
 		return Sak.builder()
 				.id((long) 1234567011)
 				.tema(tema)
@@ -176,7 +197,7 @@ class SaksmappeMapperTest {
 				.opprettetAv("srvmelosys")
 				.opprettetTidspunkt(SAK_OPPRETTET_TIDSPUNKT.toLocalDateTime())
 				.opprettetAvBeriketNavn("Automatisk jobb")
-				.jp(Arrays.asList(generateJournalpost())).build();
+				.jp(List.of(generateJournalpost(UTGAAENDE))).build();
 	}
 
 	private BrukerMedNavnedata generateBrukerMedNavnedata() {
@@ -186,10 +207,10 @@ class SaksmappeMapperTest {
 				new NavnMedGyldighet(SAK_OPPRETTET_TIDSPUNKT.plusMonths(2), null, "For nytt")));
 	}
 
-	private Journalpost generateJournalpost() throws Exception {
+	private Journalpost generateJournalpost(String journalpostType) {
 		return Journalpost.builder()
 				.id((long) 453637481)
-				.type("U")
+				.type(journalpostType)
 				.status("FS")
 				.innhold("Legg til ny institusjon")
 				.avsenderMottaker("Bruker Brukersen")
@@ -208,7 +229,7 @@ class SaksmappeMapperTest {
 				.build();
 	}
 
-	private DokumentInfo generateDokumentInfo() throws Exception {
+	private DokumentInfo generateDokumentInfo() {
 		return DokumentInfo.builder()
 				.id((long) 454017976)
 				.relTilknyttetSom("HOVEDDOKUMENT")
@@ -221,11 +242,11 @@ class SaksmappeMapperTest {
 				.datoOpprettet(toLocalDateTime("2020-11-10 16:04:43.342"))
 				.opprettetAv("srvmelosys")
 				.opprettetAvBeriketNavn("Automatisk jobb")
-				.fd(Arrays.asList(generateFilDetaljer()))
+				.fd(List.of(generateFilDetaljer()))
 				.build();
 	}
 
-	private FilDetaljer generateFilDetaljer() throws Exception {
+	private FilDetaljer generateFilDetaljer() {
 		return FilDetaljer.builder()
 				.id((long) 539876247)
 				.filUuid("55c39cdb-f052-4f4e-a9a5-900b455ca915")
