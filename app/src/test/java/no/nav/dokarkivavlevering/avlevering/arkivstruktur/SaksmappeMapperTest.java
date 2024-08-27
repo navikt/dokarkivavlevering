@@ -65,7 +65,7 @@ class SaksmappeMapperTest {
 	}
 
 	@Test
-	void shouldNotMapSendDatoWhenJournalpostTypeIsNotU() throws Exception {
+	void shouldNotMapSendtDatoWhenJournalpostTypeIsNotU() throws Exception {
 		final Sak sak = generateSak().toBuilder().jp(Collections.singletonList(
 				generateJournalpost(INNGAAENDE).toBuilder()
 						.opprettetAv(null)

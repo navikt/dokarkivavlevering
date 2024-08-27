@@ -35,7 +35,7 @@ public class AvleveringUtils {
 			SAP.name(), "Vedtak om stans av sykepenger, og behandling av klager og anker"
 	);
 
-	public static boolean isStringTemaAvleverMedDokumenter(String tema) {
+	public static boolean isTemaAvleverMedDokumenter(String tema) {
 		return Tema.valueOf(tema.toUpperCase()).isAvleverDokumenter();
 	}
 

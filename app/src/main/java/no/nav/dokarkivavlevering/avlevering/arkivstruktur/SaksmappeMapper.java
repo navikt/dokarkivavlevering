@@ -28,7 +28,7 @@ import static no.nav.dokarkivavlevering.avlevering.AvleveringSakBerikerMapper.AU
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.INNGAAENDE;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.UTGAAENDE;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.getYear;
-import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.isStringTemaAvleverMedDokumenter;
+import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.isTemaAvleverMedDokumenter;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.temaNavnDecode;
 import static org.apache.camel.converter.ObjectConverter.toBigInteger;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -130,7 +130,7 @@ public class SaksmappeMapper {
 		dokumentbeskrivelse.setTilknyttetDato(dokumentInfo.getRelDatoOpprettet());
 		dokumentbeskrivelse.setTilknyttetAv(dokumentInfo.getRelOpprettetAvBeriketNavn());
 
-		if (isStringTemaAvleverMedDokumenter(tema)) {
+		if (isTemaAvleverMedDokumenter(tema)) {
 			for (FilDetaljer filDetaljer : dokumentInfo.getFd()) {
 				dokumentbeskrivelse.getDokumentobjekts().add(mapDokumentobjekt(filDetaljer, tema, journalpostId));
 			}
@@ -195,8 +195,8 @@ public class SaksmappeMapper {
 		}
 	}
 
-	private String mapKorrespondanseParttype(String journalpost_t) {
-		return INNGAAENDE.equalsIgnoreCase(journalpost_t) ? "Avsender" : "Mottaker";
+	private String mapKorrespondanseParttype(String journalpostType) {
+		return INNGAAENDE.equalsIgnoreCase(journalpostType) ? "Avsender" : "Mottaker";
 	}
 
 	private String getAdministrativEnhetFromTema(String tema) {
