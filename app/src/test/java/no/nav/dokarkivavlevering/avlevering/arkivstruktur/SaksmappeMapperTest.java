@@ -65,7 +65,7 @@ class SaksmappeMapperTest {
 	}
 
 	@Test
-	void shouldNotMapSendtDatoWhenJournalpostTypeIsNotU() throws Exception {
+	void shouldNotMapSendtDatoWhenJournalpostTypeIsNotU() {
 		final Sak sak = generateSak().toBuilder().jp(Collections.singletonList(
 				generateJournalpost(INNGAAENDE).toBuilder()
 						.opprettetAv(null)
@@ -91,7 +91,7 @@ class SaksmappeMapperTest {
 	}
 
 	@Test
-	void shouldMapOpprettetAvToBeriketNavnWhenOpprettetAvNavnIsNull() throws Exception {
+	void shouldMapOpprettetAvToBeriketNavnWhenOpprettetAvNavnIsNull() {
 		final Sak sak = generateSak().toBuilder().jp(Collections.singletonList(
 				generateJournalpost(UTGAAENDE).toBuilder()
 						.opprettetAv("A000000")
@@ -105,7 +105,7 @@ class SaksmappeMapperTest {
 	}
 
 	@Test
-	void shouldMapOpprettetAvUkjentWhenOpprettetAvIsNull() throws Exception {
+	void shouldMapOpprettetAvUkjentWhenOpprettetAvIsNull() {
 		final Sak sak = generateSak().toBuilder().jp(Collections.singletonList(
 				generateJournalpost(UTGAAENDE).toBuilder()
 						.opprettetAv(null)
