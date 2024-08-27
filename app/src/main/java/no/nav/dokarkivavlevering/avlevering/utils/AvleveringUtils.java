@@ -2,18 +2,12 @@ package no.nav.dokarkivavlevering.avlevering.utils;
 
 import no.arkivverket.standarder.noark5.arkivstruktur.SystemID;
 import no.nav.dokarkivavlevering.avlevering.config.Tema;
-import no.nav.dokarkivavlevering.avlevering.exception.AvleveringFunctionalException;
 import org.springframework.stereotype.Component;
 
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.GregorianCalendar;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.UUID;
 
 import static no.nav.dokarkivavlevering.avlevering.config.Tema.AGR;
@@ -27,9 +21,11 @@ import static no.nav.dokarkivavlevering.avlevering.config.Tema.SAP;
 @Component
 public class AvleveringUtils {
 
+	public static final String UTGAAENDE = "U";
+	public static final String INNGAAENDE = "I";
 	public static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
-	private static final Map<String,String> fagomradeBeskrivelseLookup = Map.of(
+	private static final Map<String, String> fagomradeBeskrivelseLookup = Map.of(
 			AGR.name(), "Endring av bankkonto eller midlertidige adresser",
 			ERS.name(), "Krav om økonomisk erstatning fordi NAV har gjort en feil",
 			IAR.name(), "Intensjonsavtalen om et mer inkluderende arbeidsliv: Samarbeidsavtaler, mål- og handlingsplaner. Noe tilskudd",
@@ -39,31 +35,17 @@ public class AvleveringUtils {
 			SAP.name(), "Vedtak om stans av sykepenger, og behandling av klager og anker"
 	);
 
-	public static XMLGregorianCalendar mapXmlGregorianCalendar(LocalDateTime localDateTime) {
-		try {
-			if (localDateTime == null) {
-				return null;
-			}
-			TimeZone timeZone = TimeZone.getTimeZone("Europe/Oslo");
-			GregorianCalendar cal = GregorianCalendar.from(localDateTime.atZone(timeZone.toZoneId()));
-			cal.setTimeZone(timeZone);
-			return DatatypeFactory.newInstance().newXMLGregorianCalendar(cal);
-		} catch (DatatypeConfigurationException e) {
-			throw new AvleveringFunctionalException("Kunne ikke mappe dato til XmlGregorianCalendar.", e);
-		}
-	}
-
-	public static boolean isStringTemaAvleverMedDokumenter(String tema){
+	public static boolean isTemaAvleverMedDokumenter(String tema) {
 		return Tema.valueOf(tema.toUpperCase()).isAvleverDokumenter();
 	}
 
 	public static boolean isNav(String journalpostType) {
-		return "I".equalsIgnoreCase(journalpostType) | "U".equalsIgnoreCase(journalpostType);
+		return INNGAAENDE.equalsIgnoreCase(journalpostType) | UTGAAENDE.equalsIgnoreCase(journalpostType);
 	}
 
 	public static String mapKorrespondansepartType(String journalpostType) {
-		return "I".equalsIgnoreCase(journalpostType) ? "Avsender" :
-				"U".equalsIgnoreCase(journalpostType) ? "Mottaker" : "Intern avsender";
+		return INNGAAENDE.equalsIgnoreCase(journalpostType) ? "Avsender" :
+				UTGAAENDE.equalsIgnoreCase(journalpostType) ? "Mottaker" : "Intern avsender";
 	}
 
 	public static int getYear(LocalDateTime date) {
