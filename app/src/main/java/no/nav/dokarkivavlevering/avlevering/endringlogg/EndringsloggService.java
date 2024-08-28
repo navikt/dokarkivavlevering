@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class EndringsloggService {
@@ -29,20 +31,33 @@ public class EndringsloggService {
 		List<Endring> endringer = new ArrayList<>();
 		for (Sak sak : saker) {
 			for (Journalpost jp : sak.getJp()) {
-				for (Arkivendring ae : jp.getAe()) {
-					if (ae.getTidspunkt().isAfter(jp.getDatoJournal())) {
-						endringer.add(endringsloggMapper.map(ae, ae.getElement().startsWith(SAKSRELASJON) ? sak.getUuid() : jp.getUuid()));
-					}
-				}
+				jp.getAe()
+						.stream()
+						.filter(ae -> ae.getTidspunkt().isAfter(jp.getDatoJournal()))
+						.map(ae -> endringsloggMapper.map(ae, determineCorrectUUID(ae, sak, jp)))
+						.filter(Optional::isPresent)
+						.map(Optional::get)
+						.forEach(endringer::add);
+
 				for (DokumentInfo dokumentInfo : jp.getDok()) {
-					for (Arkivendring ae : dokumentInfo.getAe()) {
-						if (ae.getTidspunkt().isAfter(jp.getDatoJournal())) {
-							endringer.add(endringsloggMapper.map(ae, dokumentInfo.getUuid()));
-						}
-					}
+					dokumentInfo.getAe()
+							.stream()
+							.filter(ae -> ae.getTidspunkt().isAfter(jp.getDatoJournal()))
+							.map(ae -> endringsloggMapper.map(ae, dokumentInfo.getUuid()))
+							.filter(Optional::isPresent)
+							.map(Optional::get)
+							.forEach(endringer::add);
 				}
 			}
 		}
 		return endringer;
+	}
+
+	private static UUID determineCorrectUUID(Arkivendring ae, Sak sak, Journalpost jp) {
+		if (ae.getElement().startsWith(SAKSRELASJON)) {
+			return sak.getUuid();
+		} else {
+			return jp.getUuid();
+		}
 	}
 }
