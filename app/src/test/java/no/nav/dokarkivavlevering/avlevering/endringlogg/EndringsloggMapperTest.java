@@ -6,7 +6,10 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 class EndringsloggMapperTest {
 
@@ -27,7 +30,9 @@ class EndringsloggMapperTest {
 				.tilVerdi("1234")
 				.build();
 
-		final Endring endring = mapper.map(arkivendring, uuid);
+		Optional<Endring> endringOptional = mapper.map(arkivendring, uuid);
+		assertThat(endringOptional).isNotEmpty();
+		Endring endring = endringOptional.get();
 
 		SoftAssertions softly = new SoftAssertions();
 		softly.assertThat(endring.getReferanseArkivenhet()).isEqualTo(uuid.toString());
@@ -54,7 +59,9 @@ class EndringsloggMapperTest {
 				.tilVerdi("FS")
 				.build();
 
-		final Endring endring = mapper.map(arkivendring, uuid);
+		Optional<Endring> endringOptional = mapper.map(arkivendring, uuid);
+		assertThat(endringOptional).isNotEmpty();
+		Endring endring = endringOptional.get();
 
 		SoftAssertions softly = new SoftAssertions();
 		softly.assertThat(endring.getReferanseArkivenhet()).isEqualTo(uuid.toString());
@@ -81,10 +88,34 @@ class EndringsloggMapperTest {
 				.tilVerdi("1234")
 				.build();
 
-		final Endring endring = mapper.map(arkivendring, uuid);
+		Optional<Endring> endringOptional = mapper.map(arkivendring, uuid);
+		assertThat(endringOptional).isNotEmpty();
+		Endring endring = endringOptional.get();
 
 		SoftAssertions softly = new SoftAssertions();
 		softly.assertThat(endring.getTidligereVerdi()).isEqualTo(Arkivendring.INGEN_VERDI);
+		softly.assertAll();
+	}
+
+	@Test
+	void shouldMapEmptyOptionalWhenToAndFromAreBothEmpty() {
+		LocalDateTime date = LocalDateTime.now();
+		UUID uuid = UUID.randomUUID();
+
+		Arkivendring arkivendring = Arkivendring.builder()
+				.id(1L)
+				.element("Saksrelasjon.sakId")
+				.tidspunkt(date)
+				.utfoertAv("B000000")
+				.utfoertAvBeriketNavn("JonBlund")
+				.fraVerdi(null)
+				.tilVerdi(null)
+				.build();
+
+		Optional<Endring> endringOptional = mapper.map(arkivendring, uuid);
+
+		SoftAssertions softly = new SoftAssertions();
+		softly.assertThat(endringOptional).isEmpty();
 		softly.assertAll();
 	}
 }

@@ -1,54 +1,49 @@
 package no.nav.dokarkivavlevering.avlevering.endringlogg;
 
-import lombok.Getter;
 import no.arkivverket.standarder.noark5.endringslogg.Endring;
 import no.nav.dokarkivavlevering.avlevering.domain.Arkivendring;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static no.nav.dokarkivavlevering.avlevering.domain.Arkivendring.INGEN_VERDI;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @Component
 public class EndringsloggMapper {
 
 	private static final String JOURNALPOST_JOURNALPOSTSTATUS = "Journalpost.journalpostStatus";
 
-	public Endring map(Arkivendring arkivendring, UUID uuid) {
-		Endring endring = new Endring();
-		endring.setReferanseArkivenhet(uuid.toString());
-		endring.setReferanseMetadata(arkivendring.getElement());
-		endring.setEndretDato(arkivendring.getTidspunkt());
-		endring.setEndretAv(arkivendring.getUtfoertAvBeriketNavn());
+	public Optional<Endring> map(Arkivendring arkivendring, UUID uuid) {
+		boolean endringIsJournalstatus = JOURNALPOST_JOURNALPOSTSTATUS.equals(arkivendring.getElement());
+		String tidligereVerdi = mapVerdi(arkivendring.getFraVerdi(), endringIsJournalstatus);
+		String nyVerdi = mapVerdi(arkivendring.getTilVerdi(), endringIsJournalstatus);
 
-		endring.setTidligereVerdi(mapTidligereVerdi(arkivendring));
-		endring.setNyVerdi(mapNyVerdi(arkivendring));
-		return endring;
-	}
-
-	private String mapNyVerdi(Arkivendring arkivendring){
-		return JOURNALPOST_JOURNALPOSTSTATUS.equals(arkivendring.getElement()) ?
-				journalpostStatusDecode(arkivendring.getTilVerdi()) :
-					isBlank(arkivendring.getTilVerdi()) ? INGEN_VERDI :  arkivendring.getTilVerdi();
-	}
-
-	private String mapTidligereVerdi(Arkivendring arkivendring) {
-		if(isBlank(arkivendring.getFraVerdi())) {
-			return INGEN_VERDI;
-		} else if(JOURNALPOST_JOURNALPOSTSTATUS.equals(arkivendring.getElement())){
-			return journalpostStatusDecode(arkivendring.getFraVerdi());
+		if (INGEN_VERDI.equals(tidligereVerdi) && INGEN_VERDI.equals(nyVerdi)) {
+			return Optional.empty();
+		} else {
+			Endring endring = new Endring();
+			endring.setReferanseArkivenhet(uuid.toString());
+			endring.setReferanseMetadata(arkivendring.getElement());
+			endring.setEndretDato(arkivendring.getTidspunkt());
+			endring.setEndretAv(arkivendring.getUtfoertAvBeriketNavn());
+			endring.setTidligereVerdi(tidligereVerdi);
+			endring.setNyVerdi(nyVerdi);
+			return Optional.of(endring);
 		}
-		return arkivendring.getFraVerdi();
 	}
 
-	private String journalpostStatusDecode(String journalpostStatus){
-		return isEmpty(journalpostStatus) ?
-				JournalpostStatus.UKJENT_STATUS : JournalpostStatus.valueOf(journalpostStatus).getStatusDecode();
+	private String mapVerdi(String verdi, boolean isJournalstatusEndring) {
+		if (isBlank(verdi)) {
+			return INGEN_VERDI;
+		} else if (isJournalstatusEndring) {
+			return JournalpostStatus.valueOf(verdi).statusDecode;
+		} else {
+			return verdi;
+		}
 	}
 
-	@Getter
 	private enum JournalpostStatus {
 		J("J", "JOURNALFØRT"),
 		M("M", "MOTTATT"),
@@ -63,11 +58,10 @@ public class EndringsloggMapper {
 		UB("UB", "UKJENT_BRUKER"),
 		OD("OD", "OPPLASTING_DOKUMENT");
 
-		public static String UKJENT_STATUS = "UKJENT";
-		private final String statusCode;
-		private final String statusDecode;
+		public final String statusCode;
+		public final String statusDecode;
 
-		JournalpostStatus(String statusCode, String statusDecode){
+		JournalpostStatus(String statusCode, String statusDecode) {
 			this.statusCode = statusCode;
 			this.statusDecode = statusDecode;
 		}

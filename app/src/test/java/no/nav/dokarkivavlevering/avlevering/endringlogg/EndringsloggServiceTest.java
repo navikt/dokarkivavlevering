@@ -16,11 +16,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Arrays.asList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class EndringsloggServiceTest {
@@ -38,6 +40,8 @@ class EndringsloggServiceTest {
 
 	@Test
 	void shouldMapEndringerAfterJournalDato() {
+		when(endringsloggMapper.map(any(), any())).thenReturn(Optional.of(new Endring()));
+
 		List<Sak> saker = opprettSaker();
 		List<Endring> endringer = endringsloggService.avlevering(saker);
 
@@ -51,6 +55,20 @@ class EndringsloggServiceTest {
 		softly.assertThat(utvalgteArkivendringerListe.get(0).getElement()).isEqualTo("Test1");
 		softly.assertThat(utvalgteArkivendringerListe.get(1).getTidspunkt()).isAfter(journalfoeringsDato);
 		softly.assertThat(utvalgteArkivendringerListe.get(1).getElement()).isEqualTo("Test4");
+		softly.assertAll();
+	}
+
+	@Test
+	void shouldNotMapEmptyEndringer() {
+		when(endringsloggMapper.map(any(), any())).thenReturn(Optional.empty());
+
+		List<Sak> saker = opprettSaker();
+		List<Endring> endringer = endringsloggService.avlevering(saker);
+
+		verify(endringsloggMapper, times(2)).map(arkivendringArgumentCaptor.capture(), any());
+
+		SoftAssertions softly = new SoftAssertions();
+		softly.assertThat(endringer).isEmpty();
 		softly.assertAll();
 	}
 
