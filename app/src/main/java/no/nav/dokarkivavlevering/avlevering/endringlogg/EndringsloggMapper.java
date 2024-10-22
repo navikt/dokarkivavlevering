@@ -1,5 +1,6 @@
 package no.nav.dokarkivavlevering.avlevering.endringlogg;
 
+import lombok.extern.slf4j.Slf4j;
 import no.arkivverket.standarder.noark5.endringslogg.Endring;
 import no.nav.dokarkivavlevering.avlevering.domain.Arkivendring;
 import org.springframework.stereotype.Component;
@@ -10,6 +11,7 @@ import java.util.UUID;
 import static no.nav.dokarkivavlevering.avlevering.domain.Arkivendring.INGEN_VERDI;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
+@Slf4j
 @Component
 public class EndringsloggMapper {
 
@@ -21,6 +23,9 @@ public class EndringsloggMapper {
 		String nyVerdi = mapVerdi(arkivendring.getTilVerdi(), endringIsJournalstatus);
 
 		if (INGEN_VERDI.equals(tidligereVerdi) && INGEN_VERDI.equals(nyVerdi)) {
+			return Optional.empty();
+		} else if (uuid == null && isBlank(arkivendring.getElement())) {
+			log.warn("arkivendring er null og kan ikke mappe endringslogg");
 			return Optional.empty();
 		} else {
 			Endring endring = new Endring();
