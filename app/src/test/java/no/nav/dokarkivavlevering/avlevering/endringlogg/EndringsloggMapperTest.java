@@ -118,4 +118,25 @@ class EndringsloggMapperTest {
 		softly.assertThat(endringOptional).isEmpty();
 		softly.assertAll();
 	}
+
+	@Test
+	void shouldMapEmptyAndLoggWarningWhenReferanseArkivenhetAndReferanseMetadataErNull() {
+		LocalDateTime date = LocalDateTime.now();
+
+		Arkivendring arkivendring = Arkivendring.builder()
+				.id(1L)
+				.element(null)
+				.tidspunkt(date)
+				.utfoertAv("B000000")
+				.utfoertAvBeriketNavn("JonBlund")
+				.fraVerdi("J")
+				.tilVerdi("FS")
+				.build();
+
+		Optional<Endring> endringOptional = mapper.map(arkivendring, null);
+
+		SoftAssertions softly = new SoftAssertions();
+		softly.assertThat(endringOptional).isEmpty();
+		softly.assertAll();
+	}
 }
