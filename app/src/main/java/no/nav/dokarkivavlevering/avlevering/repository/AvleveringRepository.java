@@ -25,24 +25,6 @@ import static no.nav.dokarkivavlevering.avlevering.repository.SqlQueries.FINN_SA
 @Repository
 @Slf4j
 public class AvleveringRepository {
-	private static final ResultSetExtractor<List<Sak>> SAK_RESULTSET_EXTRACTOR = JdbcTemplateMapperFactory.newInstance()
-			.addKeys("id",
-					"bruker_id",
-					"fagomrade_fagomrade",
-					"jp_id",
-					"jp_dok_id",
-					"jp_dok_fd_id",
-					"jp_ae_id",
-					"jp_dok_ae_id")
-			.newResultSetExtractor(Sak.class);
-
-	private static final ResultSetExtractor<List<Fagomrade>> FAGOMRADE_RESULTSET_EXTRACTOR = JdbcTemplateMapperFactory.newInstance()
-			.addKeys("faromrade_fagomrade")
-			.newResultSetExtractor(Fagomrade.class);
-
-	private static final ResultSetExtractor<List<Long>> SAKID_RESULTSET_EXTRACTOR = JdbcTemplateMapperFactory.newInstance()
-			.addKeys("sakId")
-			.newResultSetExtractor(Long.class);
 
 	public static final int ORACLE_MAX_IN = 1000;
 
@@ -96,4 +78,24 @@ public class AvleveringRepository {
 
 		}
 	}
+
+	private static final ResultSetExtractor<List<Sak>> SAK_RESULTSET_EXTRACTOR = JdbcTemplateMapperFactory.newInstance()
+			.addKeys("id",
+					"bruker_id",
+					"fagomrade_fagomrade",
+					"jp_id",
+					"jp_dok_id",
+					"jp_dok_fd_id",
+					"jp_ae_id",
+					"jp_dok_ae_id")
+			.newResultSetExtractor(Sak.class);
+
+	private static final ResultSetExtractor<List<Fagomrade>> FAGOMRADE_RESULTSET_EXTRACTOR = JdbcTemplateMapperFactory.newInstance()
+			.addKeys("faromrade_fagomrade")
+			.newResultSetExtractor(Fagomrade.class);
+
+	private static final ResultSetExtractor<List<Long>> SAKID_RESULTSET_EXTRACTOR = JdbcTemplateMapperFactory.newInstance()
+			.addKeys("sakId")
+			.newResultSetExtractor(Long.class);
+
 }

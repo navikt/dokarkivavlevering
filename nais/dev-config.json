@@ -1,11 +1,11 @@
 {
   "SERVICEUSER_VAULT_PATH": "/serviceuser/data/dev/srvdokavlevering",
   "SRV_LINUX": "/serviceuser/data/dev/srvssolinux",
-  "DOKARKIVAVLEVERING_DS": "/oracle/data/dev/creds/joark_q2-dokarkivavlevering",
-  "SPRING_DATASOURCE_URL": "jdbc:oracle:thin:@a01dbfl033.adeo.no:1521/joark_q2",
+  "DOKARKIVAVLEVERING_DS_CREDS": "/oracle/data/dev/creds/joark_q2-dokarkivavlevering",
+  "DOKARKIVAVLEVERING_DS_CONFIG": "/oracle/data/dev/config/joark_q2",
   "SECURITY_TOKEN_SERVICE_TOKEN_URL": "https://security-token-service.dev.adeo.no/rest/v1/sts/token",
   "PDL_URL": "https://pdl-api.dev.adeo.no/graphql",
   "SPRING_LDAP_URLS": "ldaps://ldapgw.preprod.local",
   "AD_NAVUSER_BASEDN": "ou=NAV,ou=BusinessUnits,dc=preprod,dc=local",
-  "EREG_URL": "https://ereg-services-q1.intern.dev.nav.no/v1/organisasjon/"
+  "EREG_URL": "https://ereg-services-q1.dev.intern.nav.no/v2/organisasjon/"
 }

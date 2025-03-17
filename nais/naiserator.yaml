@@ -20,8 +20,6 @@ spec:
   env:
     - name: SPRING_LDAP_URLS
       value: "{{SPRING_LDAP_URLS}}"
-    - name: SPRING_DATASOURCE_URL
-      value: "{{SPRING_DATASOURCE_URL}}"
     - name: AVLEVERING_PDLURL
       value: "{{PDL_URL}}"
     - name: AVLEVERING_EREGURL
@@ -43,5 +41,7 @@ spec:
         mountPath: "/secrets/serviceuser/dokavlevering"
       - kvPath: {{ SRV_LINUX }}
         mountPath: "/var/run/secrets/nais.io/ldap"
-      - kvPath: {{ DOKARKIVAVLEVERING_DS }}
-        mountPath: "/var/run/secrets/nais.io/dokarkivavleveringDS"
+      - kvPath: {{ DOKARKIVAVLEVERING_DS_CREDS }}
+        mountPath: "/var/run/secrets/nais.io/db_creds"
+      - kvPath: {{ DOKARKIVAVLEVERING_DS_CONFIG }}
+        mountPath: "/var/run/secrets/nais.io/db_config"
