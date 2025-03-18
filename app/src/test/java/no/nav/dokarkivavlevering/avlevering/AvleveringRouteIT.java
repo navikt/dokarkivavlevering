@@ -22,19 +22,17 @@ import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.AdviceWith;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import javax.sql.DataSource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.LongStream;
@@ -47,7 +45,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-@CamelSpringBootTest
 public class AvleveringRouteIT {
 
 	@Autowired
@@ -56,19 +53,19 @@ public class AvleveringRouteIT {
 	@Autowired
 	private ProducerTemplate template;
 
-	@MockBean
+	@MockitoBean
 	AsposeService asposeServiceMock;
 
-	@MockBean
+	@MockitoBean
 	PdlGraphQLConsumer pdlGraphQLConsumer;
 
-	@MockBean
+	@MockitoBean
 	AvleveringRepository avleveringRepositoryMock;
 
-	@MockBean
+	@MockitoBean
 	DataSource dataSource_noop;
 
-	@MockBean
+	@MockitoBean
 	AvleveringSFTPRoute avleveringSFTPRoute_noop;
 	private MockEndpoint sftpMock;
 	private static final int ANTALL_SAKER = 15;

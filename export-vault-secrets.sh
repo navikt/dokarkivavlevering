@@ -12,15 +12,21 @@ then
     export AVLEVERING_SERVICEUSER_PASSWORD=$(cat /secrets/serviceuser/dokavlevering/password)
 fi
 # database
-if test -f /var/run/secrets/nais.io/dokarkivavleveringDS/username;
+if test -f /var/run/secrets/nais.io/db_config/jdbc_url;
+then
+    export SPRING_DATASOURCE_URL=$(cat /var/run/secrets/nais.io/db_config/jdbc_url)
+    echo "Setting SPRING_DATASOURCE_URL=$SPRING_DATASOURCE_URL"
+fi
+
+if test -f /var/run/secrets/nais.io/db_creds/username;
 then
     echo "Setting SPRING_DATASOURCE_USERNAME"
-    export SPRING_DATASOURCE_USERNAME=$(cat /var/run/secrets/nais.io/dokarkivavleveringDS/username)
+    export SPRING_DATASOURCE_USERNAME=$(cat /var/run/secrets/nais.io/db_creds/username)
 fi
-if test -f /var/run/secrets/nais.io/dokarkivavleveringDS/password;
+if test -f /var/run/secrets/nais.io/db_creds/password;
 then
     echo "Setting SPRING_DATASOURCE_PASSWORD"
-    export SPRING_DATASOURCE_PASSWORD=$(cat /var/run/secrets/nais.io/dokarkivavleveringDS/password)
+    export SPRING_DATASOURCE_PASSWORD=$(cat /var/run/secrets/nais.io/db_creds/password)
 fi
 # sftp
 if test -f /var/run/secrets/nais.io/vault/privateKeyFile;

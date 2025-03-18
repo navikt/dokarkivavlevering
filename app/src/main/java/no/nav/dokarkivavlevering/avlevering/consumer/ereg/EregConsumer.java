@@ -2,7 +2,6 @@ package no.nav.dokarkivavlevering.avlevering.consumer.ereg;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
-import no.nav.dokarkivavlevering.avlevering.consumer.sts.StsRestConsumer;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.RequestEntity;
@@ -21,7 +20,6 @@ import java.util.Optional;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -29,20 +27,16 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Slf4j
 @Component
 public class EregConsumer {
-	private static final String NAV_CONSUMER_TOKEN = "Nav-Consumer-Token";
 
 	private final RestTemplate restTemplate;
-	private final StsRestConsumer stsRestConsumer;
 	private final String eregUrl;
 
 	public EregConsumer(RestTemplateBuilder restTemplateBuilder,
-						StsRestConsumer stsRestConsumer,
 						AvleveringProperties avleveringProperties) {
 		this.restTemplate = restTemplateBuilder
-				.setConnectTimeout(Duration.ofSeconds(3))
-				.setReadTimeout(Duration.ofSeconds(20))
+				.connectTimeout(Duration.ofSeconds(3))
+				.readTimeout(Duration.ofSeconds(20))
 				.build();
-		this.stsRestConsumer = stsRestConsumer;
 		this.eregUrl = avleveringProperties.getEregurl();
 	}
 
@@ -51,21 +45,17 @@ public class EregConsumer {
 		if (isValidOrgnrFormat(orgnr)) {
 			try {
 				final URI uri = UriComponentsBuilder.fromUriString(eregUrl).pathSegment(orgnr + "/noekkelinfo").build().toUri();
-				final String serviceuserToken = "Bearer " + stsRestConsumer.getStsToken().getAccess_token();
 
 				final RequestEntity<Void> requestEntity = RequestEntity.get(uri)
 						.accept(APPLICATION_JSON)
 						.header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-						.header(AUTHORIZATION, serviceuserToken)
-						.header(NAV_CONSUMER_TOKEN, serviceuserToken)
 						.build();
-
 
 				log.debug("Henter organisasjonavn for orgnr={}", orgnr);
 				ResponseEntity<EregHentNoekkelInfoResponse> response =
 						requireNonNull(restTemplate.exchange(requestEntity, EregHentNoekkelInfoResponse.class));
 				log.debug("Ferdig hentet organisasjonavn for orgnr={}", orgnr);
-				return Optional.ofNullable(response.getBody())
+				return Optional.of(response.getBody())
 						.map(EregHentNoekkelInfoResponse::getNavn)
 						.map(this::getFullName)
 						.orElse("Ukjent organisasjonsnavn");

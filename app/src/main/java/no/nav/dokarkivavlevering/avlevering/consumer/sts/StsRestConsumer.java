@@ -31,8 +31,8 @@ public class StsRestConsumer {
 		this.restTemplate = restTemplateBuilder
 				.basicAuthentication(avleveringProperties.getServiceuser().getUsername(),
 						avleveringProperties.getServiceuser().getPassword())
-				.setConnectTimeout(Duration.ofSeconds(3))
-				.setReadTimeout(Duration.ofSeconds(20))
+				.connectTimeout(Duration.ofSeconds(3))
+				.readTimeout(Duration.ofSeconds(20))
 				.build();
 	}
 
