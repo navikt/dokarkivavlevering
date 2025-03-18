@@ -45,8 +45,8 @@ public class PdlGraphQLConsumer {
 							  StsRestConsumer stsConsumer,
 							  AvleveringProperties avleveringProperties) {
 		this.restTemplate = restTemplateBuilder
-				.setConnectTimeout(Duration.ofSeconds(3))
-				.setReadTimeout(Duration.ofSeconds(20))
+				.connectTimeout(Duration.ofSeconds(3))
+				.readTimeout(Duration.ofSeconds(20))
 				.build();
 		this.stsConsumer = stsConsumer;
 		this.avleveringProperties = avleveringProperties;
@@ -54,11 +54,11 @@ public class PdlGraphQLConsumer {
 
 	@Retryable(retryFor = HttpServerErrorException.class)
 	public Map<String, BrukerMedNavnedata> hentPersonBolk(Set<String> aktoerIds, String tema) {
-		if(aktoerIds.isEmpty()) {
+		if (aktoerIds.isEmpty()) {
 			return emptyMap();
 		}
 		try {
-			final UriComponents uri = UriComponentsBuilder.fromHttpUrl(avleveringProperties.getPdlurl()).build();
+			final UriComponents uri = UriComponentsBuilder.fromUriString(avleveringProperties.getPdlurl()).build();
 			final String serviceuserToken = "Bearer " + stsConsumer.getStsToken().getAccess_token();
 			final RequestEntity<PdlRequest> requestEntity = RequestEntity.post(uri.toUri())
 					.accept(MediaType.APPLICATION_JSON)
