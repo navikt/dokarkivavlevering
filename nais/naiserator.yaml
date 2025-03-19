@@ -20,19 +20,19 @@ spec:
   env:
     - name: SPRING_LDAP_URLS
       value: "{{SPRING_LDAP_URLS}}"
-    - name: AVLEVERING_PDLURL
-      value: "{{PDL_URL}}"
-    - name: AVLEVERING_EREGURL
+    - name: DOKARKIVAVLEVERING_ENDPOINTS_PDL_URL
+      value: "{{DOKARKIVAVLEVERING_ENDPOINTS_PDL_URL}}"
+    - name: DOKARKIVAVLEVERING_EREGURL
       value: "{{EREG_URL}}"
-    - name: AVLEVERING_STSTOKENURL
+    - name: DOKARKIVAVLEVERING_STSTOKENURL
       value: "{{SECURITY_TOKEN_SERVICE_TOKEN_URL}}"
-    - name: AVLEVERING_ACTIVEDIRECTORY_BASEDN
+    - name: DOKARKIVAVLEVERING_ACTIVEDIRECTORY_BASEDN
       value: "{{AD_NAVUSER_BASEDN}}"
-    - name: AVLEVERING_PERIODE_STARTDATO
+    - name: DOKARKIVAVLEVERING_PERIODE_STARTDATO
       value: "{{periodestart}}"
-    - name: AVLEVERING_PERIODE_SLUTTDATO
+    - name: DOKARKIVAVLEVERING_PERIODE_SLUTTDATO
       value: "{{periodeslutt}}"
-    - name: AVLEVERING_TEMA
+    - name: DOKARKIVAVLEVERING_TEMA
       value: "{{tema}}"
   vault:
     enabled: true

@@ -17,6 +17,8 @@
 
 	<modules>
 		<module>app</module>
+		<module>core</module>
+		<module>avlevering</module>
 		<module>arkivverket-schemas</module>
 	</modules>
 
@@ -28,8 +30,12 @@
 		<simpleflatmapper.version>8.2.3</simpleflatmapper.version>
 		<commons-io.version>2.18.0</commons-io.version>
 		<guava.version>33.4.0-jre</guava.version>
+		<resilience4j.version>2.3.0</resilience4j.version>
+
+
 		<!-- aspose-pdf kan ikke oppdateres til en versjon > 23.5 (på grunn av lisens) -->
 		<aspose-pdf.version>23.5</aspose-pdf.version>
+
 
 		<hisrc-higherjaxb40-maven-plugin.version>2.2.1</hisrc-higherjaxb40-maven-plugin.version>
 		<maven-toolchains-plugin.version>3.2.0</maven-toolchains-plugin.version>
@@ -45,6 +51,16 @@
 			<dependency>
 				<groupId>no.nav.dokarkivavlevering</groupId>
 				<artifactId>arkivverket-schemas</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>no.nav.dokarkivavlevering</groupId>
+				<artifactId>avlevering</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>no.nav.dokarkivavlevering</groupId>
+				<artifactId>core</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
@@ -85,6 +101,11 @@
 				<groupId>com.aspose</groupId>
 				<artifactId>aspose-pdf</artifactId>
 				<version>${aspose-pdf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.github.resilience4j</groupId>
+				<artifactId>resilience4j-spring-boot3</artifactId>
+				<version>${resilience4j.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
