@@ -1,8 +1,8 @@
 package no.nav.dokarkivavlevering.avlevering.arkivuttrekk;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
-import no.nav.dokarkivavlevering.avlevering.exception.AvleveringFunctionalException;
+import no.nav.dokarkivavlevering.core.DokarkivavleveringProperties;
+import no.nav.dokarkivavlevering.core.exception.DokarkivavleveringFunctionalException;
 import org.apache.camel.Handler;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
@@ -40,9 +40,9 @@ public class ArkivuttrekkMapper {
 	private static final String OFFENTLIGJOURNAL_XSD_SJEKKSUM = "$OFFENTLIGJOURNAL_XSD_SJEKKSUM$";
 	private static final String OFFENTLIGJOURNAL_ANTALL_JOURNALREGISTRERING = "$OFFENTLIGJOURNAL_ANTALL_JOURNALREGISTRERING$";
 
-	private final AvleveringProperties avleveringProperties;
+	private final DokarkivavleveringProperties avleveringProperties;
 
-	public ArkivuttrekkMapper(AvleveringProperties avleveringProperties) {
+	public ArkivuttrekkMapper(DokarkivavleveringProperties avleveringProperties) {
 		this.avleveringProperties = avleveringProperties;
 	}
 
@@ -51,7 +51,7 @@ public class ArkivuttrekkMapper {
 		final InputStream resourceInputStream = this.getClass().getClassLoader().getResourceAsStream("arkivuttrekk/arkivuttrekk_template.xml");
 
 		if (resourceInputStream == null) {
-			throw new AvleveringFunctionalException("Fant ikke fil 'arkivuttrekk/arkivuttrekk_template.xml'");
+			throw new DokarkivavleveringFunctionalException("Fant ikke fil 'arkivuttrekk/arkivuttrekk_template.xml'");
 		}
 
 		return IOUtils.toString(resourceInputStream, UTF_8)

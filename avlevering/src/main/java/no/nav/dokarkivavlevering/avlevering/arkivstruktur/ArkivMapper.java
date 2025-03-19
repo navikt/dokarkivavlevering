@@ -3,8 +3,8 @@ package no.nav.dokarkivavlevering.avlevering.arkivstruktur;
 import no.arkivverket.standarder.noark5.arkivstruktur.Arkiv;
 import no.arkivverket.standarder.noark5.arkivstruktur.Arkivdel;
 import no.arkivverket.standarder.noark5.arkivstruktur.Arkivskaper;
-import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils;
+import no.nav.dokarkivavlevering.core.DokarkivavleveringProperties;
 import org.apache.camel.Handler;
 import org.springframework.stereotype.Component;
 
@@ -19,9 +19,9 @@ public class ArkivMapper {
 
 	public static final LocalDateTime ARKIV_OPPRETTET_TIDSPUNKT = LocalDateTime.from(DATE_TIME_FORMAT.parse("2008-12-01T12:00:00"));
 
-	private final AvleveringProperties.ArkivConfig arkivConfig;
+	private final DokarkivavleveringProperties.ArkivConfig arkivConfig;
 
-	public ArkivMapper(AvleveringProperties avleveringProperties) {
+	public ArkivMapper(DokarkivavleveringProperties avleveringProperties) {
 		this.arkivConfig = avleveringProperties.getArkivConfig();
 	}
 

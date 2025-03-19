@@ -3,7 +3,7 @@ package no.nav.dokarkivavlevering.avlevering.loependejournal;
 import no.arkivverket.standarder.noark5.loependejournal.Arkivskaper;
 import no.arkivverket.standarder.noark5.loependejournal.Journalhode;
 import no.arkivverket.standarder.noark5.loependejournal.LoependeJournal;
-import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
+import no.nav.dokarkivavlevering.core.DokarkivavleveringProperties;
 import org.springframework.stereotype.Component;
 
 import static org.apache.camel.converter.ObjectConverter.toBigInteger;
@@ -11,9 +11,9 @@ import static org.apache.camel.converter.ObjectConverter.toBigInteger;
 @Component
 public class LoependejournalMapper {
 
-	private final AvleveringProperties.Periode periode;
+	private final DokarkivavleveringProperties.Periode periode;
 
-	public LoependejournalMapper(AvleveringProperties avleveringProperties) {
+	public LoependejournalMapper(DokarkivavleveringProperties avleveringProperties) {
 		this.periode = avleveringProperties.getPeriode();
 	}
 

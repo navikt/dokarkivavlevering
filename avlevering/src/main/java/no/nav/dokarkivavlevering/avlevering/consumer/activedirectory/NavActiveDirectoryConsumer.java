@@ -1,7 +1,7 @@
 package no.nav.dokarkivavlevering.avlevering.consumer.activedirectory;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
+import no.nav.dokarkivavlevering.core.DokarkivavleveringProperties;
 import org.springframework.ldap.NamingException;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.query.LdapQuery;
@@ -23,9 +23,9 @@ import static org.springframework.ldap.query.LdapQueryBuilder.query;
 public class NavActiveDirectoryConsumer {
 
 	private final LdapTemplate ldapTemplate;
-	private final AvleveringProperties.Activedirectory activedirectory;
+	private final DokarkivavleveringProperties.Activedirectory activedirectory;
 
-	public NavActiveDirectoryConsumer(LdapTemplate ldapTemplate, AvleveringProperties avleveringProperties) {
+	public NavActiveDirectoryConsumer(LdapTemplate ldapTemplate, DokarkivavleveringProperties avleveringProperties) {
 		this.ldapTemplate = ldapTemplate;
 		this.activedirectory = avleveringProperties.getActivedirectory();
 	}

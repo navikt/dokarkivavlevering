@@ -1,7 +1,7 @@
 package no.nav.dokarkivavlevering.avlevering.consumer.ereg;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
+import no.nav.dokarkivavlevering.core.DokarkivavleveringProperties;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.RequestEntity;
@@ -32,7 +32,7 @@ public class EregConsumer {
 	private final String eregUrl;
 
 	public EregConsumer(RestTemplateBuilder restTemplateBuilder,
-						AvleveringProperties avleveringProperties) {
+						DokarkivavleveringProperties avleveringProperties) {
 		this.restTemplate = restTemplateBuilder
 				.connectTimeout(Duration.ofSeconds(3))
 				.readTimeout(Duration.ofSeconds(20))

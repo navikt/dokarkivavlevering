@@ -3,10 +3,10 @@ package no.nav.dokarkivavlevering.avlevering;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avlevering.arkivstruktur.AvleveringArkivstrukturRoute;
 import no.nav.dokarkivavlevering.avlevering.arkivuttrekk.AvleveringArkivuttrekkRoute;
-import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.endringlogg.AvleveringEndringsloggRoute;
 import no.nav.dokarkivavlevering.avlevering.loependejournal.AvleveringLoependeJournalRoute;
 import no.nav.dokarkivavlevering.avlevering.offentligjournal.AvleveringOffentligJournalRoute;
+import no.nav.dokarkivavlevering.core.DokarkivavleveringProperties;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.Processor;
@@ -27,10 +27,10 @@ public class AvleveringRoute extends RouteBuilder {
 	public static final String SHUTDOWN = "direct:shutdown";
 
 	private final ApplicationContext springContext;
-	private final AvleveringProperties avleveringProperties;
+	private final DokarkivavleveringProperties avleveringProperties;
 
 	@Autowired
-	public AvleveringRoute(AvleveringProperties avleveringProperties,
+	public AvleveringRoute(DokarkivavleveringProperties avleveringProperties,
 						   ApplicationContext springContext) {
 		this.avleveringProperties = avleveringProperties;
 		this.springContext = springContext;

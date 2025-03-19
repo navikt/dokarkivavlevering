@@ -20,8 +20,8 @@ spec:
   env:
     - name: SPRING_LDAP_URLS
       value: "{{SPRING_LDAP_URLS}}"
-    - name: AVLEVERING_PDLURL
-      value: "{{PDL_URL}}"
+    - name: DOKARKIVAVLEVERING_ENDPOINTS_PDL_URL
+      value: "{{DOKARKIVAVLEVERING_ENDPOINTS_PDL_URL}}"
     - name: AVLEVERING_EREGURL
       value: "{{EREG_URL}}"
     - name: AVLEVERING_STSTOKENURL

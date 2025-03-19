@@ -3,7 +3,7 @@ package no.nav.dokarkivavlevering.avlevering.offentligjournal;
 import no.arkivverket.standarder.noark5.offentligjournal.Arkivskaper;
 import no.arkivverket.standarder.noark5.offentligjournal.Journalhode;
 import no.arkivverket.standarder.noark5.offentligjournal.OffentligJournal;
-import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
+import no.nav.dokarkivavlevering.core.DokarkivavleveringProperties;
 import org.springframework.stereotype.Component;
 
 import static org.apache.camel.converter.ObjectConverter.toBigInteger;
@@ -11,9 +11,9 @@ import static org.apache.camel.converter.ObjectConverter.toBigInteger;
 @Component
 public class OffentligJournalMapper {
 
-	private final AvleveringProperties.Periode periode;
+	private final DokarkivavleveringProperties.Periode periode;
 
-	public OffentligJournalMapper(AvleveringProperties avleveringProperties) {
+	public OffentligJournalMapper(DokarkivavleveringProperties avleveringProperties) {
 		this.periode = avleveringProperties.getPeriode();
 	}
 

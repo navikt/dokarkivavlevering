@@ -2,7 +2,6 @@ package no.nav.dokarkivavlevering.avlevering;
 
 import no.nav.dokarkivavlevering.avlevering.arkivuttrekk.AvleveringArkivuttrekkRoute;
 import no.nav.dokarkivavlevering.avlevering.aspose.AsposeService;
-import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.config.Tema;
 import no.nav.dokarkivavlevering.avlevering.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokarkivavlevering.avlevering.domain.Arkivendring;
@@ -18,18 +17,16 @@ import no.nav.dokarkivavlevering.avlevering.loependejournal.AvleveringLoependeJo
 import no.nav.dokarkivavlevering.avlevering.offentligjournal.AvleveringOffentligJournalRoute;
 import no.nav.dokarkivavlevering.avlevering.repository.AvleveringRepository;
 import no.nav.dokarkivavlevering.avlevering.sftp.AvleveringSFTPRoute;
+import no.nav.dokarkivavlevering.core.DokarkivavleveringProperties;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.AdviceWith;
 import org.apache.camel.component.mock.MockEndpoint;
-//import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -50,10 +47,9 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest(classes = AvleveringProperties.class)
+@SpringBootTest(classes = DokarkivavleveringProperties.class)
 @ComponentScan
 @EnableAutoConfiguration
-//@EnableConfigurationProperties
 public class AvleveringRouteIT {
 
 	@Autowired

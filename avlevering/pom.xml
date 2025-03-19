@@ -15,6 +15,10 @@
     <dependencies>
         <dependency>
             <groupId>no.nav.dokarkivavlevering</groupId>
+            <artifactId>core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.dokarkivavlevering</groupId>
             <artifactId>arkivverket-schemas</artifactId>
         </dependency>
 

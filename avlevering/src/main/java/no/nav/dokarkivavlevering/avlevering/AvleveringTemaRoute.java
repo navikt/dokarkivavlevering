@@ -3,13 +3,13 @@ package no.nav.dokarkivavlevering.avlevering;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avlevering.arkivstruktur.AvleveringArkivstrukturRoute;
-import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.config.Tema;
 import no.nav.dokarkivavlevering.avlevering.dokument.DokumentRoute;
 import no.nav.dokarkivavlevering.avlevering.endringlogg.AvleveringEndringsloggRoute;
 import no.nav.dokarkivavlevering.avlevering.loependejournal.AvleveringLoependeJournalRoute;
 import no.nav.dokarkivavlevering.avlevering.offentligjournal.AvleveringOffentligJournalRoute;
 import no.nav.dokarkivavlevering.avlevering.repository.AvleveringRepository;
+import no.nav.dokarkivavlevering.core.DokarkivavleveringProperties;
 import org.apache.camel.builder.RouteBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -29,12 +29,12 @@ public class AvleveringTemaRoute extends RouteBuilder {
 	public static final String DETERMINE_AVLEVER_DOKUMENTER = "direct:determine_avlever_dokumenter";
 	public static final String HEADER_TEMA_SKIP = "AvleveringTemaSkip";
 	public static final String PROPERTY_AVLEVER_MED_DOKUMENTER = "AvleverMedDokumenter";
-	private final AvleveringProperties avleveringProperties;
+	private final DokarkivavleveringProperties avleveringProperties;
 	private final AvleveringRepository avleveringRepository;
 	private final AvleveringSakBerikerService avleveringSakBerikerService;
 
 	@Autowired
-	public AvleveringTemaRoute(AvleveringProperties avleveringProperties, AvleveringRepository avleveringRepository,
+	public AvleveringTemaRoute(DokarkivavleveringProperties avleveringProperties, AvleveringRepository avleveringRepository,
 							   AvleveringSakBerikerService avleveringSakBerikerService) {
 		this.avleveringProperties = avleveringProperties;
 		this.avleveringRepository = avleveringRepository;

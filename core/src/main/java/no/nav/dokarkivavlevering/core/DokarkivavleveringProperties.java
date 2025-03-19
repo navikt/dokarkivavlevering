@@ -1,5 +1,4 @@
-package no.nav.dokarkivavlevering.avlevering.config;
-
+package no.nav.dokarkivavlevering.core;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
@@ -18,11 +17,12 @@ import java.util.UUID;
 
 @Data
 @Validated
-//@EnableConfigurationProperties
-@ConfigurationProperties("avlevering")
-public class AvleveringProperties {
+@ConfigurationProperties("dokarkivavlevering")
+public class DokarkivavleveringProperties {
 
 	public static final String BEHANDLINGSNUMMER = "B524";
+
+	private final Endpoints endpoints = new Endpoints();
 
 	private final String avleveringId = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm"));
 	@NotEmpty
@@ -33,8 +33,6 @@ public class AvleveringProperties {
 	@NotEmpty
 	String ststokenurl;
 	@NotEmpty
-	String pdlurl;
-	@NotEmpty
 	String eregurl;
 	@ToString.Exclude
 	@NotEmpty
@@ -44,7 +42,7 @@ public class AvleveringProperties {
 	 * Brukes for å generere systemID for avlevering under oppstart. Referes til på forskjellige nivåer i arkivstruktur.xml.
 	 */
 	@Valid
-	private final AvleveringProperties.ArkivConfig arkivConfig = new ArkivConfig();
+	private final DokarkivavleveringProperties.ArkivConfig arkivConfig = new ArkivConfig();
 	@Valid
 	private final Activedirectory activedirectory = new Activedirectory();
 	@Valid
@@ -98,5 +96,27 @@ public class AvleveringProperties {
 		private LocalDate startdato;
 		@NotNull
 		private LocalDate sluttdato;
+	}
+
+	@Data
+	@Validated
+	public static class Endpoints {
+		@NotNull
+		private AzureEndpoint pdl;
+	}
+
+	@Data
+	@Validated
+	public static class AzureEndpoint {
+		/**
+		 * Url til tjeneste som har azure autorisasjon
+		 */
+		@NotEmpty
+		private String url;
+		/**
+		 * Scope til azure client credential flow
+		 */
+		@NotEmpty
+		private String scope;
 	}
 }

@@ -1,10 +1,10 @@
 package no.nav.dokarkivavlevering.avlevering.repository;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.config.Tema;
 import no.nav.dokarkivavlevering.avlevering.domain.Fagomrade;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
+import no.nav.dokarkivavlevering.core.DokarkivavleveringProperties;
 import org.apache.camel.Body;
 import org.simpleflatmapper.jdbc.spring.JdbcTemplateMapperFactory;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -28,10 +28,10 @@ public class AvleveringRepository {
 
 	public static final int ORACLE_MAX_IN = 1000;
 
-	private final AvleveringProperties avleveringProperties;
+	private final DokarkivavleveringProperties avleveringProperties;
 	private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-	public AvleveringRepository(AvleveringProperties avleveringProperties,
+	public AvleveringRepository(DokarkivavleveringProperties avleveringProperties,
 								NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
 		this.avleveringProperties = avleveringProperties;
 		this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;

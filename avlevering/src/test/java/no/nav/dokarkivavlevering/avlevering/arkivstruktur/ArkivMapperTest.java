@@ -5,7 +5,6 @@ import no.arkivverket.standarder.noark5.arkivstruktur.Arkivdel;
 import no.arkivverket.standarder.noark5.arkivstruktur.Arkivskaper;
 import no.arkivverket.standarder.noark5.arkivstruktur.Klassifikasjonssystem;
 import no.arkivverket.standarder.noark5.arkivstruktur.Skjerming;
-import no.nav.dokarkivavlevering.avlevering.config.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.config.Tema;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ArkivMapperTest {
 
 	public static final Tema SAK_TEMA = Tema.IAR;
-	private final ArkivMapper arkivMapper = new ArkivMapper(new AvleveringProperties());
+	private final ArkivMapper arkivMapper = new ArkivMapper(new DokarkivavleveringProperties());
 
 	@Test
 	void shouldMap() {
