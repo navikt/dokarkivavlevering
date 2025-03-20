@@ -1,10 +1,9 @@
 {
-  "SERVICEUSER_VAULT_PATH": "/serviceuser/data/dev/srvdokavlevering",
   "SRV_LINUX": "/serviceuser/data/dev/srvssolinux",
   "DOKARKIVAVLEVERING_DS_CREDS": "/oracle/data/dev/creds/joark_q2-dokarkivavlevering",
   "DOKARKIVAVLEVERING_DS_CONFIG": "/oracle/data/dev/config/joark_q2",
-  "DOKARKIVAVLEVERING_ENDPOINTS_PDL_URL": "https://pdl-api.dev.adeo.no/graphql",
   "SPRING_LDAP_URLS": "ldaps://ldapgw.preprod.local",
   "AD_NAVUSER_BASEDN": "ou=NAV,ou=BusinessUnits,dc=preprod,dc=local",
+  "DOKARKIVAVLEVERING_ENDPOINTS_PDL_URL": "https://pdl-api.dev.adeo.no/graphql",
   "EREG_URL": "https://ereg-services-q1.dev.intern.nav.no/v2/organisasjon/"
 }

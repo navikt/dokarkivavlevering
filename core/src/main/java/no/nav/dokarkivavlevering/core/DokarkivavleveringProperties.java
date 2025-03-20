@@ -46,8 +46,6 @@ public class DokarkivavleveringProperties {
 	@Valid
 	private final Filomraade filomraade = new Filomraade();
 	@Valid
-	private final Serviceuser serviceuser = new Serviceuser();
-	@Valid
 	private final Periode periode = new Periode();
 
 	@Value
@@ -75,16 +73,6 @@ public class DokarkivavleveringProperties {
 	public static class Filomraade {
 		@NotEmpty
 		private String work;
-	}
-
-	@Data
-	@Validated
-	public static class Serviceuser {
-		@NotEmpty
-		private String username;
-		@NotEmpty
-		@ToString.Exclude
-		private String password;
 	}
 
 	@Data
