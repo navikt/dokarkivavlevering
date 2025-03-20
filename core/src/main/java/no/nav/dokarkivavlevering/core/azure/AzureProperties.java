@@ -7,8 +7,8 @@ import org.springframework.validation.annotation.Validated;
 /**
  * Konfigurert av naiserator. https://doc.nais.io/security/auth/azure-ad/#runtime-variables-credentials
  */
-@ConfigurationProperties("azure")
 @Validated
+@ConfigurationProperties("azure")
 public record AzureProperties(
 		@NotEmpty String appClientId,
 		@NotEmpty String appClientSecret,

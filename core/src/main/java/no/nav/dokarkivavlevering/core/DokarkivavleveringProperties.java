@@ -20,8 +20,6 @@ import java.util.UUID;
 @ConfigurationProperties("dokarkivavlevering")
 public class DokarkivavleveringProperties {
 
-	public static final String BEHANDLINGSNUMMER = "B524";
-
 	private final Endpoints endpoints = new Endpoints();
 
 	private final String avleveringId = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm"));

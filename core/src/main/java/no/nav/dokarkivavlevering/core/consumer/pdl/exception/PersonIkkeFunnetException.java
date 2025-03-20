@@ -1,5 +1,4 @@
-package no.nav.dokarkivavlevering.core.consumer.pdl;
-
+package no.nav.dokarkivavlevering.core.consumer.pdl.exception;
 
 import no.nav.dokarkivavlevering.core.exception.DokarkivavleveringFunctionalException;
 

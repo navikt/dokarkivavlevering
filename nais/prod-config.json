@@ -5,5 +5,6 @@
   "SPRING_LDAP_URLS": "ldaps://ldapgw.adeo.no",
   "AD_NAVUSER_BASEDN": "ou=NAV,ou=BusinessUnits,dc=adeo,dc=no",
   "DOKARKIVAVLEVERING_ENDPOINTS_PDL_URL": "https://pdl-api.nais.adeo.no/graphql",
+  "DOKARKIVAVLEVERING_ENDPOINTS_PDL_SCOPE": "api://prod-fss.pdl.pdl-api/.default",
   "EREG_URL": "https://ereg-services.intern.nav.no/v2/organisasjon/"
 }
