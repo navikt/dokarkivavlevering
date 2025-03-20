@@ -17,7 +17,6 @@
 			<groupId>no.nav.dokarkivavlevering</groupId>
 			<artifactId>core</artifactId>
 		</dependency>
-
 	</dependencies>
 
 	<build>
