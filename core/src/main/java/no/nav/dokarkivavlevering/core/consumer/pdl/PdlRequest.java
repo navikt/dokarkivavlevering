@@ -1,4 +1,4 @@
-package no.nav.dokarkivavlevering.avlevering.consumer.pdl;
+package no.nav.dokarkivavlevering.core.consumer.pdl;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

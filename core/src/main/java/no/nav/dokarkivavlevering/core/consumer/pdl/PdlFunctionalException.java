@@ -1,4 +1,4 @@
-package no.nav.dokarkivavlevering.avlevering.consumer.pdl;
+package no.nav.dokarkivavlevering.core.consumer.pdl;
 
 /**
  * @author Joakim Bjørnstad, Jbit AS

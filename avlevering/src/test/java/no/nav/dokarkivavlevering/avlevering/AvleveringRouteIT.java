@@ -3,7 +3,7 @@ package no.nav.dokarkivavlevering.avlevering;
 import no.nav.dokarkivavlevering.avlevering.arkivuttrekk.AvleveringArkivuttrekkRoute;
 import no.nav.dokarkivavlevering.avlevering.aspose.AsposeService;
 import no.nav.dokarkivavlevering.avlevering.config.Tema;
-import no.nav.dokarkivavlevering.avlevering.consumer.pdl.PdlGraphQLConsumer;
+import no.nav.dokarkivavlevering.core.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokarkivavlevering.avlevering.domain.Arkivendring;
 import no.nav.dokarkivavlevering.avlevering.domain.Bruker;
 import no.nav.dokarkivavlevering.avlevering.domain.BrukerMedNavnedata;

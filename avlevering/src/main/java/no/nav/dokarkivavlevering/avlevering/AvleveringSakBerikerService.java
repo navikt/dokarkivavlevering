@@ -6,17 +6,25 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avlevering.config.Tema;
 import no.nav.dokarkivavlevering.avlevering.consumer.activedirectory.NavActiveDirectoryConsumer;
 import no.nav.dokarkivavlevering.avlevering.consumer.ereg.EregService;
-import no.nav.dokarkivavlevering.avlevering.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokarkivavlevering.avlevering.domain.Arkivendring;
 import no.nav.dokarkivavlevering.avlevering.domain.BrukerMedNavnedata;
 import no.nav.dokarkivavlevering.avlevering.domain.DokumentInfo;
 import no.nav.dokarkivavlevering.avlevering.domain.FilDetaljer;
 import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
+import no.nav.dokarkivavlevering.avlevering.domain.NavnMedGyldighet;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
+import no.nav.dokarkivavlevering.avlevering.domain.SimpleNavn;
+import no.nav.dokarkivavlevering.core.consumer.pdl.PdlGraphQLConsumer;
+import no.nav.dokarkivavlevering.core.consumer.pdl.PdlHentPersonBolkResponse;
 import org.apache.camel.Body;
 import org.apache.camel.ExchangeProperty;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +32,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static no.nav.dokarkivavlevering.avlevering.domain.Bruker.UKJENT_PERSON;
 
 @Slf4j
 @Service
@@ -52,7 +63,7 @@ public class AvleveringSakBerikerService {
 		return doBerikSaker(saker, tema, false);
 	}
 
-	private List<Sak> doBerikSaker(List<Sak> saker, final Tema tema, boolean avleverDokumenter){
+	private List<Sak> doBerikSaker(List<Sak> saker, final Tema tema, boolean avleverDokumenter) {
 		// hent metadata og berik modellen
 		log.info("Beriker metadata for {} saker med tema={}", saker.size(), tema);
 		return Flowable.fromIterable(saker)
@@ -66,13 +77,14 @@ public class AvleveringSakBerikerService {
 							.filter(s -> s.getBruker().isPerson())
 							.map(s -> s.getBruker().getId())
 							.collect(Collectors.toSet());
-					final Map<String, BrukerMedNavnedata> pdlHentIdenterBolks = pdlGraphQLConsumer.hentPersonBolk(unikeAktoerids, tema.getTemakode());
+					final List<PdlHentPersonBolkResponse.PdlHentPersonBolk> pdlResponse = pdlGraphQLConsumer.hentPersonBolk(unikeAktoerids);
+					final Map<String, BrukerMedNavnedata> pdlHentIdenterBolks = mapPdlHentIdenterPersonBolk(pdlResponse);
 					final Set<String> unikeOrgnr = saks.stream()
 							.filter(s -> s.getBruker().isOrganisasjon())
 							.map(s -> s.getBruker().getId())
 							.collect(Collectors.toSet());
 					final Map<String, BrukerMedNavnedata> eregOrganisasjonBolk = eregService.hentOrganisasjonBrukere(unikeOrgnr);
-					if(avleverDokumenter) {
+					if (avleverDokumenter) {
 						return saks.stream()
 								.map(sak -> avleveringSakBerikerMapper.berikMedDokumenter(sak, navAnsatteNavn, pdlHentIdenterBolks, eregOrganisasjonBolk))
 								.collect(Collectors.toList());
@@ -86,6 +98,49 @@ public class AvleveringSakBerikerService {
 				.sequential()
 				.toList().subscribeOn(Schedulers.io()).blockingGet();
 	}
+
+	private Map<String, BrukerMedNavnedata> mapPdlHentIdenterPersonBolk(List<PdlHentPersonBolkResponse.PdlHentPersonBolk> hentPersonBolk) {
+		Map<String, BrukerMedNavnedata> brukerMedNavnedataMap = new HashMap<>();
+		for (PdlHentPersonBolkResponse.PdlHentPersonBolk personbolk : hentPersonBolk) {
+			brukerMedNavnedataMap.put(personbolk.getIdent(), toBrukerMedNavnedata(personbolk));
+		}
+		return brukerMedNavnedataMap;
+	}
+
+	private static BrukerMedNavnedata toBrukerMedNavnedata(PdlHentPersonBolkResponse.PdlHentPersonBolk personbolk) {
+		return new BrukerMedNavnedata(personbolk.getIdent(), getNavnMedGyldighet(personbolk));
+	}
+
+	private static List<NavnMedGyldighet> getNavnMedGyldighet(PdlHentPersonBolkResponse.PdlHentPersonBolk personbolk) {
+		if (personbolk.getPerson() == null) {
+			return List.of(new NavnMedGyldighet(null, null, UKJENT_PERSON));
+		}
+		return personbolk.getPerson().getNavn().stream().map(AvleveringSakBerikerService::toNavnMedGyldighet).toList();
+	}
+
+	private static NavnMedGyldighet toNavnMedGyldighet(PdlHentPersonBolkResponse.PdlNavn pdlNavn) {
+		PdlHentPersonBolkResponse.PdlFolkeregistermetadata folkeregistermetadata =pdlNavn.getPdlFolkeregistermetadata();
+		if (folkeregistermetadata == null) {
+			return new SimpleNavn(fulltnavn(pdlNavn));
+		}
+		return new NavnMedGyldighet(parseZonedDateTime(folkeregistermetadata.getGyldighetstidspunkt()),
+				parseZonedDateTime(folkeregistermetadata.getOpphoerstidspunkt()), fulltnavn(pdlNavn));
+	}
+	private static final ZoneId OSLO = ZoneId.of("Europe/Oslo");
+
+	public static ZonedDateTime parseZonedDateTime(String tidspunkt) {
+		if (tidspunkt == null) {
+			return null;
+		}
+		return LocalDateTime.from(DateTimeFormatter.ISO_DATE_TIME.parse(tidspunkt)).atZone(OSLO);
+	}
+
+	static String fulltnavn(PdlHentPersonBolkResponse.PdlNavn pdlNavn) {
+		return Stream.of(pdlNavn.getFornavn(), pdlNavn.getMellomnavn(), pdlNavn.getEtternavn())
+				.filter(Objects::nonNull)
+				.collect(Collectors.joining(" "));
+	}
+
 
 	private Set<String> adeoIdenter(final List<Sak> saker) {
 		Set<String> adeoIdenter = new HashSet<>();

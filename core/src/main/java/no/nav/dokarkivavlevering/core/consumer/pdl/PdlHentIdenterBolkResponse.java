@@ -1,4 +1,4 @@
-package no.nav.dokarkivavlevering.avlevering.consumer.pdl;
+package no.nav.dokarkivavlevering.core.consumer.pdl;
 
 import lombok.Data;
 import lombok.ToString;
@@ -27,6 +27,8 @@ public class PdlHentIdenterBolkResponse {
     public static class PdlIdentTo {
         @ToString.Exclude
         private String ident;
+        private boolean historisk;
+        private PdlGruppe gruppe;
     }
 
     @Data
@@ -39,5 +41,9 @@ public class PdlHentIdenterBolkResponse {
     public static class PdlErrorExtensionTo {
         private String code;
         private String classification;
+    }
+
+    public enum PdlGruppe {
+        FOLKEREGISTERIDENT, AKTORID, NPID;
     }
 }
