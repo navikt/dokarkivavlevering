@@ -3,7 +3,6 @@
   "SRV_LINUX": "/serviceuser/data/dev/srvssolinux",
   "DOKARKIVAVLEVERING_DS_CREDS": "/oracle/data/dev/creds/joark_q2-dokarkivavlevering",
   "DOKARKIVAVLEVERING_DS_CONFIG": "/oracle/data/dev/config/joark_q2",
-  "SECURITY_TOKEN_SERVICE_TOKEN_URL": "https://security-token-service.dev.adeo.no/rest/v1/sts/token",
   "DOKARKIVAVLEVERING_ENDPOINTS_PDL_URL": "https://pdl-api.dev.adeo.no/graphql",
   "SPRING_LDAP_URLS": "ldaps://ldapgw.preprod.local",
   "AD_NAVUSER_BASEDN": "ou=NAV,ou=BusinessUnits,dc=preprod,dc=local",

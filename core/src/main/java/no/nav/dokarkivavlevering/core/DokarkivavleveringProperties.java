@@ -31,8 +31,6 @@ public class DokarkivavleveringProperties {
 	@Max(1000) // max IN query i Oracle
 	int batchsize;
 	@NotEmpty
-	String ststokenurl;
-	@NotEmpty
 	String eregurl;
 	@ToString.Exclude
 	@NotEmpty
