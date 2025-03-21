@@ -17,6 +17,10 @@
 			<groupId>no.nav.dokarkivavlevering</groupId>
 			<artifactId>core</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>no.nav.dokarkivavlevering</groupId>
+			<artifactId>avlevering</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
