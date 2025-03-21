@@ -32,7 +32,7 @@ public class AvleveringArkivuttrekkRoute extends RouteBuilder {
 				.routeId("opprett_arkivuttrekk")
 				.bean(arkivuttrekkMapper)
 				.setHeader(Exchange.FILE_NAME, simple("${exchangeProperty.AvleveringId}/arkivuttrekk.xml"))
-				.to("file://{{avlevering.filomraade.work}}?fileExist=Override")
+				.to("file://{{dokarkivavlevering.filomraade.work}}?fileExist=Override")
 				.setHeader(AvleveringSFTPRoute.HEADER_FILNAVN, simple("arkivuttrekk.xml"))
 				.to(AvleveringSFTPRoute.SFTP)
 				.log(LoggingLevel.INFO, log, "Genererte arkivuttrekk til ${header.CamelFileNameProduced}");

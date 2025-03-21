@@ -59,7 +59,7 @@ public class AvleveringLoependeJournalRoute extends RouteBuilder {
 				.bean(loependejournalMapper)
 				.marshal(marshalJaxbFormat())
 				.setHeader(Exchange.FILE_NAME, simple("${exchangeProperty.AvleveringId}/pre_loependeJournal.xml"))
-				.to("file://{{avlevering.filomraade.work}}?fileExist=Override")
+				.to("file://{{dokarkivavlevering.filomraade.work}}?fileExist=Override")
 				.log(LoggingLevel.INFO, log, "Genererte pre_loependeJournal til ${header.CamelFileNameProduced}");
 
 		from(FLETT_LOEPENDEJOURNAL)
@@ -70,8 +70,8 @@ public class AvleveringLoependeJournalRoute extends RouteBuilder {
 					InputStream inputStream = FileUtils.openInputStream(Paths.get(exchange.getIn().getHeader(Exchange.FILE_NAME_PRODUCED, String.class)).toFile());
 					exchange.getIn().setBody(inputStream);
 				})
-				.setHeader(HEADER_XSL_PARAM_LOEPENDEJOURNAL_XML, simple("file:///{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/?select=loependejournal_*.xml"))
-				.setHeader(Exchange.XSLT_FILE_NAME, simple("{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/loependeJournal.xml"))
+				.setHeader(HEADER_XSL_PARAM_LOEPENDEJOURNAL_XML, simple("file:///{{dokarkivavlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/?select=loependejournal_*.xml"))
+				.setHeader(Exchange.XSLT_FILE_NAME, simple("{{dokarkivavlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/loependeJournal.xml"))
 				.to("xslt-saxon:classpath:loependejournal/embed_registrering_into_loependejournal.xsl?output=file")
 				.setHeader(AvleveringSFTPRoute.HEADER_FILNAVN, simple("loependeJournal.xml"))
 				.to(AvleveringSFTPRoute.SFTP)
@@ -89,7 +89,7 @@ public class AvleveringLoependeJournalRoute extends RouteBuilder {
 				})
 				.marshal(marshalJaxbFormat())
 				.setHeader(Exchange.FILE_NAME, simple("${exchangeProperty.AvleveringId}/loependejournal_${exchangeProperty.AvleveringTema}_${header.CamelSplitIndex}.xml"))
-				.to("file://{{avlevering.filomraade.work}}?fileExist=Append")
+				.to("file://{{dokarkivavlevering.filomraade.work}}?fileExist=Append")
 				.log(LoggingLevel.INFO, log, "Behandlet ferdig ${header.CamelFilenameProduced} for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelSplitIndex}");
 	}
 }
