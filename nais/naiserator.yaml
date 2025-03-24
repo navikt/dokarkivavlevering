@@ -53,6 +53,3 @@ spec:
     - "-Dspring.profiles.active=nais"
     - "/app/app.jar"
     - "{{COMMAND}}"
-    - "{{ARGUMENT1}}"
-    - "{{ARGUMENT2}}"
-    - "{{ARGUMENT3}}"
