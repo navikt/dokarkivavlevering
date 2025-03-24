@@ -17,6 +17,7 @@ import java.nio.file.Paths;
 import java.util.Objects;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static no.nav.dokarkivavlevering.avlevering.AvleveringRoute.AVLEVERING_ID_VALUE;
 import static org.apache.commons.io.FileUtils.readFileToByteArray;
 
 @Slf4j
@@ -39,6 +40,7 @@ public class ArkivuttrekkMapper {
 	private static final String OFFENTLIGJOURNAL_XML_SJEKKSUM = "$OFFENTLIGJOURNAL_XML_SJEKKSUM$";
 	private static final String OFFENTLIGJOURNAL_XSD_SJEKKSUM = "$OFFENTLIGJOURNAL_XSD_SJEKKSUM$";
 	private static final String OFFENTLIGJOURNAL_ANTALL_JOURNALREGISTRERING = "$OFFENTLIGJOURNAL_ANTALL_JOURNALREGISTRERING$";
+	private static final String FILOMRAADE_WORK = "/tmp/";
 
 	private final DokarkivavleveringProperties avleveringProperties;
 
@@ -75,7 +77,7 @@ public class ArkivuttrekkMapper {
 
 	private String generateSHA256(String fileName) throws IOException {
 		if (fileName.endsWith(".xml")) {
-			File fil = Paths.get(avleveringProperties.getFilomraade().getWork() + "/" + avleveringProperties.getAvleveringId() + "/" + fileName).toFile();
+			File fil = Paths.get(FILOMRAADE_WORK + AVLEVERING_ID_VALUE + "/" + fileName).toFile();
 			return DigestUtils.sha256Hex(readFileToByteArray(fil));
 		} else {
 			return DigestUtils.sha256Hex(IOUtils.toByteArray(this.getClass().getClassLoader().getResourceAsStream(fileName)));
@@ -85,7 +87,7 @@ public class ArkivuttrekkMapper {
 	private String countElements(String fileName, String element) {
 		try {
 			Document doc = DocumentBuilderFactory.newInstance()
-					.newDocumentBuilder().parse(avleveringProperties.getFilomraade().getWork() + "/" + avleveringProperties.getAvleveringId() + "/" + fileName);
+					.newDocumentBuilder().parse(FILOMRAADE_WORK + AVLEVERING_ID_VALUE + "/" + fileName);
 			Objects.requireNonNull(doc);
 			return String.valueOf(doc.getElementsByTagName(element).getLength());
 		} catch (Exception e) {

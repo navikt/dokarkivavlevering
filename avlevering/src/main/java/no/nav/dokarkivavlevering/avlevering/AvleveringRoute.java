@@ -15,12 +15,18 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import static no.nav.dokarkivavlevering.avlevering.AvleveringTemaRoute.BEHANDLE_TEMA;
 
 
 @Slf4j
 @Component
 public class AvleveringRoute extends RouteBuilder {
+
+
+	public static final String AVLEVERING_ID_VALUE = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm"));
 
 	public static final String PROPERTY_AVLEVERING_ID = "AvleveringId";
 	public static final String PROPERTY_TEMA = "AvleveringTema";
@@ -54,7 +60,7 @@ public class AvleveringRoute extends RouteBuilder {
 
 		from("direct:start_avlevering")
 				.routeId("start_avlevering")
-				.setProperty(PROPERTY_AVLEVERING_ID, constant(avleveringProperties.getAvleveringId()))
+				.setProperty(PROPERTY_AVLEVERING_ID, constant(AVLEVERING_ID_VALUE))
 				.log(LoggingLevel.INFO, log, "Dokarkivavlevering starter avlevering=${exchangeProperty.AvleveringId}.")
 				.log(LoggingLevel.INFO, log, "Konfigurasjon=" + avleveringProperties)
 				.setBody(constant(avleveringProperties.getTema()))

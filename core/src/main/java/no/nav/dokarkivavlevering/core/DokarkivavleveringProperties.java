@@ -6,80 +6,34 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.ToString;
-import lombok.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.UUID;
 
 @Data
 @Validated
 @ConfigurationProperties("dokarkivavlevering")
 public class DokarkivavleveringProperties {
 
+	/*
+	 * Påkrevd config
+	 */
 	private final Endpoints endpoints = new Endpoints();
-
-	private final String avleveringId = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm"));
-	@NotEmpty
-	String tema;
-	@NotNull
-	@Max(1000) // max IN query i Oracle
-	int batchsize;
+	@Valid
+	private final Activedirectory activedirectory = new Activedirectory();
 	@NotEmpty
 	String eregurl;
+
 	@ToString.Exclude
 	@NotEmpty
 	String AsposeLicense;
-
-	/**
-	 * Brukes for å generere systemID for avlevering under oppstart. Referes til på forskjellige nivåer i arkivstruktur.xml.
-	 */
-	@Valid
-	private final DokarkivavleveringProperties.ArkivConfig arkivConfig = new ArkivConfig();
-	@Valid
-	private final Activedirectory activedirectory = new Activedirectory();
-	@Valid
-	private final Filomraade filomraade = new Filomraade();
-	@Valid
-	private final Periode periode = new Periode();
-
-	@Value
-	@Valid
-	public static class ArkivConfig {
-		String systemID = UUID.randomUUID().toString();
-		ArkivdelConfig arkivdelConfig = new ArkivdelConfig();
-	}
-
-	@Value
-	@Valid
-	public static class ArkivdelConfig {
-		String systemID = UUID.randomUUID().toString();
-	}
 
 	@Data
 	@Validated
 	public static class Activedirectory {
 		@NotEmpty
 		private String basedn;
-	}
-
-	@Data
-	@Validated
-	public static class Filomraade {
-		@NotEmpty
-		private String work;
-	}
-
-	@Data
-	@Validated
-	public static class Periode {
-		@NotNull
-		private LocalDate startdato;
-		@NotNull
-		private LocalDate sluttdato;
 	}
 
 	@Data
@@ -103,4 +57,27 @@ public class DokarkivavleveringProperties {
 		@NotEmpty
 		private String scope;
 	}
+
+	/*
+	 * Generelle properties
+	 */
+
+	@NotEmpty
+	String tema;
+
+	@Max(1000) // max IN query i Oracle
+	int batchsize;
+
+	/*
+	 * Properties for generering av arkivpakke til arkivverket
+	 */
+
+	private final Periode periode = new Periode();
+
+	@Data
+	public static class Periode {
+		private LocalDate startdato;
+		private LocalDate sluttdato;
+	}
+
 }
