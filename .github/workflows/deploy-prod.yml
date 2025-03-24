@@ -27,14 +27,16 @@ jobs:
   deploy:
     name: Deploy job to prod
     needs: build
+    permissions:
+      contents: read
+      id-token: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Deploy job to NAIS prod-fss
-        uses: nais/deploy/actions/deploy@v1
+        uses: nais/deploy/actions/deploy@v2
         env:
           PRINT_PAYLOAD: true
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: prod-fss
           RESOURCE: nais/naiserator.yaml
           VAR: image=${{needs.build.outputs.image}},periodestart=${{github.event.inputs.periodeStart}},periodeslutt=${{github.event.inputs.periodeSlutt}},tema=${{github.event.inputs.tema}}
