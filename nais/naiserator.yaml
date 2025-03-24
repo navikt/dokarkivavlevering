@@ -22,10 +22,10 @@ spec:
       value: "{{SPRING_LDAP_URLS}}"
     - name: DOKARKIVAVLEVERING_ENDPOINTS_PDL_URL
       value: "{{DOKARKIVAVLEVERING_ENDPOINTS_PDL_URL}}"
+    - name: DOKARKIVAVLEVERING_ENDPOINTS_PDL_SCOPE
+      value: "{{DOKARKIVAVLEVERING_ENDPOINTS_PDL_SCOPE}}"
     - name: DOKARKIVAVLEVERING_EREGURL
       value: "{{EREG_URL}}"
-    - name: DOKARKIVAVLEVERING_STSTOKENURL
-      value: "{{SECURITY_TOKEN_SERVICE_TOKEN_URL}}"
     - name: DOKARKIVAVLEVERING_ACTIVEDIRECTORY_BASEDN
       value: "{{AD_NAVUSER_BASEDN}}"
     - name: DOKARKIVAVLEVERING_PERIODE_STARTDATO
@@ -34,11 +34,13 @@ spec:
       value: "{{periodeslutt}}"
     - name: DOKARKIVAVLEVERING_TEMA
       value: "{{tema}}"
+  webproxy: true
+  azure:
+    application:
+      enabled: true
   vault:
     enabled: true
     paths:
-      - kvPath: {{ SERVICEUSER_VAULT_PATH }}
-        mountPath: "/secrets/serviceuser/dokavlevering"
       - kvPath: {{ SRV_LINUX }}
         mountPath: "/var/run/secrets/nais.io/ldap"
       - kvPath: {{ DOKARKIVAVLEVERING_DS_CREDS }}

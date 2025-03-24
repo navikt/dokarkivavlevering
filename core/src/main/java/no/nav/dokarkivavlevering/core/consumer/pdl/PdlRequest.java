@@ -1,4 +1,4 @@
-package no.nav.dokarkivavlevering.avlevering.consumer.pdl;
+package no.nav.dokarkivavlevering.core.consumer.pdl;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -7,9 +7,6 @@ import lombok.Getter;
 
 import java.util.Map;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 @Builder
 @Getter
 public class PdlRequest {

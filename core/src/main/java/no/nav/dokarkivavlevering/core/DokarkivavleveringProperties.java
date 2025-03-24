@@ -20,8 +20,6 @@ import java.util.UUID;
 @ConfigurationProperties("dokarkivavlevering")
 public class DokarkivavleveringProperties {
 
-	public static final String BEHANDLINGSNUMMER = "B524";
-
 	private final Endpoints endpoints = new Endpoints();
 
 	private final String avleveringId = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm"));
@@ -30,8 +28,6 @@ public class DokarkivavleveringProperties {
 	@NotNull
 	@Max(1000) // max IN query i Oracle
 	int batchsize;
-	@NotEmpty
-	String ststokenurl;
 	@NotEmpty
 	String eregurl;
 	@ToString.Exclude
@@ -47,8 +43,6 @@ public class DokarkivavleveringProperties {
 	private final Activedirectory activedirectory = new Activedirectory();
 	@Valid
 	private final Filomraade filomraade = new Filomraade();
-	@Valid
-	private final Serviceuser serviceuser = new Serviceuser();
 	@Valid
 	private final Periode periode = new Periode();
 
@@ -77,16 +71,6 @@ public class DokarkivavleveringProperties {
 	public static class Filomraade {
 		@NotEmpty
 		private String work;
-	}
-
-	@Data
-	@Validated
-	public static class Serviceuser {
-		@NotEmpty
-		private String username;
-		@NotEmpty
-		@ToString.Exclude
-		private String password;
 	}
 
 	@Data

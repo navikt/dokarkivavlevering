@@ -1,21 +1,13 @@
-package no.nav.dokarkivavlevering.avlevering.consumer.pdl;
+package no.nav.dokarkivavlevering.core.consumer.pdl;
 
 import lombok.Data;
 import lombok.ToString;
-import no.nav.dokarkivavlevering.avlevering.domain.BrukerMedNavnedata;
-import no.nav.dokarkivavlevering.avlevering.domain.NavnMedGyldighet;
-import no.nav.dokarkivavlevering.avlevering.domain.SimpleNavn;
 
-import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static no.nav.dokarkivavlevering.avlevering.domain.BrukerMedNavnedata.UKJENT_PERSON;
 
 @Data
 public class PdlHentPersonBolkResponse {
@@ -25,40 +17,26 @@ public class PdlHentPersonBolkResponse {
 	private List<PdlError> errors;
 
 	@Data
-	static class PdlHentIdenterBolkData {
+	public static class PdlHentIdenterBolkData {
 		private List<PdlHentPersonBolk> hentPersonBolk;
 	}
 
 	@Data
-	static class PdlHentPersonBolk {
+	public static class PdlHentPersonBolk {
 		@ToString.Exclude
 		private String ident;
 		private String code;
 		private PdlPerson person;
-
-		public List<NavnMedGyldighet> getNavnMedGyldighet() {
-			if(person == null){
-				return List.of(new NavnMedGyldighet(null, null, UKJENT_PERSON));
-			}
-			return person.getNavn().stream()
-					.map(PdlNavn::toNavnMedGyldighet)
-					.toList();
-		}
-
-		public BrukerMedNavnedata toBrukerMedNavnedata() {
-			return new BrukerMedNavnedata(getIdent(), getNavnMedGyldighet());
-		}
-
 	}
 
 	@Data
-	static class PdlPerson {
+	public static class PdlPerson {
 		private List<PdlFolkeregisteridentifikator> folkeregisteridentifikator;
 		private List<PdlNavn> navn;
 	}
 
 	@Data
-	static class PdlNavn {
+	public static class PdlNavn {
 		@ToString.Exclude
 		private String fornavn;
 		@ToString.Exclude
@@ -73,21 +51,6 @@ public class PdlHentPersonBolkResponse {
 					.filter(Objects::nonNull)
 					.collect(Collectors.joining(" "));
 		}
-
-		private static ZonedDateTime parseZonedDateTime(String tidspunkt) {
-			if (tidspunkt == null) {
-				return null;
-			}
-			return LocalDateTime.from(DateTimeFormatter.ISO_DATE_TIME.parse(tidspunkt)).atZone(OSLO);
-		}
-
-		private NavnMedGyldighet toNavnMedGyldighet() {
-			if (getPdlFolkeregistermetadata() == null) {
-				return new SimpleNavn(fulltnavn());
-			}
-			return new NavnMedGyldighet(parseZonedDateTime(getPdlFolkeregistermetadata().gyldighetstidspunkt),
-					parseZonedDateTime(getPdlFolkeregistermetadata().opphoerstidspunkt), fulltnavn());
-		}
 	}
 
 	@Data
@@ -97,7 +60,7 @@ public class PdlHentPersonBolkResponse {
 	}
 
 	@Data
-	static class PdlFolkeregistermetadata {
+	public static class PdlFolkeregistermetadata {
 		private String gyldighetstidspunkt;
 		private String opphoerstidspunkt;
 		private int sekvens;

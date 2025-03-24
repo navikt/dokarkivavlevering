@@ -56,7 +56,7 @@ public class AvleveringEndringsloggRoute extends RouteBuilder {
 				})
 				.marshal(endringsloggJaxbFormat())
 				.setHeader(Exchange.FILE_NAME, simple("${exchangeProperty.AvleveringId}/endringslogg_pre.xml"))
-				.to("file://{{avlevering.filomraade.work}}?fileExist=Override")
+				.to("file://{{dokarkivavlevering.filomraade.work}}?fileExist=Override")
 				.log(LoggingLevel.INFO, log, "Genererte endringslogg til ${header.CamelFileNameProduced}");
 
 		from(FLETT_ENDRINGSLOGG)
@@ -65,8 +65,8 @@ public class AvleveringEndringsloggRoute extends RouteBuilder {
 					InputStream inputStream = FileUtils.openInputStream(Paths.get(exchange.getIn().getHeader(Exchange.FILE_NAME_PRODUCED, String.class)).toFile());
 					exchange.getIn().setBody(inputStream);
 				})
-				.setHeader(HEADER_XSL_PARAM_ENDRING_XML, simple("file:///{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}?select=endring_*.xml"))
-				.setHeader(Exchange.XSLT_FILE_NAME, simple("{{avlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/endringslogg.xml"))
+				.setHeader(HEADER_XSL_PARAM_ENDRING_XML, simple("file:///{{dokarkivavlevering.filomraade.work}}/${exchangeProperty.AvleveringId}?select=endring_*.xml"))
+				.setHeader(Exchange.XSLT_FILE_NAME, simple("{{dokarkivavlevering.filomraade.work}}/${exchangeProperty.AvleveringId}/endringslogg.xml"))
 				.to("xslt-saxon:classpath:endringslogg/embed_arkivendring_into_endringslogg.xsl?output=file")
 				.setHeader(AvleveringSFTPRoute.HEADER_FILNAVN, simple("endringslogg.xml"))
 				.to(AvleveringSFTPRoute.SFTP);
@@ -81,7 +81,7 @@ public class AvleveringEndringsloggRoute extends RouteBuilder {
 					exchange.getIn().setBody(endringslogg);
 				})
 				.setHeader(Exchange.FILE_NAME, simple("${exchangeProperty.AvleveringId}/endring_${exchangeProperty.AvleveringTema}_${header.CamelSplitIndex}.xml"))
-				.to("file://{{avlevering.filomraade.work}}?fileExist=Override")
+				.to("file://{{dokarkivavlevering.filomraade.work}}?fileExist=Override")
 				.log(LoggingLevel.INFO, log, "Behandlet ferdig ${header.CamelFilenameProduced} for tema=${exchangeProperty.AvleveringTema}, loop=${header.CamelSplitIndex}");
 	}
 }

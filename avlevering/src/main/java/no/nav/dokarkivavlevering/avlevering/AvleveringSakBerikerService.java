@@ -6,13 +6,14 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avlevering.config.Tema;
 import no.nav.dokarkivavlevering.avlevering.consumer.activedirectory.NavActiveDirectoryConsumer;
 import no.nav.dokarkivavlevering.avlevering.consumer.ereg.EregService;
-import no.nav.dokarkivavlevering.avlevering.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokarkivavlevering.avlevering.domain.Arkivendring;
 import no.nav.dokarkivavlevering.avlevering.domain.BrukerMedNavnedata;
 import no.nav.dokarkivavlevering.avlevering.domain.DokumentInfo;
 import no.nav.dokarkivavlevering.avlevering.domain.FilDetaljer;
 import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
+import no.nav.dokarkivavlevering.core.consumer.pdl.PdlGraphQLConsumer;
+import no.nav.dokarkivavlevering.core.consumer.pdl.PdlHentPersonBolkResponse;
 import org.apache.camel.Body;
 import org.apache.camel.ExchangeProperty;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import static no.nav.dokarkivavlevering.avlevering.PdlResponseMapper.mapPdlHentIdenterPersonBolk;
 
 @Slf4j
 @Service
@@ -52,7 +55,7 @@ public class AvleveringSakBerikerService {
 		return doBerikSaker(saker, tema, false);
 	}
 
-	private List<Sak> doBerikSaker(List<Sak> saker, final Tema tema, boolean avleverDokumenter){
+	private List<Sak> doBerikSaker(List<Sak> saker, final Tema tema, boolean avleverDokumenter) {
 		// hent metadata og berik modellen
 		log.info("Beriker metadata for {} saker med tema={}", saker.size(), tema);
 		return Flowable.fromIterable(saker)
@@ -66,13 +69,14 @@ public class AvleveringSakBerikerService {
 							.filter(s -> s.getBruker().isPerson())
 							.map(s -> s.getBruker().getId())
 							.collect(Collectors.toSet());
-					final Map<String, BrukerMedNavnedata> pdlHentIdenterBolks = pdlGraphQLConsumer.hentPersonBolk(unikeAktoerids, tema.getTemakode());
+					final List<PdlHentPersonBolkResponse.PdlHentPersonBolk> pdlResponse = pdlGraphQLConsumer.hentPersonBolk(unikeAktoerids);
+					final Map<String, BrukerMedNavnedata> pdlHentIdenterBolks = mapPdlHentIdenterPersonBolk(pdlResponse);
 					final Set<String> unikeOrgnr = saks.stream()
 							.filter(s -> s.getBruker().isOrganisasjon())
 							.map(s -> s.getBruker().getId())
 							.collect(Collectors.toSet());
 					final Map<String, BrukerMedNavnedata> eregOrganisasjonBolk = eregService.hentOrganisasjonBrukere(unikeOrgnr);
-					if(avleverDokumenter) {
+					if (avleverDokumenter) {
 						return saks.stream()
 								.map(sak -> avleveringSakBerikerMapper.berikMedDokumenter(sak, navAnsatteNavn, pdlHentIdenterBolks, eregOrganisasjonBolk))
 								.collect(Collectors.toList());

@@ -6,6 +6,7 @@ import no.arkivverket.standarder.noark5.arkivstruktur.Arkivskaper;
 import no.arkivverket.standarder.noark5.arkivstruktur.Klassifikasjonssystem;
 import no.arkivverket.standarder.noark5.arkivstruktur.Skjerming;
 import no.nav.dokarkivavlevering.avlevering.config.Tema;
+import no.nav.dokarkivavlevering.core.DokarkivavleveringProperties;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
