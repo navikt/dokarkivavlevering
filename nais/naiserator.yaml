@@ -47,3 +47,12 @@ spec:
         mountPath: "/var/run/secrets/nais.io/db_creds"
       - kvPath: {{ DOKARKIVAVLEVERING_DS_CONFIG }}
         mountPath: "/var/run/secrets/nais.io/db_config"
+  command:
+    - "java"
+    - "-jar"
+    - "-Dspring.profiles.active=nais"
+    - "/app/app.jar"
+    - "{{COMMAND}}"
+    - "{{ARGUMENT1}}"
+    - "{{ARGUMENT2}}"
+    - "{{ARGUMENT3}}"

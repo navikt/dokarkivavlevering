@@ -1,4 +1,4 @@
-name: Deploy dokarkivavlevering [dev-fss]
+name: Produser avleveringspakke [prod-fss]
 on:
   workflow_dispatch:
     inputs:
@@ -25,7 +25,7 @@ jobs:
       java-version: '21'
 
   deploy:
-    name: Deploy job to dev
+    name: Deploy job to prod
     needs: build
     permissions:
       contents: read
@@ -33,13 +33,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Deploy job to NAIS dev-fss
+      - name: Deploy job to NAIS prod-fss
         uses: nais/deploy/actions/deploy@v2
         env:
           PRINT_PAYLOAD: true
-          CLUSTER: dev-fss
+          CLUSTER: prod-fss
           RESOURCE: nais/naiserator.yaml
-          VAR: image=${{needs.build.outputs.image}},periodestart=${{github.event.inputs.periodeStart}},periodeslutt=${{github.event.inputs.periodeSlutt}},tema=${{github.event.inputs.tema}}
-          VARS: nais/dev-config.json
+          VAR: image=${{needs.build.outputs.image}},COMMAND=produser-avleveringspakke-til-arkivverket,ARGUMENT1=${{github.event.inputs.periodeStart}},ARGUMENT2=${{github.event.inputs.periodeSlutt}},ARGUMENT3=${{github.event.inputs.tema}},periodestart=${{github.event.inputs.periodeStart}},periodeslutt=${{github.event.inputs.periodeSlutt}},tema=${{github.event.inputs.tema}}
+          VARS: nais/prod-config.json
           WAIT: true
-          TIMEOUT: 1h
+          TIMEOUT: 3h

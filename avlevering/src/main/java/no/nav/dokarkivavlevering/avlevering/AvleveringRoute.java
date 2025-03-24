@@ -11,7 +11,6 @@ import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -22,6 +21,7 @@ import static no.nav.dokarkivavlevering.avlevering.AvleveringTemaRoute.BEHANDLE_
 @Slf4j
 @Component
 public class AvleveringRoute extends RouteBuilder {
+
 	public static final String PROPERTY_AVLEVERING_ID = "AvleveringId";
 	public static final String PROPERTY_TEMA = "AvleveringTema";
 	public static final String SHUTDOWN = "direct:shutdown";
@@ -29,7 +29,6 @@ public class AvleveringRoute extends RouteBuilder {
 	private final ApplicationContext springContext;
 	private final DokarkivavleveringProperties avleveringProperties;
 
-	@Autowired
 	public AvleveringRoute(DokarkivavleveringProperties avleveringProperties,
 						   ApplicationContext springContext) {
 		this.avleveringProperties = avleveringProperties;
@@ -46,10 +45,6 @@ public class AvleveringRoute extends RouteBuilder {
 				.logHandled(true)
 				.logExhausted(true)
 				.logExhaustedMessageHistory(false));
-
-		from("timer://runOnce?repeatCount=1&delay=1000")
-				.routeId("start_everything")
-				.to("direct:start_intermediate");
 
 		// denne oppdelingen fremstår umiddelbart som omstendelig og meningsløs,
 		// men er nødvendig for stabil mocking i test
