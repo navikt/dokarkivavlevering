@@ -11,10 +11,12 @@ import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import static no.nav.dokarkivavlevering.avlevering.AvleveringTemaRoute.BEHANDLE_TEMA;
 
@@ -22,6 +24,10 @@ import static no.nav.dokarkivavlevering.avlevering.AvleveringTemaRoute.BEHANDLE_
 @Slf4j
 @Component
 public class AvleveringRoute extends RouteBuilder {
+
+
+	public static final String AVLEVERING_ID_VALUE = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm"));
+
 	public static final String PROPERTY_AVLEVERING_ID = "AvleveringId";
 	public static final String PROPERTY_TEMA = "AvleveringTema";
 	public static final String SHUTDOWN = "direct:shutdown";
@@ -29,7 +35,6 @@ public class AvleveringRoute extends RouteBuilder {
 	private final ApplicationContext springContext;
 	private final DokarkivavleveringProperties avleveringProperties;
 
-	@Autowired
 	public AvleveringRoute(DokarkivavleveringProperties avleveringProperties,
 						   ApplicationContext springContext) {
 		this.avleveringProperties = avleveringProperties;
@@ -47,10 +52,6 @@ public class AvleveringRoute extends RouteBuilder {
 				.logExhausted(true)
 				.logExhaustedMessageHistory(false));
 
-		from("timer://runOnce?repeatCount=1&delay=1000")
-				.routeId("start_everything")
-				.to("direct:start_intermediate");
-
 		// denne oppdelingen fremstår umiddelbart som omstendelig og meningsløs,
 		// men er nødvendig for stabil mocking i test
 		from("direct:start_intermediate")
@@ -59,7 +60,7 @@ public class AvleveringRoute extends RouteBuilder {
 
 		from("direct:start_avlevering")
 				.routeId("start_avlevering")
-				.setProperty(PROPERTY_AVLEVERING_ID, constant(avleveringProperties.getAvleveringId()))
+				.setProperty(PROPERTY_AVLEVERING_ID, constant(AVLEVERING_ID_VALUE))
 				.log(LoggingLevel.INFO, log, "Dokarkivavlevering starter avlevering=${exchangeProperty.AvleveringId}.")
 				.log(LoggingLevel.INFO, log, "Konfigurasjon=" + avleveringProperties)
 				.setBody(constant(avleveringProperties.getTema()))
