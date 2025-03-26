@@ -34,7 +34,7 @@ spec:
       value: "{{periodeslutt}}"
     - name: DOKARKIVAVLEVERING_TEMA
       value: "{{tema}}"
-    - name: DOKAKIVAVLEVERING_JOBTYPE
+    - name: DOKARKIVAVLEVERING_JOBTYPE
       value: "{{jobb}}"
   webproxy: true
   azure:
