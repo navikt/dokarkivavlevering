@@ -42,7 +42,7 @@ jobs:
           PRINT_PAYLOAD: true
           CLUSTER: dev-fss
           RESOURCE: nais/naiserator.yaml
-          VAR: image=${{needs.build.outputs.image}},jobb=AVSLUTTSAKER,tema=${{github.event.inputs.tema}},referanse=${{github.event.inputs.referanse}},avsluttetDato=${{github.event.inputs.avsluttetDato}},administrativEnhet=${{github.event.inputs.administrativEnhet}}
+          VAR: image=${{needs.build.outputs.image}},profile=avsluttSaker,jobb=AVSLUTTSAKER,tema=${{github.event.inputs.tema}},referanse=${{github.event.inputs.referanse}},avsluttetDato=${{github.event.inputs.avsluttetDato}},administrativEnhet=${{github.event.inputs.administrativEnhet}}
           VARS: nais/dev-config.json
           WAIT: true
           TIMEOUT: 1h
