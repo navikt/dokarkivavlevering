@@ -10,7 +10,7 @@ import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.AvsluttSakerVali
 
 @Slf4j
 @Component
-@Profile("avsluttSak")
+@Profile("avsluttSaker")
 public class AvsluttAlleSakerPaaTema {
 
 	private final AvsluttSakProperties avsluttSakProperties;

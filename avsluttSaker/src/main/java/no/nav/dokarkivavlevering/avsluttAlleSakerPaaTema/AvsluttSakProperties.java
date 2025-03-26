@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Validated
-@Profile("avsluttSak")
+@Profile("avsluttSaker")
 @ConfigurationProperties("avsluttsak")
 public class AvsluttSakProperties {
 
