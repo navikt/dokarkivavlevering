@@ -39,7 +39,7 @@ jobs:
           PRINT_PAYLOAD: true
           CLUSTER: dev-fss
           RESOURCE: nais/naiserator.yaml
-          VAR: image=${{needs.build.outputs.image}},COMMAND=produser-avleveringspakke-til-arkivverket,periodestart=${{github.event.inputs.periodeStart}},periodeslutt=${{github.event.inputs.periodeSlutt}},tema=${{github.event.inputs.tema}}
+          VAR: image=${{needs.build.outputs.image}},jobb=AVLEVERING,periodestart=${{github.event.inputs.periodeStart}},periodeslutt=${{github.event.inputs.periodeSlutt}},tema=${{github.event.inputs.tema}}
           VARS: nais/dev-config.json
           WAIT: true
           TIMEOUT: 1h
