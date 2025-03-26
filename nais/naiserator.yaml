@@ -34,13 +34,13 @@ spec:
       value: "{{periodeslutt}}"
     - name: AVLEVERING_TEMA
       value: "{{tema}}"
-    - name: ASLUTTSAK_TEMA
+    - name: AVSLUTTSAK_TEMA
       value: "{{tema}}"
-    - name: ASLUTTSAK_AVSLUTTETDATO
+    - name: AVSLUTTSAK_AVSLUTTETDATO
       value: "{{avsluttetDato}}"
-    - name: ASLUTTSAK_ADMINISTRATIVENHET
+    - name: AVSLUTTSAK_ADMINISTRATIVENHET
       value: "{{administrativEnhet}}"
-    - name: ASLUTTSAK_REFERANSE
+    - name: AVSLUTTSAK_REFERANSE
       value: "{{referanse}}"
     - name: SPRING_PROFILES_ACTIVE
       value: "{{profile}}"
