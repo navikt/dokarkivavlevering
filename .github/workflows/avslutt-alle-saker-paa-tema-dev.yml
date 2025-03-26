@@ -9,7 +9,7 @@ on:
         description: 'Jira-saksid (referanse til bestillingen)'
         required: true
       avsluttetDato:
-        description: 'Tidspunkt når sakene ble avsluttet. Settes kun dersom alle sakene på tema skal merkes med samme avsluttet dato.'
+        description: 'Tidspunkt når sakene ble avsluttet. Settes kun dersom alle sakene på tema skal merkes med samme avsluttet dato. Format: yyyy-MM-ddTmm:ss'
         required: false
       administrativEnhet:
         description: 'Navn på enhet som er ansvarlig for sakene. Settes kun dersom alle sakene på tema skal merkes med samme administrative enhet.'
