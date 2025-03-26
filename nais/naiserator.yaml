@@ -34,6 +34,8 @@ spec:
       value: "{{periodeslutt}}"
     - name: DOKARKIVAVLEVERING_TEMA
       value: "{{tema}}"
+    - name: DOKAKIVAVLEVERING_JOBTYPE
+      value: "{{jobb}}"
   webproxy: true
   azure:
     application:
@@ -47,9 +49,3 @@ spec:
         mountPath: "/var/run/secrets/nais.io/db_creds"
       - kvPath: {{ DOKARKIVAVLEVERING_DS_CONFIG }}
         mountPath: "/var/run/secrets/nais.io/db_config"
-  command:
-    - "java"
-    - "-jar"
-    - "-Dspring.profiles.active=nais"
-    - "/app/app.jar"
-    - "{{COMMAND}}"
