@@ -1,5 +1,6 @@
 package no.nav.dokarkivavlevering.avlevering;
 
+import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.core.DokarkivavleveringProperties;
 import no.nav.dokarkivavlevering.core.exception.MissingPropertiesException;
 import org.apache.camel.ProducerTemplate;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import static java.util.Objects.isNull;
 
+@Slf4j
 @Component
 public class ProduserAvleveringspakkeTilArkivverket {
 
@@ -19,6 +21,8 @@ public class ProduserAvleveringspakkeTilArkivverket {
 	}
 
 	public void execute() {
+		log.info("produserAvleveringspakkeTilArkivverket skal produsere avleveringspakke til Arkivverket for tema={} med periodeStart={} og periodeSlutt={}",
+				dokarkivavleveringProperties.getTema(), dokarkivavleveringProperties.getPeriode().getStartdato(), dokarkivavleveringProperties.getPeriode().getSluttdato());
 		validerPåkrevdeProduserAvleveringspakkeTilArkivverketPropertiesErSatt();
 		producerTemplate.send("direct:start_intermediate", exchange -> exchange.getIn().setBody("Start avlevering"));
 	}

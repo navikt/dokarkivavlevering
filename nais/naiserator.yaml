@@ -36,6 +36,10 @@ spec:
       value: "{{tema}}"
     - name: DOKARKIVAVLEVERING_JOBTYPE
       value: "{{jobb}}"
+    - name: DOKARKIVAVLEVERING_AVSLUTTETDATO
+      value: "{{avsluttetDato}}"
+    - name: DOKARKIVAVLEVERING_ADMINISTRATIVENHET
+      value: "{{administrativEnhet}}"
   webproxy: true
   azure:
     application:

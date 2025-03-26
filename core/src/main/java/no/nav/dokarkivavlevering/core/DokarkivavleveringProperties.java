@@ -10,6 +10,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Validated
@@ -74,7 +75,6 @@ public class DokarkivavleveringProperties {
 	/*
 	 * Properties for generering av arkivpakke til arkivverket
 	 */
-
 	private final Periode periode = new Periode();
 
 	@Data
@@ -82,5 +82,12 @@ public class DokarkivavleveringProperties {
 		private LocalDate startdato;
 		private LocalDate sluttdato;
 	}
+
+	/*
+	 * Properties for generering av arkivpakke til arkivverket
+	 */
+	private String referanse;
+	private String administrativEnhet;
+	private LocalDateTime avsluttetDato;
 
 }
