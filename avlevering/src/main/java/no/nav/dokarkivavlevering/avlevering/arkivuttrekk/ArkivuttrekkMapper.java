@@ -1,11 +1,13 @@
 package no.nav.dokarkivavlevering.avlevering.arkivuttrekk;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.dokarkivavlevering.avlevering.AvleveringProperties;
 import no.nav.dokarkivavlevering.core.DokarkivavleveringProperties;
 import no.nav.dokarkivavlevering.core.exception.DokarkivavleveringFunctionalException;
 import org.apache.camel.Handler;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 
@@ -22,6 +24,7 @@ import static org.apache.commons.io.FileUtils.readFileToByteArray;
 
 @Slf4j
 @Component
+@Profile("genererAvlevering")
 public class ArkivuttrekkMapper {
 
 	private static final String AVLEVERING_SLUTTDATO = "$AVLEVERING_SLUTTDATO$";
@@ -42,9 +45,9 @@ public class ArkivuttrekkMapper {
 	private static final String OFFENTLIGJOURNAL_ANTALL_JOURNALREGISTRERING = "$OFFENTLIGJOURNAL_ANTALL_JOURNALREGISTRERING$";
 	private static final String FILOMRAADE_WORK = "/tmp/";
 
-	private final DokarkivavleveringProperties avleveringProperties;
+	private final AvleveringProperties avleveringProperties;
 
-	public ArkivuttrekkMapper(DokarkivavleveringProperties avleveringProperties) {
+	public ArkivuttrekkMapper(AvleveringProperties avleveringProperties) {
 		this.avleveringProperties = avleveringProperties;
 	}
 

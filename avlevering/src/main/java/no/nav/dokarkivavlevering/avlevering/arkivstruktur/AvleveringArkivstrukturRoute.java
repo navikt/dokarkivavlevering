@@ -12,6 +12,7 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.converter.jaxb.JaxbConstants;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.apache.commons.io.FileUtils;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
@@ -19,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 
 @Component
+@Profile("genererAvlevering")
 public class AvleveringArkivstrukturRoute extends RouteBuilder {
 	public static final String SAKSMAPPE = "direct:saksmappe";
 	public static final String ARKIV = "direct:arkiv";

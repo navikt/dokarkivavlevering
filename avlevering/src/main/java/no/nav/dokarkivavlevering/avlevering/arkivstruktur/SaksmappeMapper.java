@@ -16,6 +16,7 @@ import no.nav.dokarkivavlevering.avlevering.domain.MedOpprettetAv;
 import no.nav.dokarkivavlevering.avlevering.domain.MedOpprettetAvNavn;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -34,6 +35,7 @@ import static org.apache.camel.converter.ObjectConverter.toBigInteger;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Component
+@Profile("genererAvlevering")
 public class SaksmappeMapper {
 
 	public static final String DOKUMENT_STATUS_FERDIGSTILT = "FERDIGSTILT";

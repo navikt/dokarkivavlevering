@@ -15,13 +15,9 @@ import java.time.LocalDateTime;
 
 @Data
 @Validated
-@EnableScheduling
 @ConfigurationProperties("dokarkivavlevering")
 public class DokarkivavleveringProperties {
 
-	/*
-	 * Påkrevd config
-	 */
 	private final Endpoints endpoints = new Endpoints();
 	@Valid
 	private final Activedirectory activedirectory = new Activedirectory();
@@ -29,7 +25,7 @@ public class DokarkivavleveringProperties {
 	String eregurl;
 
 	@ToString.Exclude
-	@NotEmpty
+	//@NotEmpty
 	String AsposeLicense;
 
 	@NotNull
@@ -64,32 +60,8 @@ public class DokarkivavleveringProperties {
 		private String scope;
 	}
 
-	/*
-	 * Generelle properties
-	 */
-
-	@NotEmpty
-	String tema;
-
 	@Max(1000) // max IN query i Oracle
 	int batchsize;
 
-	/*
-	 * Properties for generering av arkivpakke til arkivverket
-	 */
-	private final Periode periode = new Periode();
-
-	@Data
-	public static class Periode {
-		private LocalDate startdato;
-		private LocalDate sluttdato;
-	}
-
-	/*
-	 * Properties for generering av arkivpakke til arkivverket
-	 */
-	private String referanse;
-	private String administrativEnhet;
-	private LocalDateTime avsluttetDato;
 
 }

@@ -4,12 +4,14 @@ import no.arkivverket.standarder.noark5.loependejournal.Journalregistrering;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import org.apache.camel.Body;
 import org.apache.camel.Handler;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
+@Profile("genererAvlevering")
 public class LoependeJournalregistreringService {
 
 	private final JournalRegistreringMapper journalRegistreringMapper;

@@ -4,12 +4,14 @@ import no.arkivverket.standarder.noark5.arkivstruktur.Arkiv;
 import no.nav.dokarkivavlevering.avlevering.domain.Fagomrade;
 import org.apache.camel.Body;
 import org.apache.camel.Handler;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
 
 @Service
+@Profile("genererAvlevering")
 public class AvleveringArkivstrukturService {
 	private final KlasseMapper klasseMapper;
 	private final ArkivdelMapper arkivdelMapper;

@@ -7,6 +7,7 @@ import no.arkivverket.standarder.noark5.arkivstruktur.Skjerming;
 import no.arkivverket.standarder.noark5.arkivstruktur.SystemID;
 import no.nav.dokarkivavlevering.avlevering.domain.Fagomrade;
 import no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
@@ -15,6 +16,7 @@ import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.generat
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.getFagomradeBeskrivelse;
 
 @Component
+@Profile("genererAvlevering")
 public class ArkivdelMapper {
 
 	public Arkivdel map(Fagomrade fagomrade, Klasse klasse) {

@@ -5,6 +5,7 @@ import no.nav.dokarkivavlevering.avlevering.sftp.AvleveringSFTPRoute;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
@@ -16,6 +17,7 @@ import java.io.InputStream;
  */
 @Slf4j
 @Component
+@Profile("genererAvlevering")
 public class AvleveringStatiskRoute extends RouteBuilder {
 	public static String AVLEVERING_STATIC = "direct:avlevering_statisk";
 

@@ -3,17 +3,20 @@ package no.nav.dokarkivavlevering.avlevering.offentligjournal;
 import no.arkivverket.standarder.noark5.offentligjournal.Arkivskaper;
 import no.arkivverket.standarder.noark5.offentligjournal.Journalhode;
 import no.arkivverket.standarder.noark5.offentligjournal.OffentligJournal;
+import no.nav.dokarkivavlevering.avlevering.AvleveringProperties;
 import no.nav.dokarkivavlevering.core.DokarkivavleveringProperties;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import static org.apache.camel.converter.ObjectConverter.toBigInteger;
 
 @Component
+@Profile("genererAvlevering")
 public class OffentligJournalMapper {
 
-	private final DokarkivavleveringProperties.Periode periode;
+	private final AvleveringProperties.Periode periode;
 
-	public OffentligJournalMapper(DokarkivavleveringProperties avleveringProperties) {
+	public OffentligJournalMapper(AvleveringProperties avleveringProperties) {
 		this.periode = avleveringProperties.getPeriode();
 	}
 

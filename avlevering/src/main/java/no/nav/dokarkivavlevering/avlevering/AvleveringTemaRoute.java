@@ -12,6 +12,7 @@ import no.nav.dokarkivavlevering.avlevering.repository.AvleveringRepository;
 import no.nav.dokarkivavlevering.core.DokarkivavleveringProperties;
 import org.apache.camel.builder.RouteBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -21,6 +22,7 @@ import static org.apache.camel.LoggingLevel.INFO;
 
 @Slf4j
 @Component
+@Profile("genererAvlevering")
 public class AvleveringTemaRoute extends RouteBuilder {
 
 	public static final String BEHANDLE_TEMA = "direct:behandle_tema";

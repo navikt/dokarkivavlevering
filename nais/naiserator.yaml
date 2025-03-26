@@ -42,6 +42,8 @@ spec:
       value: "{{administrativEnhet}}"
     - name: DOKARKIVAVLEVERING_REFERANSE
       value: "{{referanse}}"
+    - name: SPRING_PROFILES_ACTIVE
+      value: "{{profile}}"
   webproxy: true
   azure:
     application:

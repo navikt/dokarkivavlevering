@@ -7,6 +7,7 @@ import com.aspose.pdf.PdfFormat;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.core.DokarkivavleveringProperties;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
@@ -20,14 +21,15 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 @Slf4j
 @Component
+@Profile("genererAvlevering")
 public class AsposeService {
 
 	private static final License lic = new License();
 
-	@Autowired
+	/*@Autowired
 	public AsposeService(DokarkivavleveringProperties avleveringProperties) throws Exception {
 		lic.setLicense(new ByteArrayInputStream(avleveringProperties.getAsposeLicense().getBytes(StandardCharsets.UTF_8)));
-	}
+	}*/
 
 	public byte[] convertToPDFA(byte[] inputPdf, long dokumentInfoId) {
 

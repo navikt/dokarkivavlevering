@@ -8,6 +8,7 @@ import no.arkivverket.standarder.noark5.offentligjournal.SystemID;
 import no.nav.dokarkivavlevering.avlevering.common.JournaldatoMapper;
 import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -20,6 +21,7 @@ import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.temaNav
 import static org.apache.camel.converter.ObjectConverter.toBigInteger;
 
 @Component
+@Profile("genererAvlevering")
 public class OffentligJournalRegistreringMapper {
 
 	private final JournaldatoMapper journaldatoMapper;

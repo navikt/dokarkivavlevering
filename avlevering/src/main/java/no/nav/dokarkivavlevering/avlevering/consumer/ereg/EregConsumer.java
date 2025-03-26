@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.core.DokarkivavleveringProperties;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Retryable;
@@ -26,6 +27,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
 @Component
+@Profile("genererAvlevering")
 public class EregConsumer {
 
 	private final RestTemplate restTemplate;

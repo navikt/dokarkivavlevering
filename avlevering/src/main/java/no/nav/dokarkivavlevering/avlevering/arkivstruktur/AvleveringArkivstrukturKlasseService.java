@@ -4,11 +4,13 @@ import no.arkivverket.standarder.noark5.arkivstruktur.Klasse;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import org.apache.camel.Body;
 import org.apache.camel.Handler;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@Profile("genererAvlevering")
 public class AvleveringArkivstrukturKlasseService {
 	private final SaksmappeMapper saksmappeMapper;
 	private final KlasseMapper klasseMapper;
