@@ -1,4 +1,4 @@
-package no.nav.dokarkivavlevering;
+package no.nav.dokarkivavlevering.core.exception;
 
 public class MissingPropertiesException extends RuntimeException {
 

@@ -29,6 +29,9 @@ public class DokarkivavleveringProperties {
 	@NotEmpty
 	String AsposeLicense;
 
+	@NotNull
+	Jobtype jobtype;
+
 	@Data
 	@Validated
 	public static class Activedirectory {
