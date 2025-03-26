@@ -1,0 +1,48 @@
+name: Avslutt alle saker for et gitt tema [dev-fss]
+on:
+  workflow_dispatch:
+    inputs:
+      tema:
+        description: 'Tre-bokstavers kode for tema/fagområde/arkivdel som skal avsluttes'
+        required: true
+      referanse:
+        description: 'Jira-saksid (referanse til bestillingen)'
+        required: true
+      avsluttetDato:
+        description: 'Tidspunkt når sakene ble avsluttet. Settes kun dersom alle sakene på tema skal merkes med samme avsluttet dato.'
+        required: false
+      administrativEnhet:
+        description: 'Navn på enhet som er ansvarlig for sakene. Settes kun dersom alle sakene på tema skal merkes med samme administrative enhet.'
+        required: false
+
+jobs:
+  build:
+    name: Build image
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    uses: navikt/dok-workflows/.github/workflows/build-app-gar.yml@main
+    secrets: inherit
+    with:
+      java-version: '21'
+
+  deploy:
+    name: Deploy job to dev
+    needs: build
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy job to NAIS dev-fss
+        uses: nais/deploy/actions/deploy@v2
+        env:
+          PRINT_PAYLOAD: true
+          CLUSTER: dev-fss
+          RESOURCE: nais/naiserator.yaml
+          VAR: image=${{needs.build.outputs.image}},jobb=AVSLUTTSAKER,tema=${{github.event.inputs.tema}},referanse=${{github.event.inputs.referanse}},avsluttetDato=${{github.event.inputs.avsluttetDato}},administrativEnhet=${{github.event.inputs.administrativEnhet}}
+          VARS: nais/dev-config.json
+          WAIT: true
+          TIMEOUT: 1h
