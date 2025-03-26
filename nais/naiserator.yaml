@@ -40,6 +40,8 @@ spec:
       value: "{{avsluttetDato}}"
     - name: DOKARKIVAVLEVERING_ADMINISTRATIVENHET
       value: "{{administrativEnhet}}"
+    - name: DOKARKIVAVLEVERING_REFERANSE
+      value: "{{referanse}}"
   webproxy: true
   azure:
     application:
