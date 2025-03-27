@@ -5,6 +5,7 @@ import com.aspose.pdf.Document;
 import com.aspose.pdf.License;
 import com.aspose.pdf.PdfFormat;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.dokarkivavlevering.avlevering.AvleveringProperties;
 import no.nav.dokarkivavlevering.core.DokarkivavleveringProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -26,10 +27,10 @@ public class AsposeService {
 
 	private static final License lic = new License();
 
-	/*@Autowired
-	public AsposeService(DokarkivavleveringProperties avleveringProperties) throws Exception {
+	@Autowired
+	public AsposeService(AvleveringProperties avleveringProperties) throws Exception {
 		lic.setLicense(new ByteArrayInputStream(avleveringProperties.getAsposeLicense().getBytes(StandardCharsets.UTF_8)));
-	}*/
+	}
 
 	public byte[] convertToPDFA(byte[] inputPdf, long dokumentInfoId) {
 

@@ -17,13 +17,14 @@ import java.time.LocalDateTime;
 @ConfigurationProperties("avsluttsak")
 public class AvsluttSakProperties {
 
-
 	@NotEmpty
 	String tema;
+
 	@NotEmpty
 	private String referanse;
-	@NotEmpty
+
 	private String administrativEnhet;
+
 	private LocalDateTime avsluttetDato;
 
 }

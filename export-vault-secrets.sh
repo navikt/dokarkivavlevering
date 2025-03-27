@@ -31,7 +31,7 @@ fi
 if test -f /var/run/secrets/nais.io/vault/asposeLicense;
 then
     echo "Setting aspose license"
-    export DOKARKIVAVLEVERING_ASPOSELICENSE=$(cat /var/run/secrets/nais.io/vault/asposeLicense)
+    export AVLEVERING_ASPOSELICENSE=$(cat /var/run/secrets/nais.io/vault/asposeLicense)
 fi
 if test -f /var/run/secrets/nais.io/ldap/username;
 then

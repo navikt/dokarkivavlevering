@@ -3,6 +3,7 @@ package no.nav.dokarkivavlevering.avlevering;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.ToString;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Profile;
@@ -17,6 +18,9 @@ import java.time.LocalDate;
 @EnableConfigurationProperties(AvleveringProperties.class)
 public class AvleveringProperties {
 
+	@ToString.Exclude
+	@NotEmpty
+	String asposeLicense;
 
 	@NotEmpty
 	String tema;
