@@ -13,6 +13,7 @@ import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -23,6 +24,7 @@ import static no.nav.dokarkivavlevering.avlevering.AvleveringTemaRoute.BEHANDLE_
 
 @Slf4j
 @Component
+@Profile("genererAvlevering")
 public class AvleveringRoute extends RouteBuilder {
 
 
@@ -33,9 +35,9 @@ public class AvleveringRoute extends RouteBuilder {
 	public static final String SHUTDOWN = "direct:shutdown";
 
 	private final ApplicationContext springContext;
-	private final DokarkivavleveringProperties avleveringProperties;
+	private final AvleveringProperties avleveringProperties;
 
-	public AvleveringRoute(DokarkivavleveringProperties avleveringProperties,
+	public AvleveringRoute(AvleveringProperties avleveringProperties,
 						   ApplicationContext springContext) {
 		this.avleveringProperties = avleveringProperties;
 		this.springContext = springContext;

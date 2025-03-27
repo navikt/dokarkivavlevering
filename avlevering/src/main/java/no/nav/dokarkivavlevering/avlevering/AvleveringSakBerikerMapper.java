@@ -8,6 +8,7 @@ import no.nav.dokarkivavlevering.avlevering.domain.DokumentInfo;
 import no.nav.dokarkivavlevering.avlevering.domain.FilDetaljer;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 
 @Component
+@Profile("genererAvlevering")
 public class AvleveringSakBerikerMapper {
 	public static final String AUTOMATISK_JOBB = "Automatisk Jobb";
 	private final AsposeService asposeService;

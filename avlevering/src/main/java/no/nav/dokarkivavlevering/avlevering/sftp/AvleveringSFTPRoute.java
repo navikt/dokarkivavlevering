@@ -2,6 +2,7 @@ package no.nav.dokarkivavlevering.avlevering.sftp;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.builder.RouteBuilder;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import static org.apache.camel.Exchange.FILE_NAME;
@@ -12,6 +13,7 @@ import static org.apache.camel.LoggingLevel.INFO;
  */
 @Slf4j
 @Component
+@Profile("genererAvlevering")
 public class AvleveringSFTPRoute extends RouteBuilder {
 
 	public static final String SFTP = "direct:sftp";

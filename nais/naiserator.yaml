@@ -28,14 +28,22 @@ spec:
       value: "{{EREG_URL}}"
     - name: DOKARKIVAVLEVERING_ACTIVEDIRECTORY_BASEDN
       value: "{{AD_NAVUSER_BASEDN}}"
-    - name: DOKARKIVAVLEVERING_PERIODE_STARTDATO
+    - name: AVLEVERING_PERIODE_STARTDATO
       value: "{{periodestart}}"
-    - name: DOKARKIVAVLEVERING_PERIODE_SLUTTDATO
+    - name: AVLEVERING_PERIODE_SLUTTDATO
       value: "{{periodeslutt}}"
-    - name: DOKARKIVAVLEVERING_TEMA
+    - name: AVLEVERING_TEMA
       value: "{{tema}}"
-    - name: DOKARKIVAVLEVERING_JOBTYPE
-      value: "{{jobb}}"
+    - name: AVSLUTTSAK_TEMA
+      value: "{{tema}}"
+    - name: AVSLUTTSAK_AVSLUTTETDATO
+      value: "{{avsluttetDato}}"
+    - name: AVSLUTTSAK_ADMINISTRATIVENHET
+      value: "{{administrativEnhet}}"
+    - name: AVSLUTTSAK_REFERANSE
+      value: "{{referanse}}"
+    - name: SPRING_PROFILES_ACTIVE
+      value: "{{profile}}"
   webproxy: true
   azure:
     application:

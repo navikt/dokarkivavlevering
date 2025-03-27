@@ -5,9 +5,11 @@ import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
+@Profile("genererAvlevering")
 public class AvleveringArkivuttrekkRoute extends RouteBuilder {
 
 	public static final String GENERER_ARKIVUTTREKK = "direct:generer_arkivuttrekk";

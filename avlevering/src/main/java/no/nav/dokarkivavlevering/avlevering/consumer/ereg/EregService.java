@@ -2,6 +2,7 @@ package no.nav.dokarkivavlevering.avlevering.consumer.ereg;
 
 import no.nav.dokarkivavlevering.avlevering.domain.BrukerMedNavnedata;
 import no.nav.dokarkivavlevering.avlevering.domain.SimpleNavn;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -11,6 +12,7 @@ import java.util.stream.Collectors;
 import static java.util.Collections.singletonList;
 
 @Component
+@Profile("genererAvlevering")
 public class EregService {
 
 	private final EregConsumer eregConsumer;

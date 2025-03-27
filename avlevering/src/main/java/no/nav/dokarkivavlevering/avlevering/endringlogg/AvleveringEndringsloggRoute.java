@@ -10,6 +10,7 @@ import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.apache.commons.io.FileUtils;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
@@ -18,6 +19,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 @Component
+@Profile("genererAvlevering")
 public class AvleveringEndringsloggRoute extends RouteBuilder {
 
 	public static final String HEADER_XSL_PARAM_ENDRING_XML = "endring_xml";

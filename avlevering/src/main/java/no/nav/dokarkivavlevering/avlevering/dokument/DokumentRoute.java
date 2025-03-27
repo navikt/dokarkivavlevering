@@ -2,6 +2,7 @@ package no.nav.dokarkivavlevering.avlevering.dokument;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.builder.RouteBuilder;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import static no.nav.dokarkivavlevering.avlevering.sftp.AvleveringSFTPRoute.HEADER_FILNAVN;
@@ -12,6 +13,7 @@ import static no.nav.dokarkivavlevering.avlevering.sftp.AvleveringSFTPRoute.SFTP
  */
 @Slf4j
 @Component
+@Profile("genererAvlevering")
 public class DokumentRoute extends RouteBuilder {
 
 	public static final String SEND_DOKUMENT = "direct:send_dokument";

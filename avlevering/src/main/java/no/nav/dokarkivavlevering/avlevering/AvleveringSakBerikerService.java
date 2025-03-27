@@ -16,6 +16,7 @@ import no.nav.dokarkivavlevering.core.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokarkivavlevering.core.consumer.pdl.PdlHentPersonBolkResponse;
 import org.apache.camel.Body;
 import org.apache.camel.ExchangeProperty;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -30,6 +31,7 @@ import static no.nav.dokarkivavlevering.avlevering.PdlResponseMapper.mapPdlHentI
 
 @Slf4j
 @Service
+@Profile("genererAvlevering")
 public class AvleveringSakBerikerService {
 
 	public static final Pattern ADEO_IDENT_PATTERN = Pattern.compile("^[a-zA-Z]\\d{6}$");

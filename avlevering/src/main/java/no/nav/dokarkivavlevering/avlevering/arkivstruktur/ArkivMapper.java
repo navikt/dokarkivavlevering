@@ -5,6 +5,7 @@ import no.arkivverket.standarder.noark5.arkivstruktur.Arkivdel;
 import no.arkivverket.standarder.noark5.arkivstruktur.Arkivskaper;
 import no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils;
 import org.apache.camel.Handler;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.DATE_TI
 
 
 @Component
+@Profile("genererAvlevering")
 public class ArkivMapper {
 
 	public static final LocalDateTime ARKIV_OPPRETTET_TIDSPUNKT = LocalDateTime.from(DATE_TIME_FORMAT.parse("2008-12-01T12:00:00"));

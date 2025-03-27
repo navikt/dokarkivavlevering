@@ -2,6 +2,7 @@ package no.nav.dokarkivavlevering.avlevering.consumer.activedirectory;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.core.DokarkivavleveringProperties;
+import org.springframework.context.annotation.Profile;
 import org.springframework.ldap.NamingException;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.query.LdapQuery;
@@ -19,6 +20,7 @@ import static org.springframework.ldap.query.LdapQueryBuilder.query;
  * @author Joakim Bjørnstad, Jbit AS
  */
 @Component
+@Profile("genererAvlevering")
 @Slf4j
 public class NavActiveDirectoryConsumer {
 

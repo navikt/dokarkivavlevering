@@ -7,6 +7,7 @@ import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import org.apache.camel.Body;
 import org.apache.camel.Handler;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Profile("genererAvlevering")
 public class EndringsloggService {
 
 	private static final String SAKSRELASJON = "Saksrelasjon";

@@ -2,6 +2,7 @@ package no.nav.dokarkivavlevering.avlevering.utils;
 
 import no.arkivverket.standarder.noark5.arkivstruktur.SystemID;
 import no.nav.dokarkivavlevering.avlevering.config.Tema;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -19,6 +20,7 @@ import static no.nav.dokarkivavlevering.avlevering.config.Tema.RVE;
 import static no.nav.dokarkivavlevering.avlevering.config.Tema.SAP;
 
 @Component
+@Profile("genererAvlevering")
 public class AvleveringUtils {
 
 	public static final String UTGAAENDE = "U";

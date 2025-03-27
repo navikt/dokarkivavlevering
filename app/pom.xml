@@ -15,11 +15,11 @@
 	<dependencies>
 		<dependency>
 			<groupId>no.nav.dokarkivavlevering</groupId>
-			<artifactId>core</artifactId>
+			<artifactId>avlevering</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>no.nav.dokarkivavlevering</groupId>
-			<artifactId>avlevering</artifactId>
+			<artifactId>avsluttSaker</artifactId>
 		</dependency>
 	</dependencies>
 
