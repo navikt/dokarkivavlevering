@@ -5,7 +5,6 @@ import no.nav.dokarkivavlevering.avlevering.AvleveringProperties;
 import no.nav.dokarkivavlevering.avlevering.config.Tema;
 import no.nav.dokarkivavlevering.avlevering.domain.Fagomrade;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
-import no.nav.dokarkivavlevering.core.DokarkivavleveringProperties;
 import org.apache.camel.Body;
 import org.simpleflatmapper.jdbc.spring.JdbcTemplateMapperFactory;
 import org.springframework.context.annotation.Profile;
