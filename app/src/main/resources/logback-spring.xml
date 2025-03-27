@@ -2,7 +2,7 @@
 <configuration scan="false" debug="false">
 
 	<springProfile name="avsluttSaker | genererAvlevering">
-		<include resource="logback.xml"/>
+		<include resource="logback-dokarkivavlevering.xml"/>
 	</springProfile>
 
 </configuration>
