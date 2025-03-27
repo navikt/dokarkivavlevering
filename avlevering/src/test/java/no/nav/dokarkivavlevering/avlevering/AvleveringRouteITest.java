@@ -3,6 +3,7 @@ package no.nav.dokarkivavlevering.avlevering;
 import no.nav.dokarkivavlevering.avlevering.arkivuttrekk.AvleveringArkivuttrekkRoute;
 import no.nav.dokarkivavlevering.avlevering.aspose.AsposeService;
 import no.nav.dokarkivavlevering.avlevering.config.Tema;
+import no.nav.dokarkivavlevering.avlevering.consumer.ereg.EregConsumer;
 import no.nav.dokarkivavlevering.core.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokarkivavlevering.avlevering.domain.Arkivendring;
 import no.nav.dokarkivavlevering.avlevering.domain.Bruker;
@@ -49,15 +50,14 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-
 @ComponentScan
 @EnableAutoConfiguration
-@ActiveProfiles("genererAvlevering")
+@ActiveProfiles(profiles = {"genererAvlevering", "itest"})
 @SpringBootTest(classes = DokarkivavleveringProperties.class)
 public class AvleveringRouteITest {
 
-	@Autowired
-	TestRestTemplate restTemplate;
+	private static final int ANTALL_SAKER = 15;
+	private static final Tema TEMA = Tema.MED;
 
 	@Autowired
 	CamelContext camelContext;
@@ -72,6 +72,9 @@ public class AvleveringRouteITest {
 	PdlGraphQLConsumer pdlGraphQLConsumer;
 
 	@MockitoBean
+	EregConsumer eregConsumer;
+
+	@MockitoBean
 	AvleveringRepository avleveringRepositoryMock;
 
 	@MockitoBean
@@ -79,14 +82,13 @@ public class AvleveringRouteITest {
 
 	@MockitoBean
 	AvleveringSFTPRoute avleveringSFTPRoute_noop;
+
 	private MockEndpoint sftpMock;
-	private static final int ANTALL_SAKER = 15;
-	private static final Tema TEMA = Tema.MED;
 
 	@BeforeEach
 	void before() throws Exception {
 		// mock ut endepunktet som timeren sender meldinger til ved oppstart
-		mockEndpointAndSkipAt("start_everything", "direct:start_intermediate");
+		mockEndpointAndSkipAt("start_everything_actual", "direct:start_intermediate");
 		// mock ut shutdown så appen ikke skrur seg av før testen er ferdig
 		mockEndpointAndSkipAt("start_avlevering", AvleveringRoute.SHUTDOWN);
 

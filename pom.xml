@@ -19,8 +19,8 @@
 		<module>app</module>
 		<module>core</module>
 		<module>avlevering</module>
-		<module>arkivverket-schemas</module>
 		<module>avsluttSaker</module>
+		<module>arkivverket-schemas</module>
 	</modules>
 
 	<properties>

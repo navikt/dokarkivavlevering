@@ -28,11 +28,13 @@ then
     echo "Setting SFTP_PRIVATEKEYPASSPHRASE"
     export SFTP_PRIVATEKEYPASSPHRASE=$(cat /var/run/secrets/nais.io/vault/privateKeyPassphrase)
 fi
+
 if test -f /var/run/secrets/nais.io/vault/asposeLicense;
 then
     echo "Setting aspose license"
     export AVLEVERING_ASPOSELICENSE=$(cat /var/run/secrets/nais.io/vault/asposeLicense)
 fi
+
 if test -f /var/run/secrets/nais.io/ldap/username;
 then
     echo "Setting SPRING_LDAP_USERNAME"
