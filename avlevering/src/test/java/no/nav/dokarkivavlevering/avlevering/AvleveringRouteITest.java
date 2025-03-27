@@ -28,7 +28,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import javax.sql.DataSource;
@@ -47,10 +49,15 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest(classes = DokarkivavleveringProperties.class)
+
 @ComponentScan
 @EnableAutoConfiguration
-public class AvleveringRouteIT {
+@ActiveProfiles("genererAvlevering")
+@SpringBootTest(classes = DokarkivavleveringProperties.class)
+public class AvleveringRouteITest {
+
+	@Autowired
+	TestRestTemplate restTemplate;
 
 	@Autowired
 	CamelContext camelContext;
