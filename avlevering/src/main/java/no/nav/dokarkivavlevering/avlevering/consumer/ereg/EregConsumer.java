@@ -39,7 +39,7 @@ public class EregConsumer {
 				.connectTimeout(Duration.ofSeconds(3))
 				.readTimeout(Duration.ofSeconds(20))
 				.build();
-		this.eregUrl = avleveringProperties.getEregurl();
+		this.eregUrl = avleveringProperties.getEndpoints().getEreg().getUrl();
 	}
 
 	@Retryable(retryFor = HttpServerErrorException.class)

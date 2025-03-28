@@ -2,10 +2,7 @@ package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
-import no.nav.dokarkivavlevering.core.DokarkivavleveringProperties;
-import no.nav.dokarkivavlevering.core.azure.AzureProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Profile;
 import org.springframework.validation.annotation.Validated;
 
@@ -23,9 +20,8 @@ public class AvsluttSakProperties {
 	@NotEmpty
 	private String referanse;
 
-	private String administrativEnhet;
-
 	private LocalDateTime avsluttetDato;
 
-}
+	private String administrativEnhet;
 
+}
