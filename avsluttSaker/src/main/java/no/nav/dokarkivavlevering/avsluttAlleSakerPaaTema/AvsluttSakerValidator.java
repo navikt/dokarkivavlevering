@@ -18,8 +18,12 @@ public class AvsluttSakerValidator {
 	}
 
 	private static void validerTema(String tema) {
-		if (isBlank(tema) || tema.length() != 3) {
-			throw new MissingPropertiesException("tema har ikke lengde 3. Mottok tema=" + tema);
+		if (isBlank(tema)) {
+			throw new MissingPropertiesException("tema kan ikke være null eller tom");
+		}
+
+		if (tema.length() != 3) {
+			throw new MissingPropertiesException("tema må ha en lengde på 3. Mottok=" + tema);
 		}
 	}
 

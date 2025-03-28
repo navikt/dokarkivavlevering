@@ -48,11 +48,11 @@ class AvsluttSakerValidatorTest {
 
 	public static Stream<Arguments> skalKasteExceptionDersomTemaErUgyldig() {
 		return Stream.of(
-				Arguments.of("", "tema har ikke lengde 3. Mottok tema="),
-				Arguments.of(" ", "tema har ikke lengde 3. Mottok tema= "),
-				Arguments.of(null, "tema har ikke lengde 3. Mottok tema=null"),
-				Arguments.of("FA", "tema har ikke lengde 3. Mottok tema=FA"),
-				Arguments.of("FARR", "tema har ikke lengde 3. Mottok tema=FARR")
+				Arguments.of("", "tema kan ikke være null eller tom"),
+				Arguments.of(" ", "tema kan ikke være null eller tom"),
+				Arguments.of(null, "tema kan ikke være null eller tom"),
+				Arguments.of("FA", "tema må ha en lengde på 3. Mottok=FA"),
+				Arguments.of("FARR", "tema må ha en lengde på 3. Mottok=FARR")
 		);
 	}
 
