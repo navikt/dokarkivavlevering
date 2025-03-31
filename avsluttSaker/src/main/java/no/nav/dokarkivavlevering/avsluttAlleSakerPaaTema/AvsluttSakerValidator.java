@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNumeric;
 
-
 public class AvsluttSakerValidator {
 
 	public static void validerAvsluttAlleSakerPaaTemaRequest(String tema, String referanse, LocalDateTime avsluttetDato, String administrativEnhet) {

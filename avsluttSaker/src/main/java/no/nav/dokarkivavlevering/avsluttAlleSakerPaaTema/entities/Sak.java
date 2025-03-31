@@ -4,10 +4,16 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "toBeDetermined")
 public class Sak {
 
@@ -18,15 +24,16 @@ public class Sak {
 	@Column(nullable = false)
 	String applikasjon;
 
-	@Column(nullable = false)
+	@Column
 	String fagsaknr;
 
-	@Column(nullable = false)
+	@Column
 	String aktoerId;
 
-	@Column(nullable = false)
+	@Column
 	String orgnr;
 
 	@Column
 	String status;
+
 }

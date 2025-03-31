@@ -8,10 +8,11 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-
 @Component
 @Profile("avsluttSaker")
 public class AvsluttAlleSakerService {
+
+	private static final int BATCHSTOERRELSE = 1000;
 
 	private final SakRepository sakRepository;
 	private final PdlGraphQLConsumer pdlGraphQLConsumer;
@@ -25,7 +26,7 @@ public class AvsluttAlleSakerService {
 		//Hent 1000 og 1000
 		List<Long> sakIds = sakRepository.findAllSakIds();
 
-		List<List<Long>> sakIdsPartitioned = Lists.partition(sakIds, 1000);
+		List<List<Long>> sakIdsPartitioned = Lists.partition(sakIds, BATCHSTOERRELSE);
 
 		sakIdsPartitioned.forEach(sakIdListe -> {
 			List<Sak> saker = sakRepository.findSaksBySakIdIn(sakIdListe);
