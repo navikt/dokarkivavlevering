@@ -67,6 +67,24 @@ public class PdlGraphQLConsumer {
 		}
 	}
 
+	@Retryable(retryFor = PdlTechnicalException.class)
+	public List<PdlHentIdenterBolkResponse.PdlHentIdenterBolk> hentGjeldendeAktoerIdForBolk(Set<String> aktoerIds) {
+		PdlHentIdenterBolkResponse pdlResponse = webClient.post()
+				.uri(dokarkivavleveringProperties.getEndpoints().getPdl().getUrl())
+				.attributes(clientRegistrationId(CLIENT_REGISTRATION_PDL))
+				.bodyValue(mapHentGjeldendeAktoerIdForBolk(aktoerIds))
+				.retrieve()
+				.bodyToMono(PdlHentIdenterBolkResponse.class)
+				.onErrorMap(this::mapError)
+				.block();
+
+		if (pdlResponse.getErrors() == null || pdlResponse.getErrors().isEmpty()) {
+			return pdlResponse.getData().getHentIdenterBolk();
+		} else {
+			throw new PdlFunctionalException("Kunne ikke hente aktørid for folkeregisterident i pdl. " + pdlResponse.getErrors());
+		}
+	}
+
 	private Throwable mapError(Throwable error) {
 		if (error instanceof WebClientResponseException response && response.getStatusCode().is4xxClientError()) {
 			return new PdlFunctionalException(
@@ -109,6 +127,25 @@ public class PdlGraphQLConsumer {
 							code
 						  }
 						}
+						""")
+				.variables(variables)
+				.build();
+	}
+
+	private PdlRequest mapHentGjeldendeAktoerIdForBolk(final Set<String> aktoerIds) {
+		final HashMap<String, Object> variables = new HashMap<>();
+		variables.put("identer", aktoerIds);
+		return PdlRequest.builder()
+				.query("""
+						query hentIdenterBolk($identer: [ID!]!) {
+						   hentIdenterBolk(identer: $identer, grupper: [AKTORID], historikk: false) {
+						         ident,
+						         identer {
+						             ident
+						         },
+						         code
+						     }
+						 }
 						""")
 				.variables(variables)
 				.build();

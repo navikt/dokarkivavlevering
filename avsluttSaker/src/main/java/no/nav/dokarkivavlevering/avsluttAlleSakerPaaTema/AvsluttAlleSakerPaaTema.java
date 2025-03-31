@@ -15,9 +15,11 @@ import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.AvsluttSakerVali
 public class AvsluttAlleSakerPaaTema {
 
 	private final AvsluttSakProperties avsluttSakProperties;
+	private final AvsluttAlleSakerService avsluttAlleSakerService;
 
-	public AvsluttAlleSakerPaaTema(AvsluttSakProperties avsluttSakProperties) {
+	public AvsluttAlleSakerPaaTema(AvsluttSakProperties avsluttSakProperties, AvsluttAlleSakerService avsluttAlleSakerService) {
 		this.avsluttSakProperties = avsluttSakProperties;
+		this.avsluttAlleSakerService = avsluttAlleSakerService;
 	}
 
 	@Scheduled(initialDelay = 1000)
@@ -29,6 +31,7 @@ public class AvsluttAlleSakerPaaTema {
 
 		validerAvsluttAlleSakerPaaTemaRequest(tema, referanse, avsluttetDato, administrativEnhet);
 		log.info("avsluttAlleSakerPaaTema skal avslutte alle saker på tema={} med referanse={}, avsluttetDato={} og administrativEnhet={}", tema, referanse, avsluttetDato, administrativEnhet);
+		avsluttAlleSakerService.avsluttAlleSaker();
 
 	}
 }
