@@ -1,4 +1,4 @@
-package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema;
+package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository;
 
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.entities.Sak;
 import org.springframework.context.annotation.Profile;

@@ -3,8 +3,9 @@ package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.entities.Sak;
+import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.SakRepository;
+import no.nav.dokarkivavlevering.core.consumer.pdl.HentIdenterBolkResponse.HentIdenterBolk;
 import no.nav.dokarkivavlevering.core.consumer.pdl.PdlGraphQLConsumer;
-import no.nav.dokarkivavlevering.core.consumer.pdl.PdlHentIdenterBolkResponse;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -45,26 +46,52 @@ public class AvsluttAlleSakerService {
 		});
 	}
 
-	public void oppdaterIdIDatabase(List<Sak> saker) {
-		Set<String> aktoerIds = saker.stream().map(Sak::getAktoerId).filter(Objects::nonNull).collect(Collectors.toSet());
-		List<PdlHentIdenterBolkResponse.PdlHentIdenterBolk> pdlHentIdenterBolk = pdlGraphQLConsumer.hentGjeldendeAktoerIdForBolk(aktoerIds);
-		Map<String, String> aktoerIdMap = new HashMap<>();
-		List<String> badAktoerIds = new ArrayList<>();
+	// TODO: Tiltak for at både aktørId og orgnr er sett, eller ingen av dei, i ei sak
+	private void oppdaterIdIDatabase(List<Sak> saker) {
+		List<Sak> sakerUtenAktoerId = saker.stream()
+				.filter(sak -> sak.getOrgnr() != null)
+				.toList();
+		sakerUtenAktoerId.forEach(sak -> sak.setStatus("SKAL_IKKE_HENTE_FRA_PDL"));
 
-		pdlHentIdenterBolk.forEach(identBolk -> {
-			if (isNull(identBolk.getIdenter())) {
-				badAktoerIds.add(identBolk.getIdent());
+		List<Sak> sakerMedAktoerId = saker.stream()
+				.filter(sak -> sak.getAktoerId() != null)
+				.toList();
+
+		Set<String> aktoerIds = sakerMedAktoerId.stream()
+				.map(Sak::getAktoerId)
+				.collect(Collectors.toSet());
+
+		if (!aktoerIds.isEmpty()) {
+			oppdaterSakerMedAktoerId(aktoerIds, sakerMedAktoerId);
+		}
+	}
+
+	private void oppdaterSakerMedAktoerId(Set<String> aktoerIds, List<Sak> sakerMedAktoerId) {
+		List<HentIdenterBolk> hentIdenterBolkListe = pdlGraphQLConsumer.hentGjeldendeAktoerIder(aktoerIds);
+		Map<String, String> aktoerIderSomSkalOppdateres = new HashMap<>();
+		List<String> aktoerIderUtenGyldigAktoerId = new ArrayList<>();
+
+		hentIdenterBolkListe.forEach(identBolk -> {
+			if (isNull(identBolk.getIdenter())) { // 404 Not Found på aktørId, ev. andre feil
+				aktoerIderUtenGyldigAktoerId.add(identBolk.getIdent());
 			} else {
-				aktoerIdMap.put(identBolk.getIdent(), identBolk.getIdenter().getFirst().getIdent());
+				// key er gammel aktoerId, value er ny aktoerId
+				String gammelAktoerId = identBolk.getIdent();
+				String nyAktoerId = identBolk.getIdenter().getFirst().getIdent();
+				if (!gammelAktoerId.equals(nyAktoerId)) {
+					aktoerIderSomSkalOppdateres.put(identBolk.getIdent(), identBolk.getIdenter().getFirst().getIdent());
+				}
 			}
 		});
 
-		saker.forEach(sak -> {
-			if (badAktoerIds.contains(sak.getAktoerId())) {
+		sakerMedAktoerId.forEach(sak -> {
+			if (aktoerIderUtenGyldigAktoerId.contains(sak.getAktoerId())) {
 				log.warn("Feil ved uthenting av person fra pdl. Sak={}", sak.getSakId());
-				sak.setStatus("FEIL_FRA_PDL");
+				sak.setStatus("PDL_FANT_IKKE_NY_AKTOERID");
 			} else {
-				sak.setAktoerId(aktoerIdMap.get(sak.getAktoerId()));
+				if (aktoerIderSomSkalOppdateres.containsKey(sak.getAktoerId())) {
+					sak.setAktoerId(aktoerIderSomSkalOppdateres.get(sak.getAktoerId()));
+				}
 				sak.setStatus("HENTET_FRA_PDL");
 			}
 		});

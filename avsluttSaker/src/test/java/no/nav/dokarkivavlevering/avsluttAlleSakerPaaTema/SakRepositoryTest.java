@@ -45,5 +45,4 @@ class SakRepositoryTest extends AbstractRepositoryTest {
 
 		assertThat(sakIds).isEqualTo(List.of(123L, 234L, 345L));
 	}
-
 }

@@ -1,0 +1,17 @@
+{
+  "errors": [
+    {
+      "message": "Validation error (WrongType@[hentIdenterBolk]) : argument 'grupper[0]' with value 'EnumValue{name='AKTOERID'}' is not a valid 'IdentGruppe' - Literal value not in allowable values for enum 'IdentGruppe' - 'EnumValue{name='AKTOERID'}'",
+      "locations": [
+        {
+          "line": 2,
+          "column": 38
+        }
+      ],
+      "extensions": {
+        "classification": "ValidationError"
+      }
+    }
+  ],
+  "data": null
+}
