@@ -1,7 +1,7 @@
 package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema;
 
+import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.config.RepositoryConfig;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.SakRepository;
-import no.nav.dokarkivavlevering.config.RepositoryConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
