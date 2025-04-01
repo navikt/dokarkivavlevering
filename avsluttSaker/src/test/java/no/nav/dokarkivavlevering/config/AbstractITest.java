@@ -38,7 +38,7 @@ public abstract class AbstractITest {
 	}
 
 	protected void emptyDatabases() {
-
+		sakRepository.deleteAll();
 	}
 
 	protected void commitAndBeginNewTransaction() {

@@ -2,6 +2,7 @@ package no.nav.dokarkivavlevering.core.consumer.pdl;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.core.DokarkivavleveringProperties;
+import no.nav.dokarkivavlevering.core.consumer.pdl.HentIdenterBolkResponse.HentIdenterBolk;
 import no.nav.dokarkivavlevering.core.consumer.pdl.exception.PdlFunctionalException;
 import no.nav.dokarkivavlevering.core.consumer.pdl.exception.PdlTechnicalException;
 import no.nav.dokarkivavlevering.core.consumer.pdl.exception.PersonIkkeFunnetException;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import static java.lang.String.format;
 import static no.nav.dokarkivavlevering.core.azure.AzureProperties.CLIENT_REGISTRATION_PDL;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.oauth2.client.web.reactive.function.client.ServerOAuth2AuthorizedClientExchangeFilterFunction.clientRegistrationId;
@@ -68,13 +70,13 @@ public class PdlGraphQLConsumer {
 	}
 
 	@Retryable(retryFor = PdlTechnicalException.class)
-	public List<PdlHentIdenterBolkResponse.PdlHentIdenterBolk> hentGjeldendeAktoerIdForBolk(Set<String> aktoerIds) {
-		PdlHentIdenterBolkResponse pdlResponse = webClient.post()
+	public List<HentIdenterBolk> hentGjeldendeAktoerIder(Set<String> aktoerIds) {
+		HentIdenterBolkResponse pdlResponse = webClient.post()
 				.uri(dokarkivavleveringProperties.getEndpoints().getPdl().getUrl())
 				.attributes(clientRegistrationId(CLIENT_REGISTRATION_PDL))
 				.bodyValue(mapHentGjeldendeAktoerIdForBolk(aktoerIds))
 				.retrieve()
-				.bodyToMono(PdlHentIdenterBolkResponse.class)
+				.bodyToMono(HentIdenterBolkResponse.class)
 				.onErrorMap(this::mapError)
 				.block();
 
@@ -88,7 +90,7 @@ public class PdlGraphQLConsumer {
 	private Throwable mapError(Throwable error) {
 		if (error instanceof WebClientResponseException response && response.getStatusCode().is4xxClientError()) {
 			return new PdlFunctionalException(
-					String.format("Kall mot pdl feilet funksjonelt med statuskode=%s Feilmelding=%s",
+					format("Kall mot pdl feilet funksjonelt med statuskode=%s Feilmelding=%s",
 							response.getStatusCode(),
 							response.getMessage()),
 					error);

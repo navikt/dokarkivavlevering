@@ -3,8 +3,9 @@ package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.entities.Sak;
+import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.SakRepository;
+import no.nav.dokarkivavlevering.core.consumer.pdl.HentIdenterBolkResponse.HentIdenterBolk;
 import no.nav.dokarkivavlevering.core.consumer.pdl.PdlGraphQLConsumer;
-import no.nav.dokarkivavlevering.core.consumer.pdl.PdlHentIdenterBolkResponse;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -45,26 +46,30 @@ public class AvsluttAlleSakerService {
 		});
 	}
 
-	public void oppdaterIdIDatabase(List<Sak> saker) {
-		Set<String> aktoerIds = saker.stream().map(Sak::getAktoerId).filter(Objects::nonNull).collect(Collectors.toSet());
-		List<PdlHentIdenterBolkResponse.PdlHentIdenterBolk> pdlHentIdenterBolk = pdlGraphQLConsumer.hentGjeldendeAktoerIdForBolk(aktoerIds);
-		Map<String, String> aktoerIdMap = new HashMap<>();
-		List<String> badAktoerIds = new ArrayList<>();
+	private void oppdaterIdIDatabase(List<Sak> saker) {
+		Set<String> aktoerIds = saker.stream()
+				.map(Sak::getAktoerId)
+				.filter(Objects::nonNull)
+				.collect(Collectors.toSet());
+		List<HentIdenterBolk> hentIdenterBolkListe = pdlGraphQLConsumer.hentGjeldendeAktoerIder(aktoerIds);
+		Map<String, String> gyldigAktoerIdMap = new HashMap<>();
+		List<String> aktoerIderUtenGyldigAktoerId = new ArrayList<>();
 
-		pdlHentIdenterBolk.forEach(identBolk -> {
+		hentIdenterBolkListe.forEach(identBolk -> {
 			if (isNull(identBolk.getIdenter())) {
-				badAktoerIds.add(identBolk.getIdent());
+				aktoerIderUtenGyldigAktoerId.add(identBolk.getIdent());
 			} else {
-				aktoerIdMap.put(identBolk.getIdent(), identBolk.getIdenter().getFirst().getIdent());
+				// key er gammel aktoerId, value er ny aktoerId
+				gyldigAktoerIdMap.put(identBolk.getIdent(), identBolk.getIdenter().getFirst().getIdent());
 			}
 		});
 
 		saker.forEach(sak -> {
-			if (badAktoerIds.contains(sak.getAktoerId())) {
+			if (aktoerIderUtenGyldigAktoerId.contains(sak.getAktoerId())) {
 				log.warn("Feil ved uthenting av person fra pdl. Sak={}", sak.getSakId());
 				sak.setStatus("FEIL_FRA_PDL");
 			} else {
-				sak.setAktoerId(aktoerIdMap.get(sak.getAktoerId()));
+				sak.setAktoerId(gyldigAktoerIdMap.get(sak.getAktoerId()));
 				sak.setStatus("HENTET_FRA_PDL");
 			}
 		});

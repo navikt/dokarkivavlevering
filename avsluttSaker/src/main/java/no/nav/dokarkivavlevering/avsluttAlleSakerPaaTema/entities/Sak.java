@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "toBeDetermined")
+@Table(name = "TO_BE_DETERMINED")
 public class Sak {
 
 	@Id
