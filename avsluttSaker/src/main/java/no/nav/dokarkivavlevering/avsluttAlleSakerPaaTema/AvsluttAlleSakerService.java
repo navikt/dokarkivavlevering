@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
@@ -35,7 +35,6 @@ public class AvsluttAlleSakerService {
 	}
 
 	public void avsluttAlleSaker() {
-		//Hent 1000 og 1000
 		List<Long> sakIds = sakRepository.findAllSakIds();
 
 		List<List<Long>> sakIdsPartitioned = Lists.partition(sakIds, BATCHSTOERRELSE);
@@ -44,14 +43,85 @@ public class AvsluttAlleSakerService {
 			List<Sak> saker = sakRepository.findSaksBySakIdIn(sakIdListe);
 			oppdaterIdIDatabase(saker);
 		});
+
+		List<String> handterteSaker = new ArrayList<>();
+
+		sakIdsPartitioned.forEach(sakIdListe -> {
+			List<Sak> saker = sakRepository.findSaksBySakIdIn(sakIdListe);
+			settSammenArkivsak2(saker);
+		});
+
+
 	}
+
+	//	Samme applikasjon, aktoerId/orgNr og evt. fagsaknr
+	private void settSammenArkivsak2(List<Sak> saker) {
+
+		for(Sak sak : saker){
+			if(sak.getArbeidsStatus().equals("HENTET_FRA_PDL") || sak.getArbeidsStatus().equals("MIDLERTIDIG_STATUS")) {
+				List<Sak> arkivSakForSak = sakRepository.findArkivSakForAktoerId(sak.getAktoerId(), sak.getFagsaknr(), sak.getApplikasjon());
+				arkivSakForSak.forEach(tmpSak -> tmpSak.setArbeidsStatus("MIDLERTIDIG_STATUS"));
+
+				//3.1
+				//Finn alle journalposter for arkivsaken
+				//valider statuser
+
+				//3.1.1
+				//Hvis tom arkivsak: Opdater
+
+				//3.2
+				//Finn eldste journalpost
+				//Hvis ingen journalpost i riktig status, skriv feilmelding og oppdater status
+
+				//3.3
+				//Finn administrativ enhet
+
+				//3.4
+				//oppdater sak
+				arkivSakForSak.forEach(tmpSak -> tmpSak.setArbeidsStatus("FERDIG_HANDTERT"));
+			}
+			//Håndtere arkivsaken - da blir det 1 og en
+
+			//Finne alle arkivsaker og håndetere bolker
+
+		}
+
+		/*List<Sak> arkivsak = sakRepository.findArkivSakForAktoerId(sak.getAktoerId(), sak.getFagsaknr(), sak.getApplikasjon());
+		Arkivsak A = new Arkivsak(arkivsak);
+
+		arkivsak.stream().forEach(handleSak -> {
+			handleSak.setArkivsak(String.valueOf(UUID.randomUUID()));
+			handleSak.setArbeidsStatus("HAR_ARKIVSAK");
+		});*/
+
+	}
+
+	//	Samme applikasjon, aktoerId/orgNr og evt. fagsaknr
+	private void settSammenArkivsak() {
+		Set<String> aktoerIds = sakRepository.findAllAktoerIds();
+
+		for(String aktoerId : aktoerIds){
+			List<Sak> sakForAktoerId = sakRepository.findSaksByAktoerId(aktoerId);
+		}
+
+		/*List<Sak> arkivsak = sakRepository.findArkivSakForAktoerId(sak.getAktoerId(), sak.getFagsaknr(), sak.getApplikasjon());
+		Arkivsak A = new Arkivsak(arkivsak);
+
+		arkivsak.stream().forEach(handleSak -> {
+			handleSak.setArkivsak(String.valueOf(UUID.randomUUID()));
+			handleSak.setStatus("HAR_ARKIVSAK");
+		});*/
+
+	}
+
+
 
 	// TODO: Tiltak for at både aktørId og orgnr er sett, eller ingen av dei, i ei sak
 	private void oppdaterIdIDatabase(List<Sak> saker) {
 		List<Sak> sakerUtenAktoerId = saker.stream()
 				.filter(sak -> sak.getOrgnr() != null)
 				.toList();
-		sakerUtenAktoerId.forEach(sak -> sak.setStatus("SKAL_IKKE_HENTE_FRA_PDL"));
+		sakerUtenAktoerId.forEach(sak -> sak.setArbeidsStatus("SKAL_IKKE_HENTE_FRA_PDL"));
 
 		List<Sak> sakerMedAktoerId = saker.stream()
 				.filter(sak -> sak.getAktoerId() != null)
@@ -87,12 +157,12 @@ public class AvsluttAlleSakerService {
 		sakerMedAktoerId.forEach(sak -> {
 			if (aktoerIderUtenGyldigAktoerId.contains(sak.getAktoerId())) {
 				log.warn("Feil ved uthenting av person fra pdl. Sak={}", sak.getSakId());
-				sak.setStatus("PDL_FANT_IKKE_NY_AKTOERID");
+				sak.setArbeidsStatus("PDL_FANT_IKKE_NY_AKTOERID");
 			} else {
 				if (aktoerIderSomSkalOppdateres.containsKey(sak.getAktoerId())) {
 					sak.setAktoerId(aktoerIderSomSkalOppdateres.get(sak.getAktoerId()));
 				}
-				sak.setStatus("HENTET_FRA_PDL");
+				sak.setArbeidsStatus("HENTET_FRA_PDL");
 			}
 		});
 	}
