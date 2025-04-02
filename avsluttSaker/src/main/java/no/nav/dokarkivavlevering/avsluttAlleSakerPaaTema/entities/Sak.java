@@ -33,7 +33,9 @@ public class Sak {
 	@Column
 	String orgnr;
 
-	@Column
+	@Column(name = "k_sak_status")
 	String status;
 
+	@Column
+	String arbeidsStatus;
 }

@@ -1,6 +1,7 @@
 package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema;
 
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.entities.Sak;
+import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.SakRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -10,9 +11,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class SakRepositoryTest extends AbstractRepositoryTest {
 
-	@BeforeEach
-	void setUp() {
-		Sak sakForPerson1 = new Sak().builder()
+	void genererTestSaker() {
+		Sak sakForPerson1 = Sak.builder()
 				.sakId(123L)
 				.applikasjon("FS22")
 				.fagsaknr(null)
@@ -20,7 +20,7 @@ class SakRepositoryTest extends AbstractRepositoryTest {
 				.orgnr(null)
 				.build();
 
-		Sak sakForPerson2 = new Sak().builder()
+		Sak sakForPerson2 = Sak.builder()
 				.sakId(234L)
 				.applikasjon("AO01")
 				.fagsaknr("123")
@@ -28,7 +28,7 @@ class SakRepositoryTest extends AbstractRepositoryTest {
 				.orgnr(null)
 				.build();
 
-		Sak sakForOrganisasjon = new Sak().builder()
+		Sak sakForOrganisasjon = Sak.builder()
 				.sakId(345L)
 				.applikasjon("FS22")
 				.fagsaknr(null)
@@ -41,8 +41,28 @@ class SakRepositoryTest extends AbstractRepositoryTest {
 
 	@Test
 	void skalHenteAlleSaksIder() {
+		genererTestSaker();
 		List<Long> sakIds = sakRepository.findAllSakIds();
 
 		assertThat(sakIds).isEqualTo(List.of(123L, 234L, 345L));
+	}
+
+	@Test
+	void skalKunHenteSakIdHvorSakStatusErNullEllerAapen() {
+		sakRepository.save(genererSakBuilder().sakId(1L).status("AAPEN").build());
+		sakRepository.save(genererSakBuilder().sakId(2L).build());
+		sakRepository.save(genererSakBuilder().sakId(3L).status("BAD_STATUS").build());
+
+		List<Long> sakIds = sakRepository.findAllSakIds();
+		assertThat(sakIds).isEqualTo(List.of(1L,2L));
+	}
+
+	private Sak.SakBuilder genererSakBuilder(){
+		return Sak.builder()
+				.sakId(123L)
+				.applikasjon("FS22")
+				.fagsaknr(null)
+				.aktoerId("12345678911")
+				.orgnr(null);
 	}
 }

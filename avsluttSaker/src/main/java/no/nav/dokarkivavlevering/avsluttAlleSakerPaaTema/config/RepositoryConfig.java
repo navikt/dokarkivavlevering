@@ -1,5 +1,6 @@
 package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.config;
 
+import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.JournalpostRepository;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.SakRepository;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +16,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 })
 @EnableJpaRepositories(
 		basePackageClasses = {
-				SakRepository.class
+				SakRepository.class,
+				JournalpostRepository.class
 		})
 public class RepositoryConfig {
 
