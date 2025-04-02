@@ -46,30 +46,52 @@ public class AvsluttAlleSakerService {
 		});
 	}
 
+	// TODO: Tiltak for at både aktørId og orgnr er sett, eller ingen av dei, i ei sak
 	private void oppdaterIdIDatabase(List<Sak> saker) {
-		Set<String> aktoerIds = saker.stream()
+		List<Sak> sakerUtenAktoerId = saker.stream()
+				.filter(sak -> sak.getOrgnr() != null)
+				.toList();
+		sakerUtenAktoerId.forEach(sak -> sak.setStatus("SKAL_IKKE_HENTE_FRA_PDL"));
+
+		List<Sak> sakerMedAktoerId = saker.stream()
+				.filter(sak -> sak.getAktoerId() != null)
+				.toList();
+
+		Set<String> aktoerIds = sakerMedAktoerId.stream()
 				.map(Sak::getAktoerId)
-				.filter(Objects::nonNull)
 				.collect(Collectors.toSet());
+
+		if (!aktoerIds.isEmpty()) {
+			oppdaterSakerMedAktoerId(aktoerIds, sakerMedAktoerId);
+		}
+	}
+
+	private void oppdaterSakerMedAktoerId(Set<String> aktoerIds, List<Sak> sakerMedAktoerId) {
 		List<HentIdenterBolk> hentIdenterBolkListe = pdlGraphQLConsumer.hentGjeldendeAktoerIder(aktoerIds);
-		Map<String, String> gyldigAktoerIdMap = new HashMap<>();
+		Map<String, String> aktoerIderSomSkalOppdateres = new HashMap<>();
 		List<String> aktoerIderUtenGyldigAktoerId = new ArrayList<>();
 
 		hentIdenterBolkListe.forEach(identBolk -> {
-			if (isNull(identBolk.getIdenter())) {
+			if (isNull(identBolk.getIdenter())) { // 404 Not Found på aktørId, ev. andre feil
 				aktoerIderUtenGyldigAktoerId.add(identBolk.getIdent());
 			} else {
 				// key er gammel aktoerId, value er ny aktoerId
-				gyldigAktoerIdMap.put(identBolk.getIdent(), identBolk.getIdenter().getFirst().getIdent());
+				String gammelAktoerId = identBolk.getIdent();
+				String nyAktoerId = identBolk.getIdenter().getFirst().getIdent();
+				if (!gammelAktoerId.equals(nyAktoerId)) {
+					aktoerIderSomSkalOppdateres.put(identBolk.getIdent(), identBolk.getIdenter().getFirst().getIdent());
+				}
 			}
 		});
 
-		saker.forEach(sak -> {
+		sakerMedAktoerId.forEach(sak -> {
 			if (aktoerIderUtenGyldigAktoerId.contains(sak.getAktoerId())) {
 				log.warn("Feil ved uthenting av person fra pdl. Sak={}", sak.getSakId());
-				sak.setStatus("FEIL_FRA_PDL");
+				sak.setStatus("PDL_FANT_IKKE_NY_AKTOERID");
 			} else {
-				sak.setAktoerId(gyldigAktoerIdMap.get(sak.getAktoerId()));
+				if (aktoerIderSomSkalOppdateres.containsKey(sak.getAktoerId())) {
+					sak.setAktoerId(aktoerIderSomSkalOppdateres.get(sak.getAktoerId()));
+				}
 				sak.setStatus("HENTET_FRA_PDL");
 			}
 		});
