@@ -37,7 +37,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		Sak sak1 = saker.get(0);
 		Sak sak2 = saker.get(1);
 
-		assertThat(sak1.getArbeidsstatus()).isEqualTo(HENTET_FRA_PDL.name());
+		assertThat(sak1.getArbeidsstatus()).isEqualTo(PROSESSERING_AV_ARKIVSAK_STARTET.name());
 		assertThat(sak1.getAktoerId()).isEqualTo("2345678901234");
 		assertThat(sak2.getArbeidsstatus()).isEqualTo(PROSESSERING_AV_ARKIVSAK_STARTET.name());
 		assertThat(sak2.getAktoerId()).isEqualTo("1234567891234");

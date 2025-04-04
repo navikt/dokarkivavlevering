@@ -5,7 +5,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.entities.Sak;
-import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.ArkivsakJournalpostRepository;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.SakRepository;
 import no.nav.dokarkivavlevering.core.consumer.pdl.HentIdenterBolkResponse.HentIdenterBolk;
 import no.nav.dokarkivavlevering.core.consumer.pdl.PdlGraphQLConsumer;
@@ -33,16 +32,13 @@ public class AvsluttAlleSakerService {
 	private static final int BATCHSTOERRELSE = 1000;
 
 	private final SakRepository sakRepository;
-	private final ArkivsakJournalpostRepository arkivsakJournalpostRepository;
 	private final PdlGraphQLConsumer pdlGraphQLConsumer;
 	private final EntityManager entityManager;
 
 	public AvsluttAlleSakerService(SakRepository sakRepository,
-								   ArkivsakJournalpostRepository arkivsakJournalpostRepository,
 								   PdlGraphQLConsumer pdlGraphQLConsumer,
 								   EntityManager entityManager) {
 		this.sakRepository = sakRepository;
-		this.arkivsakJournalpostRepository = arkivsakJournalpostRepository;
 		this.pdlGraphQLConsumer = pdlGraphQLConsumer;
 		this.entityManager = entityManager;
 	}
@@ -69,11 +65,17 @@ public class AvsluttAlleSakerService {
 
 		for (Sak sak : saker) {
 			if (sak.getArbeidsstatus().equals(HENTET_FRA_PDL.name()) || sak.getArbeidsstatus().equals(PROSESSERING_AV_ARKIVSAK_STARTET.name())) {
-				List<Sak> arkivsakForSak = sakRepository.findArkivsakForAktoerId(sak.getAktoerId(), sak.getFagsaknr(), sak.getApplikasjon());
+				List<Sak> arkivsakForSak;
+				if (sak.getFagsaknr() == null) {
+					arkivsakForSak = sakRepository.findArkivsakForAktoerIdWhereFagsaknrIsNull(sak.getAktoerId(), sak.getApplikasjon());
+				} else {
+					arkivsakForSak = sakRepository.findArkivsakForAktoerId(sak.getAktoerId(), sak.getFagsaknr(), sak.getApplikasjon());
+				}
 				arkivsakForSak.forEach(tmpSak -> tmpSak.setArbeidsstatus(PROSESSERING_AV_ARKIVSAK_STARTET.name()));
 
 				//3.1
 				List<Journalpost> arkivsakJournalposter = hentJournalposterForArkivsak(arkivsakForSak);
+				log.info(arkivsakJournalposter.get(0).getJournalstatus());
 				log.info("Test");
 				//Finn alle journalposter for arkivsaken
 				//valider statuser
@@ -119,11 +121,7 @@ public class AvsluttAlleSakerService {
 							where sr.sak_id in (:sakIds)
 				""")
 				.setParameter("sakIds", arkivsakForSak.stream().map(Sak::getSakId).toList());
-		List<Journalpost> journalposts= query.getResultList();
-
-		return journalposts;
-
-
+		return query.getResultList();
 		//return arkivsakJournalpostRepository.hentAlleJournalposterForArkivsak(arkivsakForSak.stream().map(Sak::getSakId).toList());
 	}
 
@@ -138,25 +136,6 @@ public class AvsluttAlleSakerService {
 			where sr.sak_id in (:sakIds)
 			"""
 	 */
-
-	//	Samme applikasjon, aktoerId/orgNr og evt. fagsaknr
-	private void settSammenArkivsak() {
-		Set<String> aktoerIds = sakRepository.findAllAktoerIds();
-
-		for (String aktoerId : aktoerIds) {
-			List<Sak> sakForAktoerId = sakRepository.findSaksByAktoerId(aktoerId);
-		}
-
-		/*List<Sak> arkivsak = sakRepository.findArkivSakForAktoerId(sak.getAktoerId(), sak.getFagsaknr(), sak.getApplikasjon());
-		Arkivsak A = new Arkivsak(arkivsak);
-
-		arkivsak.stream().forEach(handleSak -> {
-			handleSak.setArkivsak(String.valueOf(UUID.randomUUID()));
-			handleSak.setStatus("HAR_ARKIVSAK");
-		});*/
-
-	}
-
 
 	// TODO: Tiltak for at både aktørId og orgnr er sett, eller ingen av dei, i ei sak
 	private void oppdaterAktoerIder(List<Sak> saker) {
