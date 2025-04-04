@@ -37,5 +37,5 @@ public class Sak {
 	String status;
 
 	@Column
-	String arbeidsStatus;
+	String arbeidsstatus;
 }
