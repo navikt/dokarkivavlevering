@@ -13,25 +13,34 @@ import java.util.Set;
 public interface SakRepository extends JpaRepository<Sak, Long> {
 
 	@Query("""
-			select sak.sakId FROM Sak sak where sak.status is null OR sak.status = "AAPEN"
+			select sak.sakId from Sak sak
+			where sak.status is null or sak.status = "AAPEN"
 			""")
 	List<Long> findAllSakIds();
 
-	@Query("select distinct sak.aktoerId FROM Sak sak")
+	@Query("select distinct sak.aktoerId from Sak sak")
 	Set<String> findAllAktoerIds();
 
 	List<Sak> findSaksBySakIdIn(List<Long> sakIds);
 
-	List<Sak> findSaksByAktoerId(String aktoerId);
-
 	@Query("""
-			select sak FROM Sak sak where
-			sak.aktoerId = :aktoerId AND
-			sak.fagsaknr = :fagsaknr AND
+			select sak from Sak sak where
+			sak.aktoerId = :aktoerId and
+			sak.fagsaknr = :fagsaknr and
 			sak.applikasjon = :applikasjon
 			""")
 	List<Sak> findArkivsakForAktoerId(
 			@Param("aktoerId") String aktoerId,
 			@Param("fagsaknr") String fagsaknr,
+			@Param("applikasjon") String applikasjon);
+
+	@Query("""
+			select sak from Sak sak
+			where sak.aktoerId = :aktoerId
+			and sak.applikasjon = :applikasjon
+			and sak.fagsaknr is null
+			""")
+	List<Sak> findArkivsakForAktoerIdWhereFagsaknrIsNull(
+			@Param("aktoerId") String aktoerId,
 			@Param("applikasjon") String applikasjon);
 }
