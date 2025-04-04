@@ -18,6 +18,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.HENTET_FRA_PDL;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.PDL_FANT_IKKE_NY_AKTOERID;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.PROSESSERING_AV_ARKIVSAK_STARTET;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.SAK_AVSLUTTET;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.SKAL_IKKE_HENTE_FRA_PDL;
 
 @Slf4j
 @Component
@@ -59,9 +64,9 @@ public class AvsluttAlleSakerService {
 	private void settSammenArkivsak2(List<Sak> saker) {
 
 		for (Sak sak : saker) {
-			if (sak.getArbeidsstatus().equals("HENTET_FRA_PDL") || sak.getArbeidsstatus().equals("PROSESSERING_AV_ARKIVSAK_STARTET")) {
+			if (sak.getArbeidsstatus().equals(HENTET_FRA_PDL.name()) || sak.getArbeidsstatus().equals(PROSESSERING_AV_ARKIVSAK_STARTET.name())) {
 				List<Sak> arkivsakForSak = sakRepository.findArkivsakForAktoerId(sak.getAktoerId(), sak.getFagsaknr(), sak.getApplikasjon());
-				arkivsakForSak.forEach(tmpSak -> tmpSak.setArbeidsstatus("PROSESSERING_AV_ARKIVSAK_STARTET"));
+				arkivsakForSak.forEach(tmpSak -> tmpSak.setArbeidsstatus(PROSESSERING_AV_ARKIVSAK_STARTET.name()));
 
 				//3.1
 				//Finn alle journalposter for arkivsaken
@@ -79,7 +84,7 @@ public class AvsluttAlleSakerService {
 
 				//3.4
 				//oppdater sak
-				arkivsakForSak.forEach(tmpSak -> tmpSak.setArbeidsstatus("FERDIG_HANDTERT"));
+				//arkivsakForSak.forEach(tmpSak -> tmpSak.setArbeidsstatus(SAK_AVSLUTTET.name()));
 			}
 			//Håndtere arkivsaken - da blir det 1 og en
 
@@ -121,7 +126,7 @@ public class AvsluttAlleSakerService {
 		List<Sak> sakerUtenAktoerId = saker.stream()
 				.filter(sak -> sak.getOrgnr() != null)
 				.toList();
-		sakerUtenAktoerId.forEach(sak -> sak.setArbeidsstatus("SKAL_IKKE_HENTE_FRA_PDL"));
+		sakerUtenAktoerId.forEach(sak -> sak.setArbeidsstatus(SKAL_IKKE_HENTE_FRA_PDL.name()));
 
 		List<Sak> sakerMedAktoerId = saker.stream()
 				.filter(sak -> sak.getAktoerId() != null)
@@ -158,12 +163,12 @@ public class AvsluttAlleSakerService {
 		sakerMedAktoerId.forEach(sak -> {
 			if (aktoerIderUtenGyldigAktoerId.contains(sak.getAktoerId())) {
 				log.warn("Feil ved uthenting av person fra pdl. Sak={}", sak.getSakId());
-				sak.setArbeidsstatus("PDL_FANT_IKKE_NY_AKTOERID");
+				sak.setArbeidsstatus(PDL_FANT_IKKE_NY_AKTOERID.name());
 			} else {
 				if (aktoerIderSomSkalOppdateres.containsKey(sak.getAktoerId())) {
 					sak.setAktoerId(aktoerIderSomSkalOppdateres.get(sak.getAktoerId()));
 				}
-				sak.setArbeidsstatus("HENTET_FRA_PDL");
+				sak.setArbeidsstatus(HENTET_FRA_PDL.name());
 			}
 		});
 	}
