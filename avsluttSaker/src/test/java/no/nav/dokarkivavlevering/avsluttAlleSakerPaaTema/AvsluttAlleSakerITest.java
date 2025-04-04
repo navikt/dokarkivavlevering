@@ -9,6 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.HENTET_FRA_PDL;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.PDL_FANT_IKKE_NY_AKTOERID;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.PROSESSERING_AV_ARKIVSAK_STARTET;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.SKAL_IKKE_HENTE_FRA_PDL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -33,9 +37,9 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		Sak sak1 = saker.get(0);
 		Sak sak2 = saker.get(1);
 
-		assertThat(sak1.getArbeidsstatus()).isEqualTo("HENTET_FRA_PDL");
+		assertThat(sak1.getArbeidsstatus()).isEqualTo(HENTET_FRA_PDL.name());
 		assertThat(sak1.getAktoerId()).isEqualTo("2345678901234");
-		assertThat(sak2.getArbeidsstatus()).isEqualTo("MIDLERTIDIG_STATUS");
+		assertThat(sak2.getArbeidsstatus()).isEqualTo(PROSESSERING_AV_ARKIVSAK_STARTET.name());
 		assertThat(sak2.getAktoerId()).isEqualTo("1234567891234");
 	}
 
@@ -48,7 +52,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		avsluttAlleSakerService.avsluttAlleSaker();
 
 		Sak sak = sakRepository.findSaksBySakIdIn(List.of(123L)).getFirst();
-		assertThat(sak.getArbeidsstatus()).isEqualTo("PDL_FANT_IKKE_NY_AKTOERID");
+		assertThat(sak.getArbeidsstatus()).isEqualTo(PDL_FANT_IKKE_NY_AKTOERID.name());
 	}
 
 	@Test
@@ -66,7 +70,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		avsluttAlleSakerService.avsluttAlleSaker();
 
 		Sak sak = sakRepository.findSaksBySakIdIn(List.of(345L)).getFirst();
-		assertThat(sak.getArbeidsstatus()).isEqualTo("SKAL_IKKE_HENTE_FRA_PDL");
+		assertThat(sak.getArbeidsstatus()).isEqualTo(SKAL_IKKE_HENTE_FRA_PDL.name());
 	}
 
 	@Test
