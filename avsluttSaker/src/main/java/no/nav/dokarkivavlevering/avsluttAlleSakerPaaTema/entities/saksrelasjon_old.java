@@ -7,10 +7,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.Immutable;
 
 @Entity
-@Table(name = "T_SAKSRELASJON")
-public class Saksrelasjon {
+@Immutable
+@Table(name = "T_SAKSRELASJON_OLD")
+public class saksrelasjon_old {
 
 	@Id
 	@Column(name = "saksrelasjon_id")
@@ -25,9 +27,11 @@ public class Saksrelasjon {
 	@Column(name = "feilregistrert")
 	private Boolean feilregistrert;
 
-	@JsonIgnore
+	/*
 	@OneToOne
-	@JoinColumn(name = "journalpost_id", nullable = false)
+	@JsonIgnore
+	@JoinColumn(name = "journalpost_id", nullable = false, insertable=false, updatable=false)
 	private Journalpost journalpost;
+	*/
 
 }

@@ -1,9 +1,11 @@
 package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema;
 
 import com.google.common.collect.Lists;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.entities.Sak;
-import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.JournalpostRepository;
+import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.ArkivsakJournalpostRepository;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.SakRepository;
 import no.nav.dokarkivavlevering.core.consumer.pdl.HentIdenterBolkResponse.HentIdenterBolk;
 import no.nav.dokarkivavlevering.core.consumer.pdl.PdlGraphQLConsumer;
@@ -21,7 +23,6 @@ import static java.util.Objects.isNull;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.HENTET_FRA_PDL;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.PDL_FANT_IKKE_NY_AKTOERID;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.PROSESSERING_AV_ARKIVSAK_STARTET;
-import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.SAK_AVSLUTTET;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.SKAL_IKKE_HENTE_FRA_PDL;
 
 @Slf4j
@@ -32,15 +33,18 @@ public class AvsluttAlleSakerService {
 	private static final int BATCHSTOERRELSE = 1000;
 
 	private final SakRepository sakRepository;
-	private final JournalpostRepository journalpostRepository;
+	private final ArkivsakJournalpostRepository arkivsakJournalpostRepository;
 	private final PdlGraphQLConsumer pdlGraphQLConsumer;
+	private final EntityManager entityManager;
 
 	public AvsluttAlleSakerService(SakRepository sakRepository,
-								   JournalpostRepository journalpostRepository,
-								   PdlGraphQLConsumer pdlGraphQLConsumer) {
+								   ArkivsakJournalpostRepository arkivsakJournalpostRepository,
+								   PdlGraphQLConsumer pdlGraphQLConsumer,
+								   EntityManager entityManager) {
 		this.sakRepository = sakRepository;
-		this.journalpostRepository = journalpostRepository;
+		this.arkivsakJournalpostRepository = arkivsakJournalpostRepository;
 		this.pdlGraphQLConsumer = pdlGraphQLConsumer;
+		this.entityManager = entityManager;
 	}
 
 	public void avsluttAlleSaker() {
@@ -69,6 +73,8 @@ public class AvsluttAlleSakerService {
 				arkivsakForSak.forEach(tmpSak -> tmpSak.setArbeidsstatus(PROSESSERING_AV_ARKIVSAK_STARTET.name()));
 
 				//3.1
+				List<Journalpost> arkivsakJournalposter = hentJournalposterForArkivsak(arkivsakForSak);
+				log.info("Test");
 				//Finn alle journalposter for arkivsaken
 				//valider statuser
 
@@ -101,6 +107,37 @@ public class AvsluttAlleSakerService {
 		});*/
 
 	}
+
+	private List<Journalpost> hentJournalposterForArkivsak(List<Sak> arkivsakForSak) {
+		Query query = entityManager.createNativeQuery("""
+							select sr.feilregistrert as erFeilregistrert,
+							jp.k_journal_s as journalstatus,
+							jp.journalf_enhet as journalfoerendeEnhet,
+							jp.dato_journal as journaldato
+							FROM t_saksrelasjon sr
+							join t_journalpost jp on jp.journalpost_id = sr.journalpost_id
+							where sr.sak_id in (:sakIds)
+				""")
+				.setParameter("sakIds", arkivsakForSak.stream().map(Sak::getSakId).toList());
+		List<Journalpost> journalposts= query.getResultList();
+
+		return journalposts;
+
+
+		//return arkivsakJournalpostRepository.hentAlleJournalposterForArkivsak(arkivsakForSak.stream().map(Sak::getSakId).toList());
+	}
+
+	/*
+	value = """
+			select sr.feilregistrert as erFeilregistrert,
+			jp.journalpostStatus as journalstatus,
+			jp.journalf_enhet as journalfoerendeEnhet,
+			jp.dato_journal as journaldato
+			FROM t_saksrelasjon sr
+			join t_journalpost jp on jp.journalpost_id = sr.journalpost_id
+			where sr.sak_id in (:sakIds)
+			"""
+	 */
 
 	//	Samme applikasjon, aktoerId/orgNr og evt. fagsaknr
 	private void settSammenArkivsak() {
