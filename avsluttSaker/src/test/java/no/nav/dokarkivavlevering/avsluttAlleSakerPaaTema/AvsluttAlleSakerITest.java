@@ -33,9 +33,9 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		Sak sak1 = saker.get(0);
 		Sak sak2 = saker.get(1);
 
-		assertThat(sak1.getArbeidsStatus()).isEqualTo("HENTET_FRA_PDL");
+		assertThat(sak1.getArbeidsstatus()).isEqualTo("HENTET_FRA_PDL");
 		assertThat(sak1.getAktoerId()).isEqualTo("2345678901234");
-		assertThat(sak2.getArbeidsStatus()).isEqualTo("MIDLERTIDIG_STATUS");
+		assertThat(sak2.getArbeidsstatus()).isEqualTo("MIDLERTIDIG_STATUS");
 		assertThat(sak2.getAktoerId()).isEqualTo("1234567891234");
 	}
 
@@ -48,7 +48,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		avsluttAlleSakerService.avsluttAlleSaker();
 
 		Sak sak = sakRepository.findSaksBySakIdIn(List.of(123L)).getFirst();
-		assertThat(sak.getArbeidsStatus()).isEqualTo("PDL_FANT_IKKE_NY_AKTOERID");
+		assertThat(sak.getArbeidsstatus()).isEqualTo("PDL_FANT_IKKE_NY_AKTOERID");
 	}
 
 	@Test
@@ -66,7 +66,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		avsluttAlleSakerService.avsluttAlleSaker();
 
 		Sak sak = sakRepository.findSaksBySakIdIn(List.of(345L)).getFirst();
-		assertThat(sak.getArbeidsStatus()).isEqualTo("SKAL_IKKE_HENTE_FRA_PDL");
+		assertThat(sak.getArbeidsstatus()).isEqualTo("SKAL_IKKE_HENTE_FRA_PDL");
 	}
 
 	@Test

@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 @Profile("avsluttSaker")
 public interface JournalpostRepository extends JpaRepository<Journalpost, Long> {
+
 }

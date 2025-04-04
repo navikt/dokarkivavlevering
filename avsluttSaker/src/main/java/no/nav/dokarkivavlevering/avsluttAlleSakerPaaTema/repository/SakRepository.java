@@ -27,11 +27,11 @@ public interface SakRepository extends JpaRepository<Sak, Long> {
 	@Query("""
 			select sak FROM Sak sak where
 			sak.aktoerId = :aktoerId AND
-			sak.fagsaknr = :fagsakNr AND
+			sak.fagsaknr = :fagsaknr AND
 			sak.applikasjon = :applikasjon
 			""")
-	List<Sak> findArkivSakForAktoerId(
+	List<Sak> findArkivsakForAktoerId(
 			@Param("aktoerId") String aktoerId,
-			@Param("fagsakNr") String fagsakNr,
+			@Param("fagsaknr") String fagsaknr,
 			@Param("applikasjon") String applikasjon);
 }

@@ -3,40 +3,38 @@ package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.entities;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import org.hibernate.annotations.Immutable;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 
-@Data
 @Entity
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Immutable
 @Table(name = "T_JOURNALPOST")
 public class Journalpost {
 
 	@Id
-	@Column(name = "journalpost_id", nullable = false)
+	@Column(name = "journalpost_id")
 	private Long journalpostId;
-	@Column
-	private String journalstatus;
-	@Column
-	private boolean erFeilregistrert;
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column
-	private String journalførendeEnhet;
-	@Column
-	private Date datoJournal;
 
+	@Column(name = "k_journal_s")
+	private String journalstatus;
+
+	@Column
+	private boolean erFeilregistrert; // eksisterer ikkje
+
+	@Column(name = "journalf_enhet")
+	private String journalfoerendeEnhet;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "dato_journal")
+	private Date journaldato;
+
+	// Bidireksjonelle OneToOne relasjoner blir eager fetched fra Journalpost
+	@OneToOne(mappedBy = "journalpost")
+	private Saksrelasjon saksrelasjon;
 
 }
