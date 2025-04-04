@@ -7,13 +7,15 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import lombok.Getter;
 import org.hibernate.annotations.Immutable;
 
 import java.util.Date;
 
+@Getter
 @Entity
 @Immutable
-@Table(name = "T_JOURNALPOST")
+@Table(name = "T_JOURNALPOST_2")
 public class Journalpost {
 
 	@Id
@@ -33,8 +35,9 @@ public class Journalpost {
 	@Column(name = "dato_journal")
 	private Date journaldato;
 
-	// Bidireksjonelle OneToOne relasjoner blir eager fetched fra Journalpost
+	/*// Bidireksjonelle OneToOne relasjoner blir eager fetched fra Journalpost
 	@OneToOne(mappedBy = "journalpost")
-	private Saksrelasjon saksrelasjon;
+	private saksrelasjon_old saksrelasjonold;
+	*/
 
 }
