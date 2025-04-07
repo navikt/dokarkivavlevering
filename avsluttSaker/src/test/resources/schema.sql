@@ -9,6 +9,9 @@ create table t_saksrelasjon
 insert into t_saksrelasjon(sak_id, feilregistrert, journalpost_id)
 VALUES (123, '0', 123456);
 
+insert into t_saksrelasjon(sak_id, feilregistrert, journalpost_id)
+VALUES (234, '0', 234567);
+
 create table t_journalpost
 (
     journalpost_id NUMBER(11, 0)     not null,
@@ -19,4 +22,7 @@ create table t_journalpost
 
 insert into t_journalpost(k_journal_s, journalpost_id, journalf_enhet, dato_journal)
 VALUES ('MO', 123456, '1234', '2025-01-01T13:30');
+
+insert into t_journalpost(k_journal_s, journalpost_id, journalf_enhet, dato_journal)
+VALUES ('M', 234567, '5678', '2025-01-01T13:30');
 

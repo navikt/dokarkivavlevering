@@ -15,7 +15,6 @@ public class Journalpost {
 
 	private String journalfoerendeEnhet;
 
-	@Temporal(TemporalType.TIMESTAMP)
 	private Date journaldato;
 
 

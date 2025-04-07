@@ -1,10 +1,9 @@
 package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema;
 
 import com.google.common.collect.Lists;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.entities.Sak;
+import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.AvsluttSakRepository;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.SakRepository;
 import no.nav.dokarkivavlevering.core.consumer.pdl.HentIdenterBolkResponse.HentIdenterBolk;
 import no.nav.dokarkivavlevering.core.consumer.pdl.PdlGraphQLConsumer;
@@ -33,14 +32,13 @@ public class AvsluttAlleSakerService {
 
 	private final SakRepository sakRepository;
 	private final PdlGraphQLConsumer pdlGraphQLConsumer;
-	private final EntityManager entityManager;
+	private final AvsluttSakRepository avsluttSakRepository;
 
 	public AvsluttAlleSakerService(SakRepository sakRepository,
-								   PdlGraphQLConsumer pdlGraphQLConsumer,
-								   EntityManager entityManager) {
+								   PdlGraphQLConsumer pdlGraphQLConsumer, AvsluttSakRepository avsluttSakRepository) {
 		this.sakRepository = sakRepository;
 		this.pdlGraphQLConsumer = pdlGraphQLConsumer;
-		this.entityManager = entityManager;
+		this.avsluttSakRepository = avsluttSakRepository;
 	}
 
 	public void avsluttAlleSaker() {
@@ -74,8 +72,7 @@ public class AvsluttAlleSakerService {
 				arkivsakForSak.forEach(tmpSak -> tmpSak.setArbeidsstatus(PROSESSERING_AV_ARKIVSAK_STARTET.name()));
 
 				//3.1
-				List<Journalpost> arkivsakJournalposter = hentJournalposterForArkivsak(arkivsakForSak);
-				log.info(arkivsakJournalposter.get(0).getJournalstatus());
+				List<Journalpost> arkivsakJournalposter = avsluttSakRepository.getJournalposterForArkivsak(arkivsakForSak.stream().map(Sak::getSakId).toList());
 				log.info("Test");
 				//Finn alle journalposter for arkivsaken
 				//valider statuser
@@ -110,20 +107,6 @@ public class AvsluttAlleSakerService {
 
 	}
 
-	private List<Journalpost> hentJournalposterForArkivsak(List<Sak> arkivsakForSak) {
-		Query query = entityManager.createNativeQuery("""
-							select sr.feilregistrert as erFeilregistrert,
-							jp.k_journal_s as journalstatus,
-							jp.journalf_enhet as journalfoerendeEnhet,
-							jp.dato_journal as journaldato
-							FROM t_saksrelasjon sr
-							join t_journalpost jp on jp.journalpost_id = sr.journalpost_id
-							where sr.sak_id in (:sakIds)
-				""")
-				.setParameter("sakIds", arkivsakForSak.stream().map(Sak::getSakId).toList());
-		return query.getResultList();
-		//return arkivsakJournalpostRepository.hentAlleJournalposterForArkivsak(arkivsakForSak.stream().map(Sak::getSakId).toList());
-	}
 
 	/*
 	value = """
