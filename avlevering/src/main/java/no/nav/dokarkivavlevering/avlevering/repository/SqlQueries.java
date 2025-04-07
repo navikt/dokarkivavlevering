@@ -30,7 +30,7 @@ public class SqlQueries {
 			    AND j.dato_opprettet BETWEEN :startdato and :sluttdato
 			""";
 
-	static final String FINN_SAKER_SQL ="""
+	static final String FINN_SAKER_SQL = """
 			select sa.id                         as id,
 					       sa.tema                       as tema,
 					       sa.opprettet_tidspunkt        as opprettettidspunkt,
@@ -110,7 +110,7 @@ public class SqlQueries {
 					         alj.tidspunkt, aeed.arkiv_element_endring_id, aeed.tidspunkt
 					         """;
 
-	static final String FINN_SAKER_UTEN_DOKUMENTER_SQL ="""
+	static final String FINN_SAKER_UTEN_DOKUMENTER_SQL = """
 			select sa.id                         as id,
 					       sa.tema                       as tema,
 					       sa.opprettet_tidspunkt        as opprettettidspunkt,
