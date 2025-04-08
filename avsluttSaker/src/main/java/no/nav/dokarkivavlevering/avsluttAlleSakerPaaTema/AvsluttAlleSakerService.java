@@ -18,10 +18,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.FEIL_AAPEN_JOURNALPOST;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.FERDIG_TOM_ARKIVSAK;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.HENTET_FRA_PDL;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.PDL_FANT_IKKE_NY_AKTOERID;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.PROSESSERING_AV_ARKIVSAK_STARTET;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.SKAL_IKKE_HENTE_FRA_PDL;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.ArkivsakValidator.harArkivsakEnAapenJournalpost;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.ArkivsakValidator.harArkivsakFerdigstilteJournalposter;
 
 @Slf4j
 @Component
@@ -72,7 +76,20 @@ public class AvsluttAlleSakerService {
 				arkivsakForSak.forEach(tmpSak -> tmpSak.setArbeidsstatus(PROSESSERING_AV_ARKIVSAK_STARTET.name()));
 
 				//3.1
-				List<Journalpost> arkivsakJournalposter = avsluttSakRepository.getJournalposterForArkivsak(arkivsakForSak.stream().map(Sak::getSakId).toList());
+				List<Long> saksIder = arkivsakForSak.stream().map(Sak::getSakId).toList();
+				List<Journalpost> arkivsakJournalposter = avsluttSakRepository.getJournalposterForArkivsak(saksIder);
+
+				if (harArkivsakEnAapenJournalpost(arkivsakJournalposter)) {
+					log.warn("Kan ikke avslutte arkivsak med åpne journalposter for saksIder={}", saksIder);
+					arkivsakForSak.forEach(tmpSak -> tmpSak.setArbeidsstatus(FEIL_AAPEN_JOURNALPOST.name()));
+				}
+				if (!harArkivsakFerdigstilteJournalposter(arkivsakJournalposter)) {
+					log.info("Arkivsak har ingen ferdigstilte journalposter. Avbryter saker={} knyttet til tom arkivsak.", saksIder);
+					arkivsakForSak.forEach(tmpSak -> tmpSak.setArbeidsstatus(FERDIG_TOM_ARKIVSAK.name()));
+
+					// TODO: Oppdater sakene
+				}
+
 				log.info("Test");
 				//Finn alle journalposter for arkivsaken
 				//valider statuser

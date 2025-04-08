@@ -31,12 +31,13 @@ public class AvsluttSakRepository {
 		return namedParameterJdbcTemplate.query(FINN_JOURNALPOSTER_FOR_ARKIVSAK, params, new JournalpostRowMapper());
 	}
 
-	public class JournalpostRowMapper implements RowMapper<Journalpost> {
+	public static class JournalpostRowMapper implements RowMapper<Journalpost> {
 		@Override
 		public Journalpost mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Journalpost journalpost = new Journalpost();
 
 			journalpost.setErFeilregistrert(rs.getBoolean("erFeilregistrert"));
+			journalpost.setOpprettetdato(rs.getTimestamp("opprettetdato"));
 			journalpost.setJournaldato(rs.getTimestamp("journaldato"));
 			journalpost.setJournalfoerendeEnhet(rs.getString("journalfoerendeEnhet"));
 			journalpost.setJournalstatus(rs.getString("journalstatus"));
