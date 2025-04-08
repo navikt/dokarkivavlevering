@@ -2,9 +2,9 @@ package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema;
 
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.entities.Sak;
+import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.entities.Arbeidssak;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.AvsluttSakRepository;
-import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.SakRepository;
+import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.ArbeidssakRepository;
 import no.nav.dokarkivavlevering.core.consumer.pdl.HentIdenterBolkResponse.HentIdenterBolk;
 import no.nav.dokarkivavlevering.core.consumer.pdl.PdlGraphQLConsumer;
 import org.springframework.context.annotation.Profile;
@@ -34,58 +34,59 @@ public class AvsluttAlleSakerService {
 
 	private static final int BATCHSTOERRELSE = 1000;
 
-	private final SakRepository sakRepository;
+	private final ArbeidssakRepository arbeidssakRepository;
 	private final PdlGraphQLConsumer pdlGraphQLConsumer;
 	private final AvsluttSakRepository avsluttSakRepository;
 
-	public AvsluttAlleSakerService(SakRepository sakRepository,
+	public AvsluttAlleSakerService(ArbeidssakRepository arbeidssakRepository,
 								   PdlGraphQLConsumer pdlGraphQLConsumer, AvsluttSakRepository avsluttSakRepository) {
-		this.sakRepository = sakRepository;
+		this.arbeidssakRepository = arbeidssakRepository;
 		this.pdlGraphQLConsumer = pdlGraphQLConsumer;
 		this.avsluttSakRepository = avsluttSakRepository;
 	}
 
 	public void avsluttAlleSaker() {
-		List<Long> sakIds = sakRepository.findAllSakIds();
+		List<Long> sakIds = arbeidssakRepository.findAllSakIds();
 		List<List<Long>> sakIdsPartitioned = Lists.partition(sakIds, BATCHSTOERRELSE);
 
 		// Oppdater aktoerIder
 		sakIdsPartitioned.forEach(sakIdListe -> {
-			List<Sak> saker = sakRepository.findSaksBySakIdIn(sakIdListe);
-			oppdaterAktoerIder(saker);
+			List<Arbeidssak> arbeidssaker = arbeidssakRepository.findSaksBySakIdIn(sakIdListe);
+			oppdaterAktoerIder(arbeidssaker);
 		});
 
 		// Finn arkivsaker
 		sakIdsPartitioned.forEach(sakIdListe -> {
-			List<Sak> saker = sakRepository.findSaksBySakIdIn(sakIdListe);
-			settSammenArkivsak2(saker);
+			List<Arbeidssak> arbeidssaker = arbeidssakRepository.findSaksBySakIdIn(sakIdListe);
+			settSammenArkivsak2(arbeidssaker);
 		});
 	}
 
 	//	Samme applikasjon, aktoerId/orgNr og evt. fagsaknr
-	private void settSammenArkivsak2(List<Sak> saker) {
+	private void settSammenArkivsak2(List<Arbeidssak> arbeidssaker) {
 
-		for (Sak sak : saker) {
-			if (sak.getArbeidsstatus().equals(HENTET_FRA_PDL.name()) || sak.getArbeidsstatus().equals(PROSESSERING_AV_ARKIVSAK_STARTET.name())) {
-				List<Sak> arkivsakForSak;
-				if (sak.getFagsaknr() == null) {
-					arkivsakForSak = sakRepository.findArkivsakForAktoerIdWhereFagsaknrIsNull(sak.getAktoerId(), sak.getApplikasjon());
+		for (Arbeidssak arbeidssak : arbeidssaker) {
+			if (arbeidssak.getArbeidsstatus().equals(HENTET_FRA_PDL.name()) || arbeidssak.getArbeidsstatus().equals(PROSESSERING_AV_ARKIVSAK_STARTET.name())) {
+				List<Arbeidssak> arkivsakForArbeidssak;
+				if (arbeidssak.getFagsaknr() == null) {
+					arkivsakForArbeidssak = arbeidssakRepository.findArkivsakForAktoerIdWhereFagsaknrIsNull(arbeidssak.getAktoerId(), arbeidssak.getApplikasjon());
 				} else {
-					arkivsakForSak = sakRepository.findArkivsakForAktoerId(sak.getAktoerId(), sak.getFagsaknr(), sak.getApplikasjon());
+					arkivsakForArbeidssak = arbeidssakRepository.findArkivsakForAktoerId(arbeidssak.getAktoerId(), arbeidssak.getFagsaknr(), arbeidssak.getApplikasjon());
 				}
-				arkivsakForSak.forEach(tmpSak -> tmpSak.setArbeidsstatus(PROSESSERING_AV_ARKIVSAK_STARTET.name()));
+				arkivsakForArbeidssak.forEach(tmpArbeidssak -> tmpArbeidssak.setArbeidsstatus(PROSESSERING_AV_ARKIVSAK_STARTET.name()));
 
 				//3.1
-				List<Long> saksIder = arkivsakForSak.stream().map(Sak::getSakId).toList();
+				List<Long> saksIder = arkivsakForArbeidssak.stream().map(Arbeidssak::getSakId).toList();
 				List<Journalpost> arkivsakJournalposter = avsluttSakRepository.getJournalposterForArkivsak(saksIder);
 
 				if (harArkivsakEnAapenJournalpost(arkivsakJournalposter)) {
 					log.warn("Kan ikke avslutte arkivsak med åpne journalposter for saksIder={}", saksIder);
-					arkivsakForSak.forEach(tmpSak -> tmpSak.setArbeidsstatus(FEIL_AAPEN_JOURNALPOST.name()));
+					arkivsakForArbeidssak.forEach(tmpArbeidssak -> tmpArbeidssak.setArbeidsstatus(FEIL_AAPEN_JOURNALPOST.name()));
+					return;
 				}
 				if (!harArkivsakFerdigstilteJournalposter(arkivsakJournalposter)) {
 					log.info("Arkivsak har ingen ferdigstilte journalposter. Avbryter saker={} knyttet til tom arkivsak.", saksIder);
-					arkivsakForSak.forEach(tmpSak -> tmpSak.setArbeidsstatus(FERDIG_TOM_ARKIVSAK.name()));
+					arkivsakForArbeidssak.forEach(tmpArbeidssak -> tmpArbeidssak.setArbeidsstatus(FERDIG_TOM_ARKIVSAK.name()));
 
 					// TODO: Oppdater sakene
 				}
@@ -138,18 +139,18 @@ public class AvsluttAlleSakerService {
 	 */
 
 	// TODO: Tiltak for at både aktørId og orgnr er sett, eller ingen av dei, i ei sak
-	private void oppdaterAktoerIder(List<Sak> saker) {
-		List<Sak> sakerUtenAktoerId = saker.stream()
-				.filter(sak -> sak.getOrgnr() != null)
+	private void oppdaterAktoerIder(List<Arbeidssak> saker) {
+		List<Arbeidssak> sakerUtenAktoerId = saker.stream()
+				.filter(arbeidssak -> arbeidssak.getOrgnr() != null)
 				.toList();
-		sakerUtenAktoerId.forEach(sak -> sak.setArbeidsstatus(SKAL_IKKE_HENTE_FRA_PDL.name()));
+		sakerUtenAktoerId.forEach(arbeidssak -> arbeidssak.setArbeidsstatus(SKAL_IKKE_HENTE_FRA_PDL.name()));
 
-		List<Sak> sakerMedAktoerId = saker.stream()
-				.filter(sak -> sak.getAktoerId() != null)
+		List<Arbeidssak> sakerMedAktoerId = saker.stream()
+				.filter(arbeidssak -> arbeidssak.getAktoerId() != null)
 				.toList();
 
 		Set<String> aktoerIds = sakerMedAktoerId.stream()
-				.map(Sak::getAktoerId)
+				.map(Arbeidssak::getAktoerId)
 				.collect(Collectors.toSet());
 
 		if (!aktoerIds.isEmpty()) {
@@ -157,7 +158,7 @@ public class AvsluttAlleSakerService {
 		}
 	}
 
-	private void oppdaterArbeidssakMedGjeldendeAktoerIdFraPdl(Set<String> aktoerIds, List<Sak> sakerMedAktoerId) {
+	private void oppdaterArbeidssakMedGjeldendeAktoerIdFraPdl(Set<String> aktoerIds, List<Arbeidssak> arbeidssakerMedAktoerId) {
 		List<HentIdenterBolk> hentIdenterBolkListe = pdlGraphQLConsumer.hentGjeldendeAktoerIder(aktoerIds);
 		Map<String, String> aktoerIderSomSkalOppdateres = new HashMap<>();
 		List<String> aktoerIderUtenGyldigAktoerId = new ArrayList<>();
@@ -176,15 +177,15 @@ public class AvsluttAlleSakerService {
 			}
 		});
 
-		sakerMedAktoerId.forEach(sak -> {
-			if (aktoerIderUtenGyldigAktoerId.contains(sak.getAktoerId())) {
-				log.warn("Feil ved uthenting av person fra pdl. Sak={}", sak.getSakId());
-				sak.setArbeidsstatus(PDL_FANT_IKKE_NY_AKTOERID.name());
+		arbeidssakerMedAktoerId.forEach(arbeidssak -> {
+			if (aktoerIderUtenGyldigAktoerId.contains(arbeidssak.getAktoerId())) {
+				log.warn("Feil ved uthenting av person fra pdl. Sak={}", arbeidssak.getSakId());
+				arbeidssak.setArbeidsstatus(PDL_FANT_IKKE_NY_AKTOERID.name());
 			} else {
-				if (aktoerIderSomSkalOppdateres.containsKey(sak.getAktoerId())) {
-					sak.setAktoerId(aktoerIderSomSkalOppdateres.get(sak.getAktoerId()));
+				if (aktoerIderSomSkalOppdateres.containsKey(arbeidssak.getAktoerId())) {
+					arbeidssak.setAktoerId(aktoerIderSomSkalOppdateres.get(arbeidssak.getAktoerId()));
 				}
-				sak.setArbeidsstatus(HENTET_FRA_PDL.name());
+				arbeidssak.setArbeidsstatus(HENTET_FRA_PDL.name());
 			}
 		});
 	}

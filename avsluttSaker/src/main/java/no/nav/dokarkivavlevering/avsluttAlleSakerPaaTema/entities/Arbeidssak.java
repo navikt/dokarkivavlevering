@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "TO_BE_DETERMINED")
-public class Sak {
+public class Arbeidssak {
 
 	@Id
 	@Column(name = "id", nullable = false)
