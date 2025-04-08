@@ -1,11 +1,9 @@
 package no.nav.dokarkivavlevering.config;
 
-import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.persistence.EntityManager;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.config.RepositoryConfig;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.ArbeidssakRepository;
 import no.nav.dokarkivavlevering.core.CoreConfig;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -48,7 +46,7 @@ public abstract class AbstractITest {
 	protected EntityManager entityManager;
 
 	@BeforeEach
-	public void cleanUp(){
+	public void cleanUp() {
 		emptyDatabases();
 	}
 

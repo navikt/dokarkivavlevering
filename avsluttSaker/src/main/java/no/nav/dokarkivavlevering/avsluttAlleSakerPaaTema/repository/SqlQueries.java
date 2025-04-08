@@ -14,4 +14,14 @@ public class SqlQueries {
 			where sr.sak_id in (:sakIds)
 			""";
 
+	public static final String AVBRYT_SAKER = """
+			update sak
+			set K_SAK_STATUS = 'AVBRUTT',
+				K_AVLEVERING_STATUS = 'AVBRUTT',
+				K_KASSASJON_STATUS = 'KLAR_FOR_KASSASJON',
+				ENDRET_AV = :referanse,
+				DATO_ENDRET = current_timestamp
+			where id in (:sakIds)
+			""";
+
 }

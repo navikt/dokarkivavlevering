@@ -3,8 +3,8 @@ package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.entities.Arbeidssak;
-import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.AvsluttSakRepository;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.ArbeidssakRepository;
+import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.AvsluttSakRepository;
 import no.nav.dokarkivavlevering.core.consumer.pdl.HentIdenterBolkResponse.HentIdenterBolk;
 import no.nav.dokarkivavlevering.core.consumer.pdl.PdlGraphQLConsumer;
 import org.springframework.context.annotation.Profile;
@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.emptyList;
 import static java.util.Objects.isNull;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.FEIL_AAPEN_JOURNALPOST;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.FERDIG_TOM_ARKIVSAK;
@@ -58,62 +59,43 @@ public class AvsluttAlleSakerService {
 		// Finn arkivsaker
 		sakIdsPartitioned.forEach(sakIdListe -> {
 			List<Arbeidssak> arbeidssaker = arbeidssakRepository.findSaksBySakIdIn(sakIdListe);
-			settSammenArkivsak2(arbeidssaker);
+			genererArkivsak(arbeidssaker);
 		});
 	}
 
-	//	Samme applikasjon, aktoerId/orgNr og evt. fagsaknr
-	private void settSammenArkivsak2(List<Arbeidssak> arbeidssaker) {
+	private void genererArkivsak(List<Arbeidssak> arbeidssaker) {
 
 		for (Arbeidssak arbeidssak : arbeidssaker) {
-			if (arbeidssak.getArbeidsstatus().equals(HENTET_FRA_PDL.name()) || arbeidssak.getArbeidsstatus().equals(PROSESSERING_AV_ARKIVSAK_STARTET.name())) {
-				List<Arbeidssak> arkivsakForArbeidssak;
-				if (arbeidssak.getFagsaknr() == null) {
-					arkivsakForArbeidssak = arbeidssakRepository.findArkivsakForAktoerIdWhereFagsaknrIsNull(arbeidssak.getAktoerId(), arbeidssak.getApplikasjon());
-				} else {
-					arkivsakForArbeidssak = arbeidssakRepository.findArkivsakForAktoerId(arbeidssak.getAktoerId(), arbeidssak.getFagsaknr(), arbeidssak.getApplikasjon());
-				}
-				arkivsakForArbeidssak.forEach(tmpArbeidssak -> tmpArbeidssak.setArbeidsstatus(PROSESSERING_AV_ARKIVSAK_STARTET.name()));
+			Arkivsak arkivsak = hentArkivsakForArbeidssak(arbeidssak);
+			List<Long> saksIder = arkivsak.arbeidssaker().stream().map(Arbeidssak::getSakId).toList();
+			List<Journalpost> arkivsakJournalposter = avsluttSakRepository.getJournalposterForArkivsak(saksIder);
 
-				//3.1
-				List<Long> saksIder = arkivsakForArbeidssak.stream().map(Arbeidssak::getSakId).toList();
-				List<Journalpost> arkivsakJournalposter = avsluttSakRepository.getJournalposterForArkivsak(saksIder);
-
-				if (harArkivsakEnAapenJournalpost(arkivsakJournalposter)) {
-					log.warn("Kan ikke avslutte arkivsak med åpne journalposter for saksIder={}", saksIder);
-					arkivsakForArbeidssak.forEach(tmpArbeidssak -> tmpArbeidssak.setArbeidsstatus(FEIL_AAPEN_JOURNALPOST.name()));
-					return;
-				}
-				if (!harArkivsakFerdigstilteJournalposter(arkivsakJournalposter)) {
-					log.info("Arkivsak har ingen ferdigstilte journalposter. Avbryter saker={} knyttet til tom arkivsak.", saksIder);
-					arkivsakForArbeidssak.forEach(tmpArbeidssak -> tmpArbeidssak.setArbeidsstatus(FERDIG_TOM_ARKIVSAK.name()));
-
-					// TODO: Oppdater sakene
-				}
-
-				log.info("Test");
-				//Finn alle journalposter for arkivsaken
-				//valider statuser
-
-				//3.1.1
-				//Hvis tom arkivsak: Opdater
-
-				//3.2
-				//Finn eldste journalpost
-				//Hvis ingen journalpost i riktig status, skriv feilmelding og oppdater status
-
-				//3.3
-				//Finn administrativ enhet
-
-				//3.4
-				//oppdater sak
-				//arkivsakForSak.forEach(tmpSak -> tmpSak.setArbeidsstatus(SAK_AVSLUTTET.name()));
+			if (harArkivsakEnAapenJournalpost(arkivsakJournalposter)) {
+				log.warn("Kan ikke avslutte arkivsak med åpne journalposter for saksIder={}", saksIder);
+				arkivsak.arbeidssaker().forEach(tmpArbeidssak -> tmpArbeidssak.setArbeidsstatus(FEIL_AAPEN_JOURNALPOST.name()));
+				return;
 			}
-			//Håndtere arkivsaken - da blir det 1 og en
+			if (!harArkivsakFerdigstilteJournalposter(arkivsakJournalposter)) {
+				log.info("Arkivsak har ingen ferdigstilte journalposter. Avbryter saker={} knyttet til tom arkivsak.", saksIder);
+				avsluttSakRepository.updateSakForArkivsak(arkivsak);
+				arkivsak.arbeidssaker().forEach(tmpArbeidssak -> tmpArbeidssak.setArbeidsstatus(FERDIG_TOM_ARKIVSAK.name()));
+			}
+			//3.2
+			//Finn eldste journalpost
+			//Hvis ingen journalpost i riktig status, skriv feilmelding og oppdater status
 
-			//Finne alle arkivsaker og håndetere bolker
+			//3.3
+			//Finn administrativ enhet
 
+			//3.4
+			//oppdater sak
+			//arkivsakForSak.forEach(tmpSak -> tmpSak.setArbeidsstatus(SAK_AVSLUTTET.name()));
 		}
+		//Håndtere arkivsaken - da blir det 1 og en
+
+		//Finne alle arkivsaker og håndetere bolker
+
+	}
 
 		/*List<Sak> arkivsak = sakRepository.findArkivSakForAktoerId(sak.getAktoerId(), sak.getFagsaknr(), sak.getApplikasjon());
 		Arkivsak A = new Arkivsak(arkivsak);
@@ -123,6 +105,19 @@ public class AvsluttAlleSakerService {
 			handleSak.setArbeidsStatus("HAR_ARKIVSAK");
 		});*/
 
+
+	private Arkivsak hentArkivsakForArbeidssak(Arbeidssak arbeidssak) {
+		if (arbeidssak.getArbeidsstatus().equals(HENTET_FRA_PDL.name()) || arbeidssak.getArbeidsstatus().equals(PROSESSERING_AV_ARKIVSAK_STARTET.name())) {
+			List<Arbeidssak> arkivsakForArbeidssak;
+			if (arbeidssak.getFagsaknr() == null) {
+				arkivsakForArbeidssak = arbeidssakRepository.findArkivsakForAktoerIdWhereFagsaknrIsNull(arbeidssak.getAktoerId(), arbeidssak.getApplikasjon());
+			} else {
+				arkivsakForArbeidssak = arbeidssakRepository.findArkivsakForAktoerId(arbeidssak.getAktoerId(), arbeidssak.getFagsaknr(), arbeidssak.getApplikasjon());
+			}
+			arkivsakForArbeidssak.forEach(tmpArbeidssak -> tmpArbeidssak.setArbeidsstatus(PROSESSERING_AV_ARKIVSAK_STARTET.name()));
+			return new Arkivsak(arkivsakForArbeidssak);
+		}
+		return new Arkivsak(emptyList());
 	}
 
 

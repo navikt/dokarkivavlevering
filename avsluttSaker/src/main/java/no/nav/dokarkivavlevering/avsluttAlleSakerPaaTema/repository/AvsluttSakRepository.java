@@ -1,5 +1,7 @@
 package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository;
 
+import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arkivsak;
+import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.AvsluttSakProperties;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Journalpost;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.RowMapper;
@@ -12,6 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.SqlQueries.AVBRYT_SAKER;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.SqlQueries.FINN_JOURNALPOSTER_FOR_ARKIVSAK;
 
 @Repository
@@ -19,9 +22,11 @@ import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.SqlQu
 public class AvsluttSakRepository {
 
 	private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+	private final AvsluttSakProperties avsluttSakProperties;
 
-	public AvsluttSakRepository(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+	public AvsluttSakRepository(NamedParameterJdbcTemplate namedParameterJdbcTemplate, AvsluttSakProperties avsluttSakProperties) {
 		this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+		this.avsluttSakProperties = avsluttSakProperties;
 	}
 
 	public List<Journalpost> getJournalposterForArkivsak(List<Long> sakIds) {
@@ -29,6 +34,14 @@ public class AvsluttSakRepository {
 				.addValue("sakIds", sakIds);
 
 		return namedParameterJdbcTemplate.query(FINN_JOURNALPOSTER_FOR_ARKIVSAK, params, new JournalpostRowMapper());
+	}
+
+	public void updateSakForArkivsak(Arkivsak arkivsak) {
+		final SqlParameterSource params = new MapSqlParameterSource()
+				.addValue("referanse", avsluttSakProperties.getReferanse())
+				.addValue("sakIds", arkivsak.getArbeidssaksIder());
+
+		namedParameterJdbcTemplate.update(AVBRYT_SAKER, params);
 	}
 
 	public static class JournalpostRowMapper implements RowMapper<Journalpost> {
