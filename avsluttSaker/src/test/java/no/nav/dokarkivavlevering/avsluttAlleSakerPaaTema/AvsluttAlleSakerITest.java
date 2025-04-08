@@ -9,7 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.HENTET_FRA_PDL;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.FEIL_AAPEN_JOURNALPOST;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.FERDIG_TOM_ARKIVSAK;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.PDL_FANT_IKKE_NY_AKTOERID;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.PROSESSERING_AV_ARKIVSAK_STARTET;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.SKAL_IKKE_HENTE_FRA_PDL;
@@ -25,6 +26,11 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 	public void setUp() {
  	}
 
+	private static final Long SAK_MED_LUKKET_JOURNALPOST1 = 123L;
+	private static final Long SAK_MED_LUKKET_JOURNALPOST2 = 234L;
+	private static final Long SAK_MED_AAPEN_JOURNALPOST = 345L;
+	private static final Long SAK_UTEN_FERDIGSTILT_JOURNALPOST = 456L;
+
 	@Test
 	public void skalAvslutteSaker() {
 		stubAzure();
@@ -33,7 +39,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 
 		avsluttAlleSakerService.avsluttAlleSaker();
 
-		List<Sak> saker = sakRepository.findSaksBySakIdIn(List.of(123L, 234L));
+		List<Sak> saker = sakRepository.findSaksBySakIdIn(List.of(SAK_MED_LUKKET_JOURNALPOST1, SAK_MED_LUKKET_JOURNALPOST2));
 		Sak sak1 = saker.get(0);
 		Sak sak2 = saker.get(1);
 
@@ -83,34 +89,66 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 				.isThrownBy(() -> avsluttAlleSakerService.avsluttAlleSaker());
 	}
 
+	@Test
+	public void skalFeileBehandlingAvArkivsakMedAapenJournalpost() {
+		stubAzure();
+		stubPdl("hentIdenterBolk.json");
+		sakRepository.save(lagSakForAktoer(SAK_MED_AAPEN_JOURNALPOST, "1234567891234"));
+		commitAndBeginNewTransaction();
+
+		avsluttAlleSakerService.avsluttAlleSaker();
+
+		List<Sak> saker = sakRepository.findSaksBySakIdIn(List.of(SAK_MED_AAPEN_JOURNALPOST));
+		Sak sak1 = saker.get(0);
+
+		assertThat(sak1.getArbeidsstatus()).isEqualTo(FEIL_AAPEN_JOURNALPOST.name());
+		assertThat(sak1.getAktoerId()).isEqualTo("1234567891234");
+	}
+
+	@Test
+	public void skalAvbryteSakerForTomArkivsak() {
+		stubAzure();
+		stubPdl("hentIdenterBolk.json");
+		sakRepository.save(lagSakForAktoer(SAK_UTEN_FERDIGSTILT_JOURNALPOST, "1234567891234"));
+		commitAndBeginNewTransaction();
+
+		avsluttAlleSakerService.avsluttAlleSaker();
+
+		List<Sak> saker = sakRepository.findSaksBySakIdIn(List.of(SAK_UTEN_FERDIGSTILT_JOURNALPOST));
+		Sak sak1 = saker.get(0);
+
+		assertThat(sak1.getArbeidsstatus()).isEqualTo(FERDIG_TOM_ARKIVSAK.name());
+		assertThat(sak1.getAktoerId()).isEqualTo("1234567891234");
+	}
 
 	void populerSakRepository() {
-		Sak sakForPerson1 = Sak.builder()
-				.sakId(123L)
+		sakRepository.saveAll(List.of(
+				lagSakForAktoer(123L, "1234567891123"),
+				lagSakForAktoer(234L, "1234567891234"),
+				lagSakForOrganisasjon(999L, "123456789"))
+		);
+
+		commitAndBeginNewTransaction();
+	}
+
+	private Sak lagSakForAktoer(Long sakId, String aktoerId) {
+		return Sak.builder()
+				.sakId(sakId)
 				.applikasjon("FS22")
 				.fagsaknr(null)
-				.aktoerId("1234567891123")
+				.aktoerId(aktoerId)
 				.orgnr(null)
 				.build();
+	}
 
-		Sak sakForPerson2 = Sak.builder()
-				.sakId(234L)
-				.applikasjon("AO01")
-				.fagsaknr("123")
-				.aktoerId("1234567891234")
-				.orgnr(null)
-				.build();
-
-		Sak sakForOrganisasjon = Sak.builder()
-				.sakId(345L)
+	private Sak lagSakForOrganisasjon(Long sakId, String orgnr) {
+		return Sak.builder()
+				.sakId(sakId)
 				.applikasjon("FS22")
 				.fagsaknr(null)
 				.aktoerId(null)
-				.orgnr("123456789")
+				.orgnr(orgnr)
 				.build();
-
-		sakRepository.saveAll(List.of(sakForPerson1, sakForPerson2, sakForOrganisasjon));
-		commitAndBeginNewTransaction();
 	}
 
 }
