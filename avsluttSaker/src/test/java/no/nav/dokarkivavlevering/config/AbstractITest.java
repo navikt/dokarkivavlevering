@@ -1,10 +1,12 @@
 package no.nav.dokarkivavlevering.config;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.persistence.EntityManager;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.config.RepositoryConfig;
-import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.SakRepository;
+import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.ArbeidssakRepository;
 import no.nav.dokarkivavlevering.core.CoreConfig;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,7 +39,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public abstract class AbstractITest {
 
 	@Autowired
-	protected SakRepository sakRepository;
+	protected ArbeidssakRepository arbeidssakRepository;
 
 	@Autowired
 	public WebTestClient webTestClient;
@@ -45,13 +47,13 @@ public abstract class AbstractITest {
 	@Autowired
 	protected EntityManager entityManager;
 
-	@AfterEach
-	public void setUp() {
+	@BeforeEach
+	public void cleanUp(){
 		emptyDatabases();
 	}
 
 	protected void emptyDatabases() {
-		sakRepository.deleteAll();
+		arbeidssakRepository.deleteAll();
 	}
 
 	protected void commitAndBeginNewTransaction() {
