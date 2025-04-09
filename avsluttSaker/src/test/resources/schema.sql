@@ -10,6 +10,9 @@ insert into t_saksrelasjon(sak_id, feilregistrert, journalpost_id)
 VALUES (123, '0', 123456);
 
 insert into t_saksrelasjon(sak_id, feilregistrert, journalpost_id)
+VALUES (123, '0', 123457);
+
+insert into t_saksrelasjon(sak_id, feilregistrert, journalpost_id)
 VALUES (234, '0', 234567);
 
 insert into t_saksrelasjon(sak_id, feilregistrert, journalpost_id)
@@ -29,6 +32,9 @@ create table t_journalpost
 
 insert into t_journalpost(journalpost_id, k_journal_s, journalf_enhet, dato_opprettet, dato_journal)
 VALUES ('123456', 'FL', '1234', '2025-01-01T13:30', '2025-01-02T13:30');
+
+insert into t_journalpost(journalpost_id, k_journal_s, journalf_enhet, dato_opprettet, dato_journal)
+VALUES ('123457', 'E', '1234', '2025-01-01T13:30', '2025-01-02T13:30');
 
 insert into t_journalpost(journalpost_id, k_journal_s, journalf_enhet, dato_opprettet, dato_journal)
 VALUES ('234567', 'FS', '5678', '2025-02-13T14:45', '2025-02-13T15:00');

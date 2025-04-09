@@ -36,10 +36,10 @@ public class AvsluttSakRepository {
 		return namedParameterJdbcTemplate.query(FINN_JOURNALPOSTER_FOR_ARKIVSAK, params, new JournalpostRowMapper());
 	}
 
-	public void updateSakForArkivsak(Arkivsak arkivsak) {
+	public void updateSakForArkivsak(List<Long> saksIder) {
 		final SqlParameterSource params = new MapSqlParameterSource()
 				.addValue("referanse", avsluttSakProperties.getReferanse())
-				.addValue("sakIds", arkivsak.getArbeidssaksIder());
+				.addValue("sakIds", saksIder);
 
 		namedParameterJdbcTemplate.update(AVBRYT_SAKER, params);
 	}
@@ -50,8 +50,8 @@ public class AvsluttSakRepository {
 			Journalpost journalpost = new Journalpost();
 
 			journalpost.setErFeilregistrert(rs.getBoolean("erFeilregistrert"));
-			journalpost.setOpprettetdato(rs.getTimestamp("opprettetdato"));
-			journalpost.setJournaldato(rs.getTimestamp("journaldato"));
+			journalpost.setOpprettetdato(rs.getTimestamp("opprettetdato").toLocalDateTime());
+			journalpost.setJournaldato(rs.getTimestamp("journaldato").toLocalDateTime());
 			journalpost.setJournalfoerendeEnhet(rs.getString("journalfoerendeEnhet"));
 			journalpost.setJournalstatus(rs.getString("journalstatus"));
 
