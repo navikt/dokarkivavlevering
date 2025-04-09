@@ -5,7 +5,8 @@ import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.entities.Arbeidssak;
 import java.util.List;
 
 public record Arkivsak(
-		List<Arbeidssak> arbeidssaker
+		List<Arbeidssak> arbeidssaker,
+		List<Journalpost> journalposter
 ) {
 	public List<Long> getArbeidssaksIder() {
 		return arbeidssaker.stream()

@@ -5,22 +5,18 @@ import no.nav.dokarkivavlevering.config.ApplicationTestConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static java.time.LocalDateTime.now;
-import static java.time.temporal.ChronoUnit.SECONDS;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakRepositoryUtils.Sak;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakRepositoryUtils.SakRowMapper;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakRepositoryUtils.assertAvbrutteSaker;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakRepositoryUtils.generateSakParams;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.assertj.core.api.Assertions.within;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @SpringBootTest(
@@ -57,58 +53,12 @@ class AvsluttSakRepositoryTest {
 	@Test
 	void skalOppdatereSakerForArkivsak() {
 		List<Long> sakIds = List.of(123L, 234L);
-		final SqlParameterSource params = new MapSqlParameterSource()
-				.addValue("sakIds", sakIds);
 
 		avsluttSakRepository.updateSakForArkivsak(sakIds);
 
-		List<Sak> saker = namedParameterJdbcTemplate.query("select * from sak where id in (:sakIds);", params, new SakRowMapper());
+		List<Sak> saker = namedParameterJdbcTemplate.query("select * from sak where id in (:sakIds);", generateSakParams(sakIds), new SakRowMapper());
 
-		assertThat(saker)
-				.extracting(Sak::saksstatus, Sak::avleveringsstatus, Sak::kassasjonsstatus, Sak::endretAv)
-				.containsOnly(
-						tuple("AVBRUTT", "AVBRUTT", "KLAR_FOR_KASSASJON", "REFERANSE")
-				);
-
-		assertThat(saker)
-				.allSatisfy(sak -> assertThat(sak.datoEndret).isCloseTo(now(), within(10, SECONDS)));
-	}
-
-
-	public static class SakRowMapper implements RowMapper<Sak> {
-		@Override
-		public Sak mapRow(ResultSet rs, int rowNum) throws SQLException {
-			return new Sak(
-					rs.getLong("ID"),
-					rs.getString("K_SAK_STATUS"),
-					rs.getString("K_AVLEVERING_STATUS"),
-					rs.getString("K_KASSASJON_STATUS"),
-					rs.getString("ENDRET_AV"),
-					rs.getTimestamp("DATO_ENDRET") != null ? rs.getTimestamp("DATO_ENDRET").toLocalDateTime() : null,
-					rs.getTimestamp("DATO_AVSLUTTET") != null ? rs.getTimestamp("DATO_AVSLUTTET").toLocalDateTime() : null,
-					rs.getString("AVSLUTTET_AV"),
-					rs.getString("AVSLUTTET_KILDE_NAVN"),
-					rs.getTimestamp("DATO_SAK_OPPRETTET") != null ? rs.getTimestamp("DATO_SAK_OPPRETTET").toLocalDateTime() : null,
-					rs.getString("ADMINISTRATIV_ENHET"),
-					rs.getString("SAK_ANSVARLIG")
-			);
-		}
-	}
-
-	private record Sak(
-		Long id,
-		String saksstatus,
-		String avleveringsstatus,
-		String kassasjonsstatus,
-		String endretAv,
-		LocalDateTime datoEndret,
-		LocalDateTime datoAvsluttet,
-		String avsluttetAv,
-		String avsluttetKildeNavn,
-		LocalDateTime datoSakOpprettet,
-		String administrativEnhet,
-		String sakAnsvarlig
-	) {
+		assertAvbrutteSaker(saker);
 	}
 
 }
