@@ -21,6 +21,9 @@ VALUES (345, '0', 345678);
 insert into t_saksrelasjon(sak_id, feilregistrert, journalpost_id)
 VALUES (456, '1', 456789);
 
+insert into t_saksrelasjon(sak_id, feilregistrert, journalpost_id)
+VALUES (567, '0', 5678910);
+
 create table t_journalpost
 (
     journalpost_id NUMBER(11, 0) not null,
@@ -44,6 +47,9 @@ VALUES ('345678', 'M', '5678', '2025-02-13T14:45', '2025-02-13T15:00');
 
 insert into t_journalpost(journalpost_id, k_journal_s, journalf_enhet, dato_opprettet, dato_journal)
 VALUES ('456789', 'FS', '5678', '2025-02-13T14:45', '2025-02-13T15:00');
+
+insert into t_journalpost(journalpost_id, k_journal_s, journalf_enhet, dato_opprettet, dato_journal)
+VALUES ('5678910', 'FS', '', '2025-02-13T14:45', '2025-02-13T15:00');
 
 create table sak
 (
