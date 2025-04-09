@@ -16,7 +16,11 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static java.time.LocalDateTime.now;
+import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+import static org.assertj.core.api.Assertions.within;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @SpringBootTest(
@@ -41,15 +45,13 @@ class AvsluttSakRepositoryTest {
 	public void skalHenteJournalposterForArkivsak() {
 		List<Journalpost> journalposter = avsluttSakRepository.getJournalposterForArkivsak(List.of(123L, 234L));
 
-		assertThat(journalposter.get(0))
+		assertThat(journalposter)
 				.extracting(Journalpost::getOpprettetdato, Journalpost::getJournaldato, Journalpost::getJournalstatus, Journalpost::getJournalfoerendeEnhet, Journalpost::isErFeilregistrert)
-				.containsExactly(OPPRETTETDATO_JP_123, JOURNALDATO_JP_123, "FL", "1234", false);
-		assertThat(journalposter.get(1))
-				.extracting(Journalpost::getOpprettetdato, Journalpost::getJournaldato, Journalpost::getJournalstatus, Journalpost::getJournalfoerendeEnhet, Journalpost::isErFeilregistrert)
-				.containsExactly(OPPRETTETDATO_JP_123, JOURNALDATO_JP_123, "E", "1234", false);
-		assertThat(journalposter.get(2))
-				.extracting(Journalpost::getOpprettetdato, Journalpost::getJournaldato, Journalpost::getJournalstatus, Journalpost::getJournalfoerendeEnhet, Journalpost::isErFeilregistrert)
-				.containsExactly(OPPRETTETDATO_JP_234, JOURNALDATO_JP_234, "FS", "5678", false);
+				.containsExactlyInAnyOrder(
+						tuple(OPPRETTETDATO_JP_123, JOURNALDATO_JP_123, "FL", "1234", false),
+						tuple(OPPRETTETDATO_JP_123, JOURNALDATO_JP_123, "E", "1234", false),
+						tuple(OPPRETTETDATO_JP_234, JOURNALDATO_JP_234, "FS", "5678", false)
+				);
 	}
 
 	@Test
@@ -62,15 +64,14 @@ class AvsluttSakRepositoryTest {
 
 		List<Sak> saker = namedParameterJdbcTemplate.query("select * from sak where id in (:sakIds);", params, new SakRowMapper());
 
-		assertThat(saker.get(0))
+		assertThat(saker)
 				.extracting(Sak::saksstatus, Sak::avleveringsstatus, Sak::kassasjonsstatus, Sak::endretAv)
-				.containsExactly("AVBRUTT", "AVBRUTT", "KLAR_FOR_KASSASJON", "REFERANSE");
-		assertThat(saker.get(0).datoEndret).isBefore(LocalDateTime.now());
+				.containsOnly(
+						tuple("AVBRUTT", "AVBRUTT", "KLAR_FOR_KASSASJON", "REFERANSE")
+				);
 
-		assertThat(saker.get(1))
-				.extracting(Sak::saksstatus, Sak::avleveringsstatus, Sak::kassasjonsstatus, Sak::endretAv)
-				.containsExactly("AVBRUTT", "AVBRUTT", "KLAR_FOR_KASSASJON", "REFERANSE");
-		assertThat(saker.get(1).datoEndret).isBefore(LocalDateTime.now());
+		assertThat(saker)
+				.allSatisfy(sak -> assertThat(sak.datoEndret).isCloseTo(now(), within(10, SECONDS)));
 	}
 
 
