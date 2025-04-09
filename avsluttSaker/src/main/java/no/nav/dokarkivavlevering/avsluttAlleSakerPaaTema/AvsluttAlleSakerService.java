@@ -77,7 +77,7 @@ public class AvsluttAlleSakerService {
 			}
 			if (!harArkivsakFerdigstilteJournalposter(arkivsakJournalposter)) {
 				log.info("Arkivsak har ingen ferdigstilte journalposter. Avbryter saker={} knyttet til tom arkivsak.", saksIder);
-				avsluttSakRepository.updateSakForArkivsak(arkivsak);
+				avsluttSakRepository.updateSakForArkivsak(arkivsak.getArbeidssaksIder());
 				arkivsak.arbeidssaker().forEach(tmpArbeidssak -> tmpArbeidssak.setArbeidsstatus(FERDIG_TOM_ARKIVSAK.name()));
 			}
 			//3.2

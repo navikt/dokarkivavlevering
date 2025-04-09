@@ -2,14 +2,14 @@ package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema;
 
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 public class Journalpost {
 
-	private Date opprettetdato;
+	private LocalDateTime opprettetdato;
 
-	private Date journaldato;
+	private LocalDateTime journaldato;
 
 	private String journalstatus;
 
