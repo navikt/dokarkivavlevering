@@ -51,7 +51,7 @@ public class AvsluttSakRepository {
 
 			journalpost.setErFeilregistrert(rs.getBoolean("erFeilregistrert"));
 			journalpost.setOpprettetdato(rs.getTimestamp("opprettetdato").toLocalDateTime());
-			journalpost.setJournaldato(rs.getTimestamp("journaldato").toLocalDateTime());
+			journalpost.setJournaldato(rs.getTimestamp("journaldato").toLocalDateTime().toLocalDate());
 			journalpost.setJournalfoerendeEnhet(rs.getString("journalfoerendeEnhet"));
 			journalpost.setJournalstatus(rs.getString("journalstatus"));
 

@@ -10,7 +10,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import java.util.List;
 
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.FEIL_AAPEN_JOURNALPOST;
-import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.FEIL_ADMINISTRATIV_ENHET_MANGLER;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.FEIL_INGEN_ADMINISTRATIV_ENHET;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.FEIL_INGEN_JPER_I_GYLDIG_STATUS_MED_JFR_ENHET;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.FERDIG_TOM_ARKIVSAK;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.PDL_FANT_IKKE_NY_AKTOERID;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.PROSESSERING_AV_ARKIVSAK_STARTET;
@@ -53,7 +54,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 
 		assertThat(arbeidssak1.getArbeidsstatus()).isEqualTo(PROSESSERING_AV_ARKIVSAK_STARTET.name());
 		assertThat(arbeidssak1.getAktoerId()).isEqualTo("2345678901234");
-		assertThat(arbeidssak2.getArbeidsstatus()).isEqualTo(PROSESSERING_AV_ARKIVSAK_STARTET.name());
+		assertThat(arbeidssak2.getArbeidsstatus()).isEqualTo(FEIL_INGEN_ADMINISTRATIV_ENHET.name());
 		assertThat(arbeidssak2.getAktoerId()).isEqualTo("1234567891234");
 	}
 
@@ -125,7 +126,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		List<Arbeidssak> saker = arbeidssakRepository.findSaksBySakIdIn(List.of(SAK_UTEN_JOURNALFOERENDE_ENHET_JOURNALPOST));
 		Arbeidssak arbeidssak1 = saker.get(0);
 
-		assertThat(arbeidssak1.getArbeidsstatus()).isEqualTo(FEIL_ADMINISTRATIV_ENHET_MANGLER.name());
+		assertThat(arbeidssak1.getArbeidsstatus()).isEqualTo(FEIL_INGEN_JPER_I_GYLDIG_STATUS_MED_JFR_ENHET.name());
 		assertThat(arbeidssak1.getAktoerId()).isEqualTo("1234567891234");
 
 	}

@@ -3,7 +3,6 @@ package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Consumers.DatavarehusConsumer;
-import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Consumers.DatavarehusResponse;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.entities.Arbeidssak;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.ArbeidssakRepository;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.AvsluttSakRepository;
@@ -24,7 +23,8 @@ import java.util.stream.Collectors;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.isNull;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.FEIL_AAPEN_JOURNALPOST;
-import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.FEIL_ADMINISTRATIV_ENHET_MANGLER;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.FEIL_INGEN_ADMINISTRATIV_ENHET;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.FEIL_INGEN_JPER_I_GYLDIG_STATUS_MED_JFR_ENHET;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.FERDIG_TOM_ARKIVSAK;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.HENTET_FRA_PDL;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.PDL_FANT_IKKE_NY_AKTOERID;
@@ -47,17 +47,20 @@ public class AvsluttAlleSakerService {
 	private final AvsluttSakRepository avsluttSakRepository;
 	private final AvsluttSakProperties avsluttSakProperties;
 	private final DatavarehusConsumer datavarehusConsumer;
+	private final AdministrativEnhetService administrativEnhetService;
 
 	public AvsluttAlleSakerService(ArbeidssakRepository arbeidssakRepository,
 								   PdlGraphQLConsumer pdlGraphQLConsumer,
 								   AvsluttSakRepository avsluttSakRepository,
 								   AvsluttSakProperties avsluttSakProperties,
-								   DatavarehusConsumer datavarehusConsumer) {
+								   DatavarehusConsumer datavarehusConsumer,
+								   AdministrativEnhetService administrativEnhetService) {
 		this.arbeidssakRepository = arbeidssakRepository;
 		this.pdlGraphQLConsumer = pdlGraphQLConsumer;
 		this.avsluttSakRepository = avsluttSakRepository;
 		this.avsluttSakProperties = avsluttSakProperties;
 		this.datavarehusConsumer = datavarehusConsumer;
+		this.administrativEnhetService = administrativEnhetService;
 	}
 
 	public void avsluttAlleSaker() {
@@ -100,15 +103,21 @@ public class AvsluttAlleSakerService {
 
 			Optional<Journalpost> eldsteJournalpostOptional = finnEldsteJournalpost(arkivsak);
 			if (eldsteJournalpostOptional.isEmpty()) {
-				log.warn("Fant ingen administrativ enhet for arkivsak med saksIder={}", saksIder);
-				arkivsak.arbeidssaker().forEach(tmpArbeidssak -> tmpArbeidssak.setArbeidsstatus(FEIL_ADMINISTRATIV_ENHET_MANGLER.name()));
+				log.warn("Fant ingen journalposter i gyldig status med journalforendeEnhet for saksIder={}. Kan ikke bestemme administrativEnhet.", saksIder);
+				arkivsak.arbeidssaker().forEach(tmpArbeidssak -> tmpArbeidssak.setArbeidsstatus(FEIL_INGEN_JPER_I_GYLDIG_STATUS_MED_JFR_ENHET.name()));
 				return;
 			}
 
 			//Hvis input.administrativEnhet ikke er satt så hent navnet journalførende enhet hadde når eldste journalpost (fra steg 3.2) ble journalført.
 			Journalpost eldsteJournalpost = eldsteJournalpostOptional.get();
-			determineJournalfoerendeEnhet(eldsteJournalpost);
+			Optional<String> administrativEnhetOptional = administrativEnhetService.hentHistoriskNavnForAdministrativEnhet(
+					eldsteJournalpost.getJournalfoerendeEnhet(), eldsteJournalpost.getJournaldato(), arkivsak.getApplikasjon());
 
+			if (administrativEnhetOptional.isEmpty()) {
+				log.warn("Fant ingen administrativ enhet for arkivsak med saksIder={}", saksIder);
+				arkivsak.arbeidssaker().forEach(tmpArbeidssak -> tmpArbeidssak.setArbeidsstatus(FEIL_INGEN_ADMINISTRATIV_ENHET.name()));
+				return;
+			}
 			//3.3
 			//Finn administrativ enhet
 
@@ -126,25 +135,6 @@ public class AvsluttAlleSakerService {
 	Hvis input.administrativEnhet ikke er satt så hent navnet journalførende enhet hadde når eldste journalpost (fra steg 3.2) ble journalført.
 	 */
 
-	/*
-	HVIS ingen kontortyper (ARENAENHET, INFOENHET, NORGENHET) returneres SÅ skriv feilmelding til logg (kan ikke finne navn på administrativ enhet) og gå til neste arkivsak
-ELLERS HVIS kun en kontortype (ARENAENHET, INFOENHET, NORGENHET) returneres SÅ sett administrativ enhet = nav_enhet_navn fra denne kontortypen
-ELLERS HVIS sak.applikasjon = "IT01" og kontortype INFOENHET returneres SÅ sett administrativ enhet = nav_enhet_navn fra kontortype INFOENHET
-ELLERS HVIS sak.applikasjon = "AO01" og kontortype ARENAENHET returneres SÅ sett administrativ enhet = nav_enhet_navn fra kontortype ARENAENHET
-ELLERS HVIS kontortype NORGENHET returneres SÅ sett administrativ enhet = nav_enhet_navn fra kontortype NORGENHET
-ELLERS HVIS kontortype NORGENHET ikke er returnert og kontortype INFOENHET er returnert SÅ  sett administrativ enhet = nav_enhet_navn fra kontortype INFOENHET
-ELLERS HVIS kontortype NORGENHET ikke er returnert og kontortype ARENAENHET er returnert så sett administrativ enhet = nav_enhet_navn fra kontortype ARENAENHET
-ELLERS skriv feilmelding til logg (kan ikke finne navn på administrativ enhet) og gå til neste arkivsak
-	 */
-	private String determineJournalfoerendeEnhet(Journalpost eldsteJournalpost) {
-		if (!isEmpty(avsluttSakProperties.getAdministrativEnhet())) {
-			return avsluttSakProperties.getAdministrativEnhet();
-		} else {
-			DatavarehusResponse administrativEnhet = datavarehusConsumer.hentAlleAdministrativeEnheter();
-
-			return null;
-		}
-	}
 
 	private Optional<Journalpost> finnEldsteJournalpost(Arkivsak arkivsak) {
 		String inputAdministrativEnhet = avsluttSakProperties.getAdministrativEnhet();
@@ -161,16 +151,6 @@ ELLERS skriv feilmelding til logg (kan ikke finne navn på administrativ enhet) 
 
 	}
 
-		/*List<Sak> arkivsak = sakRepository.findArkivSakForAktoerId(sak.getAktoerId(), sak.getFagsaknr(), sak.getApplikasjon());
-		Arkivsak A = new Arkivsak(arkivsak);
-
-				.filter(journalpost -> LUKKEDE_JOURNALSTATUSER.contains(journalpost.getJournalstatus()))
-		arkivsak.stream().forEach(handleSak -> {
-			handleSak.setArkivsak(String.valueOf(UUID.randomUUID()));
-			handleSak.setArbeidsStatus("HAR_ARKIVSAK");
-		});*/
-
-
 	private List<Arbeidssak> hentTilhoerendeArbeidssakerForArbeidssak(Arbeidssak arbeidssak) {
 		if (arbeidssak.getArbeidsstatus().equals(HENTET_FRA_PDL.name()) || arbeidssak.getArbeidsstatus().equals(PROSESSERING_AV_ARKIVSAK_STARTET.name())) {
 			List<Arbeidssak> arkivsakForArbeidssak;
@@ -185,18 +165,6 @@ ELLERS skriv feilmelding til logg (kan ikke finne navn på administrativ enhet) 
 		return emptyList();
 	}
 
-
-	/*
-	value = """
-			select sr.feilregistrert as erFeilregistrert,
-			jp.journalpostStatus as journalstatus,
-			jp.journalf_enhet as journalfoerendeEnhet,
-			jp.dato_journal as journaldato
-			FROM t_saksrelasjon sr
-			join t_journalpost jp on jp.journalpost_id = sr.journalpost_id
-			where sr.sak_id in (:sakIds)
-			"""
-	 */
 
 	// TODO: Tiltak for at både aktørId og orgnr er sett, eller ingen av dei, i ei sak
 	private void oppdaterAktoerIder(List<Arbeidssak> saker) {
