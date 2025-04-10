@@ -6,9 +6,6 @@ import no.nav.dokarkivavlevering.core.consumer.pdl.exception.PdlFunctionalExcept
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.TestPropertySource;
 
 import java.util.List;
 
@@ -43,6 +40,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 	public void skalAvslutteSaker() {
 		stubAzure();
 		stubPdl("hentIdenterBolk.json");
+		stubDvh("response.json");
 		arbeidssakRepository.save(lagSakForAktoer(SAK_MED_LUKKET_JOURNALPOST1, "2345678901234"));
 		arbeidssakRepository.save(lagSakForAktoer(SAK_MED_LUKKET_JOURNALPOST2, "1234567891234"));
 		commitAndBeginNewTransaction();
