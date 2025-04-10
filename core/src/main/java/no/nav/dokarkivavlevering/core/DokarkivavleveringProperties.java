@@ -36,6 +36,9 @@ public class DokarkivavleveringProperties {
 
 		@NotEmpty
 		private Endpoint ereg;
+
+		@NotEmpty
+		private Endpoint datavarehus;
 	}
 
 	@Data

@@ -137,10 +137,10 @@ ELLERS HVIS kontortype NORGENHET ikke er returnert og kontortype ARENAENHET er r
 ELLERS skriv feilmelding til logg (kan ikke finne navn på administrativ enhet) og gå til neste arkivsak
 	 */
 	private String determineJournalfoerendeEnhet(Journalpost eldsteJournalpost) {
-		if(!isEmpty(avsluttSakProperties.getAdministrativEnhet())) {
+		if (!isEmpty(avsluttSakProperties.getAdministrativEnhet())) {
 			return avsluttSakProperties.getAdministrativEnhet();
 		} else {
-			datavarehusConsumer.hentNavnForAdministrativEnhet(eldsteJournalpost.getJournalfoerendeEnhet(), eldsteJournalpost.getJournaldato());
+			DatavarehusResponse administrativEnhet = datavarehusConsumer.hentAlleAdministrativeEnheter();
 
 			return null;
 		}
@@ -154,7 +154,7 @@ ELLERS skriv feilmelding til logg (kan ikke finne navn på administrativ enhet) 
 				.filter(journalpost -> !isEmpty(inputAdministrativEnhet) || (!isEmpty(journalpost.getJournalfoerendeEnhet()) && !"9999".equals(journalpost.getJournalfoerendeEnhet())))
 				.toList();
 
-		if(filtrerteJournalposter.isEmpty()) {
+		if (filtrerteJournalposter.isEmpty()) {
 			return Optional.empty();
 		}
 		return filtrerteJournalposter.stream().min(Comparator.comparing(Journalpost::getJournaldato));
