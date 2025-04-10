@@ -13,4 +13,8 @@ public record Arkivsak(
 				.map(Arbeidssak::getSakId)
 				.toList();
 	}
+
+	public String getApplikasjon() {
+		return arbeidssaker.get(0).getApplikasjon();
+	}
 }

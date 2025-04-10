@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -26,10 +27,10 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 class AvsluttSakRepositoryTest {
 
 	private static final LocalDateTime OPPRETTETDATO_JP_123 = LocalDateTime.parse("2025-01-01T13:30:00");
-	private static final LocalDateTime JOURNALDATO_JP_123 = LocalDateTime.parse("2025-01-02T13:30:00");
+	private static final LocalDate JOURNALDATO_JP_123 = LocalDate.parse("2025-01-02");
 
 	private static final LocalDateTime OPPRETTETDATO_JP_234 = LocalDateTime.parse("2025-02-13T14:45:00");
-	private static final LocalDateTime JOURNALDATO_JP_234 = LocalDateTime.parse("2025-02-13T15:00:00");
+	private static final LocalDate JOURNALDATO_JP_234 = LocalDate.parse("2025-02-13");
 
 	@Autowired
 	protected AvsluttSakRepository avsluttSakRepository;

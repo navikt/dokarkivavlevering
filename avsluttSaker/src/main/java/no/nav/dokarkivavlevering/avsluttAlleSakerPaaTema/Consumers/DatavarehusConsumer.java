@@ -48,7 +48,6 @@ public class DatavarehusConsumer {
 				.body(DatavarehusResponse.class);
 	}
 
-	// TODO: UTC-tid?
 	private String buildQuery() {
 		return """
 				{"mapping_node_type":{"$or":[{"$eq":"ARENAENHET"},{"$eq":"INFOENHET"},{"$eq":"NORGENHET"}]}}
