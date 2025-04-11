@@ -11,6 +11,7 @@ import no.nav.dokarkivavlevering.core.consumer.pdl.PdlGraphQLConsumer;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -20,6 +21,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.time.LocalDateTime.now;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.isNull;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.FEIL_AAPEN_JOURNALPOST;
@@ -29,6 +31,7 @@ import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.FE
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.HENTET_FRA_PDL;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.PDL_FANT_IKKE_NY_AKTOERID;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.PROSESSERING_AV_ARKIVSAK_STARTET;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.SAK_AVSLUTTET;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.SKAL_IKKE_HENTE_FRA_PDL;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.ArkivsakValidator.LUKKEDE_JOURNALSTATUSER;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.ArkivsakValidator.harArkivsakEnAapenJournalpost;
@@ -96,7 +99,7 @@ public class AvsluttAlleSakerService {
 
 			if (!harArkivsakFerdigstilteJournalposter(arkivsak.journalposter())) {
 				log.info("Arkivsak har ingen ferdigstilte journalposter. Avbryter saker={} knyttet til tom arkivsak.", saksIder);
-				avsluttSakRepository.updateSakForArkivsak(arkivsak.getArbeidssaksIder());
+				avsluttSakRepository.avbrytSaker(arkivsak.getArbeidssaksIder());
 				arkivsak.arbeidssaker().forEach(tmpArbeidssak -> tmpArbeidssak.setArbeidsstatus(FERDIG_TOM_ARKIVSAK.name()));
 				return;
 			}
@@ -108,27 +111,29 @@ public class AvsluttAlleSakerService {
 				return;
 			}
 
-			//Hvis input.administrativEnhet ikke er satt så hent navnet journalførende enhet hadde når eldste journalpost (fra steg 3.2) ble journalført.
 			Journalpost eldsteJournalpost = eldsteJournalpostOptional.get();
-			Optional<String> administrativEnhetOptional = administrativEnhetService.hentHistoriskNavnForAdministrativEnhet(
-					eldsteJournalpost.getJournalfoerendeEnhet(), eldsteJournalpost.getJournaldato(), arkivsak.getApplikasjon());
 
-			if (administrativEnhetOptional.isEmpty()) {
-				log.warn("Fant ingen administrativ enhet for arkivsak med saksIder={}", saksIder);
-				arkivsak.arbeidssaker().forEach(tmpArbeidssak -> tmpArbeidssak.setArbeidsstatus(FEIL_INGEN_ADMINISTRATIV_ENHET.name()));
-				return;
+			String administrativEnhet = avsluttSakProperties.getAdministrativEnhet();
+			if (isEmpty(administrativEnhet)) {
+				Optional<String> administrativEnhetOptional = administrativEnhetService.hentHistoriskNavnForAdministrativEnhet(
+						eldsteJournalpost.getJournalfoerendeEnhet(), eldsteJournalpost.getJournaldato(), arkivsak.getApplikasjon());
+
+				if (administrativEnhetOptional.isEmpty()) {
+					log.warn("Fant ingen administrativ enhet for arkivsak med saksIder={}", saksIder);
+					arkivsak.arbeidssaker().forEach(tmpArbeidssak -> tmpArbeidssak.setArbeidsstatus(FEIL_INGEN_ADMINISTRATIV_ENHET.name()));
+					return;
+				}
+				administrativEnhet = administrativEnhetOptional.get();
 			}
-			//3.3
-			//Finn administrativ enhet
 
-			//3.4
 			//oppdater sak
-			//arkivsakForSak.forEach(tmpSak -> tmpSak.setArbeidsstatus(SAK_AVSLUTTET.name()));
+
+			LocalDateTime datoAvsluttet = avsluttSakProperties.getAvsluttetDato() != null ? avsluttSakProperties.getAvsluttetDato() : now();
+			LocalDateTime datoSakOpprettet = eldsteJournalpost.getOpprettetdato();
+
+			avsluttSakRepository.avsluttSaker(arkivsak.getArbeidssaksIder(), datoAvsluttet, datoSakOpprettet, administrativEnhet);
+			arkivsak.arbeidssaker().forEach(tmpSak -> tmpSak.setArbeidsstatus(SAK_AVSLUTTET.name()));
 		}
-		//Håndtere arkivsaken - da blir det 1 og en
-
-		//Finne alle arkivsaker og håndetere bolker
-
 	}
 
 	/*
