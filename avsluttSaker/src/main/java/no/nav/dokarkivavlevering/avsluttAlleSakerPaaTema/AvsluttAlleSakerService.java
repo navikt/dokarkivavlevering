@@ -2,8 +2,8 @@ package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema;
 
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Consumers.DatavarehusConsumer;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.entities.Arbeidssak;
+import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.exeptions.KanIkkeBehandleArkivsakException;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.ArbeidssakRepository;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.AvsluttSakRepository;
 import no.nav.dokarkivavlevering.core.consumer.pdl.HentIdenterBolkResponse.HentIdenterBolk;
@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 
 import static java.time.LocalDateTime.now;
 import static java.util.Collections.emptyList;
-import static java.util.Objects.isNull;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.FEIL_AAPEN_JOURNALPOST;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.FEIL_INGEN_ADMINISTRATIV_ENHET;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.FEIL_INGEN_JPER_I_GYLDIG_STATUS_MED_JFR_ENHET;
@@ -43,26 +42,31 @@ import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 @Profile("avsluttSaker")
 public class AvsluttAlleSakerService {
 
+	private final Set<Arbeidsstatus> MIDLERTIDIG_ARBEIDSSTATUS = Set.of(
+			HENTET_FRA_PDL,
+			SKAL_IKKE_HENTE_FRA_PDL,
+			PROSESSERING_AV_ARKIVSAK_STARTET
+	);
+
+	private final String OK = "ok";
+
 	private static final int BATCHSTOERRELSE = 1000;
 
 	private final ArbeidssakRepository arbeidssakRepository;
 	private final PdlGraphQLConsumer pdlGraphQLConsumer;
 	private final AvsluttSakRepository avsluttSakRepository;
 	private final AvsluttSakProperties avsluttSakProperties;
-	private final DatavarehusConsumer datavarehusConsumer;
 	private final AdministrativEnhetService administrativEnhetService;
 
 	public AvsluttAlleSakerService(ArbeidssakRepository arbeidssakRepository,
 								   PdlGraphQLConsumer pdlGraphQLConsumer,
 								   AvsluttSakRepository avsluttSakRepository,
 								   AvsluttSakProperties avsluttSakProperties,
-								   DatavarehusConsumer datavarehusConsumer,
 								   AdministrativEnhetService administrativEnhetService) {
 		this.arbeidssakRepository = arbeidssakRepository;
 		this.pdlGraphQLConsumer = pdlGraphQLConsumer;
 		this.avsluttSakRepository = avsluttSakRepository;
 		this.avsluttSakProperties = avsluttSakProperties;
-		this.datavarehusConsumer = datavarehusConsumer;
 		this.administrativEnhetService = administrativEnhetService;
 	}
 
@@ -70,7 +74,7 @@ public class AvsluttAlleSakerService {
 		List<Long> sakIds = arbeidssakRepository.findAllSakIds();
 		List<List<Long>> sakIdsPartitioned = Lists.partition(sakIds, BATCHSTOERRELSE);
 
-		// Oppdater aktoerIder
+		// Oppdater alle aktoerIder
 		sakIdsPartitioned.forEach(sakIdListe -> {
 			List<Arbeidssak> arbeidssaker = arbeidssakRepository.findSaksBySakIdIn(sakIdListe);
 			oppdaterAktoerIder(arbeidssaker);
@@ -86,54 +90,71 @@ public class AvsluttAlleSakerService {
 	private void genererArkivsak(List<Arbeidssak> arbeidssaker) {
 
 		for (Arbeidssak arbeidssak : arbeidssaker) {
-			List<Arbeidssak> tilhoerendeArbeidssaker = hentTilhoerendeArbeidssakerForArbeidssak(arbeidssak);
-			List<Long> saksIder = tilhoerendeArbeidssaker.stream().map(Arbeidssak::getSakId).toList();
+			try {
+				List<Arbeidssak> tilhoerendeArbeidssaker = hentTilhoerendeArbeidssakerForArbeidssak(arbeidssak);
+				List<Long> saksIder = tilhoerendeArbeidssaker.stream().map(Arbeidssak::getSakId).toList();
 
-			List<Journalpost> tilhoerendeJournalposter = avsluttSakRepository.getJournalposterForArkivsak(saksIder);
-			Arkivsak arkivsak = new Arkivsak(tilhoerendeArbeidssaker, tilhoerendeJournalposter);
-			if (harArkivsakEnAapenJournalpost(arkivsak.journalposter())) {
-				log.warn("Kan ikke avslutte arkivsak med åpne journalposter for saksIder={}", saksIder);
-				arkivsak.arbeidssaker().forEach(tmpArbeidssak -> tmpArbeidssak.setArbeidsstatus(FEIL_AAPEN_JOURNALPOST.name()));
-				return;
-			}
+				List<Journalpost> tilhoerendeJournalposter = avsluttSakRepository.getJournalposterForArkivsak(saksIder);
+				Arkivsak arkivsak = new Arkivsak(tilhoerendeArbeidssaker, tilhoerendeJournalposter);
 
-			if (!harArkivsakFerdigstilteJournalposter(arkivsak.journalposter())) {
-				log.info("Arkivsak har ingen ferdigstilte journalposter. Avbryter saker={} knyttet til tom arkivsak.", saksIder);
-				avsluttSakRepository.avbrytSaker(arkivsak.getArbeidssaksIder());
-				arkivsak.arbeidssaker().forEach(tmpArbeidssak -> tmpArbeidssak.setArbeidsstatus(FERDIG_TOM_ARKIVSAK.name()));
-				return;
-			}
+				validerArkivsakHarIngenAapneJournalposter(arkivsak, saksIder);
+				hvisTomArkivsak_avsluttBehandlingOgAvbrytSak(arkivsak, saksIder);
 
-			Optional<Journalpost> eldsteJournalpostOptional = finnEldsteJournalpost(arkivsak);
-			if (eldsteJournalpostOptional.isEmpty()) {
-				log.warn("Fant ingen journalposter i gyldig status med journalforendeEnhet for saksIder={}. Kan ikke bestemme administrativEnhet.", saksIder);
-				arkivsak.arbeidssaker().forEach(tmpArbeidssak -> tmpArbeidssak.setArbeidsstatus(FEIL_INGEN_JPER_I_GYLDIG_STATUS_MED_JFR_ENHET.name()));
-				return;
-			}
+				Journalpost eldsteJournalpost = finnEldsteJournalpostForArkivsak(arkivsak, saksIder);
 
-			Journalpost eldsteJournalpost = eldsteJournalpostOptional.get();
-
-			String administrativEnhet = avsluttSakProperties.getAdministrativEnhet();
-			if (isEmpty(administrativEnhet)) {
-				Optional<String> administrativEnhetOptional = administrativEnhetService.hentHistoriskNavnForAdministrativEnhet(
-						eldsteJournalpost.getJournalfoerendeEnhet(), eldsteJournalpost.getJournaldato(), arkivsak.getApplikasjon());
-
-				if (administrativEnhetOptional.isEmpty()) {
-					log.warn("Fant ingen administrativ enhet for arkivsak med saksIder={}", saksIder);
-					arkivsak.arbeidssaker().forEach(tmpArbeidssak -> tmpArbeidssak.setArbeidsstatus(FEIL_INGEN_ADMINISTRATIV_ENHET.name()));
-					return;
+				String administrativEnhet = avsluttSakProperties.getAdministrativEnhet();
+				if (isEmpty(administrativEnhet)) {
+					administrativEnhet = hentHistoriskNavnForAdminEnhet(eldsteJournalpost, arkivsak, saksIder);
 				}
-				administrativEnhet = administrativEnhetOptional.get();
+
+				LocalDateTime datoAvsluttet = avsluttSakProperties.getAvsluttetDato() != null ? avsluttSakProperties.getAvsluttetDato() : now();
+				LocalDateTime datoSakOpprettet = eldsteJournalpost.getOpprettetdato();
+				avsluttSakRepository.avsluttSaker(arkivsak.getArbeidssaksIder(), datoAvsluttet, datoSakOpprettet, administrativEnhet);
+				arkivsak.arbeidssaker().forEach(tmpSak -> tmpSak.setArbeidsstatus(SAK_AVSLUTTET));
+
+			} catch (KanIkkeBehandleArkivsakException e) {
+
 			}
-
-			//oppdater sak
-
-			LocalDateTime datoAvsluttet = avsluttSakProperties.getAvsluttetDato() != null ? avsluttSakProperties.getAvsluttetDato() : now();
-			LocalDateTime datoSakOpprettet = eldsteJournalpost.getOpprettetdato();
-
-			avsluttSakRepository.avsluttSaker(arkivsak.getArbeidssaksIder(), datoAvsluttet, datoSakOpprettet, administrativEnhet);
-			arkivsak.arbeidssaker().forEach(tmpSak -> tmpSak.setArbeidsstatus(SAK_AVSLUTTET.name()));
 		}
+	}
+
+	private String hentHistoriskNavnForAdminEnhet(Journalpost eldsteJournalpost, Arkivsak arkivsak, List<Long> saksIder) {
+		Optional<String> administrativEnhetOptional = administrativEnhetService.hentHistoriskNavnForAdministrativEnhet(
+				eldsteJournalpost.getJournalfoerendeEnhet(), eldsteJournalpost.getJournaldato(), arkivsak.getApplikasjon());
+
+		if (administrativEnhetOptional.isEmpty()) {
+			log.warn("Fant ingen administrativ enhet for arkivsak med saksIder={}", saksIder);
+			arkivsak.arbeidssaker().forEach(tmpArbeidssak -> tmpArbeidssak.setArbeidsstatus(FEIL_INGEN_ADMINISTRATIV_ENHET));
+			throw new KanIkkeBehandleArkivsakException();
+		}
+		return administrativEnhetOptional.get();
+	}
+
+	private void hvisTomArkivsak_avsluttBehandlingOgAvbrytSak(Arkivsak arkivsak, List<Long> saksIder) {
+		if (!harArkivsakFerdigstilteJournalposter(arkivsak.journalposter())) {
+			log.info("Arkivsak har ingen ferdigstilte journalposter. Avbryter saker={} knyttet til tom arkivsak.", saksIder);
+			avsluttSakRepository.avbrytSaker(arkivsak.getArbeidssaksIder());
+			arkivsak.arbeidssaker().forEach(tmpArbeidssak -> tmpArbeidssak.setArbeidsstatus(FERDIG_TOM_ARKIVSAK));
+			throw new KanIkkeBehandleArkivsakException();
+		}
+	}
+
+	private void validerArkivsakHarIngenAapneJournalposter(Arkivsak arkivsak, List<Long> saksIder) {
+		if (harArkivsakEnAapenJournalpost(arkivsak.journalposter())) {
+			log.warn("Kan ikke avslutte arkivsak med åpne journalposter for saksIder={}", saksIder);
+			arkivsak.arbeidssaker().forEach(tmpArbeidssak -> tmpArbeidssak.setArbeidsstatus(FEIL_AAPEN_JOURNALPOST));
+			throw new KanIkkeBehandleArkivsakException();
+		}
+	}
+
+	private Journalpost finnEldsteJournalpostForArkivsak(Arkivsak arkivsak, List<Long> saksIder) {
+		Optional<Journalpost> eldsteJournalpostOptional = finnEldsteJournalpost(arkivsak);
+		if (eldsteJournalpostOptional.isEmpty()) {
+			log.warn("Fant ingen journalposter i gyldig status med journalforendeEnhet for saksIder={}. Kan ikke bestemme administrativEnhet.", saksIder);
+			arkivsak.arbeidssaker().forEach(tmpArbeidssak -> tmpArbeidssak.setArbeidsstatus(FEIL_INGEN_JPER_I_GYLDIG_STATUS_MED_JFR_ENHET));
+			throw new KanIkkeBehandleArkivsakException();
+		}
+		return eldsteJournalpostOptional.get();
 	}
 
 	/*
@@ -157,14 +178,14 @@ public class AvsluttAlleSakerService {
 	}
 
 	private List<Arbeidssak> hentTilhoerendeArbeidssakerForArbeidssak(Arbeidssak arbeidssak) {
-		if (arbeidssak.getArbeidsstatus().equals(HENTET_FRA_PDL.name()) || arbeidssak.getArbeidsstatus().equals(PROSESSERING_AV_ARKIVSAK_STARTET.name())) {
+		if (MIDLERTIDIG_ARBEIDSSTATUS.contains(arbeidssak.getArbeidsstatus())) {
 			List<Arbeidssak> arkivsakForArbeidssak;
 			if (arbeidssak.getFagsaknr() == null) {
 				arkivsakForArbeidssak = arbeidssakRepository.findArkivsakForAktoerIdWhereFagsaknrIsNull(arbeidssak.getAktoerId(), arbeidssak.getApplikasjon());
 			} else {
 				arkivsakForArbeidssak = arbeidssakRepository.findArkivsakForAktoerId(arbeidssak.getAktoerId(), arbeidssak.getFagsaknr(), arbeidssak.getApplikasjon());
 			}
-			arkivsakForArbeidssak.forEach(tmpArbeidssak -> tmpArbeidssak.setArbeidsstatus(PROSESSERING_AV_ARKIVSAK_STARTET.name()));
+			arkivsakForArbeidssak.forEach(tmpArbeidssak -> tmpArbeidssak.setArbeidsstatus(PROSESSERING_AV_ARKIVSAK_STARTET));
 			return arkivsakForArbeidssak;
 		}
 		return emptyList();
@@ -176,7 +197,7 @@ public class AvsluttAlleSakerService {
 		List<Arbeidssak> sakerUtenAktoerId = saker.stream()
 				.filter(arbeidssak -> arbeidssak.getOrgnr() != null)
 				.toList();
-		sakerUtenAktoerId.forEach(arbeidssak -> arbeidssak.setArbeidsstatus(SKAL_IKKE_HENTE_FRA_PDL.name()));
+		sakerUtenAktoerId.forEach(arbeidssak -> arbeidssak.setArbeidsstatus(SKAL_IKKE_HENTE_FRA_PDL));
 
 		List<Arbeidssak> sakerMedAktoerId = saker.stream()
 				.filter(arbeidssak -> arbeidssak.getAktoerId() != null)
@@ -191,15 +212,14 @@ public class AvsluttAlleSakerService {
 		}
 	}
 
-	private void oppdaterArbeidssakMedGjeldendeAktoerIdFraPdl(Set<String> aktoerIds, List<Arbeidssak> arbeidssakerMedAktoerId) {
+	private void oppdaterArbeidssakMedGjeldendeAktoerIdFraPdl
+			(Set<String> aktoerIds, List<Arbeidssak> arbeidssakerMedAktoerId) {
 		List<HentIdenterBolk> hentIdenterBolkListe = pdlGraphQLConsumer.hentGjeldendeAktoerIder(aktoerIds);
 		Map<String, String> aktoerIderSomSkalOppdateres = new HashMap<>();
 		List<String> aktoerIderUtenGyldigAktoerId = new ArrayList<>();
 
 		hentIdenterBolkListe.forEach(identBolk -> {
-			if (isNull(identBolk.getIdenter())) { // 404 Not Found på aktørId, ev. andre feil
-				aktoerIderUtenGyldigAktoerId.add(identBolk.getIdent());
-			} else {
+			if (OK.equals(identBolk.getCode())) {
 				// key er gammel aktoerId, value er ny aktoerId
 				String gammelAktoerId = identBolk.getIdent();
 				String nyAktoerId = identBolk.getIdenter().getFirst().getIdent();
@@ -207,18 +227,20 @@ public class AvsluttAlleSakerService {
 				if (!gammelAktoerId.equals(nyAktoerId)) {
 					aktoerIderSomSkalOppdateres.put(identBolk.getIdent(), identBolk.getIdenter().getFirst().getIdent());
 				}
+			} else {
+				aktoerIderUtenGyldigAktoerId.add(identBolk.getIdent());
 			}
 		});
 
 		arbeidssakerMedAktoerId.forEach(arbeidssak -> {
 			if (aktoerIderUtenGyldigAktoerId.contains(arbeidssak.getAktoerId())) {
 				log.warn("Feil ved uthenting av person fra pdl. Sak={}", arbeidssak.getSakId());
-				arbeidssak.setArbeidsstatus(PDL_FANT_IKKE_NY_AKTOERID.name());
+				arbeidssak.setArbeidsstatus(PDL_FANT_IKKE_NY_AKTOERID);
 			} else {
 				if (aktoerIderSomSkalOppdateres.containsKey(arbeidssak.getAktoerId())) {
 					arbeidssak.setAktoerId(aktoerIderSomSkalOppdateres.get(arbeidssak.getAktoerId()));
 				}
-				arbeidssak.setArbeidsstatus(HENTET_FRA_PDL.name());
+				arbeidssak.setArbeidsstatus(HENTET_FRA_PDL);
 			}
 		});
 	}

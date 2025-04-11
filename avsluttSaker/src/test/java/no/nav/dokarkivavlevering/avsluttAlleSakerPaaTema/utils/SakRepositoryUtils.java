@@ -32,25 +32,33 @@ public class SakRepositoryUtils {
 		assertThat(saker)
 				.extracting(Sak::saksstatus, Sak::avleveringsstatus, Sak::kassasjonsstatus, Sak::endretAv)
 				.containsOnly(
-						tuple("AVBRUTT", "AVBRUTT", "KLAR_FOR_KASSASJON", "REFERANSE")
+						tuple("AVBRUTT", "AVBRUTT", "KLAR_FOR_KASSASJON", "MMA-1337")
 				);
 
 		assertThat(saker)
 				.allSatisfy(sak -> assertThat(sak.datoEndret()).isCloseTo(now(), within(10, SECONDS)));
 	}
 
+	public static void assertAvsluttetSak(Sak sak, String administrativEnhet, LocalDateTime datoSakOpprettet){
+		assertAvsluttedeSaker(List.of(sak), administrativEnhet, datoSakOpprettet);
+	}
+
 	public static void assertAvsluttedeSaker(List<Sak> saker){
+		assertAvsluttedeSaker(saker, ADMINISTRATIV_ENHET, OPPRETTETDATO_JP_123);
+	}
+
+	public static void assertAvsluttedeSaker(List<Sak> saker, String administrativEnhet, LocalDateTime datoSakOpprettet){
 		assertThat(saker)
 				.extracting(Sak::saksstatus, Sak::avleveringsstatus, Sak::kassasjonsstatus, Sak::endretAv, Sak::endretKildeNavn, Sak::avsluttetAv, Sak::avsluttetKildeNavn, Sak::administrativEnhet, Sak::sakAnsvarlig)
 				.containsOnly(
-						tuple("AVSLUTTET", null, null, "REFERANSE", "AvsluttSakerPaaTema", "JOARK", "JOARK", ADMINISTRATIV_ENHET, ADMINISTRATIV_ENHET)
+						tuple("AVSLUTTET", null, null, "MMA-1337", "AvsluttSakerPaaTema", "JOARK", "JOARK", administrativEnhet, administrativEnhet)
 				);
 
 		assertThat(saker)
 				.allSatisfy(sak -> {
 					assertThat(sak.datoEndret()).isCloseTo(now(), within(10, SECONDS));
 					assertThat(sak.datoAvsluttet()).isCloseTo(now(), within(10, SECONDS));
-					assertThat(sak.datoSakOpprettet()).isEqualTo(OPPRETTETDATO_JP_123);
+					assertThat(sak.datoSakOpprettet()).isEqualTo(datoSakOpprettet);
 				});
 	}
 
