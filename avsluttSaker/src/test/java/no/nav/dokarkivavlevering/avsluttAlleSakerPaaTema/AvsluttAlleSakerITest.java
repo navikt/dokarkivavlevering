@@ -15,8 +15,8 @@ import java.util.List;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.FEIL_AAPEN_JOURNALPOST;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.FEIL_INGEN_JPER_I_GYLDIG_STATUS_MED_JFR_ENHET;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.FERDIG_TOM_ARKIVSAK;
-import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.PDL_FANT_IKKE_NY_AKTOERID;
-import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.SAK_AVSLUTTET;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.FEIL_PDL_FANT_IKKE_NY_AKTOERID;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.FERDIG_SAK_AVSLUTTET;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.SKAL_IKKE_HENTE_FRA_PDL;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakRepositoryUtils.Sak;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakRepositoryUtils.SakRowMapper;
@@ -75,9 +75,9 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		Arbeidssak arbeidssak1 = arbeidssaker.get(0);
 		Arbeidssak arbeidssak2 = arbeidssaker.get(1);
 
-		assertThat(arbeidssak1.getArbeidsstatus()).isEqualTo(SAK_AVSLUTTET);
+		assertThat(arbeidssak1.getArbeidsstatus()).isEqualTo(FERDIG_SAK_AVSLUTTET);
 		assertThat(arbeidssak1.getAktoerId()).isEqualTo("2345678901234");
-		assertThat(arbeidssak2.getArbeidsstatus()).isEqualTo(SAK_AVSLUTTET);
+		assertThat(arbeidssak2.getArbeidsstatus()).isEqualTo(FERDIG_SAK_AVSLUTTET);
 		assertThat(arbeidssak2.getAktoerId()).isEqualTo("1234567891234");
 		//valider avsluttede saker
 
@@ -96,7 +96,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		avsluttAlleSakerService.avsluttAlleSaker();
 
 		Arbeidssak arbeidssak = arbeidssakRepository.findSaksBySakIdIn(List.of(123L)).getFirst();
-		assertThat(arbeidssak.getArbeidsstatus()).isEqualTo(PDL_FANT_IKKE_NY_AKTOERID);
+		assertThat(arbeidssak.getArbeidsstatus()).isEqualTo(FEIL_PDL_FANT_IKKE_NY_AKTOERID);
 	}
 
 	@Test
