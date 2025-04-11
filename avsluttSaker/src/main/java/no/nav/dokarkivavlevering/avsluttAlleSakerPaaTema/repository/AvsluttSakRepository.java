@@ -1,6 +1,5 @@
 package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository;
 
-import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arkivsak;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.AvsluttSakProperties;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Journalpost;
 import org.springframework.context.annotation.Profile;
@@ -12,9 +11,11 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.SqlQueries.AVBRYT_SAKER;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.SqlQueries.AVSLUTT_SAKER;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.SqlQueries.FINN_JOURNALPOSTER_FOR_ARKIVSAK;
 
 @Repository
@@ -36,12 +37,24 @@ public class AvsluttSakRepository {
 		return namedParameterJdbcTemplate.query(FINN_JOURNALPOSTER_FOR_ARKIVSAK, params, new JournalpostRowMapper());
 	}
 
-	public void updateSakForArkivsak(List<Long> saksIder) {
+	public void avbrytSaker(List<Long> saksIder) {
 		final SqlParameterSource params = new MapSqlParameterSource()
 				.addValue("referanse", avsluttSakProperties.getReferanse())
 				.addValue("sakIds", saksIder);
 
 		namedParameterJdbcTemplate.update(AVBRYT_SAKER, params);
+	}
+
+	public void avsluttSaker(List<Long> saksIder, LocalDateTime datoAvsluttet, LocalDateTime datoSakOpprettet, String administrativEnhet) {
+		final SqlParameterSource params = new MapSqlParameterSource()
+				.addValue("referanse", avsluttSakProperties.getReferanse())
+				.addValue("sakIds", saksIder)
+				.addValue("datoAvsluttet", datoAvsluttet)
+				.addValue("datoSakOpprettet", datoSakOpprettet)
+				.addValue("administrativEnhet", administrativEnhet)
+				.addValue("sakAnsvarlig", administrativEnhet);
+
+		namedParameterJdbcTemplate.update(AVSLUTT_SAKER, params);
 	}
 
 	public static class JournalpostRowMapper implements RowMapper<Journalpost> {

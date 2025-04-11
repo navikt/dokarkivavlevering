@@ -24,4 +24,21 @@ public class SqlQueries {
 			where id in (:sakIds)
 			""";
 
+	public static final String AVSLUTT_SAKER = """
+			update sak
+			set K_SAK_STATUS = 'AVSLUTTET',
+				K_AVLEVERING_STATUS = null,
+				K_KASSASJON_STATUS = null,
+				ENDRET_AV = :referanse,
+				ENDRET_KILDE_NAVN = 'AvsluttSakerPaaTema',
+				DATO_ENDRET = current_timestamp,
+				DATO_AVSLUTTET = :datoAvsluttet,
+				AVSLUTTET_AV = 'JOARK',
+				AVSLUTTET_KILDE_NAVN = 'JOARK',
+				DATO_SAK_OPPRETTET = :datoSakOpprettet,
+				ADMINISTRATIV_ENHET = :administrativEnhet,
+				SAK_ANSVARLIG = :sakAnsvarlig
+			where id in (:sakIds)
+			""";
+
 }

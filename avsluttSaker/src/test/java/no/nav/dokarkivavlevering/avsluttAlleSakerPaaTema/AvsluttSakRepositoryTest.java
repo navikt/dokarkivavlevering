@@ -15,6 +15,7 @@ import java.util.List;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakRepositoryUtils.Sak;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakRepositoryUtils.SakRowMapper;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakRepositoryUtils.assertAvbrutteSaker;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakRepositoryUtils.assertAvsluttedeSaker;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakRepositoryUtils.generateSakParams;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
@@ -24,13 +25,14 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 		classes = ApplicationTestConfig.class,
 		webEnvironment = RANDOM_PORT)
 @ActiveProfiles(profiles = {"avsluttSaker", "itest"})
-class AvsluttSakRepositoryTest {
+public class AvsluttSakRepositoryTest {
 
-	private static final LocalDateTime OPPRETTETDATO_JP_123 = LocalDateTime.parse("2025-01-01T13:30:00");
+	public static final LocalDateTime OPPRETTETDATO_JP_123 = LocalDateTime.parse("2025-01-01T13:30:00");
 	private static final LocalDate JOURNALDATO_JP_123 = LocalDate.parse("2025-01-02");
 
 	private static final LocalDateTime OPPRETTETDATO_JP_234 = LocalDateTime.parse("2025-02-13T14:45:00");
 	private static final LocalDate JOURNALDATO_JP_234 = LocalDate.parse("2025-02-13");
+	public static final String ADMINISTRATIV_ENHET = "Nav Mandal";
 
 	@Autowired
 	protected AvsluttSakRepository avsluttSakRepository;
@@ -52,14 +54,25 @@ class AvsluttSakRepositoryTest {
 	}
 
 	@Test
-	void skalOppdatereSakerForArkivsak() {
+	void skalAvbryteSaker() {
 		List<Long> sakIds = List.of(123L, 234L);
 
-		avsluttSakRepository.updateSakForArkivsak(sakIds);
+		avsluttSakRepository.avbrytSaker(sakIds);
 
 		List<Sak> saker = namedParameterJdbcTemplate.query("select * from sak where id in (:sakIds);", generateSakParams(sakIds), new SakRowMapper());
 
 		assertAvbrutteSaker(saker);
+	}
+
+	@Test
+	void skalAvslutteSaker() {
+		List<Long> sakIds = List.of(123L, 234L);
+
+		avsluttSakRepository.avsluttSaker(sakIds, LocalDateTime.now(), OPPRETTETDATO_JP_123, ADMINISTRATIV_ENHET);
+
+		List<Sak> saker = namedParameterJdbcTemplate.query("select * from sak where id in (:sakIds);", generateSakParams(sakIds), new SakRowMapper());
+
+		assertAvsluttedeSaker(saker);
 	}
 
 }

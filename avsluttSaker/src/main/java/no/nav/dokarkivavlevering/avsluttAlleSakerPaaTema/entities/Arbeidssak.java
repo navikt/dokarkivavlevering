@@ -8,13 +8,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus;
 
 @Data
 @Entity
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "TO_BE_DETERMINED")
+@Table(name = "AVSLUTTSAKER_TMP_TABELL")
 public class Arbeidssak {
 
 	@Id
@@ -37,5 +38,5 @@ public class Arbeidssak {
 	String status;
 
 	@Column
-	String arbeidsstatus;
+	Arbeidsstatus arbeidsstatus;
 }
