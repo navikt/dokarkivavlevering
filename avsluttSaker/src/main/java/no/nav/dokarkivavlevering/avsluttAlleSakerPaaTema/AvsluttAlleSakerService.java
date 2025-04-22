@@ -115,8 +115,12 @@ public class AvsluttAlleSakerService {
 
 	private Arkivsak finnArkivsakForArbeidssak(Arbeidssak arbeidssak) {
 		List<Arbeidssak> tilhoerendeArbeidssaker = finnArbeidssakerForArkivsak(arbeidssak);
-		List<Long> saksIder = tilhoerendeArbeidssaker.stream().map(Arbeidssak::getSakId).toList();
+		List<Long> saksIder = tilhoerendeArbeidssaker.stream()
+				.map(Arbeidssak::getSakId)
+				.toList();
+
 		List<Journalpost> tilhoerendeJournalposter = avsluttSakRepository.getJournalposterForArkivsak(saksIder);
+
 		return new Arkivsak(tilhoerendeArbeidssaker, tilhoerendeJournalposter);
 	}
 

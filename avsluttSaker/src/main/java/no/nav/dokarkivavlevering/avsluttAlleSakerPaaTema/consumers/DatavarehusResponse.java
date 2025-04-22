@@ -1,4 +1,4 @@
-package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Consumers;
+package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.consumers;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

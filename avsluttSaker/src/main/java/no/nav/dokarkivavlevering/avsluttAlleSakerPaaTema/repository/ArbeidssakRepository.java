@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Set;
 
 @Profile("avsluttSaker")
 public interface ArbeidssakRepository extends JpaRepository<Arbeidssak, Long> {
@@ -17,9 +16,6 @@ public interface ArbeidssakRepository extends JpaRepository<Arbeidssak, Long> {
 			where arbeidssak.status is null or arbeidssak.status = "AAPEN"
 			""")
 	List<Long> findAllSakIds();
-
-	@Query("select distinct arbeidssak.aktoerId from Arbeidssak arbeidssak")
-	Set<String> findAllAktoerIds();
 
 	List<Arbeidssak> findSaksBySakIdIn(List<Long> sakIds);
 
