@@ -1,8 +1,8 @@
 package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema;
 
-import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Consumers.DatavarehusConsumer;
-import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Consumers.DatavarehusResponse;
-import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Consumers.DatavarehusResponse.AdministrativEnhet;
+import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.consumers.DatavarehusConsumer;
+import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.consumers.DatavarehusResponse;
+import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.consumers.DatavarehusResponse.AdministrativEnhet;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

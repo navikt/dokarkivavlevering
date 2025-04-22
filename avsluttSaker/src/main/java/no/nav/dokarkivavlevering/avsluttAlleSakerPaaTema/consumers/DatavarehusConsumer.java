@@ -1,4 +1,4 @@
-package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Consumers;
+package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.consumers;
 
 import no.nav.dokarkivavlevering.core.DokarkivavleveringProperties;
 import no.nav.dokarkivavlevering.core.exception.DokarkivavleveringFunctionalException;
