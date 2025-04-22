@@ -15,7 +15,7 @@ public interface ArbeidssakRepository extends JpaRepository<Arbeidssak, Long> {
 			select arbeidssak.sakId from Arbeidssak arbeidssak
 			where arbeidssak.status is null or arbeidssak.status = "AAPEN"
 			""")
-	List<Long> findAllSakIds();
+	List<Long> findAllSakIdsWhereStatusIsNullOrAapen();
 
 	List<Arbeidssak> findSaksBySakIdIn(List<Long> sakIds);
 
@@ -38,5 +38,26 @@ public interface ArbeidssakRepository extends JpaRepository<Arbeidssak, Long> {
 			""")
 	List<Arbeidssak> findArkivsakForAktoerIdWhereFagsaknrIsNull(
 			@Param("aktoerId") String aktoerId,
+			@Param("applikasjon") String applikasjon);
+
+	@Query("""
+			select arbeidssak from Arbeidssak arbeidssak where
+			arbeidssak.orgnr = :orgnr and
+			arbeidssak.fagsaknr = :fagsaknr and
+			arbeidssak.applikasjon = :applikasjon
+			""")
+	List<Arbeidssak> findArkivsakForOrgNr(
+			@Param("orgnr") String orgnr,
+			@Param("fagsaknr") String fagsaknr,
+			@Param("applikasjon") String applikasjon);
+
+	@Query("""
+			select arbeidssak from Arbeidssak arbeidssak
+			where arbeidssak.orgnr = :orgnr
+			and arbeidssak.applikasjon = :applikasjon
+			and arbeidssak.fagsaknr is null
+			""")
+	List<Arbeidssak> findArkivsakForOrgNrWhereFagsaknrIsNull(
+			@Param("orgnr") String orgnr,
 			@Param("applikasjon") String applikasjon);
 }

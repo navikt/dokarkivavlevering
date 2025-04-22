@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static java.time.LocalDateTime.now;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakRepositoryUtils.Sak;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakRepositoryUtils.SakRowMapper;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakRepositoryUtils.assertAvbrutteSaker;
@@ -68,7 +69,7 @@ public class AvsluttSakRepositoryTest {
 	void skalAvslutteSaker() {
 		List<Long> sakIds = List.of(123L, 234L);
 
-		avsluttSakRepository.avsluttSaker(sakIds, LocalDateTime.now(), OPPRETTETDATO_JP_123, ADMINISTRATIV_ENHET);
+		avsluttSakRepository.avsluttSaker(sakIds, now(), OPPRETTETDATO_JP_123, ADMINISTRATIV_ENHET);
 
 		List<Sak> saker = namedParameterJdbcTemplate.query("select * from sak where id in (:sakIds);", generateSakParams(sakIds), new SakRowMapper());
 

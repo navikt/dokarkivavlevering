@@ -39,15 +39,15 @@ public class SakRepositoryUtils {
 				.allSatisfy(sak -> assertThat(sak.datoEndret()).isCloseTo(now(), within(10, SECONDS)));
 	}
 
-	public static void assertAvsluttetSak(Sak sak, String administrativEnhet, LocalDateTime datoSakOpprettet){
-		assertAvsluttedeSaker(List.of(sak), administrativEnhet, datoSakOpprettet);
+	public static void assertAvsluttetSak(Sak sak, String administrativEnhet, LocalDateTime datoSakOpprettet, LocalDateTime datoAvsluttet){
+		assertAvsluttedeSaker(List.of(sak), administrativEnhet, datoSakOpprettet, datoAvsluttet);
 	}
 
 	public static void assertAvsluttedeSaker(List<Sak> saker){
-		assertAvsluttedeSaker(saker, ADMINISTRATIV_ENHET, OPPRETTETDATO_JP_123);
+		assertAvsluttedeSaker(saker, ADMINISTRATIV_ENHET, OPPRETTETDATO_JP_123, now());
 	}
 
-	public static void assertAvsluttedeSaker(List<Sak> saker, String administrativEnhet, LocalDateTime datoSakOpprettet){
+	public static void assertAvsluttedeSaker(List<Sak> saker, String administrativEnhet, LocalDateTime datoSakOpprettet, LocalDateTime datoAvsluttet){
 		assertThat(saker)
 				.extracting(Sak::saksstatus, Sak::avleveringsstatus, Sak::kassasjonsstatus, Sak::endretAv, Sak::endretKildeNavn, Sak::avsluttetAv, Sak::avsluttetKildeNavn, Sak::administrativEnhet, Sak::sakAnsvarlig)
 				.containsOnly(
@@ -57,7 +57,7 @@ public class SakRepositoryUtils {
 		assertThat(saker)
 				.allSatisfy(sak -> {
 					assertThat(sak.datoEndret()).isCloseTo(now(), within(10, SECONDS));
-					assertThat(sak.datoAvsluttet()).isCloseTo(now(), within(10, SECONDS));
+					assertThat(sak.datoAvsluttet()).isCloseTo(datoAvsluttet, within(10, SECONDS));
 					assertThat(sak.datoSakOpprettet()).isEqualTo(datoSakOpprettet);
 				});
 	}

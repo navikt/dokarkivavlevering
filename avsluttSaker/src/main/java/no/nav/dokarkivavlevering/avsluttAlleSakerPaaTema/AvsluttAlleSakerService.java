@@ -27,7 +27,7 @@ import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.EN
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.FEIL_AAPEN_JOURNALPOST;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.FEIL_INGEN_ADMINISTRATIV_ENHET_FUNNET_FOR_ARKIVSAK;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.FEIL_INGEN_JPER_I_GYLDIG_STATUS_MED_JFR_ENHET;
-import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.FEIL_PDL_FANT_IKKE_NY_AKTOERID;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.FEIL_PDL_FANT_IKKE_AKTOERID;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.FERDIG_SAK_AVSLUTTET;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.FERDIG_TOM_ARKIVSAK;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus.HENTET_FRA_PDL;
@@ -65,7 +65,7 @@ public class AvsluttAlleSakerService {
 	}
 
 	public void avsluttAlleSaker() {
-		List<Long> sakIds = arbeidssakRepository.findAllSakIds();
+		List<Long> sakIds = arbeidssakRepository.findAllSakIdsWhereStatusIsNullOrAapen();
 		List<List<Long>> sakIdsPartitioned = Lists.partition(sakIds, BATCHSTOERRELSE);
 
 		// Oppdater alle aktoerIder
@@ -85,8 +85,7 @@ public class AvsluttAlleSakerService {
 
 		for (Arbeidssak arbeidssak : arbeidssaker) {
 			if (ENDELIGE_STATUSER.contains(arbeidssak.getArbeidsstatus())) {
-				//Hvis arkivsaken allerede er håndtert
-				//Dette kan skje hvis flere arbeidssaker i lista som kommer inn tilhører samme arkivsak
+				log.warn(format("Hopper over sak med sakId=%s arbeidsstatus=%s fordi den allerede er håndtert / står i en endelig status", arbeidssak.getSakId(), arbeidssak.getArbeidsstatus()));
 				return;
 			}
 			Arkivsak arkivsak = finnArkivsakForArbeidssak(arbeidssak);
@@ -176,21 +175,42 @@ public class AvsluttAlleSakerService {
 
 	private List<Arbeidssak> finnArbeidssakerForArkivsak(Arbeidssak arbeidssak) {
 		List<Arbeidssak> arbeidssakerForArkivsak;
+
+		if (arbeidssak.getAktoerId() != null) {
+			arbeidssakerForArkivsak = finnArbeidssakerForArkivsakMedAktoerId(arbeidssak);
+		} else {
+			arbeidssakerForArkivsak = finnArbeidssakerForArkivsakMedOrgnr(arbeidssak);
+		}
+
+		oppdaterArbeidsstatusForArbeidssak(arbeidssakerForArkivsak, PROSESSERING_AV_ARKIVSAK_STARTET);
+		return arbeidssakerForArkivsak;
+	}
+
+	private List<Arbeidssak> finnArbeidssakerForArkivsakMedAktoerId(Arbeidssak arbeidssak) {
+		List<Arbeidssak> arbeidssakerForArkivsak;
 		if (arbeidssak.getFagsaknr() == null) {
 			arbeidssakerForArkivsak = arbeidssakRepository.findArkivsakForAktoerIdWhereFagsaknrIsNull(arbeidssak.getAktoerId(), arbeidssak.getApplikasjon());
 		} else {
 			arbeidssakerForArkivsak = arbeidssakRepository.findArkivsakForAktoerId(arbeidssak.getAktoerId(), arbeidssak.getFagsaknr(), arbeidssak.getApplikasjon());
 		}
-		oppdaterArbeidsstatusForArbeidssak(arbeidssakerForArkivsak, PROSESSERING_AV_ARKIVSAK_STARTET);
 		return arbeidssakerForArkivsak;
 	}
 
-	// TODO: Tiltak for at både aktørId og orgnr er sett, eller ingen av dei, i ei sak
+	private List<Arbeidssak> finnArbeidssakerForArkivsakMedOrgnr(Arbeidssak arbeidssak) {
+		List<Arbeidssak> arbeidssakerForArkivsak;
+		if (arbeidssak.getFagsaknr() == null) {
+			arbeidssakerForArkivsak = arbeidssakRepository.findArkivsakForOrgNrWhereFagsaknrIsNull(arbeidssak.getOrgnr(), arbeidssak.getApplikasjon());
+		} else {
+			arbeidssakerForArkivsak = arbeidssakRepository.findArkivsakForOrgNr(arbeidssak.getOrgnr(), arbeidssak.getFagsaknr(), arbeidssak.getApplikasjon());
+		}
+		return arbeidssakerForArkivsak;
+	}
+
 	private void oppdaterAktoerIder(List<Arbeidssak> saker) {
-		List<Arbeidssak> sakerUtenAktoerId = saker.stream()
+		List<Arbeidssak> sakerMedOrgnr = saker.stream()
 				.filter(arbeidssak -> arbeidssak.getOrgnr() != null)
 				.toList();
-		sakerUtenAktoerId.forEach(arbeidssak -> arbeidssak.setArbeidsstatus(SKAL_IKKE_HENTE_FRA_PDL));
+		sakerMedOrgnr.forEach(arbeidssak -> arbeidssak.setArbeidsstatus(SKAL_IKKE_HENTE_FRA_PDL));
 
 		List<Arbeidssak> sakerMedAktoerId = saker.stream()
 				.filter(arbeidssak -> arbeidssak.getAktoerId() != null)
@@ -205,8 +225,7 @@ public class AvsluttAlleSakerService {
 		}
 	}
 
-	private void oppdaterArbeidssakMedGjeldendeAktoerIdFraPdl
-			(Set<String> aktoerIds, List<Arbeidssak> arbeidssakerMedAktoerId) {
+	private void oppdaterArbeidssakMedGjeldendeAktoerIdFraPdl(Set<String> aktoerIds, List<Arbeidssak> arbeidssakerMedAktoerId) {
 		List<HentIdenterBolk> hentIdenterBolkListe = pdlGraphQLConsumer.hentGjeldendeAktoerIder(aktoerIds);
 		Map<String, String> aktoerIderSomSkalOppdateres = new HashMap<>();
 		List<String> aktoerIderUtenGyldigAktoerId = new ArrayList<>();
@@ -228,7 +247,7 @@ public class AvsluttAlleSakerService {
 		arbeidssakerMedAktoerId.forEach(arbeidssak -> {
 			if (aktoerIderUtenGyldigAktoerId.contains(arbeidssak.getAktoerId())) {
 				log.warn("Feil ved uthenting av person fra pdl. Sak={}", arbeidssak.getSakId());
-				arbeidssak.setArbeidsstatus(FEIL_PDL_FANT_IKKE_NY_AKTOERID);
+				arbeidssak.setArbeidsstatus(FEIL_PDL_FANT_IKKE_AKTOERID);
 			} else {
 				if (aktoerIderSomSkalOppdateres.containsKey(arbeidssak.getAktoerId())) {
 					arbeidssak.setAktoerId(aktoerIderSomSkalOppdateres.get(arbeidssak.getAktoerId()));

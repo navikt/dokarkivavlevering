@@ -15,6 +15,7 @@ import org.springframework.test.context.ContextConfiguration;
 public abstract class AbstractRepositoryTest {
 
 	protected final String AKTOER_ID = "12345678911";
+	protected final String ORGNR = "123456789";
 	protected final String FAGSAKSYSTEM_FS22 = "FS22";
 	protected final String FAGSAKSYSTEM_AO01 = "AO01";
 	protected final String FAGSAKNR = "fagsakNr";
@@ -27,13 +28,23 @@ public abstract class AbstractRepositoryTest {
 		arbeidssakRepository.deleteAll();
 	}
 
-	protected Arbeidssak.ArbeidssakBuilder baseArkivsak() {
+	protected Arbeidssak.ArbeidssakBuilder baseArkivsakForAktoerId() {
 		return Arbeidssak.builder()
 				.sakId(123L)
 				.applikasjon(FAGSAKSYSTEM_FS22)
 				.fagsaknr(null)
 				.aktoerId(AKTOER_ID)
 				.orgnr(null);
+	}
+
+
+	protected Arbeidssak.ArbeidssakBuilder baseArkivsakForOrganisasjon() {
+		return Arbeidssak.builder()
+				.sakId(123L)
+				.applikasjon(FAGSAKSYSTEM_FS22)
+				.fagsaknr(null)
+				.aktoerId(null)
+				.orgnr(ORGNR);
 	}
 
 }
