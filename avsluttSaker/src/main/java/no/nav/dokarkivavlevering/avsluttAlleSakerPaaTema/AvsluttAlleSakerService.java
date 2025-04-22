@@ -176,21 +176,42 @@ public class AvsluttAlleSakerService {
 
 	private List<Arbeidssak> finnArbeidssakerForArkivsak(Arbeidssak arbeidssak) {
 		List<Arbeidssak> arbeidssakerForArkivsak;
+
+		if (arbeidssak.getAktoerId() != null) {
+			arbeidssakerForArkivsak = finnArbeidssakerForArkivsakMedAktoerId(arbeidssak);
+		} else {
+			arbeidssakerForArkivsak = finnArbeidssakerForArkivsakMedOrgnr(arbeidssak);
+		}
+
+		oppdaterArbeidsstatusForArbeidssak(arbeidssakerForArkivsak, PROSESSERING_AV_ARKIVSAK_STARTET);
+		return arbeidssakerForArkivsak;
+	}
+
+	private List<Arbeidssak> finnArbeidssakerForArkivsakMedAktoerId(Arbeidssak arbeidssak) {
+		List<Arbeidssak> arbeidssakerForArkivsak;
 		if (arbeidssak.getFagsaknr() == null) {
 			arbeidssakerForArkivsak = arbeidssakRepository.findArkivsakForAktoerIdWhereFagsaknrIsNull(arbeidssak.getAktoerId(), arbeidssak.getApplikasjon());
 		} else {
 			arbeidssakerForArkivsak = arbeidssakRepository.findArkivsakForAktoerId(arbeidssak.getAktoerId(), arbeidssak.getFagsaknr(), arbeidssak.getApplikasjon());
 		}
-		oppdaterArbeidsstatusForArbeidssak(arbeidssakerForArkivsak, PROSESSERING_AV_ARKIVSAK_STARTET);
 		return arbeidssakerForArkivsak;
 	}
 
-	// TODO: Tiltak for at både aktørId og orgnr er sett, eller ingen av dei, i ei sak
+	private List<Arbeidssak> finnArbeidssakerForArkivsakMedOrgnr(Arbeidssak arbeidssak) {
+		List<Arbeidssak> arbeidssakerForArkivsak;
+		if (arbeidssak.getFagsaknr() == null) {
+			arbeidssakerForArkivsak = arbeidssakRepository.findArkivsakForOrgNrWhereFagsaknrIsNull(arbeidssak.getOrgnr(), arbeidssak.getApplikasjon());
+		} else {
+			arbeidssakerForArkivsak = arbeidssakRepository.findArkivsakForOrgNr(arbeidssak.getOrgnr(), arbeidssak.getFagsaknr(), arbeidssak.getApplikasjon());
+		}
+		return arbeidssakerForArkivsak;
+	}
+
 	private void oppdaterAktoerIder(List<Arbeidssak> saker) {
-		List<Arbeidssak> sakerUtenAktoerId = saker.stream()
+		List<Arbeidssak> sakerMedOrgnr = saker.stream()
 				.filter(arbeidssak -> arbeidssak.getOrgnr() != null)
 				.toList();
-		sakerUtenAktoerId.forEach(arbeidssak -> arbeidssak.setArbeidsstatus(SKAL_IKKE_HENTE_FRA_PDL));
+		sakerMedOrgnr.forEach(arbeidssak -> arbeidssak.setArbeidsstatus(SKAL_IKKE_HENTE_FRA_PDL));
 
 		List<Arbeidssak> sakerMedAktoerId = saker.stream()
 				.filter(arbeidssak -> arbeidssak.getAktoerId() != null)

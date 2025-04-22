@@ -79,5 +79,3 @@ VALUES (345);
 
 insert into sak(ID)
 VALUES (456);
-
-

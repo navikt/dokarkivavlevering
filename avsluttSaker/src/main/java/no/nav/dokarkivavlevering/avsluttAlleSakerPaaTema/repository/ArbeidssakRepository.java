@@ -11,6 +11,7 @@ import java.util.List;
 @Profile("avsluttSaker")
 public interface ArbeidssakRepository extends JpaRepository<Arbeidssak, Long> {
 
+	// TODO: Sjå om metodenamnet kan gjerast klarare
 	@Query("""
 			select arbeidssak.sakId from Arbeidssak arbeidssak
 			where arbeidssak.status is null or arbeidssak.status = "AAPEN"
@@ -38,5 +39,26 @@ public interface ArbeidssakRepository extends JpaRepository<Arbeidssak, Long> {
 			""")
 	List<Arbeidssak> findArkivsakForAktoerIdWhereFagsaknrIsNull(
 			@Param("aktoerId") String aktoerId,
+			@Param("applikasjon") String applikasjon);
+
+	@Query("""
+			select arbeidssak from Arbeidssak arbeidssak where
+			arbeidssak.aktoerId = :aktoerId and
+			arbeidssak.fagsaknr = :fagsaknr and
+			arbeidssak.applikasjon = :applikasjon
+			""")
+	List<Arbeidssak> findArkivsakForOrgNr(
+			@Param("orgnr") String orgnr,
+			@Param("fagsaknr") String fagsaknr,
+			@Param("applikasjon") String applikasjon);
+
+	@Query("""
+			select arbeidssak from Arbeidssak arbeidssak
+			where arbeidssak.orgnr = :orgnr
+			and arbeidssak.applikasjon = :applikasjon
+			and arbeidssak.fagsaknr is null
+			""")
+	List<Arbeidssak> findArkivsakForOrgNrWhereFagsaknrIsNull(
+			@Param("orgnr") String orgnr,
 			@Param("applikasjon") String applikasjon);
 }
