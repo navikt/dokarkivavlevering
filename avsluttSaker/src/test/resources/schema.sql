@@ -24,6 +24,15 @@ VALUES (456, '1', 456789);
 insert into t_saksrelasjon(sak_id, feilregistrert, journalpost_id)
 VALUES (567, '0', 5678910);
 
+insert into t_saksrelasjon(sak_id, feilregistrert, journalpost_id)
+VALUES (678, '0', 67891011);
+
+insert into t_saksrelasjon(sak_id, feilregistrert, journalpost_id)
+VALUES (7898, '0', 123456);
+
+insert into t_saksrelasjon(sak_id, feilregistrert, journalpost_id)
+VALUES (7899, '0', 123456);
+
 create table t_journalpost
 (
     journalpost_id NUMBER(11, 0) not null,
@@ -51,6 +60,9 @@ VALUES ('456789', 'FS', '5678', '2025-02-13T14:45', '2025-02-13T15:00');
 insert into t_journalpost(journalpost_id, k_journal_s, journalf_enhet, dato_opprettet, dato_journal)
 VALUES ('5678910', 'FS', '', '2025-02-13T14:45', '2025-02-13T15:00');
 
+insert into t_journalpost(journalpost_id, k_journal_s, journalf_enhet, dato_opprettet, dato_journal)
+VALUES ('67891011', 'FL', '1111', '2025-01-01T13:30', '2025-01-02T13:30');
+
 create table sak
 (
     ID                   NUMBER(10, 0) not null,
@@ -65,11 +77,12 @@ create table sak
     AVSLUTTET_KILDE_NAVN VARCHAR2(40),
     DATO_SAK_OPPRETTET   TIMESTAMP(6),
     ADMINISTRATIV_ENHET  VARCHAR2(40),
-    SAK_ANSVARLIG        VARCHAR2(40)
+    SAK_ANSVARLIG        VARCHAR2(40),
+    FAGSAKNR             VARCHAR2(40)
 );
 
-insert into sak(ID)
-VALUES (123);
+insert into sak(ID, K_SAK_STATUS)
+VALUES (123, 'AAPEN');
 
 insert into sak(ID)
 VALUES (234);
@@ -79,3 +92,15 @@ VALUES (345);
 
 insert into sak(ID)
 VALUES (456);
+
+insert into sak(ID)
+VALUES (568);
+
+insert into sak(ID)
+VALUES (678);
+
+insert into sak(ID, FAGSAKNR)
+VALUES (7898, 'FAGSAK_123');
+
+insert into sak(ID, FAGSAKNR)
+VALUES (7899, 'FAGSAK_234');

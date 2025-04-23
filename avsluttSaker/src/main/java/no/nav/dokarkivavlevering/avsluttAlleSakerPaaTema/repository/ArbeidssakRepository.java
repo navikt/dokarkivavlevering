@@ -11,12 +11,11 @@ import java.util.List;
 @Profile("avsluttSaker")
 public interface ArbeidssakRepository extends JpaRepository<Arbeidssak, Long> {
 
-	// TODO: Sjå om metodenamnet kan gjerast klarare
 	@Query("""
 			select arbeidssak.sakId from Arbeidssak arbeidssak
 			where arbeidssak.status is null or arbeidssak.status = "AAPEN"
 			""")
-	List<Long> findAllSakIds();
+	List<Long> findAllSakIdsWhereStatusIsNullOrAapen();
 
 	List<Arbeidssak> findSaksBySakIdIn(List<Long> sakIds);
 
@@ -43,7 +42,7 @@ public interface ArbeidssakRepository extends JpaRepository<Arbeidssak, Long> {
 
 	@Query("""
 			select arbeidssak from Arbeidssak arbeidssak where
-			arbeidssak.aktoerId = :aktoerId and
+			arbeidssak.orgnr = :orgnr and
 			arbeidssak.fagsaknr = :fagsaknr and
 			arbeidssak.applikasjon = :applikasjon
 			""")
