@@ -1,11 +1,13 @@
 package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository;
 
+import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.entities.Arbeidssak;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.EnumSet;
 import java.util.List;
 
 @Profile("avsluttSaker")
@@ -19,45 +21,20 @@ public interface ArbeidssakRepository extends JpaRepository<Arbeidssak, Long> {
 
 	List<Arbeidssak> findSaksBySakIdIn(List<Long> sakIds);
 
-	@Query("""
-			select arbeidssak from Arbeidssak arbeidssak where
-			arbeidssak.aktoerId = :aktoerId and
-			arbeidssak.fagsaknr = :fagsaknr and
-			arbeidssak.applikasjon = :applikasjon
-			""")
-	List<Arbeidssak> findArkivsakForAktoerId(
-			@Param("aktoerId") String aktoerId,
-			@Param("fagsaknr") String fagsaknr,
-			@Param("applikasjon") String applikasjon);
+	List<Arbeidssak> findSaksByAktoerIdIn(List<String> aktoerIds);
+	List<Arbeidssak> findSaksByOrgnrIn(List<String> orgnrs);
 
 	@Query("""
-			select arbeidssak from Arbeidssak arbeidssak
-			where arbeidssak.aktoerId = :aktoerId
-			and arbeidssak.applikasjon = :applikasjon
-			and arbeidssak.fagsaknr is null
+			select distinct(arbeidssak.aktoerId) from Arbeidssak arbeidssak
+			where arbeidssak.aktoerId is not null
+			and arbeidssak.arbeidsstatus not in (:endeligeStatuser)
 			""")
-	List<Arbeidssak> findArkivsakForAktoerIdWhereFagsaknrIsNull(
-			@Param("aktoerId") String aktoerId,
-			@Param("applikasjon") String applikasjon);
+	List<String> findDistinctAktoerIds(EnumSet<Arbeidsstatus> endeligeStatuser);
 
 	@Query("""
-			select arbeidssak from Arbeidssak arbeidssak where
-			arbeidssak.orgnr = :orgnr and
-			arbeidssak.fagsaknr = :fagsaknr and
-			arbeidssak.applikasjon = :applikasjon
+			select distinct(arbeidssak.orgnr) from Arbeidssak arbeidssak
+			where arbeidssak.orgnr is not null
+			and arbeidssak.arbeidsstatus not in (:endeligeStatuser)
 			""")
-	List<Arbeidssak> findArkivsakForOrgNr(
-			@Param("orgnr") String orgnr,
-			@Param("fagsaknr") String fagsaknr,
-			@Param("applikasjon") String applikasjon);
-
-	@Query("""
-			select arbeidssak from Arbeidssak arbeidssak
-			where arbeidssak.orgnr = :orgnr
-			and arbeidssak.applikasjon = :applikasjon
-			and arbeidssak.fagsaknr is null
-			""")
-	List<Arbeidssak> findArkivsakForOrgNrWhereFagsaknrIsNull(
-			@Param("orgnr") String orgnr,
-			@Param("applikasjon") String applikasjon);
+	List<String> findDistinctOrgnrs(EnumSet<Arbeidsstatus> endeligeStatuser);
 }

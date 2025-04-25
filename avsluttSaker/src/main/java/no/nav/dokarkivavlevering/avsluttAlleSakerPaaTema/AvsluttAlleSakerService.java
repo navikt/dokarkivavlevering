@@ -64,63 +64,107 @@ public class AvsluttAlleSakerService {
 		this.administrativEnhetService = administrativEnhetService;
 	}
 
+	//TODO: Rydd opp i denne klassen. Den er et work in progress
 	public void avsluttAlleSaker() {
+		//Oppdater alle aktoerId'er til siste gyldige
+		oppdaterAlleAktoerIder();
+
+		avsluttAlleSakerForAktoerId();
+
+		avsluttAlleSakerOrgnr();
+	}
+
+	private void avsluttAlleSakerForAktoerId(){
+		List<String> alleAktoerIder = arbeidssakRepository.findDistinctAktoerIds(ENDELIGE_STATUSER);
+		//Del alle aktørId'ene opp i håndterlige partisjoner
+		List<List<String>> aktoerIdsPartitioned = Lists.partition(alleAktoerIder, 200);
+
+		for (List<String> aktoerIdList : aktoerIdsPartitioned) {
+			//Finn alle tilhørende arbeidssaker for aktørId'ene i partisjonen
+			List<Arbeidssak> arbeidssaker = arbeidssakRepository.findSaksByAktoerIdIn(aktoerIdList);
+
+			//Grupper arbeidssakene til arkivsaker
+			List<List<Arbeidssak>> groupedLists = new ArrayList<>(
+					arbeidssaker.stream()
+							.collect(Collectors.groupingBy(arbeidssak -> List.of(
+									arbeidssak.getAktoerId(),
+									arbeidssak.getApplikasjon(),
+									//TODO: Ikke grupper de som mangler fagsaknr
+									arbeidssak.getFagsaknr() == null ? "" : arbeidssak.getFagsaknr()
+							)))
+							.values()
+			);
+
+			List<Arkivsak> arkivsaker = createArkivsaker(groupedLists);
+			arkivsaker.forEach(this::avsluttSak);
+		}
+	}
+
+	private void avsluttAlleSakerOrgnr(){
+		List<String> alleOrgNr = arbeidssakRepository.findDistinctOrgnrs(ENDELIGE_STATUSER);
+		List<List<String>> orgnrPartitioned = Lists.partition(alleOrgNr, 200);
+
+		for (List<String> orgNrList : orgnrPartitioned) {
+			//Finn alle tilhørende arbeidssaker for aktørId'ene i partisjonen
+			List<Arbeidssak> arbeidssaker = arbeidssakRepository.findSaksByOrgnrIn(orgNrList);
+
+			List<List<Arbeidssak>> groupedLists = new ArrayList<>(
+					arbeidssaker.stream()
+							.collect(Collectors.groupingBy(arbeidssak -> List.of(
+									arbeidssak.getOrgnr(),
+									arbeidssak.getApplikasjon(),
+									//TODO: Ikke grupper de som mangler fagsaknr
+									arbeidssak.getFagsaknr() == null ? "" : arbeidssak.getFagsaknr()
+							)))
+							.values()
+			);
+
+			List<Arkivsak> arkivsaker = createArkivsaker(groupedLists);
+			arkivsaker.forEach(this::avsluttSak);
+		}
+	}
+
+	private List<Arkivsak> createArkivsaker(List<List<Arbeidssak>> arbeidssaksListe) {
+		ArrayList<Arkivsak> arkivsaker = new ArrayList<>();
+		for (List<Arbeidssak> arbsaker : arbeidssaksListe) {
+			Arkivsak arkivsak = new Arkivsak(arbsaker, new ArrayList<>());
+			List<Journalpost> tilhoerendeJournalposter = avsluttSakRepository.getJournalposterForArkivsak(arkivsak.getArbeidssaksIder());
+			arkivsak.journalposter().addAll(tilhoerendeJournalposter);
+			arkivsaker.add(arkivsak);
+		}
+		return arkivsaker;
+	}
+
+	private void avsluttSak(Arkivsak arkivsak) {
+		try {
+			validerArkivsakHarIngenAapneJournalposter(arkivsak);
+			hvisTomArkivsak_avsluttBehandlingOgAvbrytSak(arkivsak);
+
+			Journalpost eldsteJournalpost = finnEldsteJournalpostForArkivsak(arkivsak);
+
+			String administrativEnhet = avsluttSakProperties.getAdministrativEnhet();
+			if (isEmpty(administrativEnhet)) {
+				administrativEnhet = hentHistoriskNavnForAdminEnhet(eldsteJournalpost, arkivsak);
+			}
+
+			LocalDateTime datoSakOpprettet = eldsteJournalpost.getOpprettetdato();
+			avsluttSakRepository.avsluttSaker(arkivsak.getArbeidssaksIder(), avsluttSakProperties.getAvsluttetDato(), datoSakOpprettet, administrativEnhet);
+			oppdaterArbeidsstatusForArkivsak(arkivsak, FERDIG_SAK_AVSLUTTET);
+
+		} catch (KanIkkeBehandleArkivsakException e) {
+			log.warn(e.getMessage());
+		}
+	}
+
+	private void oppdaterAlleAktoerIder() {
 		List<Long> sakIds = arbeidssakRepository.findAllSakIdsWhereStatusIsNullOrAapen();
 		List<List<Long>> sakIdsPartitioned = Lists.partition(sakIds, BATCHSTOERRELSE);
 
 		// Oppdater alle aktoerIder
 		sakIdsPartitioned.forEach(sakIdListe -> {
 			List<Arbeidssak> arbeidssaker = arbeidssakRepository.findSaksBySakIdIn(sakIdListe);
-			oppdaterAktoerIder(arbeidssaker);
+			oppdaterAlleAktoerIder(arbeidssaker);
 		});
-
-		// Finn arkivsaker
-		sakIdsPartitioned.forEach(sakIdListe -> {
-			List<Arbeidssak> arbeidssaker = arbeidssakRepository.findSaksBySakIdIn(sakIdListe);
-			behandleSaker(arbeidssaker);
-		});
-	}
-
-	private void behandleSaker(List<Arbeidssak> arbeidssaker) {
-
-		for (Arbeidssak arbeidssak : arbeidssaker) {
-			if (ENDELIGE_STATUSER.contains(arbeidssak.getArbeidsstatus())) {
-				log.warn(format("Hopper over sak med sakId=%s arbeidsstatus=%s fordi den allerede er håndtert / står i en endelig status", arbeidssak.getSakId(), arbeidssak.getArbeidsstatus()));
-				return;
-			}
-			Arkivsak arkivsak = finnArkivsakForArbeidssak(arbeidssak);
-
-			try {
-				validerArkivsakHarIngenAapneJournalposter(arkivsak);
-				hvisTomArkivsak_avsluttBehandlingOgAvbrytSak(arkivsak);
-
-				Journalpost eldsteJournalpost = finnEldsteJournalpostForArkivsak(arkivsak);
-
-				String administrativEnhet = avsluttSakProperties.getAdministrativEnhet();
-				if (isEmpty(administrativEnhet)) {
-					administrativEnhet = hentHistoriskNavnForAdminEnhet(eldsteJournalpost, arkivsak);
-				}
-
-				LocalDateTime datoAvsluttet = avsluttSakProperties.getAvsluttetDato() != null ? avsluttSakProperties.getAvsluttetDato() : now();
-				LocalDateTime datoSakOpprettet = eldsteJournalpost.getOpprettetdato();
-				avsluttSakRepository.avsluttSaker(arkivsak.getArbeidssaksIder(), datoAvsluttet, datoSakOpprettet, administrativEnhet);
-				oppdaterArbeidsstatusForArkivsak(arkivsak, FERDIG_SAK_AVSLUTTET);
-
-			} catch (KanIkkeBehandleArkivsakException e) {
-				log.warn(e.getMessage());
-			}
-		}
-	}
-
-	private Arkivsak finnArkivsakForArbeidssak(Arbeidssak arbeidssak) {
-		List<Arbeidssak> tilhoerendeArbeidssaker = finnArbeidssakerForArkivsak(arbeidssak);
-		List<Long> saksIder = tilhoerendeArbeidssaker.stream()
-				.map(Arbeidssak::getSakId)
-				.toList();
-
-		List<Journalpost> tilhoerendeJournalposter = avsluttSakRepository.getJournalposterForArkivsak(saksIder);
-
-		return new Arkivsak(tilhoerendeArbeidssaker, tilhoerendeJournalposter);
 	}
 
 	private String hentHistoriskNavnForAdminEnhet(Journalpost eldsteJournalpost, Arkivsak arkivsak) {
@@ -170,43 +214,9 @@ public class AvsluttAlleSakerService {
 			return Optional.empty();
 		}
 		return filtrerteJournalposter.stream().min(Comparator.comparing(Journalpost::getJournaldato));
-
 	}
 
-	private List<Arbeidssak> finnArbeidssakerForArkivsak(Arbeidssak arbeidssak) {
-		List<Arbeidssak> arbeidssakerForArkivsak;
-
-		if (arbeidssak.getAktoerId() != null) {
-			arbeidssakerForArkivsak = finnArbeidssakerForArkivsakMedAktoerId(arbeidssak);
-		} else {
-			arbeidssakerForArkivsak = finnArbeidssakerForArkivsakMedOrgnr(arbeidssak);
-		}
-
-		oppdaterArbeidsstatusForArbeidssak(arbeidssakerForArkivsak, PROSESSERING_AV_ARKIVSAK_STARTET);
-		return arbeidssakerForArkivsak;
-	}
-
-	private List<Arbeidssak> finnArbeidssakerForArkivsakMedAktoerId(Arbeidssak arbeidssak) {
-		List<Arbeidssak> arbeidssakerForArkivsak;
-		if (arbeidssak.getFagsaknr() == null) {
-			arbeidssakerForArkivsak = arbeidssakRepository.findArkivsakForAktoerIdWhereFagsaknrIsNull(arbeidssak.getAktoerId(), arbeidssak.getApplikasjon());
-		} else {
-			arbeidssakerForArkivsak = arbeidssakRepository.findArkivsakForAktoerId(arbeidssak.getAktoerId(), arbeidssak.getFagsaknr(), arbeidssak.getApplikasjon());
-		}
-		return arbeidssakerForArkivsak;
-	}
-
-	private List<Arbeidssak> finnArbeidssakerForArkivsakMedOrgnr(Arbeidssak arbeidssak) {
-		List<Arbeidssak> arbeidssakerForArkivsak;
-		if (arbeidssak.getFagsaknr() == null) {
-			arbeidssakerForArkivsak = arbeidssakRepository.findArkivsakForOrgNrWhereFagsaknrIsNull(arbeidssak.getOrgnr(), arbeidssak.getApplikasjon());
-		} else {
-			arbeidssakerForArkivsak = arbeidssakRepository.findArkivsakForOrgNr(arbeidssak.getOrgnr(), arbeidssak.getFagsaknr(), arbeidssak.getApplikasjon());
-		}
-		return arbeidssakerForArkivsak;
-	}
-
-	private void oppdaterAktoerIder(List<Arbeidssak> saker) {
+	private void oppdaterAlleAktoerIder(List<Arbeidssak> saker) {
 		List<Arbeidssak> sakerMedOrgnr = saker.stream()
 				.filter(arbeidssak -> arbeidssak.getOrgnr() != null)
 				.toList();
@@ -258,10 +268,7 @@ public class AvsluttAlleSakerService {
 	}
 
 	private void oppdaterArbeidsstatusForArkivsak(Arkivsak arkivsak, Arbeidsstatus arbeidsstatus) {
+		//TODO: Ved oppdatering til en endelig status burde vi endre vanlig status også, ikke bare arbeidsstatus
 		arkivsak.arbeidssaker().forEach(arbeidssak -> arbeidssak.setArbeidsstatus(arbeidsstatus));
-	}
-
-	private void oppdaterArbeidsstatusForArbeidssak(List<Arbeidssak> arbeidssaker, Arbeidsstatus arbeidsstatus) {
-		arbeidssaker.forEach(tmpArbeidssak -> tmpArbeidssak.setArbeidsstatus(arbeidsstatus));
 	}
 }
