@@ -8,6 +8,8 @@ import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
 
+import static java.time.LocalDateTime.now;
+
 @Data
 @Validated
 @Profile("avsluttSaker")
@@ -23,5 +25,9 @@ public class AvsluttSakProperties {
 	private LocalDateTime avsluttetDato;
 
 	private String administrativEnhet;
+
+	public LocalDateTime getAvsluttetDato(){
+		return avsluttetDato != null ? avsluttetDato : now();
+	}
 
 }
