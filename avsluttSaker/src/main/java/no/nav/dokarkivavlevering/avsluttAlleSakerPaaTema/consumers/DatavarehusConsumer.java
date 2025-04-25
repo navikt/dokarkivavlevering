@@ -43,7 +43,7 @@ public class DatavarehusConsumer {
 					if (res.getStatusCode().is4xxClientError()) {
 						throw new DokarkivavleveringFunctionalException(format("Funksjonell feil ved henting av henting av navn for administrativ fra DVH. Feilmelding=%s", res.getStatusText()));
 					}
-					throw new DokarkivavleveringTechnicalException(format("Funksjonell feil ved henting av henting av navn for administrativ fra DVH. Feilmelding=%s", res.getStatusText()));
+					throw new DokarkivavleveringTechnicalException(format("Teknisk feil ved henting av henting av navn for administrativ fra DVH. Feilmelding=%s", res.getStatusText()));
 				})
 				.body(DatavarehusResponse.class);
 	}
