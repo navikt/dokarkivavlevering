@@ -66,7 +66,6 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 	public void skalAvslutteSaker() {
 		stubAzure();
 		stubPdl("hentIdenterBolk.json");
-		stubDvh("response.json");
 		arbeidssakRepository.save(lagSakForAktoer(SAK_MED_LUKKET_JOURNALPOST1, FNR));
 		arbeidssakRepository.save(lagSakForOrganisasjon(SAK_MED_LUKKET_JOURNALPOST2, ORGNR));
 		commitAndBeginNewTransaction();
@@ -91,7 +90,6 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 	public void skalAvslutteSakerMedAvsluttetDato() {
 		stubAzure();
 		stubPdl("hentIdenterBolk.json");
-		stubDvh("response.json");
 		when(avsluttSakPropertiesMock.getAvsluttetDato()).thenReturn(AVSLUTTET_DATO);
 
 		arbeidssakRepository.save(lagSakForAktoer(SAK_MED_LUKKET_JOURNALPOST1, FNR));
@@ -118,7 +116,6 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 	public void skalAvslutteSakerMedFagsaknr() {
 		stubAzure();
 		stubPdl("hentIdenterBolk.json");
-		stubDvh("response.json");
 		when(avsluttSakPropertiesMock.getAvsluttetDato()).thenReturn(AVSLUTTET_DATO);
 
 		arbeidssakRepository.save(lagSakForAktoer(SAK_MED_FAGSAKNR1, FNR, "FAGSAK_123"));
@@ -145,7 +142,6 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 	public void skalAvslutteSakerMedAdministrativEnhet() {
 		stubAzure();
 		stubPdl("hentIdenterBolk.json");
-		stubDvh("response.json");
 		when(avsluttSakPropertiesMock.getAdministrativEnhet()).thenReturn(ADMINISTRATIV_ENHET);
 
 		arbeidssakRepository.save(lagSakForAktoer(SAK_MED_LUKKET_JOURNALPOST1, FNR));
@@ -172,7 +168,6 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 	public void skalIkkeAvslutteSakerUtenAdministrativEnhet() {
 		stubAzure();
 		stubPdl("hentIdenterBolk.json");
-		stubDvh("response.json");
 
 		arbeidssakRepository.save(lagSakForAktoer(SAK_UTEN_DVH_ADMINISTRATIV_ENHET, FNR));
 		commitAndBeginNewTransaction();
@@ -207,7 +202,6 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 	public void skalOppdatereAktoerIdOgAvslutteSak() {
 		stubAzure();
 		stubPdl("hentIdenterBolk.json");
-		stubDvh("response.json");
 		when(avsluttSakPropertiesMock.getAdministrativEnhet()).thenReturn(ADMINISTRATIV_ENHET);
 
 		arbeidssakRepository.save(lagSakForAktoer(SAK_MED_LUKKET_JOURNALPOST1, FNR_OLD));

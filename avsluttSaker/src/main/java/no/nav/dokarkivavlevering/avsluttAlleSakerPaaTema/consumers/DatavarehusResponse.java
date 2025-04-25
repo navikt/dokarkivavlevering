@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Data
 @NoArgsConstructor
@@ -16,13 +15,6 @@ import java.util.stream.Stream;
 public class DatavarehusResponse {
 
 	List<AdministrativEnhet> items;
-
-	public Stream<AdministrativEnhet> administrativeEnheter() {
-		if (items == null || items.isEmpty()) {
-			return Stream.empty();
-		}
-		return items.stream();
-	}
 
 	@Builder
 	public record AdministrativEnhet(

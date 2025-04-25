@@ -13,7 +13,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static java.util.Collections.emptyList;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.AdministrativEnhetService.APPLIKASJON_AO01;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.AdministrativEnhetService.APPLIKASJON_IT01;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.AdministrativEnhetService.KONTORTYPE_ARENA;
@@ -39,23 +38,9 @@ class AdministrativEnhetServiceTest {
 	private static final LocalDate GYLDIG_TIL = GYLDIG_FRA.plusYears(2);
 
 	@Test
-	public void skalIkkeFinneAdministrativEnhetNarDvhReturnerernullListe() {
-		when(datavarehusConsumermock.hentAlleAdministrativeEnheter()).thenReturn(new DatavarehusResponse());
-
-		Optional<String> administrativEnhet = administrativEnhetService.hentHistoriskNavnForAdministrativEnhet(JFR_ENHET, LocalDate.now(), APPLIKASJON_GOSYS);
-		assertThat(administrativEnhet).isEmpty();
-	}
-	@Test
-	public void skalIkkeFinneAdministrativEnhetNarDvhReturnererTomListe() {
-		when(datavarehusConsumermock.hentAlleAdministrativeEnheter()).thenReturn(new DatavarehusResponse(emptyList()));
-
-		Optional<String> administrativEnhet = administrativEnhetService.hentHistoriskNavnForAdministrativEnhet(JFR_ENHET, LocalDate.now(), APPLIKASJON_GOSYS);
-		assertThat(administrativEnhet).isEmpty();
-	}
-
-	@Test
 	public void skalReturnereAdministrativEnhetNarDvhReturnererEtSvar() {
 		when(datavarehusConsumermock.hentAlleAdministrativeEnheter()).thenReturn(new DatavarehusResponse(List.of(createDefaultAdministrativEnhet())));
+		administrativEnhetService.populerAdministrativEnhetMap();
 
 		Optional<String> administrativEnhet = administrativEnhetService.hentHistoriskNavnForAdministrativEnhet(JFR_ENHET, GYLDIG_FRA, APPLIKASJON_GOSYS);
 		assertThat(administrativEnhet.get()).isEqualTo(KONTORNAVN_OSLO);
@@ -67,6 +52,7 @@ class AdministrativEnhetServiceTest {
 				new DatavarehusResponse(List.of(
 						createAdministrativEnhet(JFR_ENHET, KONTORTYPE_INFOTRYGD, KONTORNAVN_OSLO, GYLDIG_FRA, GYLDIG_TIL),
 						createAdministrativEnhet(JFR_ENHET, KONTORTYPE_NORG, KONTORNAVN_KRISTIANIA, GYLDIG_FRA, GYLDIG_TIL))));
+		administrativEnhetService.populerAdministrativEnhetMap();
 
 		Optional<String> administrativEnhet = administrativEnhetService.hentHistoriskNavnForAdministrativEnhet(JFR_ENHET, GYLDIG_FRA.plusDays(5), APPLIKASJON_IT01);
 		assertThat(administrativEnhet.get()).isEqualTo(KONTORNAVN_OSLO);
@@ -78,6 +64,7 @@ class AdministrativEnhetServiceTest {
 				new DatavarehusResponse(List.of(
 						createAdministrativEnhet(JFR_ENHET, KONTORTYPE_ARENA, KONTORNAVN_OSLO, GYLDIG_FRA, GYLDIG_TIL),
 						createAdministrativEnhet(JFR_ENHET, KONTORTYPE_NORG, KONTORNAVN_KRISTIANIA, GYLDIG_FRA, GYLDIG_TIL))));
+		administrativEnhetService.populerAdministrativEnhetMap();
 
 		Optional<String> administrativEnhet = administrativEnhetService.hentHistoriskNavnForAdministrativEnhet(JFR_ENHET, GYLDIG_FRA.plusDays(5), APPLIKASJON_AO01);
 		assertThat(administrativEnhet.get()).isEqualTo(KONTORNAVN_OSLO);
@@ -89,6 +76,7 @@ class AdministrativEnhetServiceTest {
 				new DatavarehusResponse(List.of(
 						createAdministrativEnhet(JFR_ENHET, KONTORTYPE_ARENA, KONTORNAVN_KRISTIANIA, GYLDIG_FRA, GYLDIG_TIL),
 						createAdministrativEnhet(JFR_ENHET, KONTORTYPE_NORG, KONTORNAVN_OSLO, GYLDIG_FRA, GYLDIG_TIL))));
+		administrativEnhetService.populerAdministrativEnhetMap();
 
 		Optional<String> administrativEnhet = administrativEnhetService.hentHistoriskNavnForAdministrativEnhet(JFR_ENHET, GYLDIG_FRA.plusDays(5), APPLIKASJON_GOSYS);
 		assertThat(administrativEnhet.get()).isEqualTo(KONTORNAVN_OSLO);
@@ -100,6 +88,7 @@ class AdministrativEnhetServiceTest {
 				new DatavarehusResponse(List.of(
 						createAdministrativEnhet(JFR_ENHET, KONTORTYPE_ARENA, KONTORNAVN_KRISTIANIA, GYLDIG_FRA, GYLDIG_TIL),
 						createAdministrativEnhet(JFR_ENHET, KONTORTYPE_INFOTRYGD, KONTORNAVN_OSLO, GYLDIG_FRA, GYLDIG_TIL))));
+		administrativEnhetService.populerAdministrativEnhetMap();
 
 		Optional<String> administrativEnhet = administrativEnhetService.hentHistoriskNavnForAdministrativEnhet(JFR_ENHET, GYLDIG_FRA.plusDays(5), APPLIKASJON_GOSYS);
 		assertThat(administrativEnhet.get()).isEqualTo(KONTORNAVN_OSLO);
@@ -111,6 +100,7 @@ class AdministrativEnhetServiceTest {
 				new DatavarehusResponse(List.of(
 						createAdministrativEnhet(JFR_ENHET, KONTORTYPE_ARENA, KONTORNAVN_OSLO, GYLDIG_FRA, GYLDIG_TIL),
 						createAdministrativEnhet(JFR_ENHET, "FIKTIVT_KONTOR", KONTORNAVN_KRISTIANIA, GYLDIG_FRA, GYLDIG_TIL))));
+		administrativEnhetService.populerAdministrativEnhetMap();
 
 		Optional<String> administrativEnhet = administrativEnhetService.hentHistoriskNavnForAdministrativEnhet(JFR_ENHET, GYLDIG_FRA.plusDays(5), APPLIKASJON_GOSYS);
 		assertThat(administrativEnhet.get()).isEqualTo(KONTORNAVN_OSLO);
@@ -122,6 +112,7 @@ class AdministrativEnhetServiceTest {
 				new DatavarehusResponse(List.of(
 						createAdministrativEnhet(JFR_ENHET, "FIKTIVT_KONTOR2", KONTORNAVN_OSLO, GYLDIG_FRA, GYLDIG_TIL),
 						createAdministrativEnhet(JFR_ENHET, "FIKTIVT_KONTOR", KONTORNAVN_KRISTIANIA, GYLDIG_FRA, GYLDIG_TIL))));
+		administrativEnhetService.populerAdministrativEnhetMap();
 
 		Optional<String> administrativEnhet = administrativEnhetService.hentHistoriskNavnForAdministrativEnhet(JFR_ENHET, GYLDIG_FRA.plusDays(5), APPLIKASJON_GOSYS);
 		assertThat(administrativEnhet).isEmpty();
