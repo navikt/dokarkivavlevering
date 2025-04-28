@@ -1,4 +1,4 @@
-package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema;
+package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.validators;
 
 import no.nav.dokarkivavlevering.core.exception.MissingPropertiesException;
 

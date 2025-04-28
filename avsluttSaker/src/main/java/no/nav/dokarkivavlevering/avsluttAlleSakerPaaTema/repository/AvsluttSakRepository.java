@@ -1,7 +1,7 @@
 package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository;
 
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.AvsluttSakProperties;
-import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Journalpost;
+import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.domain.Journalpost;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
