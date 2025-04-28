@@ -1,6 +1,8 @@
 package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema;
 
+import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.domain.Journalpost;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.AvsluttSakRepository;
+import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.services.AdministrativEnhetService;
 import no.nav.dokarkivavlevering.config.ApplicationTestConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

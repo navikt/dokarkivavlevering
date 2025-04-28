@@ -1,8 +1,11 @@
-package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema;
+package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.services;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.consumers.DatavarehusConsumer;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.consumers.DatavarehusResponse.AdministrativEnhet;
+import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.domain.Arkivsak;
+import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.domain.Journalpost;
+import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.exeptions.KanIkkeBehandleArkivsakException;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
@@ -15,6 +18,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.Arbeidsstatus.FEIL_INGEN_ADMINISTRATIV_ENHET_FUNNET_FOR_ARKIVSAK;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.AvsluttSakUtils.oppdaterArbeidsstatusForArkivsak;
+
 @Slf4j
 @Component
 @Profile("avsluttSaker")
@@ -23,8 +30,8 @@ public class AdministrativEnhetService {
 	private Map<String, List<AdministrativEnhet>> administrativEnhetMap;
 	private final DatavarehusConsumer datavarehusConsumer;
 
-	public static final String APPLIKASJON_IT01 = "IT01";
-	public static final String APPLIKASJON_AO01 = "AO01";
+	public static final String APPLIKASJON_INFOTRYGD = "IT01";
+	public static final String APPLIKASJON_ARENA = "AO01";
 	public static final String KONTORTYPE_NORG = "NORGENHET";
 	public static final String KONTORTYPE_INFOTRYGD = "INFOENHET";
 	public static final String KONTORTYPE_ARENA = "ARENAENHET";
@@ -41,7 +48,18 @@ public class AdministrativEnhetService {
 				.collect(Collectors.groupingBy(AdministrativEnhet::journalfoerendeEnhet));
 	}
 
-	public Optional<String> hentHistoriskNavnForAdministrativEnhet(String journalfoerendeEnhet, LocalDate journalfoertDato, String applikasjon) {
+	public String hentHistoriskNavnForAdministrativEnhet(Journalpost eldsteJournalpost, Arkivsak arkivsak) {
+		Optional<String> administrativEnhetOptional = finnHistoriskKontornavnForAdministrativEnhet(
+				eldsteJournalpost.getJournalfoerendeEnhet(), eldsteJournalpost.getJournaldato(), arkivsak.getApplikasjon());
+
+		if (administrativEnhetOptional.isEmpty()) {
+			oppdaterArbeidsstatusForArkivsak(arkivsak, FEIL_INGEN_ADMINISTRATIV_ENHET_FUNNET_FOR_ARKIVSAK);
+			throw new KanIkkeBehandleArkivsakException(format("Fant ingen administrativ enhet for arkivsak med saksIder=%s", arkivsak.getArbeidssaksIder()));
+		}
+		return administrativEnhetOptional.get();
+	}
+
+	private Optional<String> finnHistoriskKontornavnForAdministrativEnhet(String journalfoerendeEnhet, LocalDate journalfoertDato, String applikasjon) {
 
 		List<AdministrativEnhet> kontorer = administrativEnhetMap.get(journalfoerendeEnhet);
 		if (kontorer == null) {
@@ -60,10 +78,10 @@ public class AdministrativEnhetService {
 			return Optional.of(gyldigeKontorer.getFirst().kontornavn());
 		}
 
-		if (APPLIKASJON_IT01.equals(applikasjon) && harDataForKontor(gyldigeKontorer, KONTORTYPE_INFOTRYGD)) {
+		if (APPLIKASJON_INFOTRYGD.equals(applikasjon) && harDataForKontor(gyldigeKontorer, KONTORTYPE_INFOTRYGD)) {
 			return hentKontornavn(gyldigeKontorer, KONTORTYPE_INFOTRYGD);
 		}
-		if (APPLIKASJON_AO01.equals(applikasjon) && harDataForKontor(gyldigeKontorer, KONTORTYPE_ARENA)) {
+		if (APPLIKASJON_ARENA.equals(applikasjon) && harDataForKontor(gyldigeKontorer, KONTORTYPE_ARENA)) {
 			return hentKontornavn(gyldigeKontorer, KONTORTYPE_ARENA);
 		}
 

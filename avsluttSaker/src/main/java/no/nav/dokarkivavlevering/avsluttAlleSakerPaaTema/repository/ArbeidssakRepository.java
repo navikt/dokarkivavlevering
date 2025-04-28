@@ -1,11 +1,9 @@
 package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository;
 
-import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.Arbeidsstatus;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.entities.Arbeidssak;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.util.EnumSet;
 import java.util.List;
