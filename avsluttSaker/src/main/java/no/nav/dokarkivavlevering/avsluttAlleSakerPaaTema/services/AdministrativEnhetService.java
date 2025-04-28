@@ -113,12 +113,10 @@ public class AdministrativEnhetService {
 	}
 
 	private Optional<String> hentKontornavn(List<AdministrativEnhet> gyldigeKontorer, String fagsystem) {
-		String kontornavn = gyldigeKontorer.stream()
-				.filter(ae -> ae.kontortype().equals(fagsystem))
-				.findFirst()
-				.get().kontornavn();
-
-		return Optional.of(kontornavn);
+		return gyldigeKontorer.stream()
+				.filter(ae -> fagsystem.equals(ae.kontortype()))
+				.map(AdministrativEnhet::kontornavn)
+				.findFirst();
 	}
 
 	private boolean harDataForKontor(List<AdministrativEnhet> gyldigeKontorer, String fagsystem) {

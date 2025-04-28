@@ -57,17 +57,15 @@ public class OppdaterAktoerIdService {
 				.filter(arbeidssak -> arbeidssak.getAktoerId() != null)
 				.toList();
 
-		Set<String> aktoerIds = sakerMedAktoerId.stream()
-				.map(Arbeidssak::getAktoerId)
-				.collect(Collectors.toSet());
-
-		if (!aktoerIds.isEmpty()) {
-			oppdaterArbeidssakMedGjeldendeAktoerIdFraPdl(aktoerIds, sakerMedAktoerId);
+		if (!sakerMedAktoerId.isEmpty()) {
+			oppdaterArbeidssakMedGjeldendeAktoerIdFraPdl(sakerMedAktoerId, sakerMedAktoerId);
 		}
 	}
 
-	private void oppdaterArbeidssakMedGjeldendeAktoerIdFraPdl(Set<String> aktoerIds, List<Arbeidssak> arbeidssakerMedAktoerId) {
-		List<HentIdenterBolk> hentIdenterBolkListe = pdlGraphQLConsumer.hentGjeldendeAktoerIder(aktoerIds);
+	private void oppdaterArbeidssakMedGjeldendeAktoerIdFraPdl(List<Arbeidssak> sakerMedAktoerId, List<Arbeidssak> arbeidssakerMedAktoerId) {
+
+		Set<String> aktoerIderFraArbeidssaker = hentAktoerIderFraArbeidssaker(sakerMedAktoerId);
+		List<HentIdenterBolk> hentIdenterBolkListe = pdlGraphQLConsumer.hentGjeldendeAktoerIder(aktoerIderFraArbeidssaker);
 		Map<String, String> aktoerIderSomSkalOppdateres = new HashMap<>();
 		List<String> aktoerIderUtenGyldigAktoerId = new ArrayList<>();
 
@@ -98,4 +96,9 @@ public class OppdaterAktoerIdService {
 		});
 	}
 
+	private Set<String> hentAktoerIderFraArbeidssaker(List<Arbeidssak> sakerMedAktoerId) {
+		return sakerMedAktoerId.stream()
+				.map(Arbeidssak::getAktoerId)
+				.collect(Collectors.toSet());
+	}
 }
