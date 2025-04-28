@@ -16,11 +16,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static java.time.LocalDateTime.now;
-import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakRepositoryUtils.Sak;
-import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakRepositoryUtils.SakRowMapper;
-import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakRepositoryUtils.assertAvbrutteSaker;
-import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakRepositoryUtils.assertAvsluttedeSaker;
-import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakRepositoryUtils.generateSakParams;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakRepositoryTestUtils.Sak;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakRepositoryTestUtils.SakRowMapper;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakRepositoryTestUtils.assertAvbrutteSaker;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakRepositoryTestUtils.assertAvsluttedeSaker;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakRepositoryTestUtils.generateSakParams;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;

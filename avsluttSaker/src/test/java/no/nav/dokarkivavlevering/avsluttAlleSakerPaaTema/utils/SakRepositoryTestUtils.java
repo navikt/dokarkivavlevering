@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.assertj.core.api.Assertions.within;
 
-public class SakRepositoryUtils {
+public class SakRepositoryTestUtils {
 
 	public static SqlParameterSource generateSakParams(Long sakId) {
 		return generateSakParams(List.of(sakId));

@@ -20,13 +20,14 @@ import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 @Service
 public class JournalpostService {
 
-	private final AvsluttSakProperties avsluttSakProperties;
+	private static final String MASKINELL_JOURNALFOERENDE_ENHET = "9999";
 	private final AvsluttSakRepository avsluttSakRepository;
+	private static String inputAdministrativEnhet;
 
 	public JournalpostService(AvsluttSakProperties avsluttSakProperties,
 							  AvsluttSakRepository avsluttSakRepository) {
-		this.avsluttSakProperties = avsluttSakProperties;
 		this.avsluttSakRepository = avsluttSakRepository;
+		inputAdministrativEnhet = avsluttSakProperties.getAdministrativEnhet();
 	}
 
 	public List<Journalpost> hentTilhoerendeJournalposter(Arkivsak arkivsak) {
@@ -43,11 +44,10 @@ public class JournalpostService {
 	}
 
 	private Optional<Journalpost> finnEldsteJournalpost(Arkivsak arkivsak) {
-		String inputAdministrativEnhet = avsluttSakProperties.getAdministrativEnhet();
 		List<Journalpost> filtrerteJournalposter = arkivsak.journalposter().stream()
 				.filter(journalpost -> LUKKEDE_JOURNALSTATUSER.contains(journalpost.getJournalstatus()))
 				.filter(journalpost -> !journalpost.isErFeilregistrert())
-				.filter(journalpost -> !isEmpty(inputAdministrativEnhet) || (!isEmpty(journalpost.getJournalfoerendeEnhet()) && !"9999".equals(journalpost.getJournalfoerendeEnhet())))
+				.filter(journalpost -> !isEmpty(inputAdministrativEnhet) || harGyldigJournalfoerendeEnhet(journalpost))
 				.toList();
 
 		if (filtrerteJournalposter.isEmpty()) {
@@ -55,5 +55,10 @@ public class JournalpostService {
 		}
 		return filtrerteJournalposter.stream()
 				.min(Comparator.comparing(Journalpost::getJournaldato));
+	}
+
+	private boolean harGyldigJournalfoerendeEnhet(Journalpost journalpost){
+		return (!isEmpty(journalpost.getJournalfoerendeEnhet())
+						&& !MASKINELL_JOURNALFOERENDE_ENHET.equals(journalpost.getJournalfoerendeEnhet()));
 	}
 }

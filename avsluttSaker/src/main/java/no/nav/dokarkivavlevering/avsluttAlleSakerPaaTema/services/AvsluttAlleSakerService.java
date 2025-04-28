@@ -111,18 +111,13 @@ public class AvsluttAlleSakerService {
 			validerAtArkivsakenSkalAvsluttes(arkivsak);
 
 			Journalpost eldsteJournalpost = journalpostService.finnEldsteJournalpostForArkivsak(arkivsak);
-
-			String administrativEnhet = avsluttSakProperties.getAdministrativEnhet();
-			if (isEmpty(administrativEnhet)) {
-				administrativEnhet = administrativEnhetService.hentHistoriskNavnForAdministrativEnhet(eldsteJournalpost, arkivsak);
-			}
-
 			LocalDateTime datoSakOpprettet = eldsteJournalpost.getOpprettetdato();
+			String administrativEnhet = bestemAdministrativEnhet(eldsteJournalpost, arkivsak);
 			avsluttSakRepository.avsluttSaker(arkivsak.getArbeidssaksIder(), hentDatoAvsluttet(), datoSakOpprettet, administrativEnhet);
 			oppdaterArbeidsstatusForArkivsak(arkivsak, FERDIG_SAK_AVSLUTTET);
 
 		} catch (KanIkkeBehandleArkivsakException e) {
-			log.warn(e.getMessage());
+			log.warn("Feilet i å avslutte arkivsak med saksIds={} med feilmelding={}", arkivsak.getArbeidssaksIder(), e.getMessage(), e);
 		}
 	}
 
@@ -144,6 +139,10 @@ public class AvsluttAlleSakerService {
 			oppdaterArbeidsstatusForArkivsak(arkivsak, FERDIG_TOM_ARKIVSAK);
 			throw new KanIkkeBehandleArkivsakException(format("Arkivsak har ingen ferdigstilte journalposter. Avbryter saker=%s knyttet til tom arkivsak.", arkivsak.getArbeidssaksIder()));
 		}
+	}
+
+	private String bestemAdministrativEnhet(Journalpost eldsteJournalpost, Arkivsak arkivsak){
+		return isEmpty(avsluttSakProperties.getAdministrativEnhet()) ? administrativEnhetService.hentHistoriskNavnForAdministrativEnhet(eldsteJournalpost, arkivsak) : avsluttSakProperties.getAdministrativEnhet();
 	}
 
 	private LocalDateTime hentDatoAvsluttet() {
