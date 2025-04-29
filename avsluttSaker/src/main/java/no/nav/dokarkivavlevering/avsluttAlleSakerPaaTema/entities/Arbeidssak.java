@@ -2,6 +2,7 @@ package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -10,12 +11,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.Arbeidsstatus;
 
+import static jakarta.persistence.EnumType.STRING;
+
 @Data
 @Entity
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "AVSLUTTSAKER_TMP_TABELL")
+@Table(name = "MMA_7185")
 public class Arbeidssak {
 
 	@Id
@@ -28,7 +31,7 @@ public class Arbeidssak {
 	@Column
 	String fagsaknr;
 
-	@Column
+	@Column(name = "aktoerid")
 	String aktoerId;
 
 	@Column
@@ -38,5 +41,6 @@ public class Arbeidssak {
 	String status;
 
 	@Column
+	@Enumerated(STRING)
 	Arbeidsstatus arbeidsstatus;
 }
