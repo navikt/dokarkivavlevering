@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.LocalDateTime;
@@ -80,6 +81,14 @@ class AvsluttSakerValidatorTest {
 		assertThatExceptionOfType(MissingPropertiesException.class)
 				.isThrownBy(() -> validerAvsluttAlleSakerPaaTemaRequest(TEMA, REFERANSE, ugyldigAvsluttetDato, ADMINISTRATIV_ENHET))
 				.withMessageContaining("avsluttetDato kan ikke være i fremtiden.");
+	}
+
+	@ParameterizedTest
+	@ValueSource(strings = {" "})
+	@NullAndEmptySource
+	void skalGodtaAtAdministrativEnhetIkkeErSatt(String administrativEnhet) {
+		assertThatNoException()
+				.isThrownBy(() -> validerAvsluttAlleSakerPaaTemaRequest(TEMA, REFERANSE, AVSLUTTET_DATO, administrativEnhet));
 	}
 
 	@ParameterizedTest
