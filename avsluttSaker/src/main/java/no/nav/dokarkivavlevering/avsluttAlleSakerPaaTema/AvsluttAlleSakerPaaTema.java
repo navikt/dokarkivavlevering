@@ -30,9 +30,9 @@ public class AvsluttAlleSakerPaaTema {
 		LocalDateTime avsluttetDato = avsluttSakProperties.getAvsluttetDato();
 		String administrativEnhet = avsluttSakProperties.getAdministrativEnhet();
 
+		log.info("avsluttAlleSakerPaaTema skal avslutte alle saker på tema={} med referanse={}, avsluttetDato={} og administrativEnhet={}", tema, referanse, avsluttetDato, administrativEnhet);
 		validerAvsluttAlleSakerPaaTemaRequest(tema, referanse, avsluttetDato, administrativEnhet);
 
-		log.info("avsluttAlleSakerPaaTema skal avslutte alle saker på tema={} med referanse={}, avsluttetDato={} og administrativEnhet={}", tema, referanse, avsluttetDato, administrativEnhet);
 		avsluttAlleSakerService.avsluttAlleSaker();
 
 		log.info("avsluttAlleSakerPaaTema har avsluttet alle saker på tema={} med referanse={}, avsluttetDato={} og administrativEnhet={}", tema, referanse, avsluttetDato, administrativEnhet);

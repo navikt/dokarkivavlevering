@@ -47,7 +47,7 @@ public class AvsluttSakerValidator {
 	}
 
 	private static void validerAdministrativEnhet(String administrativEnhet) {
-		if (administrativEnhet != null) {
+		if (!isBlank(administrativEnhet)) {
 			if (!isNumeric(administrativEnhet)) {
 				throw new MissingPropertiesException("administrativEnhet må være et heltall. Mottok=%s".formatted(administrativEnhet));
 			}
