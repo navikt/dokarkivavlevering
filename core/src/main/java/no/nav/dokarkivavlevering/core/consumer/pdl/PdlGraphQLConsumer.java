@@ -81,6 +81,7 @@ public class PdlGraphQLConsumer {
 				.block();
 
 		if (pdlResponse.getErrors() == null || pdlResponse.getErrors().isEmpty()) {
+			log.info("hentGjeldendeAktoerIder har hentet svar fra PDL OK");
 			return pdlResponse.getData().getHentIdenterBolk();
 		} else {
 			throw new PdlFunctionalException("Kunne ikke hente aktørid for folkeregisterident i pdl. " + pdlResponse.getErrors());
