@@ -38,13 +38,17 @@ public class OppdaterAktoerIdService {
 	}
 
 	public void oppdaterUtdaterteAktoerIder() {
+		log.info("AvsluttAlleSaker starter oppdateringen av utdaterte aktoerId'er");
 		List<Long> alleSaksIder = arbeidssakRepository.findAllSakIdsWhereStatusIsNullOrAapen();
 		List<List<Long>> sakIdsPartitioned = Lists.partition(alleSaksIder, BATCHSTOERRELSE);
 
 		sakIdsPartitioned.forEach(sakIdListe -> {
 			List<Arbeidssak> arbeidssaker = arbeidssakRepository.findSaksBySakIdIn(sakIdListe);
+			log.info("Starter oppdatering av utdaterte aktoerId'er for de neste {} sakene", sakIdListe.size());
 			oppdaterAlleAktoerIder(arbeidssaker);
+			log.info("Har oppdatert utdaterte aktoerId'er");
 		});
+		log.info("AvsluttAlleSaker har oppdatert alle utdaterte aktoerId'er");
 	}
 
 	private void oppdaterAlleAktoerIder(List<Arbeidssak> saker) {
@@ -58,20 +62,19 @@ public class OppdaterAktoerIdService {
 				.toList();
 
 		if (!sakerMedAktoerId.isEmpty()) {
-			oppdaterArbeidssakMedGjeldendeAktoerIdFraPdl(sakerMedAktoerId, sakerMedAktoerId);
+			oppdaterArbeidssakMedGjeldendeAktoerIdFraPdl(sakerMedAktoerId);
 		}
 	}
 
-	private void oppdaterArbeidssakMedGjeldendeAktoerIdFraPdl(List<Arbeidssak> sakerMedAktoerId, List<Arbeidssak> arbeidssakerMedAktoerId) {
+	private void oppdaterArbeidssakMedGjeldendeAktoerIdFraPdl(List<Arbeidssak> arbeidssakerMedAktoerId) {
 
-		Set<String> aktoerIderFraArbeidssaker = hentAktoerIderFraArbeidssaker(sakerMedAktoerId);
+		Set<String> aktoerIderFraArbeidssaker = hentAktoerIderFraArbeidssaker(arbeidssakerMedAktoerId);
 		List<HentIdenterBolk> hentIdenterBolkListe = pdlGraphQLConsumer.hentGjeldendeAktoerIder(aktoerIderFraArbeidssaker);
 		Map<String, String> aktoerIderSomSkalOppdateres = new HashMap<>();
 		List<String> aktoerIderUtenGyldigAktoerId = new ArrayList<>();
 
 		hentIdenterBolkListe.forEach(identBolk -> {
 			if (OK.equals(identBolk.getCode())) {
-				// key er gammel aktoerId, value er ny aktoerId
 				String gammelAktoerId = identBolk.getIdent();
 				String nyAktoerId = identBolk.getIdenter().getFirst().getIdent();
 
