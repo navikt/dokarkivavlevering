@@ -58,6 +58,7 @@ public class AvsluttAlleSakerService {
 	}
 
 	public void avsluttAlleSaker() {
+		administrativEnhetService.populerAdministrativEnhetMap();
 		oppdaterAktoerIdService.oppdaterUtdaterteAktoerIder();
 
 		avsluttAlleSakerForAktoerId();
