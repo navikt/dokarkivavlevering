@@ -66,7 +66,7 @@ public class AvsluttSakRepositoryTest {
 
 		avsluttSakRepository.avbrytSaker(sakIds);
 
-		List<Sak> saker = namedParameterJdbcTemplate.query("select * from sak where id in (:sakIds);", generateSakParams(sakIds), new SakRowMapper());
+		List<Sak> saker = namedParameterJdbcTemplate.query("select * from joark.sak where id in (:sakIds);", generateSakParams(sakIds), new SakRowMapper());
 
 		assertAvbrutteSaker(saker);
 	}
@@ -77,7 +77,7 @@ public class AvsluttSakRepositoryTest {
 
 		avsluttSakRepository.avsluttSaker(sakIds, now(), OPPRETTETDATO_JP_123, ADMINISTRATIV_ENHET);
 
-		List<Sak> saker = namedParameterJdbcTemplate.query("select * from sak where id in (:sakIds);", generateSakParams(sakIds), new SakRowMapper());
+		List<Sak> saker = namedParameterJdbcTemplate.query("select * from joark.sak where id in (:sakIds);", generateSakParams(sakIds), new SakRowMapper());
 
 		assertAvsluttedeSaker(saker);
 	}

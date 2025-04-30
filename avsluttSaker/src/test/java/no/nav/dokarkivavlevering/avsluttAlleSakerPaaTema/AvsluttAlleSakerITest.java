@@ -82,7 +82,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		assertThat(arbeidssak2.getArbeidsstatus()).isEqualTo(FERDIG_SAK_AVSLUTTET);
 		assertThat(arbeidssak2.getOrgnr()).isEqualTo(ORGNR);
 
-		List<Sak> saker = namedParameterJdbcTemplate.query("select * from sak where id in (:sakIds);", generateSakParams(List.of(123L, 234L)), new SakRowMapper());
+		List<Sak> saker = namedParameterJdbcTemplate.query("select * from joark.sak where id in (:sakIds);", generateSakParams(List.of(123L, 234L)), new SakRowMapper());
 		assertAvsluttetSak(saker.get(0), "Nav Lindesnes", JOURNALPOST1_OPPRETTETDATO, now());
 		assertAvsluttetSak(saker.get(1), "Nav Buskerud", JOURNALPOST2_OPPRETTETDATO, now());
 	}
@@ -108,7 +108,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		assertThat(arbeidssak2.getArbeidsstatus()).isEqualTo(FERDIG_SAK_AVSLUTTET);
 		assertThat(arbeidssak2.getOrgnr()).isEqualTo(ORGNR);
 
-		List<Sak> saker = namedParameterJdbcTemplate.query("select * from sak where id in (:sakIds);", generateSakParams(List.of(123L, 234L)), new SakRowMapper());
+		List<Sak> saker = namedParameterJdbcTemplate.query("select * from joark.sak where id in (:sakIds);", generateSakParams(List.of(123L, 234L)), new SakRowMapper());
 		assertAvsluttetSak(saker.get(0), "Nav Lindesnes", JOURNALPOST1_OPPRETTETDATO, AVSLUTTET_DATO);
 		assertAvsluttetSak(saker.get(1), "Nav Buskerud", JOURNALPOST2_OPPRETTETDATO, AVSLUTTET_DATO);
 	}
@@ -134,7 +134,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		assertThat(arbeidssak2.getArbeidsstatus()).isEqualTo(FERDIG_SAK_AVSLUTTET);
 		assertThat(arbeidssak2.getOrgnr()).isEqualTo(ORGNR);
 
-		List<Sak> saker = namedParameterJdbcTemplate.query("select * from sak where id in (:sakIds);", generateSakParams(List.of(SAK_MED_FAGSAKNR1, SAK_MED_FAGSAKNR2)), new SakRowMapper());
+		List<Sak> saker = namedParameterJdbcTemplate.query("select * from joark.sak where id in (:sakIds);", generateSakParams(List.of(SAK_MED_FAGSAKNR1, SAK_MED_FAGSAKNR2)), new SakRowMapper());
 		assertAvsluttetSak(saker.get(0), "Nav Lindesnes", JOURNALPOST1_OPPRETTETDATO, AVSLUTTET_DATO);
 		assertAvsluttetSak(saker.get(1), "Nav Lindesnes", JOURNALPOST1_OPPRETTETDATO, AVSLUTTET_DATO);
 	}
@@ -160,7 +160,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		assertThat(arbeidssak2.getArbeidsstatus()).isEqualTo(FERDIG_SAK_AVSLUTTET);
 		assertThat(arbeidssak2.getOrgnr()).isEqualTo(ORGNR);
 
-		List<Sak> saker = namedParameterJdbcTemplate.query("select * from sak where id in (:sakIds);", generateSakParams(List.of(123L, 234L)), new SakRowMapper());
+		List<Sak> saker = namedParameterJdbcTemplate.query("select * from joark.sak where id in (:sakIds);", generateSakParams(List.of(123L, 234L)), new SakRowMapper());
 		assertAvsluttetSak(saker.get(0), ADMINISTRATIV_ENHET, JOURNALPOST1_OPPRETTETDATO, now());
 		assertAvsluttetSak(saker.get(1), ADMINISTRATIV_ENHET, JOURNALPOST2_OPPRETTETDATO, now());
 	}
@@ -181,7 +181,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		assertThat(arbeidssak1.getArbeidsstatus()).isEqualTo(FEIL_INGEN_ADMINISTRATIV_ENHET_FUNNET_FOR_ARKIVSAK);
 		assertThat(arbeidssak1.getAktoerId()).isEqualTo(FNR);
 
-		Sak sak = namedParameterJdbcTemplate.query("select * from sak where id in (:sakIds);", generateSakParams(List.of(SAK_UTEN_DVH_ADMINISTRATIV_ENHET)), new SakRowMapper()).getFirst();
+		Sak sak = namedParameterJdbcTemplate.query("select * from joark.sak where id in (:sakIds);", generateSakParams(List.of(SAK_UTEN_DVH_ADMINISTRATIV_ENHET)), new SakRowMapper()).getFirst();
 
 		assertThat(sak.saksstatus()).isNull();
 		assertThat(sak.datoEndret()).isNull();
@@ -216,7 +216,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		assertThat(arbeidssak1.getArbeidsstatus()).isEqualTo(FERDIG_SAK_AVSLUTTET);
 		assertThat(arbeidssak1.getAktoerId()).isEqualTo(FNR_NEW);
 
-		Sak sak = namedParameterJdbcTemplate.query("select * from sak where id in (:sakIds);", generateSakParams(List.of(SAK_MED_LUKKET_JOURNALPOST1)), new SakRowMapper()).getFirst();
+		Sak sak = namedParameterJdbcTemplate.query("select * from joark.sak where id in (:sakIds);", generateSakParams(List.of(SAK_MED_LUKKET_JOURNALPOST1)), new SakRowMapper()).getFirst();
 		assertAvsluttetSak(sak, ADMINISTRATIV_ENHET, JOURNALPOST1_OPPRETTETDATO, now());
 	}
 
@@ -295,7 +295,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		assertThat(arbeidssak1.getArbeidsstatus()).isEqualTo(FERDIG_TOM_ARKIVSAK);
 		assertThat(arbeidssak1.getAktoerId()).isEqualTo("1234567891234");
 
-		List<Sak> saker = namedParameterJdbcTemplate.query("select * from sak where id in (:sakIds);", generateSakParams(SAK_UTEN_FERDIGSTILT_JOURNALPOST), new SakRowMapper());
+		List<Sak> saker = namedParameterJdbcTemplate.query("select * from joark.sak where id in (:sakIds);", generateSakParams(SAK_UTEN_FERDIGSTILT_JOURNALPOST), new SakRowMapper());
 		assertAvbrutteSaker(saker);
 	}
 
