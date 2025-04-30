@@ -7,9 +7,6 @@ import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.domain.Arkivsak;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.domain.Journalpost;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.exeptions.KanIkkeBehandleArkivsakException;
 import org.springframework.context.annotation.Profile;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -40,12 +37,12 @@ public class AdministrativEnhetService {
 		this.datavarehusConsumer = datavarehusConsumer;
 	}
 
-	@Async
-	@EventListener(ContextRefreshedEvent.class)
 	public void populerAdministrativEnhetMap() {
+		log.info("Populerer administrativEnhetMap med data fra datavarehus");
 		List<AdministrativEnhet> administrativEnheter = datavarehusConsumer.hentAlleAdministrativeEnheter().getItems();
 		administrativEnhetMap = administrativEnheter.stream()
 				.collect(Collectors.groupingBy(AdministrativEnhet::journalfoerendeEnhet));
+		log.info("Fant {} administrative enheter fra datavarehus", administrativEnhetMap.size());
 	}
 
 	public String hentHistoriskNavnForAdministrativEnhet(Journalpost eldsteJournalpost, Arkivsak arkivsak) {

@@ -3,7 +3,6 @@ package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.consumers;
 import no.nav.dokarkivavlevering.core.DokarkivavleveringProperties;
 import no.nav.dokarkivavlevering.core.exception.DokarkivavleveringFunctionalException;
 import no.nav.dokarkivavlevering.core.exception.DokarkivavleveringTechnicalException;
-import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchProperties;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.retry.annotation.Retryable;
@@ -35,7 +34,6 @@ public class DatavarehusConsumer {
 
 	@Retryable(retryFor = {DokarkivavleveringTechnicalException.class, RestClientException.class})
 	public DatavarehusResponse hentAlleAdministrativeEnheter() {
-
 		return restClient.get()
 				.uri(uriBuilder -> UriComponentsBuilder.fromUri(uriBuilder.build())
 						.queryParam("q", QUERY)
