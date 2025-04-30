@@ -43,9 +43,11 @@ public class AdministrativEnhetService {
 	@Async
 	@EventListener(ContextRefreshedEvent.class)
 	public void populerAdministrativEnhetMap() {
+		log.info("Populerer administrativEnhetMap med data fra datavarehus");
 		List<AdministrativEnhet> administrativEnheter = datavarehusConsumer.hentAlleAdministrativeEnheter().getItems();
 		administrativEnhetMap = administrativEnheter.stream()
 				.collect(Collectors.groupingBy(AdministrativEnhet::journalfoerendeEnhet));
+		log.info("Fant {} administrative enheter fra datavarehus", administrativEnhetMap.size());
 	}
 
 	public String hentHistoriskNavnForAdministrativEnhet(Journalpost eldsteJournalpost, Arkivsak arkivsak) {
