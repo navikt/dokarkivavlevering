@@ -5,25 +5,15 @@ import no.nav.dokarkivavlevering.core.exception.MissingPropertiesException;
 import java.time.LocalDateTime;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNumeric;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.splitByWholeSeparatorPreserveAllTokens;
 
 public class AvsluttSakerValidator {
 
-	public static void validerAvsluttAlleSakerPaaTemaRequest(String tema, String referanse, LocalDateTime avsluttetDato, String administrativEnhet) {
-		validerTema(tema);
+	public static void validerAvsluttAlleSakerPaaTemaRequest(String referanse, LocalDateTime avsluttetDato, String administrativEnhet) {
 		validerReferanse(referanse);
 		validerAvsluttetDato(avsluttetDato);
 		validerAdministrativEnhet(administrativEnhet);
-	}
-
-	private static void validerTema(String tema) {
-		if (isBlank(tema)) {
-			throw new MissingPropertiesException("tema kan ikke være null eller tom");
-		}
-
-		if (tema.length() != 3) {
-			throw new MissingPropertiesException("tema må ha en lengde på 3. Mottok=" + tema);
-		}
 	}
 
 	private static void validerReferanse(String referanse) {
@@ -47,13 +37,12 @@ public class AvsluttSakerValidator {
 	}
 
 	private static void validerAdministrativEnhet(String administrativEnhet) {
+		if (!isEmpty(administrativEnhet) && isBlank(administrativEnhet)) {
+			throw new MissingPropertiesException("administrativEnhet kan ikke være tom. Mottok=%s".formatted(administrativEnhet));
+		}
 		if (!isBlank(administrativEnhet)) {
-			if (!isNumeric(administrativEnhet)) {
-				throw new MissingPropertiesException("administrativEnhet må være et heltall. Mottok=%s".formatted(administrativEnhet));
-			}
-
-			if (administrativEnhet.length() != 4) {
-				throw new MissingPropertiesException("administrativEnhet må ha en lengde på 4. Mottok=%s".formatted(administrativEnhet));
+			if (administrativEnhet.length() > 40) {
+				throw new MissingPropertiesException("administrativEnhet kan ikke være lengre enn 40 tegn. Mottok=%s".formatted(administrativEnhet));
 			}
 		}
 	}
