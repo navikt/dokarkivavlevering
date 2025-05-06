@@ -76,9 +76,9 @@ public class AvsluttAlleSakerService {
 			//Finn alle tilhørende arbeidssaker for aktørId'ene i partisjonen
 			List<Arbeidssak> arbeidssaker = arbeidssakRepository.findSaksByAktoerIdIn(aktoerIdList);
 
-			List<List<Arbeidssak>> groupedLists = grupperArbeidssakerPerAktoerId(arbeidssaker);
+			List<List<Arbeidssak>> arbeidssakerPerAktoerId = grupperArbeidssakerPerAktoerId(arbeidssaker);
 
-			List<Arkivsak> arkivsaker = lagArkivsaker(groupedLists);
+			List<Arkivsak> arkivsaker = lagArkivsaker(arbeidssakerPerAktoerId);
 			arkivsaker.forEach(this::avsluttSak);
 		}
 	}
@@ -91,9 +91,9 @@ public class AvsluttAlleSakerService {
 			//Finn alle tilhørende arbeidssaker for aktørId'ene i partisjonen
 			List<Arbeidssak> arbeidssaker = arbeidssakRepository.findSaksByOrgnrIn(orgNrList);
 
-			List<List<Arbeidssak>> groupedLists = grupperArbeidssakerPerOrgnr(arbeidssaker);
+			List<List<Arbeidssak>> arbeidssakerPerOrgNr = grupperArbeidssakerPerOrgnr(arbeidssaker);
 
-			List<Arkivsak> arkivsaker = lagArkivsaker(groupedLists);
+			List<Arkivsak> arkivsaker = lagArkivsaker(arbeidssakerPerOrgNr);
 			arkivsaker.forEach(this::avsluttSak);
 		}
 	}
