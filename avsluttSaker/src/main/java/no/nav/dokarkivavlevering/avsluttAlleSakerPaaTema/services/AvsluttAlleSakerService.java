@@ -58,14 +58,16 @@ public class AvsluttAlleSakerService {
 	}
 
 	public void avsluttAlleSaker() {
-		administrativEnhetService.populerAdministrativEnhetMap();
+		if (isEmpty(avsluttSakProperties.getAdministrativEnhet())) {
+			administrativEnhetService.populerAdministrativEnhetMap();
+		}
 		oppdaterAktoerIdService.oppdaterUtdaterteAktoerIder();
 
 		avsluttAlleSakerForAktoerId();
 		avsluttAlleSakerOrgnr();
 	}
 
-	private void avsluttAlleSakerForAktoerId(){
+	private void avsluttAlleSakerForAktoerId() {
 		List<String> alleAktoerIder = arbeidssakRepository.findDistinctAktoerIds(ENDELIGE_STATUSER);
 		//Del alle aktørId'ene opp i håndterlige partisjoner
 		List<List<String>> aktoerIdsPartitioned = Lists.partition(alleAktoerIder, 200);
@@ -81,7 +83,7 @@ public class AvsluttAlleSakerService {
 		}
 	}
 
-	private void avsluttAlleSakerOrgnr(){
+	private void avsluttAlleSakerOrgnr() {
 		List<String> alleOrgNr = arbeidssakRepository.findDistinctOrgnrs(ENDELIGE_STATUSER);
 		List<List<String>> orgnrPartitioned = Lists.partition(alleOrgNr, 200);
 
@@ -116,6 +118,7 @@ public class AvsluttAlleSakerService {
 			String administrativEnhet = bestemAdministrativEnhet(eldsteJournalpost, arkivsak);
 			avsluttSakRepository.avsluttSaker(arkivsak.getArbeidssaksIder(), hentDatoAvsluttet(), datoSakOpprettet, administrativEnhet);
 			oppdaterArbeidsstatusForArkivsak(arkivsak, FERDIG_SAK_AVSLUTTET);
+			log.info("Har avsluttet arkivsak med saksIder={}", arkivsak.getArbeidssaksIder());
 
 		} catch (KanIkkeBehandleArkivsakException e) {
 			log.warn("Feilet i å avslutte arkivsak med saksIds={} med feilmelding={}", arkivsak.getArbeidssaksIder(), e.getMessage(), e);
@@ -142,7 +145,7 @@ public class AvsluttAlleSakerService {
 		}
 	}
 
-	private String bestemAdministrativEnhet(Journalpost eldsteJournalpost, Arkivsak arkivsak){
+	private String bestemAdministrativEnhet(Journalpost eldsteJournalpost, Arkivsak arkivsak) {
 		return isEmpty(avsluttSakProperties.getAdministrativEnhet()) ? administrativEnhetService.hentHistoriskNavnForAdministrativEnhet(eldsteJournalpost, arkivsak) : avsluttSakProperties.getAdministrativEnhet();
 	}
 
