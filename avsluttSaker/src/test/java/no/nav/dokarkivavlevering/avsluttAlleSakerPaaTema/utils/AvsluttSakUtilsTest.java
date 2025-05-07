@@ -25,7 +25,7 @@ class AvsluttSakUtilsTest {
 		List<Arbeidssak> arbeidssakerUtenFagsaknr = List.of(
 			lagArbeidssakMedAktoerId(1L, AKTOERID_1, APPLIKASJON_UTEN_FAGSAKNR, null),
 			lagArbeidssakMedAktoerId(2L, AKTOERID_1, APPLIKASJON_UTEN_FAGSAKNR, null),
-			lagArbeidssakMedAktoerId(3L, AKTOERID_1, APPLIKASJON_UTEN_FAGSAKNR, null)
+			lagArbeidssakMedAktoerId(3L, AKTOERID_1, null, null)
 		);
 
 		List<List<Arbeidssak>> grupperteArbeidssaker = grupperArbeidssakerPerAktoerId(arbeidssakerUtenFagsaknr);

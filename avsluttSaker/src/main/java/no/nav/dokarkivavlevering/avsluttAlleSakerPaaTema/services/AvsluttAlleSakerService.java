@@ -29,6 +29,7 @@ import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.AvsluttSak
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.validators.ArkivsakValidator.harArkivsakEnAapenJournalpost;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.validators.ArkivsakValidator.harArkivsakFerdigstilteJournalposter;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
+import static org.springframework.transaction.annotation.Propagation.REQUIRES_NEW;
 
 @Slf4j
 @Service
@@ -67,35 +68,47 @@ public class AvsluttAlleSakerService {
 		avsluttAlleSakerOrgnr();
 	}
 
-	private void avsluttAlleSakerForAktoerId() {
+	public void avsluttAlleSakerForAktoerId() {
 		List<String> alleAktoerIder = arbeidssakRepository.findDistinctAktoerIds(ENDELIGE_STATUSER);
 		//Del alle aktørId'ene opp i håndterlige partisjoner
 		List<List<String>> aktoerIdsPartitioned = Lists.partition(alleAktoerIder, 200);
 
 		for (List<String> aktoerIdList : aktoerIdsPartitioned) {
 			//Finn alle tilhørende arbeidssaker for aktørId'ene i partisjonen
-			List<Arbeidssak> arbeidssaker = arbeidssakRepository.findSaksByAktoerIdIn(aktoerIdList);
-
-			List<List<Arbeidssak>> arbeidssakerPerAktoerId = grupperArbeidssakerPerAktoerId(arbeidssaker);
-
-			List<Arkivsak> arkivsaker = lagArkivsaker(arbeidssakerPerAktoerId);
-			arkivsaker.forEach(this::avsluttSak);
+			avsluttAktoerIdSakerForPartisjon(aktoerIdList);
 		}
 	}
 
-	private void avsluttAlleSakerOrgnr() {
+	@Transactional(propagation = REQUIRES_NEW)
+	public void avsluttAktoerIdSakerForPartisjon(List<String> aktoerIdList) {
+		List<Arbeidssak> arbeidssaker = arbeidssakRepository.findSaksByAktoerIdIn(aktoerIdList);
+
+		List<List<Arbeidssak>> arbeidssakerPerAktoerId = grupperArbeidssakerPerAktoerId(arbeidssaker);
+
+		List<Arkivsak> arkivsaker = lagArkivsaker(arbeidssakerPerAktoerId);
+		log.info("Skal avslutte arkivsaker={}", arkivsaker);
+		arkivsaker.forEach(this::avsluttSak);
+	}
+
+	public void avsluttAlleSakerOrgnr() {
 		List<String> alleOrgNr = arbeidssakRepository.findDistinctOrgnrs(ENDELIGE_STATUSER);
 		List<List<String>> orgnrPartitioned = Lists.partition(alleOrgNr, 200);
 
 		for (List<String> orgNrList : orgnrPartitioned) {
 			//Finn alle tilhørende arbeidssaker for aktørId'ene i partisjonen
-			List<Arbeidssak> arbeidssaker = arbeidssakRepository.findSaksByOrgnrIn(orgNrList);
-
-			List<List<Arbeidssak>> arbeidssakerPerOrgNr = grupperArbeidssakerPerOrgnr(arbeidssaker);
-
-			List<Arkivsak> arkivsaker = lagArkivsaker(arbeidssakerPerOrgNr);
-			arkivsaker.forEach(this::avsluttSak);
+			avsluttOrgnrSakerForPartisjon(orgNrList);
 		}
+	}
+
+	@Transactional(propagation = REQUIRES_NEW)
+	public void avsluttOrgnrSakerForPartisjon(List<String> orgNrList) {
+		List<Arbeidssak> arbeidssaker = arbeidssakRepository.findSaksByOrgnrIn(orgNrList);
+
+		List<List<Arbeidssak>> arbeidssakerPerOrgNr = grupperArbeidssakerPerOrgnr(arbeidssaker);
+
+		List<Arkivsak> arkivsaker = lagArkivsaker(arbeidssakerPerOrgNr);
+		log.info("Skal avslutte arkivsaker={}", arkivsaker);
+		arkivsaker.forEach(this::avsluttSak);
 	}
 
 	private List<Arkivsak> lagArkivsaker(List<List<Arbeidssak>> arbeidssaksListe) {
