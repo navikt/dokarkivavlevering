@@ -13,9 +13,11 @@ public interface ArbeidssakRepository extends JpaRepository<Arbeidssak, Long> {
 
 	@Query("""
 			select arbeidssak.sakId from Arbeidssak arbeidssak
-			where arbeidssak.status is null or arbeidssak.status = "AAPEN"
+			where (arbeidssak.arbeidsstatus is null or arbeidssak.arbeidsstatus not in (:endeligeStatuser))
+			and (arbeidssak.status is null or arbeidssak.status = "AAPEN")
+			order by arbeidssak.sakId asc
 			""")
-	List<Long> findAllSakIdsWhereStatusIsNullOrAapen();
+	List<Long> findAllSakIdsWhereStatusIsNullOrAapen(EnumSet<Arbeidsstatus> endeligeStatuser);
 
 	List<Arbeidssak> findSaksBySakIdIn(List<Long> sakIds);
 
@@ -25,14 +27,16 @@ public interface ArbeidssakRepository extends JpaRepository<Arbeidssak, Long> {
 	@Query("""
 			select distinct(arbeidssak.aktoerId) from Arbeidssak arbeidssak
 			where arbeidssak.aktoerId is not null
-			and arbeidssak.arbeidsstatus not in (:endeligeStatuser)
+			and (arbeidssak.arbeidsstatus is null or arbeidssak.arbeidsstatus not in (:endeligeStatuser))
+			order by arbeidssak.aktoerId asc
 			""")
 	List<String> findDistinctAktoerIds(EnumSet<Arbeidsstatus> endeligeStatuser);
 
 	@Query("""
 			select distinct(arbeidssak.orgnr) from Arbeidssak arbeidssak
 			where arbeidssak.orgnr is not null
-			and arbeidssak.arbeidsstatus not in (:endeligeStatuser)
+			and (arbeidssak.arbeidsstatus is null or arbeidssak.arbeidsstatus not in (:endeligeStatuser))
+			order by arbeidssak.orgnr asc
 			""")
 	List<String> findDistinctOrgnrs(EnumSet<Arbeidsstatus> endeligeStatuser);
 }
