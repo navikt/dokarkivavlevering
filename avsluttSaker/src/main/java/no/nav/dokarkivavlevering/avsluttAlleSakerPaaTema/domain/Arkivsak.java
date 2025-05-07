@@ -20,7 +20,10 @@ public record Arkivsak(
 
 	@Override
 	public String toString() {
-		return "Arkivsak{" + getArbeidssaksIder() +
+		if(arbeidssaker.size() < 2){
+			return ".";
+		}
+		return "TO SAKER!! Arkivsak{" + getArbeidssaksIder() +
 				'}';
 	}
 }
