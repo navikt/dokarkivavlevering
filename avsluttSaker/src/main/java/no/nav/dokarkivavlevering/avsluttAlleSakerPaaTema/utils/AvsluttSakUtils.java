@@ -29,9 +29,7 @@ public class AvsluttSakUtils {
 				.values();
 
 		ArrayList<List<Arbeidssak>> grupperteArbeidssakerPerAktoerId = new ArrayList<>();
-		arbeidssakerUtenFagsakNr.forEach(arbeidssak -> {
-			grupperteArbeidssakerPerAktoerId.add(List.of(arbeidssak));
-		});
+		arbeidssakerUtenFagsakNr.forEach(arbeidssak -> grupperteArbeidssakerPerAktoerId.add(List.of(arbeidssak)));
 		grupperteArbeidssakerPerAktoerId.addAll(arbeidssakerMedFagsaknr);
 		return grupperteArbeidssakerPerAktoerId;
 	}
@@ -50,9 +48,7 @@ public class AvsluttSakUtils {
 				.values();
 
 		ArrayList<List<Arbeidssak>> grupperteArbeidssakerPerOrgnr = new ArrayList<>();
-		arbeidssakerUtenFagsakNr.forEach(arbeidssak -> {
-			grupperteArbeidssakerPerOrgnr.add(List.of(arbeidssak));
-		});
+		arbeidssakerUtenFagsakNr.forEach(arbeidssak -> grupperteArbeidssakerPerOrgnr.add(List.of(arbeidssak)));
 		grupperteArbeidssakerPerOrgnr.addAll(arbeidssakermedFagsaknr);
 		return grupperteArbeidssakerPerOrgnr;
 	}
