@@ -8,6 +8,7 @@ import no.nav.dokarkivavlevering.core.consumer.pdl.HentIdenterBolkResponse.HentI
 import no.nav.dokarkivavlevering.core.consumer.pdl.PdlGraphQLConsumer;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,6 +21,7 @@ import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.Arbei
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.Arbeidsstatus.FEIL_PDL_FANT_IKKE_AKTOERID;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.Arbeidsstatus.HENTET_FRA_PDL;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.Arbeidsstatus.SKAL_IKKE_HENTE_FRA_PDL;
+import static org.springframework.transaction.annotation.Propagation.REQUIRES_NEW;
 
 @Slf4j
 @Service
@@ -43,13 +45,16 @@ public class OppdaterAktoerIdService {
 		List<Long> alleSaksIder = arbeidssakRepository.findAllSakIdsWhereStatusIsNullOrAapen(ENDELIGE_STATUSER);
 		List<List<Long>> sakIdsPartitioned = Lists.partition(alleSaksIder, BATCHSTOERRELSE);
 
-		sakIdsPartitioned.forEach(sakIdListe -> {
-			List<Arbeidssak> arbeidssaker = arbeidssakRepository.findSaksBySakIdIn(sakIdListe);
-			log.info("Starter oppdatering av utdaterte aktoerId'er for de neste {} sakene", sakIdListe.size());
-			oppdaterAlleAktoerIder(arbeidssaker);
-			log.info("Har oppdatert utdaterte aktoerId'er");
-		});
+		sakIdsPartitioned.forEach(this::oppdaterUtdaterteAktoerIderForPartisjon);
 		log.info("AvsluttAlleSaker har oppdatert alle utdaterte aktoerId'er");
+	}
+
+	@Transactional(propagation = REQUIRES_NEW)
+	public void oppdaterUtdaterteAktoerIderForPartisjon(List<Long> sakIdListe) {
+		List<Arbeidssak> arbeidssaker = arbeidssakRepository.findSaksBySakIdIn(sakIdListe);
+		log.info("Starter oppdatering av utdaterte aktoerId'er for de neste {} sakene", sakIdListe.size());
+		oppdaterAlleAktoerIder(arbeidssaker);
+		log.info("Har oppdatert utdaterte aktoerId'er");
 	}
 
 	private void oppdaterAlleAktoerIder(List<Arbeidssak> saker) {

@@ -17,4 +17,10 @@ public record Arkivsak(
 	public String getApplikasjon() {
 		return arbeidssaker.get(0).getApplikasjon();
 	}
+
+	@Override
+	public String toString() {
+		return "Arkivsak{" + getArbeidssaksIder() +
+				'}';
+	}
 }
