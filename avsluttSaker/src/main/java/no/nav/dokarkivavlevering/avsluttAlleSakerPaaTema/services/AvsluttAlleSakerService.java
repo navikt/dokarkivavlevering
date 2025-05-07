@@ -129,6 +129,11 @@ public class AvsluttAlleSakerService {
 			Journalpost eldsteJournalpost = journalpostService.finnEldsteJournalpostForArkivsak(arkivsak);
 			LocalDateTime datoSakOpprettet = eldsteJournalpost.getOpprettetdato();
 			String administrativEnhet = bestemAdministrativEnhet(eldsteJournalpost, arkivsak);
+			//TODO: Expand column! !! !!! !!!! !!!!! !!!!!!! !!!!!!!! !!!!!!!!!!
+			if(administrativEnhet.length() > 40) {
+				log.info("Mottok for lang Administrativ Enhet: " + administrativEnhet + " Med lengde: " + administrativEnhet.length());
+				administrativEnhet = administrativEnhet.substring(0, 40);
+			}
 			avsluttSakRepository.avsluttSaker(arkivsak.getArbeidssaksIder(), hentDatoAvsluttet(), datoSakOpprettet, administrativEnhet);
 			oppdaterArbeidsstatusForArkivsak(arkivsak, FERDIG_SAK_AVSLUTTET);
 			log.info("Har avsluttet arkivsak med saksIder={}", arkivsak.getArbeidssaksIder());
