@@ -32,9 +32,7 @@ import static org.springframework.transaction.annotation.Propagation.REQUIRES_NE
 @Slf4j
 @Component
 @Profile("avsluttSaker")
-
 public class AvsluttAlleSakerDoUpdates {
-
 
 	private final ArbeidssakRepository arbeidssakRepository;
 	private final AvsluttSakRepository avsluttSakRepository;
@@ -42,7 +40,11 @@ public class AvsluttAlleSakerDoUpdates {
 	private final JournalpostService journalpostService;
 	private final AdministrativEnhetService administrativEnhetService;
 
-	public AvsluttAlleSakerDoUpdates(ArbeidssakRepository arbeidssakRepository, AvsluttSakRepository avsluttSakRepository, AvsluttSakProperties avsluttSakProperties, OppdaterAktoerIdService oppdaterAktoerIdService, JournalpostService journalpostService, AdministrativEnhetService administrativEnhetService) {
+	public AvsluttAlleSakerDoUpdates(ArbeidssakRepository arbeidssakRepository,
+									 AvsluttSakRepository avsluttSakRepository,
+									 AvsluttSakProperties avsluttSakProperties,
+									 JournalpostService journalpostService,
+									 AdministrativEnhetService administrativEnhetService) {
 		this.arbeidssakRepository = arbeidssakRepository;
 		this.avsluttSakRepository = avsluttSakRepository;
 		this.avsluttSakProperties = avsluttSakProperties;
@@ -91,7 +93,7 @@ public class AvsluttAlleSakerDoUpdates {
 			LocalDateTime datoSakOpprettet = eldsteJournalpost.getOpprettetdato();
 			String administrativEnhet = bestemAdministrativEnhet(eldsteJournalpost, arkivsak);
 			//TODO: Expand column! !! !!! !!!! !!!!! !!!!!!! !!!!!!!! !!!!!!!!!!
-			if(administrativEnhet.length() > 40) {
+			if (administrativEnhet.length() > 40) {
 				log.info("Mottok for lang Administrativ Enhet: " + administrativEnhet + " Med lengde: " + administrativEnhet.length());
 				administrativEnhet = administrativEnhet.substring(0, 40);
 			}

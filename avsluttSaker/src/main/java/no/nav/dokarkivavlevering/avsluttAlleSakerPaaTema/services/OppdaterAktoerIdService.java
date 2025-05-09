@@ -15,7 +15,7 @@ import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.Arbei
 @Profile("avsluttSaker")
 public class OppdaterAktoerIdService {
 
-	private static final int BATCHSTOERRELSE = 100;
+	private static final int BATCHSTOERRELSE = 1000;
 
 	private final ArbeidssakRepository arbeidssakRepository;
 	private final OppdaterArbeidssakForPdl OppdaterArbeidssakForPdl;

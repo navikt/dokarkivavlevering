@@ -5,7 +5,6 @@ import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.services.AvsluttAlleSak
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -25,7 +24,7 @@ public class AvsluttAlleSakerPaaTema {
 	}
 
 	@Scheduled(initialDelay = 1000)
-	public void execute(){
+	public void execute() {
 		String referanse = avsluttSakProperties.getReferanse();
 		LocalDateTime avsluttetDato = avsluttSakProperties.getAvsluttetDato();
 		String administrativEnhet = avsluttSakProperties.getAdministrativEnhet();

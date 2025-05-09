@@ -195,8 +195,6 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		commitAndBeginNewTransaction();
 
 		avsluttAlleSakerService.avsluttAlleSaker();
-		/*assertThatExceptionOfType(RuntimeException.class)
-				.isThrownBy(() -> avsluttAlleSakerService.avsluttAlleSaker());*/
 		Arbeidssak arbeidssak = arbeidssakRepository.findSaksBySakIdIn(List.of(123L)).getFirst();
 		assertThat(arbeidssak.getArbeidsstatus()).isEqualTo(FEIL_PDL_FANT_IKKE_AKTOERID);
 	}

@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.AvsluttSakProperties;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.ArbeidssakRepository;
-import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.AvsluttSakRepository;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +27,8 @@ public class AvsluttAlleSakerService {
 	public AvsluttAlleSakerService(ArbeidssakRepository arbeidssakRepository,
 								   AvsluttSakProperties avsluttSakProperties,
 								   OppdaterAktoerIdService oppdaterAktoerIdService,
-								   AdministrativEnhetService administrativEnhetService, AvsluttAlleSakerDoUpdates avsluttAlleSakerDoUpdates) {
+								   AdministrativEnhetService administrativEnhetService,
+								   AvsluttAlleSakerDoUpdates avsluttAlleSakerDoUpdates) {
 		this.arbeidssakRepository = arbeidssakRepository;
 		this.avsluttSakProperties = avsluttSakProperties;
 		this.oppdaterAktoerIdService = oppdaterAktoerIdService;
@@ -43,9 +43,6 @@ public class AvsluttAlleSakerService {
 		}
 		oppdaterAktoerIdService.oppdaterUtdaterteAktoerIder();
 
-		if(!isEmpty(avsluttSakProperties.getAdministrativEnhet()) && avsluttSakProperties.getAdministrativEnhet().equals("TEST2")) {
-			throw new RuntimeException("Crasj app");
-		}
 		avsluttAlleSakerForAktoerId();
 		avsluttAlleSakerOrgnr();
 	}
