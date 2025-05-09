@@ -8,7 +8,9 @@ import no.nav.dokarkivavlevering.core.consumer.pdl.HentIdenterBolkResponse.HentI
 import no.nav.dokarkivavlevering.core.consumer.pdl.PdlGraphQLConsumer;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.ArrayList;
@@ -22,7 +24,6 @@ import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.Arbei
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.Arbeidsstatus.FEIL_PDL_FANT_IKKE_AKTOERID;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.Arbeidsstatus.HENTET_FRA_PDL;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.Arbeidsstatus.SKAL_IKKE_HENTE_FRA_PDL;
-import static org.springframework.transaction.annotation.Propagation.REQUIRES_NEW;
 
 @Slf4j
 @Service
@@ -34,13 +35,13 @@ public class OppdaterAktoerIdService {
 
 	private final PdlGraphQLConsumer pdlGraphQLConsumer;
 	private final ArbeidssakRepository arbeidssakRepository;
-	private final TransactionTemplate transactionTemplate;
+	private final PlatformTransactionManager transactionManager;
 
 	public OppdaterAktoerIdService(PdlGraphQLConsumer pdlGraphQLConsumer,
-								   ArbeidssakRepository arbeidssakRepository, TransactionTemplate transactionTemplate) {
+								   ArbeidssakRepository arbeidssakRepository, TransactionTemplate transactionTemplate, PlatformTransactionManager transactionManager) {
 		this.pdlGraphQLConsumer = pdlGraphQLConsumer;
 		this.arbeidssakRepository = arbeidssakRepository;
-		this.transactionTemplate = transactionTemplate;
+		this.transactionManager = transactionManager;
 	}
 
 	public void oppdaterUtdaterteAktoerIder() {
@@ -55,18 +56,23 @@ public class OppdaterAktoerIdService {
 		if (alleSaksIder.size() > 5) {
 			throw new RuntimeException("Crasj app");
 		}
-
 	}
 	
 	public void oppdaterUtdaterteAktoerIderForPartisjon(List<Long> sakIdListe) {
-		transactionTemplate.execute(status -> {
+		TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
+
+		try {
 			List<Arbeidssak> arbeidssaker = arbeidssakRepository.findSaksBySakIdIn(sakIdListe);
 			log.info("Starter oppdatering av utdaterte aktoerId'er for de neste {} sakene", sakIdListe.size());
 			oppdaterAlleAktoerIder(arbeidssaker);
 			arbeidssakRepository.saveAll(arbeidssaker);
+			transactionManager.commit(status);
 			log.info("Har oppdatert utdaterte aktoerId'er");
-			return null;
-		});
+		} catch (Exception e) {
+			transactionManager.rollback(status);
+			throw e;
+		}
+
 		/*List<Arbeidssak> arbeidssaker = arbeidssakRepository.findSaksBySakIdIn(sakIdListe);
 		log.info("Starter oppdatering av utdaterte aktoerId'er for de neste {} sakene", sakIdListe.size());
 		oppdaterAlleAktoerIder(arbeidssaker);
