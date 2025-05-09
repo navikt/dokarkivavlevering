@@ -25,26 +25,22 @@ import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.Arbei
 @Slf4j
 @Service
 @Profile("avsluttSaker")
-public class doUpdateArbeidssakForPdl {
+public class OppdaterArbeidssakForPdl {
 	private static final String OK = "ok";
 
 	private final PdlGraphQLConsumer pdlGraphQLConsumer;
 	private final ArbeidssakRepository arbeidssakRepository;
 
-	public doUpdateArbeidssakForPdl(PdlGraphQLConsumer pdlGraphQLConsumer, ArbeidssakRepository arbeidssakRepository) {
+	public OppdaterArbeidssakForPdl(PdlGraphQLConsumer pdlGraphQLConsumer, ArbeidssakRepository arbeidssakRepository) {
 		this.pdlGraphQLConsumer = pdlGraphQLConsumer;
 		this.arbeidssakRepository = arbeidssakRepository;
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void oppdaterUtdaterteAktoerIderForPartisjon(List<Long> sakIdListe, int input) {
+	public void oppdaterUtdaterteAktoerIderForPartisjon(List<Long> sakIdListe) {
 		List<Arbeidssak> arbeidssaker = arbeidssakRepository.findSaksBySakIdIn(sakIdListe);
 		log.info("Starter oppdatering av utdaterte aktoerId'er for de neste {} sakene", sakIdListe.size());
-		if(input == 2){
-			throw new RuntimeException("dumme app");
-		}
 		oppdaterAlleAktoerIder(arbeidssaker);
-		arbeidssakRepository.saveAll(arbeidssaker);
 		log.info("Har oppdatert utdaterte aktoerId'er");
 	}
 

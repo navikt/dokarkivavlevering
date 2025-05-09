@@ -25,7 +25,6 @@ import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakReposit
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakRepositoryTestUtils.assertAvbrutteSaker;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakRepositoryTestUtils.assertAvsluttetSak;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakRepositoryTestUtils.generateSakParams;
-import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.validators.AvsluttSakerValidator.validerAvsluttAlleSakerPaaTemaRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.when;
@@ -64,7 +63,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		when(avsluttSakPropertiesMock.getReferanse()).thenReturn("MMA-1337");
 	}
 
-	//@Test
+	@Test
 	public void skalAvslutteSaker() {
 		stubAzure();
 		stubPdl("hentIdenterBolk.json");
@@ -88,7 +87,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		assertAvsluttetSak(saker.get(1), "Nav Buskerud", JOURNALPOST2_OPPRETTETDATO, now());
 	}
 
-	//@Test
+	@Test
 	public void skalAvslutteSakerMedAvsluttetDato() {
 		stubAzure();
 		stubPdl("hentIdenterBolk.json");
@@ -114,7 +113,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		assertAvsluttetSak(saker.get(1), "Nav Buskerud", JOURNALPOST2_OPPRETTETDATO, AVSLUTTET_DATO);
 	}
 
-	//@Test
+	@Test
 	public void skalAvslutteSakerMedFagsaknr() {
 		stubAzure();
 		stubPdl("hentIdenterBolk.json");
@@ -140,7 +139,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		assertAvsluttetSak(saker.get(1), "Nav Lindesnes", JOURNALPOST1_OPPRETTETDATO, AVSLUTTET_DATO);
 	}
 
-	//@Test
+	@Test
 	public void skalAvslutteSakerMedAdministrativEnhet() {
 		stubAzure();
 		stubPdl("hentIdenterBolk.json");
@@ -166,7 +165,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		assertAvsluttetSak(saker.get(1), ADMINISTRATIV_ENHET, JOURNALPOST2_OPPRETTETDATO, now());
 	}
 
-	//@Test
+	@Test
 	public void skalIkkeAvslutteSakerUtenAdministrativEnhet() {
 		stubAzure();
 		stubPdl("hentIdenterBolk.json");
@@ -188,7 +187,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		assertThat(sak.datoEndret()).isNull();
 	}
 
-	//@Test
+	@Test
 	public void skalOppdatereStatusTilPdlFantIkkeNyAktoerId() {
 		stubAzure();
 		stubPdl("hentIdenterBolkSomInneholderNotFound.json");
@@ -202,7 +201,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		assertThat(arbeidssak.getArbeidsstatus()).isEqualTo(FEIL_PDL_FANT_IKKE_AKTOERID);
 	}
 
-	//@Test
+	@Test
 	public void skalOppdatereAktoerIdOgAvslutteSak() {
 		stubAzure();
 		stubPdl("hentIdenterBolk.json");
@@ -223,7 +222,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		assertAvsluttetSak(sak, ADMINISTRATIV_ENHET, JOURNALPOST1_OPPRETTETDATO, now());
 	}
 
-	//@Test
+	@Test
 	public void skalOppdatereStatusTilFeilAapenJournalpost() {
 		Arbeidssak arbeidssakForOrganisasjon = Arbeidssak.builder()
 				.sakId(345L)
@@ -241,7 +240,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		assertThat(arbeidssak.getArbeidsstatus()).isEqualTo(FEIL_AAPEN_JOURNALPOST);
 	}
 
-	//@Test
+	@Test
 	public void skalKastePdlFunctionalException() {
 		stubAzure();
 		stubPdl("validationError.json");
@@ -251,7 +250,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 				.isThrownBy(() -> avsluttAlleSakerService.avsluttAlleSaker());
 	}
 
-	//@Test
+	@Test
 	public void skalFeileBehandlingAvArkivsakMedAapenJournalpost() {
 		stubAzure();
 		stubPdl("hentIdenterBolk.json");
@@ -267,7 +266,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		assertThat(arbeidssak1.getAktoerId()).isEqualTo("1234567891234");
 	}
 
-	//@Test
+	@Test
 	public void skalFeileBehandlingAvArkivsakUtenJournalfoerendeEnhet() {
 		stubAzure();
 		stubPdl("hentIdenterBolk.json");
@@ -283,7 +282,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		assertThat(arbeidssak1.getAktoerId()).isEqualTo("1234567891234");
 	}
 
-	//@Test
+	@Test
 	public void skalAvbryteSakerForTomArkivsak() {
 		stubAzure();
 		stubPdl("hentIdenterBolk.json");
