@@ -37,9 +37,12 @@ public class doUpdateArbeidssakForPdl {
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void oppdaterUtdaterteAktoerIderForPartisjon(List<Long> sakIdListe) {
+	public void oppdaterUtdaterteAktoerIderForPartisjon(List<Long> sakIdListe, int input) {
 		List<Arbeidssak> arbeidssaker = arbeidssakRepository.findSaksBySakIdIn(sakIdListe);
 		log.info("Starter oppdatering av utdaterte aktoerId'er for de neste {} sakene", sakIdListe.size());
+		if(input == 2){
+			throw new RuntimeException("dumme app");
+		}
 		oppdaterAlleAktoerIder(arbeidssaker);
 		arbeidssakRepository.saveAll(arbeidssaker);
 		log.info("Har oppdatert utdaterte aktoerId'er");

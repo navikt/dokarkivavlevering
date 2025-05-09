@@ -17,7 +17,7 @@ import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 @Profile("avsluttSaker")
 public class OppdaterAktoerIdService {
 
-	private static final int BATCHSTOERRELSE = 1000;
+	private static final int BATCHSTOERRELSE = 100;
 
 	private final ArbeidssakRepository arbeidssakRepository;
 	private final doUpdateArbeidssakForPdl doUpdateArbeidssakForPdl;
@@ -28,6 +28,7 @@ public class OppdaterAktoerIdService {
 		this.doUpdateArbeidssakForPdl = doUpdateArbeidssakForPdl;
 		this.avsluttSakProperties = avsluttSakProperties;
 	}
+	static int i = 0;
 
 	public void oppdaterUtdaterteAktoerIder() {
 		log.info("AvsluttAlleSaker starter oppdateringen av utdaterte aktoerId'er");
@@ -35,7 +36,9 @@ public class OppdaterAktoerIdService {
 		List<Long> alleSaksIder = arbeidssakRepository.findAllSakIdsWhereStatusIsNullOrAapen(ENDELIGE_STATUSER);
 		List<List<Long>> sakIdsPartitioned = Lists.partition(alleSaksIder, BATCHSTOERRELSE);
 
-		sakIdsPartitioned.forEach(doUpdateArbeidssakForPdl::oppdaterUtdaterteAktoerIderForPartisjon);
+		sakIdsPartitioned.forEach(partisjon -> {
+			doUpdateArbeidssakForPdl.oppdaterUtdaterteAktoerIderForPartisjon(partisjon,i++);
+		});
 		if(!isEmpty(avsluttSakProperties.getAdministrativEnhet()) && avsluttSakProperties.getAdministrativEnhet().equals("TEST3")) {
 			throw new RuntimeException("Crasj app");
 		}
