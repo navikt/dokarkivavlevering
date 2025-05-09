@@ -44,7 +44,7 @@ public class AvsluttAlleSakerService {
 		oppdaterAktoerIdService.oppdaterUtdaterteAktoerIder();
 
 		avsluttAlleSakerForAktoerId();
-		if(avsluttSakProperties.getAdministrativEnhet().equals("TEST2")) {
+		if(!isEmpty(avsluttSakProperties.getAdministrativEnhet()) && avsluttSakProperties.getAdministrativEnhet().equals("TEST2")) {
 			throw new RuntimeException("Crasj app");
 		}
 	}
