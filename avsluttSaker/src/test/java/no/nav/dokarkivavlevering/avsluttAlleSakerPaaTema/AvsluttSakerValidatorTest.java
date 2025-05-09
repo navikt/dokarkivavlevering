@@ -6,53 +6,34 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 import java.time.LocalDateTime;
 import java.util.stream.Stream;
 
-import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.AvsluttSakerValidator.validerAvsluttAlleSakerPaaTemaRequest;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.validators.AvsluttSakerValidator.validerAvsluttAlleSakerPaaTemaRequest;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 
 class AvsluttSakerValidatorTest {
 
-	private static final String TEMA = "FAR";
 	private static final String REFERANSE = "MMA-7899";
 	private static final LocalDateTime AVSLUTTET_DATO = LocalDateTime.now();
-	private static final String ADMINISTRATIV_ENHET = "1294";
+	private static final String ADMINISTRATIV_ENHET = "ENHET ENHETSEN";
 
 	@ParameterizedTest
 	@MethodSource
-	void skalValidere(String tema, String referanse, LocalDateTime avsluttetDato, String administrativEnhet) {
+	void skalValidere(String referanse, LocalDateTime avsluttetDato, String administrativEnhet) {
 		assertThatNoException().isThrownBy(() ->
-				validerAvsluttAlleSakerPaaTemaRequest(tema, referanse, avsluttetDato, administrativEnhet));
+				validerAvsluttAlleSakerPaaTemaRequest(referanse, avsluttetDato, administrativEnhet));
 	}
 
 	public static Stream<Arguments> skalValidere() {
 		return Stream.of(
-				Arguments.of(TEMA, REFERANSE, AVSLUTTET_DATO, ADMINISTRATIV_ENHET),
-				Arguments.of(TEMA, REFERANSE, null, ADMINISTRATIV_ENHET),
-				Arguments.of(TEMA, REFERANSE, AVSLUTTET_DATO, null),
-				Arguments.of(TEMA, REFERANSE, null, null)
-		);
-	}
-
-	@ParameterizedTest
-	@MethodSource
-	void skalKasteExceptionDersomTemaErUgyldig(String tema, String feilmelding) {
-		assertThatExceptionOfType(MissingPropertiesException.class)
-				.isThrownBy(() -> validerAvsluttAlleSakerPaaTemaRequest(tema, REFERANSE, AVSLUTTET_DATO, ADMINISTRATIV_ENHET))
-				.withMessage(feilmelding);
-	}
-
-	public static Stream<Arguments> skalKasteExceptionDersomTemaErUgyldig() {
-		return Stream.of(
-				Arguments.of("", "tema kan ikke være null eller tom"),
-				Arguments.of(" ", "tema kan ikke være null eller tom"),
-				Arguments.of(null, "tema kan ikke være null eller tom"),
-				Arguments.of("FA", "tema må ha en lengde på 3. Mottok=FA"),
-				Arguments.of("FARR", "tema må ha en lengde på 3. Mottok=FARR")
+				Arguments.of(REFERANSE, AVSLUTTET_DATO, ADMINISTRATIV_ENHET),
+				Arguments.of(REFERANSE, null, ADMINISTRATIV_ENHET),
+				Arguments.of(REFERANSE, AVSLUTTET_DATO, ""),
+				Arguments.of(REFERANSE, null, null)
 		);
 	}
 
@@ -60,7 +41,7 @@ class AvsluttSakerValidatorTest {
 	@MethodSource
 	void skalKasteExceptionDersomReferanseErForLang(String referanse, String feilmelding) {
 		assertThatExceptionOfType(MissingPropertiesException.class)
-				.isThrownBy(() -> validerAvsluttAlleSakerPaaTemaRequest(TEMA, referanse, AVSLUTTET_DATO, ADMINISTRATIV_ENHET))
+				.isThrownBy(() -> validerAvsluttAlleSakerPaaTemaRequest(referanse, AVSLUTTET_DATO, ADMINISTRATIV_ENHET))
 				.withMessage(feilmelding);
 	}
 
@@ -78,24 +59,29 @@ class AvsluttSakerValidatorTest {
 		LocalDateTime ugyldigAvsluttetDato = LocalDateTime.now().plusMinutes(1);
 
 		assertThatExceptionOfType(MissingPropertiesException.class)
-				.isThrownBy(() -> validerAvsluttAlleSakerPaaTemaRequest(TEMA, REFERANSE, ugyldigAvsluttetDato, ADMINISTRATIV_ENHET))
+				.isThrownBy(() -> validerAvsluttAlleSakerPaaTemaRequest(REFERANSE, ugyldigAvsluttetDato, ADMINISTRATIV_ENHET))
 				.withMessageContaining("avsluttetDato kan ikke være i fremtiden.");
 	}
 
 	@ParameterizedTest
-	@ValueSource(strings = {"abcd", "123a"})
-	void skalKasteExceptionDersomAdministrativEnhetIkkeErEtHeltall(String administrativEnhet) {
-		assertThatExceptionOfType(MissingPropertiesException.class)
-				.isThrownBy(() -> validerAvsluttAlleSakerPaaTemaRequest(TEMA, REFERANSE, AVSLUTTET_DATO, administrativEnhet))
-				.withMessage("administrativEnhet må være et heltall. Mottok=%s".formatted(administrativEnhet));
+	@NullAndEmptySource
+	void skalGodtaAtAdministrativEnhetIkkeErSatt(String administrativEnhet) {
+		assertThatNoException()
+				.isThrownBy(() -> validerAvsluttAlleSakerPaaTemaRequest(REFERANSE, AVSLUTTET_DATO, administrativEnhet));
 	}
 
-	@ParameterizedTest
-	@ValueSource(strings = {"123", "12345"})
-	void skalKasteExceptionDersomAdministrativEnhetErFeilLengde(String administrativEnhet) {
+	@Test
+	void skalKasteExceptionDersomAdministrativEnhetErOver40Tegn() {
+		String administrativEnhet = "detteErEnAltForLangStrengPåOver40TegnKanskje";
 		assertThatExceptionOfType(MissingPropertiesException.class)
-				.isThrownBy(() -> validerAvsluttAlleSakerPaaTemaRequest(TEMA, REFERANSE, AVSLUTTET_DATO, administrativEnhet))
-				.withMessage("administrativEnhet må ha en lengde på 4. Mottok=%s".formatted(administrativEnhet));
+				.isThrownBy(() -> validerAvsluttAlleSakerPaaTemaRequest(REFERANSE, AVSLUTTET_DATO, administrativEnhet))
+				.withMessage("administrativEnhet kan ikke være lengre enn 40 tegn. Mottok=" + administrativEnhet);
 	}
 
+	@Test
+	void skalKasteExceptionDersomAdministrativEnhetErTom() {
+		assertThatExceptionOfType(MissingPropertiesException.class)
+				.isThrownBy(() -> validerAvsluttAlleSakerPaaTemaRequest(REFERANSE, AVSLUTTET_DATO, " "))
+				.withMessage("administrativEnhet kan ikke være tom. Mottok=%s".formatted(" "));
+	}
 }

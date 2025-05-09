@@ -15,9 +15,6 @@ import java.time.LocalDateTime;
 public class AvsluttSakProperties {
 
 	@NotEmpty
-	String tema;
-
-	@NotEmpty
 	private String referanse;
 
 	private LocalDateTime avsluttetDato;

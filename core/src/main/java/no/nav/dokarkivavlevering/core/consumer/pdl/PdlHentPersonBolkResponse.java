@@ -75,7 +75,7 @@ public class PdlHentPersonBolkResponse {
 	@Data
 	static class PdlError {
 		private String message;
-		private PdlHentIdenterBolkResponse.PdlErrorExtensionTo extensions;
+		private PdlErrorExtensionTo extensions;
 	}
 
 	@Data

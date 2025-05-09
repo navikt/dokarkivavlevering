@@ -2,6 +2,7 @@ package no.nav.dokarkivavlevering.core.consumer.pdl;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.core.DokarkivavleveringProperties;
+import no.nav.dokarkivavlevering.core.consumer.pdl.HentIdenterBolkResponse.HentIdenterBolk;
 import no.nav.dokarkivavlevering.core.consumer.pdl.exception.PdlFunctionalException;
 import no.nav.dokarkivavlevering.core.consumer.pdl.exception.PdlTechnicalException;
 import no.nav.dokarkivavlevering.core.consumer.pdl.exception.PersonIkkeFunnetException;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import static java.lang.String.format;
 import static no.nav.dokarkivavlevering.core.azure.AzureProperties.CLIENT_REGISTRATION_PDL;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.oauth2.client.web.reactive.function.client.ServerOAuth2AuthorizedClientExchangeFilterFunction.clientRegistrationId;
@@ -67,10 +69,29 @@ public class PdlGraphQLConsumer {
 		}
 	}
 
+	@Retryable(retryFor = PdlTechnicalException.class)
+	public List<HentIdenterBolk> hentGjeldendeAktoerIder(Set<String> aktoerIds) {
+		HentIdenterBolkResponse pdlResponse = webClient.post()
+				.uri(dokarkivavleveringProperties.getEndpoints().getPdl().getUrl())
+				.attributes(clientRegistrationId(CLIENT_REGISTRATION_PDL))
+				.bodyValue(mapHentGjeldendeAktoerIdForBolk(aktoerIds))
+				.retrieve()
+				.bodyToMono(HentIdenterBolkResponse.class)
+				.onErrorMap(this::mapError)
+				.block();
+
+		if (pdlResponse.getErrors() == null || pdlResponse.getErrors().isEmpty()) {
+			log.info("hentGjeldendeAktoerIder har hentet svar fra PDL OK");
+			return pdlResponse.getData().getHentIdenterBolk();
+		} else {
+			throw new PdlFunctionalException("Kunne ikke hente aktørid for folkeregisterident i pdl. " + pdlResponse.getErrors());
+		}
+	}
+
 	private Throwable mapError(Throwable error) {
 		if (error instanceof WebClientResponseException response && response.getStatusCode().is4xxClientError()) {
 			return new PdlFunctionalException(
-					String.format("Kall mot pdl feilet funksjonelt med statuskode=%s Feilmelding=%s",
+					format("Kall mot pdl feilet funksjonelt med statuskode=%s Feilmelding=%s",
 							response.getStatusCode(),
 							response.getMessage()),
 					error);
@@ -109,6 +130,25 @@ public class PdlGraphQLConsumer {
 							code
 						  }
 						}
+						""")
+				.variables(variables)
+				.build();
+	}
+
+	private PdlRequest mapHentGjeldendeAktoerIdForBolk(final Set<String> aktoerIds) {
+		final HashMap<String, Object> variables = new HashMap<>();
+		variables.put("identer", aktoerIds);
+		return PdlRequest.builder()
+				.query("""
+						query hentIdenterBolk($identer: [ID!]!) {
+						   hentIdenterBolk(identer: $identer, grupper: [AKTORID], historikk: false) {
+						         ident,
+						         identer {
+						             ident
+						         },
+						         code
+						     }
+						 }
 						""")
 				.variables(variables)
 				.build();
