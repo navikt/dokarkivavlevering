@@ -192,6 +192,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		stubAzure();
 		stubPdl("hentIdenterBolkSomInneholderNotFound.json");
 		arbeidssakRepository.save(lagSakForAktoer(SAK_MED_LUKKET_JOURNALPOST1, "1234567891123"));
+		commitAndBeginNewTransaction();
 
 		avsluttAlleSakerService.avsluttAlleSaker();
 
