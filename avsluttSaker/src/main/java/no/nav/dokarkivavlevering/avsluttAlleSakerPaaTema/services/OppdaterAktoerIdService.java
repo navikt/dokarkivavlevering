@@ -47,6 +47,10 @@ public class OppdaterAktoerIdService {
 
 		sakIdsPartitioned.forEach(this::oppdaterUtdaterteAktoerIderForPartisjon);
 		log.info("AvsluttAlleSaker har oppdatert alle utdaterte aktoerId'er");
+
+		if (alleSaksIder.size() > 20) {
+			throw new RuntimeException("Crasj app");
+		}
 	}
 
 	@Transactional(propagation = REQUIRES_NEW)
@@ -54,6 +58,7 @@ public class OppdaterAktoerIdService {
 		List<Arbeidssak> arbeidssaker = arbeidssakRepository.findSaksBySakIdIn(sakIdListe);
 		log.info("Starter oppdatering av utdaterte aktoerId'er for de neste {} sakene", sakIdListe.size());
 		oppdaterAlleAktoerIder(arbeidssaker);
+		arbeidssakRepository.saveAll(arbeidssaker);
 		log.info("Har oppdatert utdaterte aktoerId'er");
 	}
 
