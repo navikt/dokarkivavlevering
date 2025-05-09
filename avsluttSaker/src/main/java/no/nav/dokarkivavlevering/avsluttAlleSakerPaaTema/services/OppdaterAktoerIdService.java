@@ -53,10 +53,6 @@ public class OppdaterAktoerIdService {
 
 		sakIdsPartitioned.forEach(this::oppdaterUtdaterteAktoerIderForPartisjon);
 		log.info("AvsluttAlleSaker har oppdatert alle utdaterte aktoerId'er");
-
-		if (alleSaksIder.size() > 5) {
-			throw new RuntimeException("Crasj app");
-		}
 	}
 
 	public void oppdaterUtdaterteAktoerIderForPartisjon(List<Long> sakIdListe) {
