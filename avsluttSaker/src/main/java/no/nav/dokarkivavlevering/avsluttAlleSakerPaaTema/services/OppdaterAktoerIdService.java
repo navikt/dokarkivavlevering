@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -35,15 +37,14 @@ public class OppdaterAktoerIdService {
 
 	private final PdlGraphQLConsumer pdlGraphQLConsumer;
 	private final ArbeidssakRepository arbeidssakRepository;
-	private final PlatformTransactionManager transactionManager;
 
 	public OppdaterAktoerIdService(PdlGraphQLConsumer pdlGraphQLConsumer,
-								   ArbeidssakRepository arbeidssakRepository, TransactionTemplate transactionTemplate, PlatformTransactionManager transactionManager) {
+								   ArbeidssakRepository arbeidssakRepository, PlatformTransactionManager transactionManager) {
 		this.pdlGraphQLConsumer = pdlGraphQLConsumer;
 		this.arbeidssakRepository = arbeidssakRepository;
-		this.transactionManager = transactionManager;
 	}
 
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void oppdaterUtdaterteAktoerIder() {
 		log.info("AvsluttAlleSaker starter oppdateringen av utdaterte aktoerId'er");
 
@@ -57,27 +58,13 @@ public class OppdaterAktoerIdService {
 			throw new RuntimeException("Crasj app");
 		}
 	}
-	
+
 	public void oppdaterUtdaterteAktoerIderForPartisjon(List<Long> sakIdListe) {
-		TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
-
-		try {
-			List<Arbeidssak> arbeidssaker = arbeidssakRepository.findSaksBySakIdIn(sakIdListe);
-			log.info("Starter oppdatering av utdaterte aktoerId'er for de neste {} sakene", sakIdListe.size());
-			oppdaterAlleAktoerIder(arbeidssaker);
-			arbeidssakRepository.saveAll(arbeidssaker);
-			transactionManager.commit(status);
-			log.info("Har oppdatert utdaterte aktoerId'er");
-		} catch (Exception e) {
-			transactionManager.rollback(status);
-			throw e;
-		}
-
-		/*List<Arbeidssak> arbeidssaker = arbeidssakRepository.findSaksBySakIdIn(sakIdListe);
+		List<Arbeidssak> arbeidssaker = arbeidssakRepository.findSaksBySakIdIn(sakIdListe);
 		log.info("Starter oppdatering av utdaterte aktoerId'er for de neste {} sakene", sakIdListe.size());
 		oppdaterAlleAktoerIder(arbeidssaker);
 		arbeidssakRepository.saveAll(arbeidssaker);
-		log.info("Har oppdatert utdaterte aktoerId'er");*/
+		log.info("Har oppdatert utdaterte aktoerId'er");
 	}
 
 	private void oppdaterAlleAktoerIder(List<Arbeidssak> saker) {
