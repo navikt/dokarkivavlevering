@@ -25,6 +25,7 @@ import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakReposit
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakRepositoryTestUtils.assertAvbrutteSaker;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakRepositoryTestUtils.assertAvsluttetSak;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakRepositoryTestUtils.generateSakParams;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.validators.AvsluttSakerValidator.validerAvsluttAlleSakerPaaTemaRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.when;
@@ -195,7 +196,8 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		commitAndBeginNewTransaction();
 
 		avsluttAlleSakerService.avsluttAlleSaker();
-
+		/*assertThatExceptionOfType(RuntimeException.class)
+				.isThrownBy(() -> avsluttAlleSakerService.avsluttAlleSaker());*/
 		Arbeidssak arbeidssak = arbeidssakRepository.findSaksBySakIdIn(List.of(123L)).getFirst();
 		assertThat(arbeidssak.getArbeidsstatus()).isEqualTo(FEIL_PDL_FANT_IKKE_AKTOERID);
 	}

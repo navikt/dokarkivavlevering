@@ -42,18 +42,20 @@ public class OppdaterAktoerIdService {
 		this.arbeidssakRepository = arbeidssakRepository;
 		this.transactionTemplate = transactionTemplate;
 	}
-	@Transactional(propagation = REQUIRES_NEW)
+
 	public void oppdaterUtdaterteAktoerIder() {
 		log.info("AvsluttAlleSaker starter oppdateringen av utdaterte aktoerId'er");
+
 		List<Long> alleSaksIder = arbeidssakRepository.findAllSakIdsWhereStatusIsNullOrAapen(ENDELIGE_STATUSER);
 		List<List<Long>> sakIdsPartitioned = Lists.partition(alleSaksIder, BATCHSTOERRELSE);
 
 		sakIdsPartitioned.forEach(this::oppdaterUtdaterteAktoerIderForPartisjon);
 		log.info("AvsluttAlleSaker har oppdatert alle utdaterte aktoerId'er");
 
-		if (alleSaksIder.size() > 20) {
+		if (alleSaksIder.size() > 5) {
 			throw new RuntimeException("Crasj app");
 		}
+
 	}
 	
 	public void oppdaterUtdaterteAktoerIderForPartisjon(List<Long> sakIdListe) {
@@ -61,6 +63,7 @@ public class OppdaterAktoerIdService {
 			List<Arbeidssak> arbeidssaker = arbeidssakRepository.findSaksBySakIdIn(sakIdListe);
 			log.info("Starter oppdatering av utdaterte aktoerId'er for de neste {} sakene", sakIdListe.size());
 			oppdaterAlleAktoerIder(arbeidssaker);
+			arbeidssakRepository.saveAll(arbeidssaker);
 			log.info("Har oppdatert utdaterte aktoerId'er");
 			return null;
 		});
