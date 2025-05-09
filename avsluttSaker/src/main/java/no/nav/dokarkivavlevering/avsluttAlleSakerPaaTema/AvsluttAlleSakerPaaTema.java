@@ -24,7 +24,7 @@ public class AvsluttAlleSakerPaaTema {
 	}
 
 	@Scheduled(initialDelay = 1000)
-	public void execute(){
+	public void execute() {
 		String referanse = avsluttSakProperties.getReferanse();
 		LocalDateTime avsluttetDato = avsluttSakProperties.getAvsluttetDato();
 		String administrativEnhet = avsluttSakProperties.getAdministrativEnhet();

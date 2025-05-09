@@ -192,9 +192,9 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		stubAzure();
 		stubPdl("hentIdenterBolkSomInneholderNotFound.json");
 		arbeidssakRepository.save(lagSakForAktoer(SAK_MED_LUKKET_JOURNALPOST1, "1234567891123"));
+		commitAndBeginNewTransaction();
 
 		avsluttAlleSakerService.avsluttAlleSaker();
-
 		Arbeidssak arbeidssak = arbeidssakRepository.findSaksBySakIdIn(List.of(123L)).getFirst();
 		assertThat(arbeidssak.getArbeidsstatus()).isEqualTo(FEIL_PDL_FANT_IKKE_AKTOERID);
 	}
