@@ -39,4 +39,12 @@ public interface ArbeidssakRepository extends JpaRepository<Arbeidssak, Long> {
 			order by arbeidssak.orgnr asc
 			""")
 	List<String> findDistinctOrgnrs(EnumSet<Arbeidsstatus> endeligeStatuser);
+
+	@Query("""
+			select arbeidssak.arbeidsstatus, count(arbeidssak)
+			from Arbeidssak arbeidssak
+			group by arbeidssak.arbeidsstatus
+			order by count(arbeidssak) desc
+			""")
+	List<Object[]> tellAntallArbeidssakerForHverArbeidsstatus();
 }

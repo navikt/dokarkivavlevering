@@ -4,11 +4,14 @@ import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.AvsluttSakProperties;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.ArbeidssakRepository;
+import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.Arbeidsstatus;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.Arbeidsstatus.ENDELIGE_STATUSER;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
@@ -45,6 +48,13 @@ public class AvsluttAlleSakerService {
 
 		avsluttAlleSakerForAktoerId();
 		avsluttAlleSakerOrgnr();
+		loggOppsummering();
+	}
+
+	private void loggOppsummering() {
+		Map<Arbeidsstatus, Long> arbeidsstatusMap = hentOgMapAntallArbeidssakerIHverArbeidstatus();
+
+		arbeidsstatusMap.forEach(((key, value) -> log.info("Arbeidsstatus={} har antallSaker={} ", key.name(), value)));
 	}
 
 	public void avsluttAlleSakerForAktoerId() {
@@ -66,5 +76,13 @@ public class AvsluttAlleSakerService {
 			//Finn alle tilhørende arbeidssaker for aktørId'ene i partisjonen
 			avsluttAlleSakerDoUpdates.avsluttOrgnrSakerForPartisjon(orgNrList);
 		}
+	}
+
+	public Map<Arbeidsstatus, Long> hentOgMapAntallArbeidssakerIHverArbeidstatus() {
+		return arbeidssakRepository.tellAntallArbeidssakerForHverArbeidsstatus().stream()
+				.collect(Collectors.toMap(
+						row -> (Arbeidsstatus) row[0], // arbeidsstatus
+						row -> (Long) row[1]    // count
+				));
 	}
 }
