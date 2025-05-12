@@ -17,8 +17,6 @@ public abstract class AbstractRepositoryTest {
 	protected final String AKTOER_ID = "12345678911";
 	protected final String ORGNR = "123456789";
 	protected final String FAGSAKSYSTEM_FS22 = "FS22";
-	protected final String FAGSAKSYSTEM_AO01 = "AO01";
-	protected final String FAGSAKNR = "fagsakNr";
 
 	@Autowired
 	protected ArbeidssakRepository arbeidssakRepository;
@@ -36,7 +34,6 @@ public abstract class AbstractRepositoryTest {
 				.aktoerId(AKTOER_ID)
 				.orgnr(null);
 	}
-
 
 	protected Arbeidssak.ArbeidssakBuilder baseArkivsakForOrganisasjon() {
 		return Arbeidssak.builder()

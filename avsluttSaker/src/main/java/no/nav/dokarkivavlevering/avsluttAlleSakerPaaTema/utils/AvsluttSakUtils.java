@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-//TODO: Lag tester for gruppering av saker
 public class AvsluttSakUtils {
 
 	public static void oppdaterArbeidsstatusForArkivsak(Arkivsak arkivsak, Arbeidsstatus arbeidsstatus) {

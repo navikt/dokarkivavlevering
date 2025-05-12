@@ -9,11 +9,10 @@ import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.Arbei
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.Arbeidsstatus.FEIL_PDL_FANT_IKKE_AKTOERID;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.Arbeidsstatus.FERDIG_SAK_AVSLUTTET;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.Arbeidsstatus.HENTET_FRA_PDL;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.Arbeidsstatus.PROSESSERING_AV_ARKIVSAK_STARTET;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ArbeidssakRepositoryTest extends AbstractRepositoryTest {
-
-	//TODO: Legg til tester for de nye metodene i ArbeidssakRepository
 
 	@Test
 	void skalHenteSaksIder() {
@@ -39,6 +38,46 @@ class ArbeidssakRepositoryTest extends AbstractRepositoryTest {
 		List<Long> sakIds = arbeidssakRepository.findAllSakIdsWhereStatusIsNullOrAapen(ENDELIGE_STATUSER);
 
 		assertThat(sakIds).isEqualTo(List.of(1L, 2L, 4L));
+	}
+
+	@Test
+	void skalFinneDistinkteAktoerIder() {
+		arbeidssakRepository.saveAll(List.of(
+				baseArkivsakForAktoerId().sakId(1L).aktoerId("111").build(),
+				baseArkivsakForAktoerId().sakId(2L).aktoerId("222").build(),
+				baseArkivsakForAktoerId().sakId(3L).aktoerId("222").build(),
+				baseArkivsakForAktoerId().sakId(4L).aktoerId("444").arbeidsstatus(FERDIG_SAK_AVSLUTTET).build(),
+				baseArkivsakForAktoerId().sakId(6L).aktoerId("555").arbeidsstatus(PROSESSERING_AV_ARKIVSAK_STARTET).build(),
+				baseArkivsakForAktoerId().sakId(7L).aktoerId("666").arbeidsstatus(FEIL_AAPEN_JOURNALPOST).build(),
+				baseArkivsakForAktoerId().sakId(8L).aktoerId(null).build(),
+				baseArkivsakForOrganisasjon().sakId(9L).build()
+		));
+
+		List<String> distinkteAktoerIder = arbeidssakRepository.findDistinctAktoerIds(ENDELIGE_STATUSER);
+
+		assertThat(distinkteAktoerIder)
+				.hasSize(3)
+				.containsAll(List.of("111", "222", "555"));
+	}
+
+	@Test
+	void skalFinneDistinkteOrgnr() {
+		arbeidssakRepository.saveAll(List.of(
+				baseArkivsakForOrganisasjon().sakId(1L).orgnr("1111").build(),
+				baseArkivsakForOrganisasjon().sakId(2L).orgnr("2222").build(),
+				baseArkivsakForOrganisasjon().sakId(3L).orgnr("2222").build(),
+				baseArkivsakForOrganisasjon().sakId(4L).orgnr("4444").arbeidsstatus(FERDIG_SAK_AVSLUTTET).build(),
+				baseArkivsakForOrganisasjon().sakId(6L).orgnr("5555").arbeidsstatus(PROSESSERING_AV_ARKIVSAK_STARTET).build(),
+				baseArkivsakForOrganisasjon().sakId(7L).orgnr("6666").arbeidsstatus(FEIL_AAPEN_JOURNALPOST).build(),
+				baseArkivsakForOrganisasjon().sakId(8L).orgnr(null).build(),
+				baseArkivsakForAktoerId().sakId(9L).build()
+		));
+
+		List<String> distinkteOrgnr = arbeidssakRepository.findDistinctOrgnrs(ENDELIGE_STATUSER);
+
+		assertThat(distinkteOrgnr)
+				.hasSize(3)
+				.containsAll(List.of("1111", "2222", "5555"));
 	}
 
 	@Test
