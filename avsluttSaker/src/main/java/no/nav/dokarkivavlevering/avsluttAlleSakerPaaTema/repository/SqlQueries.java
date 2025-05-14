@@ -20,6 +20,7 @@ public class SqlQueries {
 				K_AVLEVERING_STATUS = 'AVBRUTT',
 				K_KASSASJON_STATUS = 'KLAR_FOR_KASSASJON',
 				ENDRET_AV = :referanse,
+				ENDRET_KILDE_NAVN = 'AvsluttSakerPaaTema',
 				DATO_ENDRET = current_timestamp
 			where id in (:sakIds)
 			""";
