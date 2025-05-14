@@ -8,8 +8,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.Arbeidsstatus.ENDELIGE_STATUSER;
-
 @Slf4j
 @Service
 @Profile("avsluttSaker")
@@ -28,10 +26,15 @@ public class OppdaterAktoerIdService {
 	public void oppdaterUtdaterteAktoerIder() {
 		log.info("AvsluttAlleSaker starter oppdateringen av utdaterte aktoerId'er");
 
-		List<Long> alleSaksIder = arbeidssakRepository.findAllSakIdsWhereStatusIsNullOrAapen(ENDELIGE_STATUSER);
-		List<List<Long>> sakIdsPartitioned = Lists.partition(alleSaksIder, BATCHSTOERRELSE);
+		List<Long> ubehandledeSakerMedAktoerId = arbeidssakRepository.hentAlleUbehandledeSakerMedAktoerId();
+		if (ubehandledeSakerMedAktoerId.isEmpty()) {
+			log.info("Fant ingen ubehandlede saker med aktoerId. Prøver ikke å oppdatere aktørIder fra PDL.");
+			return;
+		}
 
+		List<List<Long>> sakIdsPartitioned = Lists.partition(ubehandledeSakerMedAktoerId, BATCHSTOERRELSE);
 		sakIdsPartitioned.forEach(OppdaterArbeidssakForPdl::oppdaterUtdaterteAktoerIderForPartisjon);
+
 		log.info("AvsluttAlleSaker har oppdatert alle utdaterte aktoerId'er");
 	}
 

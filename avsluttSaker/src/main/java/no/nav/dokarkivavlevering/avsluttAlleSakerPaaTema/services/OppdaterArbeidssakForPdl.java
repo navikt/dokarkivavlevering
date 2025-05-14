@@ -1,6 +1,5 @@
 package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.services;
 
-
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.entities.Arbeidssak;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.ArbeidssakRepository;
@@ -20,7 +19,6 @@ import java.util.stream.Collectors;
 
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.Arbeidsstatus.FEIL_PDL_FANT_IKKE_AKTOERID;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.Arbeidsstatus.HENTET_FRA_PDL;
-import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.Arbeidsstatus.SKAL_IKKE_HENTE_FRA_PDL;
 
 @Slf4j
 @Service
@@ -40,29 +38,14 @@ public class OppdaterArbeidssakForPdl {
 	public void oppdaterUtdaterteAktoerIderForPartisjon(List<Long> sakIdListe) {
 		List<Arbeidssak> arbeidssaker = arbeidssakRepository.findSaksBySakIdIn(sakIdListe);
 		log.info("Starter oppdatering av utdaterte aktoerId'er for de neste {} sakene", sakIdListe.size());
-		oppdaterAlleAktoerIder(arbeidssaker);
+		oppdaterArbeidssakMedGjeldendeAktoerIdFraPdl(arbeidssaker);
 		log.info("Har oppdatert utdaterte aktoerId'er");
 	}
 
-	private void oppdaterAlleAktoerIder(List<Arbeidssak> saker) {
-		List<Arbeidssak> sakerMedOrgnr = saker.stream()
-				.filter(arbeidssak -> arbeidssak.getOrgnr() != null)
-				.toList();
-		sakerMedOrgnr.forEach(arbeidssak -> arbeidssak.setArbeidsstatus(SKAL_IKKE_HENTE_FRA_PDL));
-
-		List<Arbeidssak> sakerMedAktoerId = saker.stream()
-				.filter(arbeidssak -> arbeidssak.getAktoerId() != null)
-				.toList();
-
-		if (!sakerMedAktoerId.isEmpty()) {
-			oppdaterArbeidssakMedGjeldendeAktoerIdFraPdl(sakerMedAktoerId);
-		}
-	}
-
 	private void oppdaterArbeidssakMedGjeldendeAktoerIdFraPdl(List<Arbeidssak> arbeidssakerMedAktoerId) {
-
 		Set<String> aktoerIderFraArbeidssaker = hentAktoerIderFraArbeidssaker(arbeidssakerMedAktoerId);
 		List<HentIdenterBolkResponse.HentIdenterBolk> hentIdenterBolkListe = pdlGraphQLConsumer.hentGjeldendeAktoerIder(aktoerIderFraArbeidssaker);
+
 		Map<String, String> aktoerIderSomSkalOppdateres = new HashMap<>();
 		List<String> aktoerIderUtenGyldigAktoerId = new ArrayList<>();
 

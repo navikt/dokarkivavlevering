@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.Arbeidsstatus.ENDELIGE_STATUSER;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 
 @Slf4j
@@ -58,7 +57,7 @@ public class AvsluttAlleSakerService {
 	}
 
 	public void avsluttAlleSakerForAktoerId() {
-		List<String> alleAktoerIder = arbeidssakRepository.findDistinctAktoerIds(ENDELIGE_STATUSER);
+		List<String> alleAktoerIder = arbeidssakRepository.hentOppdaterteAktoerIder();
 		//Del alle aktørId'ene opp i håndterlige partisjoner
 		List<List<String>> aktoerIdsPartitioned = Lists.partition(alleAktoerIder, 200);
 
@@ -69,7 +68,7 @@ public class AvsluttAlleSakerService {
 	}
 
 	public void avsluttAlleSakerOrgnr() {
-		List<String> alleOrgNr = arbeidssakRepository.findDistinctOrgnrs(ENDELIGE_STATUSER);
+		List<String> alleOrgNr = arbeidssakRepository.hentOrgnrs();
 		List<List<String>> orgnrPartitioned = Lists.partition(alleOrgNr, 200);
 
 		for (List<String> orgNrList : orgnrPartitioned) {

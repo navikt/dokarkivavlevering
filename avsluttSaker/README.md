@@ -23,7 +23,7 @@ SELECT
     aktoerid,
     orgnr,
     k_sak_status
-FROM sak
-where tema = 'MOB'
-and k_sak_status is null or k_sak_status = 'AAPEN';
+FROM joark.sak
+WHERE tema = 'MOB'
+AND k_sak_status is null or k_sak_status = 'AAPEN';
 ```

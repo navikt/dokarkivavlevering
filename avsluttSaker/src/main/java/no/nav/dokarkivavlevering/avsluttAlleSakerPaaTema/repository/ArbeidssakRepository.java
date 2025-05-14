@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.EnumSet;
 import java.util.List;
 
 @Profile("avsluttSaker")
@@ -13,11 +12,12 @@ public interface ArbeidssakRepository extends JpaRepository<Arbeidssak, Long> {
 
 	@Query("""
 			select arbeidssak.sakId from Arbeidssak arbeidssak
-			where (arbeidssak.arbeidsstatus is null or arbeidssak.arbeidsstatus not in (:endeligeStatuser))
+			where arbeidssak.arbeidsstatus is null
 			and (arbeidssak.status is null or arbeidssak.status = "AAPEN")
+			and arbeidssak.aktoerId is not null
 			order by arbeidssak.sakId asc
 			""")
-	List<Long> findAllSakIdsWhereStatusIsNullOrAapen(EnumSet<Arbeidsstatus> endeligeStatuser);
+	List<Long> hentAlleUbehandledeSakerMedAktoerId();
 
 	List<Arbeidssak> findSaksBySakIdIn(List<Long> sakIds);
 
@@ -27,18 +27,18 @@ public interface ArbeidssakRepository extends JpaRepository<Arbeidssak, Long> {
 	@Query("""
 			select distinct(arbeidssak.aktoerId) from Arbeidssak arbeidssak
 			where arbeidssak.aktoerId is not null
-			and (arbeidssak.arbeidsstatus is null or arbeidssak.arbeidsstatus not in (:endeligeStatuser))
+			and arbeidssak.arbeidsstatus = 'HENTET_FRA_PDL'
 			order by arbeidssak.aktoerId asc
 			""")
-	List<String> findDistinctAktoerIds(EnumSet<Arbeidsstatus> endeligeStatuser);
+	List<String> hentOppdaterteAktoerIder();
 
 	@Query("""
 			select distinct(arbeidssak.orgnr) from Arbeidssak arbeidssak
 			where arbeidssak.orgnr is not null
-			and (arbeidssak.arbeidsstatus is null or arbeidssak.arbeidsstatus not in (:endeligeStatuser))
+			and arbeidssak.arbeidsstatus is null
 			order by arbeidssak.orgnr asc
 			""")
-	List<String> findDistinctOrgnrs(EnumSet<Arbeidsstatus> endeligeStatuser);
+	List<String> hentOrgnrs();
 
 	@Query("""
 			select arbeidssak.arbeidsstatus, count(arbeidssak)
