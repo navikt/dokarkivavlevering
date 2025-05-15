@@ -2,7 +2,7 @@
 
 ### Oppretting av arbeidstabell
 ```
-CREATE TABLE MMA_7185 (
+CREATE TABLE <ARBEIDSTABELL> (
     id NUMBER(10) NOT NULL PRIMARY KEY,
     applikasjon VARCHAR2(40),
     fagsaknr VARCHAR2(40),
@@ -15,7 +15,7 @@ CREATE TABLE MMA_7185 (
 
 ### Populering av arbeidstabell
 ```
-INSERT INTO MMA_7185 (id, applikasjon, fagsaknr, aktoerid, orgnr, k_sak_status)
+INSERT INTO <ARBEIDSTABELL> (id, applikasjon, fagsaknr, aktoerid, orgnr, k_sak_status)
 SELECT 
     id,
     applikasjon,
@@ -24,6 +24,6 @@ SELECT
     orgnr,
     k_sak_status
 FROM joark.sak
-WHERE tema = 'MOB'
+WHERE tema = '<TEMA>'
 AND k_sak_status is null or k_sak_status = 'AAPEN';
 ```
