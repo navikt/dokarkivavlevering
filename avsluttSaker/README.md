@@ -1,4 +1,4 @@
-# Skript brukt for testing i q2
+# Skript brukt for oppretting av tabeller i q2 og prod
 
 ### Oppretting av arbeidstabell
 ```
@@ -29,7 +29,7 @@ AND k_sak_status is null or k_sak_status = 'AAPEN';
 COMMIT;
 ```
 
-### Opprydding av sak-tabell etter kjøring ved testing
+### Opprydding av sak-tabell etter kjøring ved testing i q2
 ```
 UPDATE joark.sak 
 SET

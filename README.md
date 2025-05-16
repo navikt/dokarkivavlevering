@@ -36,8 +36,7 @@ Før jobben blir kjørt må derfor:
 - Arbeidstabell bli opprettet og populert med data. Navn på denne kan være Jira-sak for tema som skal bli avsluttet. Dette kan vi utføre selv i q2, men krever en [Jira-bestilling for prod](https://jira.adeo.no/browse/IKT-649254).
 - [Arbeidssak.java](avsluttSaker/src/main/java/no/nav/dokarkivavlevering/avsluttAlleSakerPaaTema/entities/Arbeidssak.java) sin Table-annotasjon må få samme navn som arbeidstabellen.
 
-Skript for oppretting av arbeidstabell og innsetting av data for q2-miljøet finnes i [avsluttSaker/README.md](avsluttSaker/README.md).
-
+Skript for oppretting av arbeidstabell og innsetting av data for q2- og prod-miljøet finnes i [avsluttSaker/README.md](avsluttSaker/README.md).
 
 ## Henvendelser
 Spørsmål rundt koden eller prosjektet kan rettes til Team Dokumentløsninger på [\#Team Dokumentløsninger](https://nav-it.slack.com/client/T5LNAMWNA/C6W9E5GPJ).
