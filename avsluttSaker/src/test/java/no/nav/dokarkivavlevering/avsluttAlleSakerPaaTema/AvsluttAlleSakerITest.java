@@ -7,6 +7,7 @@ import no.nav.dokarkivavlevering.core.consumer.pdl.exception.PdlFunctionalExcept
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
@@ -40,14 +41,15 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 	@MockitoBean
 	AvsluttSakProperties avsluttSakPropertiesMock;
 
-	private static final Long SAK_MED_LUKKET_JOURNALPOST1 = 123L;
-	private static final Long SAK_MED_LUKKET_JOURNALPOST2 = 234L;
-	private static final Long SAK_MED_AAPEN_JOURNALPOST = 345L;
-	private static final Long SAK_UTEN_FERDIGSTILT_JOURNALPOST = 456L;
-	private static final Long SAK_UTEN_JOURNALFOERENDE_ENHET_JOURNALPOST = 567L;
-	private static final Long SAK_UTEN_DVH_ADMINISTRATIV_ENHET = 678L;
-	private static final Long SAK_MED_FAGSAKNR1 = 7898L;
-	private static final Long SAK_MED_FAGSAKNR2 = 7899L;
+	private static final long SAK_MED_LUKKET_JOURNALPOST1 = 123L;
+	private static final long SAK_MED_LUKKET_JOURNALPOST2 = 234L;
+	private static final long SAK_MED_AAPEN_JOURNALPOST = 345L;
+	private static final long SAK_UTEN_FERDIGSTILT_JOURNALPOST = 456L;
+	private static final long SAK_UTEN_JOURNALFOERENDE_ENHET_JOURNALPOST = 567L;
+	private static final long SAK_UTEN_DVH_ADMINISTRATIV_ENHET = 678L;
+	private static final long SAK_MED_FAGSAKNR1 = 7898L;
+	private static final long SAK_MED_FAGSAKNR2 = 7899L;
+	private static final long SAK_UTEN_SAKSRELASJONER_ID = 321L;
 	private static final String ORGNR = "123456789";
 	private static final String FNR = "2345678901234";
 	private static final String FNR_OLD = "1234567891123";
@@ -296,6 +298,27 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		assertThat(arbeidssak1.getAktoerId()).isEqualTo("1234567891234");
 
 		List<Sak> saker = namedParameterJdbcTemplate.query("select * from joark.sak where id in (:sakIds);", generateSakParams(SAK_UTEN_FERDIGSTILT_JOURNALPOST), new SakRowMapper());
+		assertAvbrutteSaker(saker);
+	}
+
+	@Test
+	public void skalAvbryteSakerForArkivsakUtenSaksrelasjoner() {
+		stubAzure();
+		stubPdl("hentIdenterBolk.json");
+		arbeidssakRepository.save(lagSakForAktoer(SAK_UTEN_SAKSRELASJONER_ID, "1234567891234"));
+		final MapSqlParameterSource sakIdParameterSource = new MapSqlParameterSource().addValue("sakId", SAK_UTEN_SAKSRELASJONER_ID);
+		namedParameterJdbcTemplate.update("insert into joark.sak (id) values (:sakId)", sakIdParameterSource);
+		commitAndBeginNewTransaction();
+
+		avsluttAlleSakerService.avsluttAlleSaker();
+
+		List<Arbeidssak> arbeidssaker = arbeidssakRepository.findSaksBySakIdIn(List.of(SAK_UTEN_SAKSRELASJONER_ID));
+		Arbeidssak arbeidssak1 = arbeidssaker.get(0);
+
+		assertThat(arbeidssak1.getArbeidsstatus()).isEqualTo(FERDIG_TOM_ARKIVSAK);
+		assertThat(arbeidssak1.getAktoerId()).isEqualTo("1234567891234");
+
+		List<Sak> saker = namedParameterJdbcTemplate.query("select * from joark.sak where id in (:sakId);", sakIdParameterSource, new SakRowMapper());
 		assertAvbrutteSaker(saker);
 	}
 
