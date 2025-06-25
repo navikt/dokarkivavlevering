@@ -18,7 +18,7 @@ import static jakarta.persistence.EnumType.STRING;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "MMA_6865")
+@Table(name = "MMA_8141")
 public class Arbeidssak {
 
 	@Id

@@ -33,7 +33,7 @@ Personlig tilgang til utviklere gis med personlig public key.
 Jobben bruker en arbeidstabell som må bli laget og populert før kjøring i dev og prod.
 
 Før jobben blir kjørt må derfor:
-- Arbeidstabell bli opprettet og populert med data. Navn på denne kan være Jira-sak for tema som skal bli avsluttet. Dette kan vi utføre selv i q2, men krever en [Jira-bestilling for prod](https://jira.adeo.no/browse/IKT-649254).
+- Arbeidstabell bli opprettet og populert med data. Navn på denne kan være Jira-sak for tema som skal bli avsluttet. Dette kan vi utføre selv i q2, men krever en [Jira-bestilling for prod](https://jira.adeo.no/browse/IKT-655353).
 - [Arbeidssak.java](avsluttSaker/src/main/java/no/nav/dokarkivavlevering/avsluttAlleSakerPaaTema/entities/Arbeidssak.java) sin Table-annotasjon må få samme navn som arbeidstabellen.
 
 Skript for oppretting av arbeidstabell og innsetting av data for q2- og prod-miljøet finnes i [avsluttSaker/README.md](avsluttSaker/README.md).
