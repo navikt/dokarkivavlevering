@@ -14,3 +14,5 @@ jobs:
       id-token: write
     uses: navikt/dok-workflows/.github/workflows/automerge-dependabot-pr.yml@main
     secrets: inherit
+    with:
+      deploy-and-draft-release: false
