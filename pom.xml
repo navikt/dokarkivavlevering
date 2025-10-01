@@ -30,7 +30,7 @@
 		<logstash-logback-encoder.version>8.0</logstash-logback-encoder.version>
 		<simpleflatmapper.version>8.2.3</simpleflatmapper.version>
 		<commons-io.version>2.20.0</commons-io.version>
-		<guava.version>33.4.0-jre</guava.version>
+		<guava.version>33.5.0-jre</guava.version>
 
 		<!-- aspose-pdf kan ikke oppdateres til en versjon > 23.5 (på grunn av lisens) -->
 		<aspose-pdf.version>23.5</aspose-pdf.version>
