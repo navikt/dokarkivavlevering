@@ -43,13 +43,13 @@ spec:
       value: "{{AD_NAVUSER_BASEDN}}"
     - name: SFTP_URL
       value: "{{ SFTP_URL }}"
-    - name : SFTP_USERNAME
+    - name: SFTP_USERNAME
       value: "srvDokarkivavlevering"
     - name: SFTP_PRIVATEKEYFILE
       value: "/var/run/secrets/nais_secrets/privatekey.key"
-    - name: AVLEVERING_BATCHSIZE
+    - name: DOKARKIVAVLEVERING_BATCHSIZE
       value: "200"
-    - name: AVLEVERING_FILOMRAADE_WORK
+    - name: DOKARKIVAVLEVERING_FILOMRAADE_WORK
       value: "/tmp"
     - name: AVLEVERING_PERIODE_STARTDATO
       value: "{{periodestart}}"
