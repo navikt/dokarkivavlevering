@@ -1,5 +1,4 @@
 {
-  "SPRING_LDAP_URLS": "ldaps://ldapgw.preprod.local",
   "SFTP_URL": "b27drvl011.preprod.local",
   "AD_NAVUSER_BASEDN": "ou=NAV,ou=BusinessUnits,dc=preprod,dc=local",
   "DOKARKIVAVLEVERING_ENDPOINTS_DATAVAREHUS_URL": "https://dvh.adeo.no/ords/dvh/dt_kodeverk/dim_org",

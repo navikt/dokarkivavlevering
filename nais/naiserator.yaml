@@ -22,6 +22,7 @@ spec:
       mountPath: /var/run/secrets/nais_secrets
   envFrom:
     - secret: dokarkivavlevering
+    - secret: ldap
   env:
     - name: JAVA_TRUSTSTORE_OPTIONS
       value: "-Djavax.net.ssl.trustStore=$(NAV_TRUSTSTORE_PATH)
@@ -29,8 +30,6 @@ spec:
     - name: JDK_JAVA_OPTIONS
       value: "-XX:MaxRAMPercentage=75
               $(JAVA_PROXY_OPTIONS) $(JAVA_TRUSTSTORE_OPTIONS)"
-    - name: SPRING_LDAP_URLS
-      value: "{{SPRING_LDAP_URLS}}"
     - name: DOKARKIVAVLEVERING_ENDPOINTS_DATAVAREHUS_URL
       value: "{{DOKARKIVAVLEVERING_ENDPOINTS_DATAVAREHUS_URL}}"
     - name: DOKARKIVAVLEVERING_ENDPOINTS_EREG_URL
@@ -47,8 +46,6 @@ spec:
       value: "srvDokarkivavlevering"
     - name: SFTP_PRIVATEKEYFILE
       value: "/var/run/secrets/nais_secrets/privatekey.key"
-    - name: DOKARKIVAVLEVERING_BATCHSIZE
-      value: "200"
     - name: DOKARKIVAVLEVERING_FILOMRAADE_WORK
       value: "/tmp"
     - name: AVLEVERING_PERIODE_STARTDATO

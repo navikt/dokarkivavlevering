@@ -1,6 +1,5 @@
 {
   "tema": "RPO",
-  "SPRING_LDAP_URLS": "ldaps://ldapgw.adeo.no",
   "SFTP_URL": "a01drvl100.adeo.no",
   "AD_NAVUSER_BASEDN": "ou=NAV,ou=BusinessUnits,dc=adeo,dc=no",
   "DOKARKIVAVLEVERING_ENDPOINTS_DATAVAREHUS_URL": "https://dvh.adeo.no/ords/dvh/dt_kodeverk/dim_org",
