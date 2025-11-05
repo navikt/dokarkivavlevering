@@ -5,6 +5,7 @@ import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.domain.Arkivsak;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.domain.Journalpost;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.exeptions.KanIkkeBehandleArkivsakException;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.AvsluttSakRepository;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -18,6 +19,7 @@ import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.validators.Arkiv
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 
 @Service
+@Profile("avsluttSaker")
 public class JournalpostService {
 
 	private static final String MASKINELL_JOURNALFOERENDE_ENHET = "9999";
