@@ -1,8 +1,6 @@
 {
-  "SRV_LINUX": "/serviceuser/data/prod/srvssolinux",
-  "DOKARKIVAVLEVERING_DS_CREDS": "/oracle/data/prod/creds/joark-dokarkivavlevering",
-  "DOKARKIVAVLEVERING_DS_CONFIG": "/oracle/data/prod/config/joark",
-  "SPRING_LDAP_URLS": "ldaps://ldapgw.adeo.no",
+  "tema": "RPO",
+  "SFTP_URL": "a01drvl100.adeo.no",
   "AD_NAVUSER_BASEDN": "ou=NAV,ou=BusinessUnits,dc=adeo,dc=no",
   "DOKARKIVAVLEVERING_ENDPOINTS_DATAVAREHUS_URL": "https://dvh.adeo.no/ords/dvh/dt_kodeverk/dim_org",
   "DOKARKIVAVLEVERING_ENDPOINTS_EREG_URL": "https://ereg-services.intern.nav.no/v2/organisasjon/",

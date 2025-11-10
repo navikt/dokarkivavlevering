@@ -1,9 +1,19 @@
-FROM ghcr.io/navikt/baseimages/temurin:21
+FROM europe-north1-docker.pkg.dev/cgr-nav/pull-through/nav.no/jre:openjdk-25-dev AS builder
 USER root
-RUN sed -i "s#deb http://deb.debian.org/debian bullseye main#deb http://deb.debian.org/debian bullseye main contrib non-free#g" /etc/apt/sources.list
-RUN apt-get update && apt-get install -y libfreetype6 fontconfig ttf-mscorefonts-installer
+RUN apk add cabextract
+WORKDIR /ttf
+COPY get_ms_core_fonts.sh .
+RUN ./get_ms_core_fonts.sh
+WORKDIR /build
+COPY app/target/app.jar app.jar
+RUN java -Djarmode=tools -jar app.jar extract --launcher --layers --destination extracted
 
-USER apprunner
-COPY app/target/app.jar /app/app.jar
-COPY export-vault-secrets.sh /init-scripts/50-export-vault-secrets.sh
-ENV JAVA_OPTS="-Xmx2048m -Djava.security.egd=file:/dev/./urandom"
+FROM europe-north1-docker.pkg.dev/cgr-nav/pull-through/nav.no/jre:openjdk-21
+COPY --from=builder /ttf/ /usr/share/fonts/truetype/mscorefonts
+COPY --from=builder --chown=1069:1069 /build/extracted/snapshot-dependencies/ ./
+COPY --from=builder --chown=1069:1069 /build/extracted/spring-boot-loader/ ./
+COPY --from=builder --chown=1069:1069 /build/extracted/dependencies/ ./
+COPY --from=builder --chown=1069:1069 /build/extracted/application/ ./
+
+ENV TZ="Europe/Oslo"
+CMD ["-server", "-cp", ".", "org.springframework.boot.loader.launch.JarLauncher"]
