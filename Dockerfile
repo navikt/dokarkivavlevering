@@ -1,7 +1,7 @@
 FROM europe-north1-docker.pkg.dev/cgr-nav/pull-through/nav.no/jre:openjdk-25-dev AS builder
 USER root
 RUN apk add cabextract
-WORKDIR /ttf
+WORKDIR /getfonts
 COPY get_ms_core_fonts.sh .
 RUN ./get_ms_core_fonts.sh
 WORKDIR /build
