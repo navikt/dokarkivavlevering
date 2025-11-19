@@ -5,36 +5,138 @@ import no.arkivverket.standarder.noark5.offentligjournal.Klasse;
 import no.arkivverket.standarder.noark5.offentligjournal.Korrespondansepart;
 import no.arkivverket.standarder.noark5.offentligjournal.Saksmappe;
 import no.nav.dokarkivavlevering.avlevering.common.JournaldatoMapper;
+import no.nav.dokarkivavlevering.avlevering.config.Tema;
 import no.nav.dokarkivavlevering.avlevering.domain.DokumentInfo;
 import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import no.nav.dokarkivavlevering.avlevering.testUtils.TestUtils;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+
+import java.util.ArrayList;
 
 import static java.util.Collections.singletonList;
+import static no.nav.dokarkivavlevering.avlevering.config.Tema.MED;
+import static no.nav.dokarkivavlevering.avlevering.config.Tema.PER;
 import static no.nav.dokarkivavlevering.avlevering.testUtils.TestUtils.toLocalDateTime;
 import static org.apache.camel.converter.ObjectConverter.toBigInteger;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class OffentligJournalRegistreringMapperTest {
 	private final OffentligJournalRegistreringMapper mapper = new OffentligJournalRegistreringMapper(new JournaldatoMapper());
 
 	@Test
 	void testMapping() throws Exception {
-		final Journalregistrering journalRegistrering = mapper.map(generateSak(), generateSak().getJp().get(0));
+		Sak sak = generateSak();
+		final Journalregistrering journalRegistrering = mapper.map(sak, sak.getJp().get(0));
 
-		assertKlasse(journalRegistrering.getKlasse());
-		assertMappe(journalRegistrering.getSaksmappe());
-		assertJournalpost(journalRegistrering.getJournalpost());
+		assertKlasse(journalRegistrering.getKlasse(), MED);
+		assertMappe(journalRegistrering.getSaksmappe(), MED);
+		assertJournalpostWithSkjermingMetadata(journalRegistrering.getJournalpost());
 	}
 
-	private void assertKlasse(Klasse klasse) {
-		assertEquals(klasse.getKlasseID(), "MED");
-		assertEquals(klasse.getTittel(), "Medlemskap");
+	@Test
+	void shouldMapOffentligJournalForTemaPer() throws Exception {
+		Sak sak = generateSak();
+		final Journalregistrering journalRegistrering = mapper.map(generateSak("PER"), sak.getJp().get(0));
+
+		assertKlasse(journalRegistrering.getKlasse(), PER);
+		assertMappe(journalRegistrering.getSaksmappe(), PER);
+		assertJournalpostWithSkjermingMetadata(journalRegistrering.getJournalpost());
 	}
 
-	private void assertJournalpost(no.arkivverket.standarder.noark5.offentligjournal.Journalpost jp) throws Exception {
+	@Test
+	void shouldMapOffentligJournalForOffentligJournalAvsenderMottaker() {
+		Sak sak = generateSakWithoutJournalposts("MED");
+		Journalpost jp = generateJournalPost().offentligJournalAvsenderMottaker("Navn Navnesen").build();
+		sak.getJp().add(jp);
+
+		final Journalregistrering journalRegistrering = mapper.map(sak, sak.getJp().get(0));
+
+		assertKlasse(journalRegistrering.getKlasse(), MED);
+		assertMappe(journalRegistrering.getSaksmappe(), MED);
+		assertJournalpostWithoutSkjermingMetadata(journalRegistrering.getJournalpost());
+	}
+
+	@ParameterizedTest
+	@CsvSource({
+			"123",
+			"12345678",
+			"123456789",
+			"1234567890123"
+	})
+	void shouldMapOffentligJournalForMottakerWith3or8or9or13numbers(String idnr){
+		Sak sak = generateSakWithoutJournalposts("MED");
+		Journalpost jp = generateJournalPost().avsenderMottakerId(idnr).build();
+		sak.getJp().add(jp);
+
+		final Journalregistrering journalRegistrering = mapper.map(sak, sak.getJp().get(0));
+
+		assertKlasse(journalRegistrering.getKlasse(), MED);
+		assertMappe(journalRegistrering.getSaksmappe(), MED);
+		assertJournalpostWithoutSkjermingMetadata(journalRegistrering.getJournalpost());
+	}
+
+	@ParameterizedTest
+	@CsvSource({
+			"HPRNR",
+			"UTL_ORG"
+	})
+	void shouldMapOffentligJournalForHPRNR_UTL_ORG(String idtype){
+		Sak sak = generateSakWithoutJournalposts("MED");
+		Journalpost jp = generateJournalPost().avsenderMottakerIdType(idtype).build();
+		sak.getJp().add(jp);
+
+		final Journalregistrering journalRegistrering = mapper.map(sak, sak.getJp().get(0));
+
+		assertKlasse(journalRegistrering.getKlasse(), MED);
+		assertMappe(journalRegistrering.getSaksmappe(), MED);
+		assertJournalpostWithoutSkjermingMetadata(journalRegistrering.getJournalpost());
+	}
+
+	@Test
+	void shouldNotSkjermeNotat(){
+		Sak sak = generateSakWithoutJournalposts("MED");
+		Journalpost jp = generateJournalPost().type("N").build();
+		sak.getJp().add(jp);
+
+		final Journalregistrering journalRegistrering = mapper.map(sak, sak.getJp().get(0));
+
+		assertKlasse(journalRegistrering.getKlasse(), MED);
+		assertMappe(journalRegistrering.getSaksmappe(), MED);
+		assertJournalpostWithoutSkjermingMetadataAndKorrespondansepart(journalRegistrering.getJournalpost());
+	}
+
+	private void assertKlasse(Klasse klasse, Tema tema) {
+		assertEquals(klasse.getKlasseID(), tema.getTemakode());
+		assertEquals(klasse.getTittel(), tema.getTemanavn());
+	}
+
+	private void assertJournalpostWithSkjermingMetadata(no.arkivverket.standarder.noark5.offentligjournal.Journalpost jp) {
+		assertBaseJournalpost(jp);
+		assertEquals(jp.getSkjermingMetadata(), "Skjerming navn mottaker");
+		assertEquals(jp.getSkjermingshjemmel(), "Offl. § 13 1. ledd, jf fvl § 13 1. ledd nr. 2 / NAV-loven § 7");
+		assertKorrespondanseParts(jp.getKorrespondanseparts().get(0));
+	}
+
+	private void assertJournalpostWithoutSkjermingMetadata(no.arkivverket.standarder.noark5.offentligjournal.Journalpost jp) {
+		assertBaseJournalpost(jp);
+		assertNull(jp.getSkjermingMetadata());
+		assertNull(jp.getSkjermingshjemmel());
+		assertKorrespondanseParts(jp.getKorrespondanseparts().get(0), "Arena", "Mottaker");
+	}
+
+	private void assertJournalpostWithoutSkjermingMetadataAndKorrespondansepart(no.arkivverket.standarder.noark5.offentligjournal.Journalpost jp){
+		assertBaseJournalpost(jp);
+		assertNull(jp.getSkjermingMetadata());
+		assertNull(jp.getSkjermingshjemmel());
+		assertNull(jp.getKorrespondanseparts().get(0));
+	}
+
+	private void assertBaseJournalpost(no.arkivverket.standarder.noark5.offentligjournal.Journalpost jp){
 		assertThat(jp.getSystemID().getValue()).isNotEmpty();
 		assertEquals(jp.getJournalaar(), toBigInteger(2020));
 		assertEquals(jp.getJournalsekvensnummer(), toBigInteger(453637481));
@@ -42,32 +144,43 @@ class OffentligJournalRegistreringMapperTest {
 		assertEquals(jp.getOffentligTittel(), "Legg til ny institusjon");
 		assertEquals(jp.getJournaldato(), TestUtils.toLocalDateTime("2020-11-10 16:04:43").toLocalDate());
 		assertEquals(jp.getDokumentetsDato(), TestUtils.toLocalDateTime("2020-11-10 16:05:43").toLocalDate());
-		assertEquals(jp.getSkjermingMetadata(), "Skjerming navn mottaker");
-		assertEquals(jp.getSkjermingshjemmel(), "Offentleglova § 13");
-		assertKorrespondanseParts(jp.getKorrespondanseparts().get(0));
 	}
 
 	private void assertKorrespondanseParts(Korrespondansepart part) {
-		assertEquals(part.getKorrespondansepartNavn(), "****");
-		assertEquals(part.getKorrespondanseparttype(), "Mottaker");
+		assertKorrespondanseParts(part, "****", "Mottaker");
 	}
 
-	private void assertMappe(Saksmappe mappe) {
+	private void assertKorrespondanseParts(Korrespondansepart part, String expectedName, String expectedType) {
+		assertEquals(part.getKorrespondansepartNavn(), expectedName);
+		assertEquals(part.getKorrespondanseparttype(), expectedType);
+	}
+
+	private void assertMappe(Saksmappe mappe, Tema tema) {
 		assertEquals(mappe.getSaksaar(), toBigInteger(2019));
 		assertEquals(mappe.getSakssekvensnummer(), toBigInteger((1234567011)));
-		assertEquals(mappe.getOffentligTittel(), "Medlemskap");
+		assertEquals(mappe.getOffentligTittel(), tema.getTemanavn());
 	}
 
 	private Sak generateSak() throws Exception {
-		return Sak.builder()
-				.id((long) 1234567011)
-				.tema("MED")
-				.opprettetAv("srvmelosys")
-				.opprettetTidspunkt(toLocalDateTime("2019-10-28 11:41:36.673"))
-				.jp(singletonList(generateJournalPost())).build();
+		return generateSak("MED");
 	}
 
-	private Journalpost generateJournalPost() throws Exception {
+	private Sak generateSak(String tema) throws Exception {
+		Sak sak = generateSakWithoutJournalposts(tema);
+		sak.getJp().add(generateJournalPost().build());
+		return sak;
+	}
+
+	private Sak generateSakWithoutJournalposts(String tema) {
+		return Sak.builder()
+				.id((long) 1234567011)
+				.tema(tema)
+				.opprettetAv("srvmelosys")
+				.opprettetTidspunkt(toLocalDateTime("2019-10-28 11:41:36.673"))
+				.jp(new ArrayList<>()).build();
+	}
+
+	private Journalpost.JournalpostBuilder generateJournalPost() {
 		return Journalpost.builder()
 				.id((long) 453637481)
 				.type("U")
@@ -85,11 +198,10 @@ class OffentligJournalRegistreringMapperTest {
 				.opprettetAvNavn("srvmelosys")
 				.endretAv("srvmelosys")
 				.endretAvBeriketNavn(null)
-				.dok(singletonList(generateDokumentInfo()))
-				.build();
+				.dok(singletonList(generateDokumentInfo()));
 	}
 
-	private DokumentInfo generateDokumentInfo() throws Exception {
+	private DokumentInfo generateDokumentInfo() {
 		return DokumentInfo.builder()
 				.id((long) 454017976)
 				.relTilknyttetSom("HOVEDDOKUMENT")

@@ -19,6 +19,9 @@ public class Journalpost implements MedOpprettetAvNavn {
 	String innhold;
 	@ToString.Exclude
 	String avsenderMottaker;
+	String avsenderMottakerId;
+	String avsenderMottakerIdType;
+	String offentligJournalAvsenderMottaker;
 	LocalDateTime datoMottatt;
 	LocalDateTime datoDokument;
 	LocalDateTime datoJournal;
