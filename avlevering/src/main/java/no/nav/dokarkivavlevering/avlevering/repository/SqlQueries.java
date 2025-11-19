@@ -46,7 +46,7 @@ public class SqlQueries {
 					       j.innhold                     as jp_innhold,
 					       j.avsend_mottaker             as jp_avsendermottaker,
 					       j.avsend_mottak_id            as jp_avsendermottakerid,
-					       j.k_avsendmottak_id_t         as jp_avsendermottaktype,
+					       j.k_avsend_mottak_id_t         as jp_avsendermottaktype,
 					       j.dato_mottatt                as jp_datomottatt,
 					       j.dato_dokument               as jp_datodokument,
 					       j.dato_journal                as jp_datojournal,
@@ -104,7 +104,7 @@ public class SqlQueries {
 					         left join t_arkiv_element_endring aeej on alj.aksjonslogg_id = aeej.aksjonslogg_id
 					         left join t_aksjonslogg ald on ald.journalpost_id = j.journalpost_id and ald.dokument_info_id = d.dokument_info_id
 					         left join t_arkiv_element_endring aeed on ald.aksjonslogg_id = aeed.aksjonslogg_id
-					         join t_k_offentlig_journal_avsender_mottaker ojam on lower(trim(j.avsender_mottaker)) = lower(trim(ojam.k_offentlig_journal_avsender_mottaker))
+					         join t_k_offentlig_journal_avsender_mottaker ojam on lower(trim(j.avsend_mottaker)) = lower(trim(ojam.k_offentlig_journal_avsender_mottaker))
 					where s.sak_id in (:sakIds)
 					  and j.k_journal_s in ('J', 'FS', 'FL', 'E')
 					  and (j.dato_opprettet between :startdato and :sluttdato)
@@ -130,7 +130,7 @@ public class SqlQueries {
 					       j.innhold                     as jp_innhold,
 					       j.avsend_mottaker             as jp_avsendermottaker,
 					       j.avsend_mottak_id            as jp_avsendermottakerid,
-					       j.k_avsendmottak_id_t         as jp_avsendermottaktype,
+					       j.k_avsend_mottak_id_t         as jp_avsendermottaktype,
 					       j.dato_mottatt                as jp_datomottatt,
 					       j.dato_dokument               as jp_datodokument,
 					       j.dato_journal                as jp_datojournal,
@@ -186,7 +186,7 @@ public class SqlQueries {
 					         left join t_arkiv_element_endring aeej on alj.aksjonslogg_id = aeej.aksjonslogg_id
 					         left join t_aksjonslogg ald on ald.journalpost_id = j.journalpost_id and ald.dokument_info_id = d.dokument_info_id
 					         left join t_arkiv_element_endring aeed on ald.aksjonslogg_id = aeed.aksjonslogg_id
-					         join t_k_offentlig_journal_avsender_mottaker ojam on lower(trim(j.avsender_mottaker)) = lower(trim(ojam.k_offentlig_journal_avsender_mottaker))
+					         join t_k_offentlig_journal_avsender_mottaker ojam on lower(trim(j.avsend_mottaker)) = lower(trim(ojam.k_offentlig_journal_avsender_mottaker))
 					where s.sak_id in (:sakIds)
 					  and j.k_journal_s in ('J', 'FS', 'FL', 'E')
 					  and (j.dato_opprettet between :startdato and :sluttdato)
