@@ -88,8 +88,6 @@ public class SaksmappeMapper {
 		registrering.setJournalposttype(determineJournalPostType(journalpost.getType()));
 		registrering.setJournaldato(journaldato.toLocalDate());
 		registrering.setSendtDato(determineSendtDato(journalpost, journaldato));
-		registrering.setRegistreringsID(journalpostId.toString());
-		registrering.setTittel(journalpost.getInnhold());
 		registrering.setJournalstatus("Arkivert");
 
 		//Skal kun settes hvis det ikke er et notat.
