@@ -106,7 +106,7 @@ public class PdlGraphQLConsumer {
 		variables.put("grupper", "FOLKEREGISTERIDENT");
 		return PdlRequest.builder()
 				.query("""
-						query hentIdenterBolk($identer: [ID!]!, $grupper: [IdentGruppe!])) {
+						query hentIdenterBolk($identer: [ID!]!, $grupper: [IdentGruppe!]) {
 						  hentPersonBolk(identer: $identer, grupper: $grupper) {
 							ident
 							person {
