@@ -23,13 +23,13 @@ public class PdlResponseMapper {
 	public static Map<String, BrukerMedNavnedata> mapPdlHentIdenterPersonBolk(List<PdlHentPersonBolkResponse.PdlHentPersonBolk> hentPersonBolk) {
 		Map<String, BrukerMedNavnedata> brukerMedNavnedataMap = new HashMap<>();
 		for (PdlHentPersonBolkResponse.PdlHentPersonBolk personbolk : hentPersonBolk) {
-			brukerMedNavnedataMap.put(personbolk.getIdent(), toBrukerMedNavnedata(personbolk));
+			brukerMedNavnedataMap.put(personbolk.getPerson().getFolkeregisteridentifikator().getFirst().getIdentifikasjonsnummer(), toBrukerMedNavnedata(personbolk));
 		}
 		return brukerMedNavnedataMap;
 	}
 
 	private static BrukerMedNavnedata toBrukerMedNavnedata(PdlHentPersonBolkResponse.PdlHentPersonBolk personbolk) {
-		return new BrukerMedNavnedata(personbolk.getIdent(), getNavnMedGyldighet(personbolk));
+		return new BrukerMedNavnedata(personbolk.getPerson().getFolkeregisteridentifikator().getFirst().getIdentifikasjonsnummer(), getNavnMedGyldighet(personbolk));
 	}
 
 	private static List<NavnMedGyldighet> getNavnMedGyldighet(PdlHentPersonBolkResponse.PdlHentPersonBolk personbolk) {
