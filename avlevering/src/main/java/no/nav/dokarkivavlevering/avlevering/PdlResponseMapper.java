@@ -24,7 +24,7 @@ public class PdlResponseMapper {
 	public static Map<String, BrukerMedNavnedata> mapPdlHentIdenterPersonBolk(List<PdlHentPersonBolkResponse.PdlHentPersonBolk> hentPersonBolk) {
 		Map<String, BrukerMedNavnedata> brukerMedNavnedataMap = new HashMap<>();
 		for (PdlHentPersonBolkResponse.PdlHentPersonBolk personbolk : hentPersonBolk) {
-			brukerMedNavnedataMap.put(folkeregisterIdentifikator(personbolk.getPerson()), toBrukerMedNavnedata(personbolk));
+			brukerMedNavnedataMap.put(personbolk.getIdent(), toBrukerMedNavnedata(personbolk));
 		}
 		return brukerMedNavnedataMap;
 	}
