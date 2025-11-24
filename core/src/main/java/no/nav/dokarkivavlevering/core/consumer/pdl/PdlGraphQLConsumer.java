@@ -103,11 +103,10 @@ public class PdlGraphQLConsumer {
 	private PdlRequest mapHentPersonBolk(final Set<String> aktoerIds) {
 		final HashMap<String, Object> variables = new HashMap<>();
 		variables.put("identer", aktoerIds);
-		variables.put("grupper", "FOLKEREGISTERIDENT");
 		return PdlRequest.builder()
 				.query("""
-						query hentIdenterBolk($identer: [ID!]!, $grupper: [IdentGruppe!]) {
-						  hentPersonBolk(identer: $identer, grupper: $grupper) {
+						query hentIdenterBolk($identer: [ID!]!) {
+						  hentPersonBolk(identer: $identer) {
 							ident
 							person {
 							  folkeregisteridentifikator {
