@@ -23,13 +23,13 @@ public class PdlResponseMapper {
 	public static Map<String, BrukerMedNavnedata> mapPdlHentIdenterPersonBolk(List<PdlHentPersonBolkResponse.PdlHentPersonBolk> hentPersonBolk) {
 		Map<String, BrukerMedNavnedata> brukerMedNavnedataMap = new HashMap<>();
 		for (PdlHentPersonBolkResponse.PdlHentPersonBolk personbolk : hentPersonBolk) {
-			brukerMedNavnedataMap.put(personbolk.getPerson().getFolkeregisteridentifikator().getFirst().getIdentifikasjonsnummer(), toBrukerMedNavnedata(personbolk));
+			brukerMedNavnedataMap.put(folkeregisterIdentifikator(personbolk.getPerson()), toBrukerMedNavnedata(personbolk));
 		}
 		return brukerMedNavnedataMap;
 	}
 
 	private static BrukerMedNavnedata toBrukerMedNavnedata(PdlHentPersonBolkResponse.PdlHentPersonBolk personbolk) {
-		return new BrukerMedNavnedata(personbolk.getPerson().getFolkeregisteridentifikator().getFirst().getIdentifikasjonsnummer(), getNavnMedGyldighet(personbolk));
+		return new BrukerMedNavnedata(folkeregisterIdentifikator(personbolk.getPerson()), getNavnMedGyldighet(personbolk));
 	}
 
 	private static List<NavnMedGyldighet> getNavnMedGyldighet(PdlHentPersonBolkResponse.PdlHentPersonBolk personbolk) {
@@ -55,6 +55,15 @@ public class PdlResponseMapper {
 			return null;
 		}
 		return LocalDateTime.from(DateTimeFormatter.ISO_DATE_TIME.parse(tidspunkt)).atZone(OSLO);
+	}
+
+	private static String folkeregisterIdentifikator(PdlHentPersonBolkResponse.PdlPerson person){
+		return person.getFolkeregisteridentifikator().stream()
+				.map(PdlHentPersonBolkResponse.PdlFolkeregisteridentifikator::getIdentifikasjonsnummer)
+				.filter(Objects::nonNull)
+				.findFirst()
+				.orElse("Mangler data om folkeregisteridentifikator");
+
 	}
 
 	private static String fulltnavn(PdlHentPersonBolkResponse.PdlNavn pdlNavn) {
