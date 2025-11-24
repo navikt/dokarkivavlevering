@@ -16,6 +16,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.Objects.isNull;
 import static no.nav.dokarkivavlevering.avlevering.domain.Bruker.UKJENT_PERSON;
 
 public class PdlResponseMapper {
@@ -58,11 +59,14 @@ public class PdlResponseMapper {
 	}
 
 	private static String folkeregisterIdentifikator(PdlHentPersonBolkResponse.PdlPerson person){
+		if (isNull(person)) {
+			return "Mangler data om folkeregisteridentifikator, person er null";
+		}
 		return person.getFolkeregisteridentifikator().stream()
 				.map(PdlHentPersonBolkResponse.PdlFolkeregisteridentifikator::getIdentifikasjonsnummer)
 				.filter(Objects::nonNull)
 				.findFirst()
-				.orElse("Mangler data om folkeregisteridentifikator");
+				.orElse("Mangler data om folkeregisteridentifikator, har ingen identifikasjonsnummer");
 
 	}
 
