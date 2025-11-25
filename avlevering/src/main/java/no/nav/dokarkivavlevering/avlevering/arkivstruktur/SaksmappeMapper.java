@@ -57,13 +57,20 @@ public class SaksmappeMapper {
 		mappe.setSaksaar(toBigInteger(getYear(sak.getOpprettetTidspunkt())));
 		mappe.setSakssekvensnummer(toBigInteger(sak.getId()));
 		mappe.setSaksdato(sak.getOpprettetTidspunkt().toLocalDate());
-		mappe.setAdministrativEnhet(getAdministrativEnhetFromTema((sak.getTema())));
+		mappe.setAdministrativEnhet(getAdministrativEnhet(sak));
 		mappe.setSaksansvarlig(getSaksAnsvarlig(sak.getJp()));
 		mappe.setSaksstatus("Under behandling");
 		for (Journalpost journalpost : sak.getJp()) {
 			mappe.getRegistrerings().add(mapRegistrering(journalpost, sak.getTema()));
 		}
 		return mappe;
+	}
+
+	private String getAdministrativEnhet(Sak sak) {
+		if(sak.getAdministrativ_enhet() != null && !sak.getAdministrativ_enhet().isBlank()) {
+			return sak.getAdministrativ_enhet();
+		}
+		return getAdministrativEnhetFromTema((sak.getTema()));
 	}
 
 	private Part mapPart(Sak sak) {
@@ -167,7 +174,7 @@ public class SaksmappeMapper {
 		dokumentobjekt.setFormat(filformat);
 		dokumentobjekt.setOpprettetDato(filDetaljer.getDatoOpprettet());
 		dokumentobjekt.setOpprettetAv(resolveOpprettetAv(filDetaljer));
-		dokumentobjekt.setReferanseDokumentfil("DOKUMENTER/%s/%s_%s.%s".formatted(tema, journalpostId, filDetaljer.getFilUuid(), filformat));
+		dokumentobjekt.setReferanseDokumentfil("DOKUMENTER/%s/%s_%s.%s".formatted(tema, journalpostId, filDetaljer.getFilUuid(), filformat.toLowerCase()));
 		dokumentobjekt.setSjekksum(filDetaljer.getSha256hashBeriket());
 		dokumentobjekt.setSjekksumAlgoritme("SHA-256");
 		dokumentobjekt.setFilstoerrelse(toBigInteger(filDetaljer.getFilstorrelseBeriket()));

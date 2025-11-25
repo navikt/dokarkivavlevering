@@ -39,6 +39,7 @@ public class SqlQueries {
 					           when sa.aktoerid is null
 					               then sa.orgnr
 					           else sa.aktoerid end      as bruker_id,
+					       sa.administrativ_enhet		 as administrativ_enhet,
 					
 					       j.journalpost_id              as jp_id,
 					       j.k_journalpost_t             as jp_type,

@@ -129,7 +129,7 @@ class SaksmappeMapperTest {
 		assertEquals(registrering.getJournalsekvensnummer().toString(), "453637481");
 		assertEquals(registrering.getJournalpostnummer().toString(), "453637481");
 		assertEquals(registrering.getJournalposttype(), "Utgående dokument");
-		assertEquals(registrering.getJournalstatus(), "Arkivert");
+		assertEquals(registrering.getJournalstatus(), "Ferdig og klar for sentral utskrift");
 		assertEquals(registrering.getJournaldato(), toLocalDateTime("2020-11-10 16:04:43").toLocalDate());
 		assertEquals(registrering.getDokumentetsDato(), toLocalDateTime("2020-11-10 16:05:43").toLocalDate());
 		assertThat(registrering.getSystemID().getValue()).isNotEmpty();
@@ -148,7 +148,7 @@ class SaksmappeMapperTest {
 		assertFalse(dokObjekt.getSystemID().getValue().isEmpty());
 		assertEquals(dokObjekt.getVersjonsnummer(), toBigInteger(1));
 		assertEquals(dokObjekt.getVariantformat(), "Arkivformat");
-		assertEquals(dokObjekt.getFormat(), "PDF/A");
+		assertEquals(dokObjekt.getFormat(), "PDF");
 		assertThat(dokObjekt.getOpprettetDato()).isEqualToIgnoringNanos(toLocalDateTime("2020-11-10 16:04:43"));
 		assertEquals(dokObjekt.getOpprettetAv(), "Automatisk jobb");
 		assertEquals(dokObjekt.getReferanseDokumentfil(), "DOKUMENTER/KTR/453637481_55c39cdb-f052-4f4e-a9a5-900b455ca915.pdf");
@@ -249,6 +249,7 @@ class SaksmappeMapperTest {
 		return FilDetaljer.builder()
 				.id((long) 539876247)
 				.filUuid("55c39cdb-f052-4f4e-a9a5-900b455ca915")
+				.filtype("PDF")
 				.fil(FIL.getBytes())
 				.filstorrelseBeriket(FIL.length())
 				.sha256hashBeriket("a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e")
