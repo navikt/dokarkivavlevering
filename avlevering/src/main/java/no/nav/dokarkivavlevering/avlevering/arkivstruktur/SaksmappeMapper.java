@@ -90,6 +90,7 @@ public class SaksmappeMapper {
 		registrering.setJournaldato(journaldato.toLocalDate());
 		registrering.setSendtDato(determineSendtDato(journalpost, journaldato));
 		registrering.setJournalstatus("Arkivert");
+		registrering.setJournalstatus(mapJournalstatus(journalpost.getStatus()));
 
 		//Skal kun settes hvis det ikke er et notat.
 		if (!"N".equals(journalpost.getType())) {
@@ -108,6 +109,16 @@ public class SaksmappeMapper {
 		}
 
 		return registrering;
+	}
+
+	private String mapJournalstatus(String journalpostStatus) {
+		return switch(journalpostStatus) {
+			case "J" -> "Journalført";
+			case "FS" -> "Ferdig og klar for sentral utskrift";
+			case "FL" -> "Ferdig og klar for lokal utskrift";
+			case "E" -> "Ekspedert";
+			default -> "Journalposten har ingen gyldig status";
+		};
 	}
 
 	private Korrespondansepart mapKorrespondansePart(Journalpost journalpost) {
