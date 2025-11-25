@@ -18,6 +18,7 @@ public class FilDetaljer implements MedOpprettetAv {
 	@ToString.Exclude
 	String opprettetAvBeriketNavn;
 	byte[] fil;
+	String filtype;
 	int filstorrelseBeriket;
 	String sha256hashBeriket;
 }

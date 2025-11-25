@@ -71,6 +71,7 @@ public class SqlQueries {
 					       f.fil_uuid                    as jp_dok_fd_filuuid,
 					       f.dato_opprettet              as jp_dok_fd_datoopprettet,
 					       f.opprettet_av                as jp_dok_fd_opprettetav,
+					       f.k_fil_t                     as jp_dok_fd_filtype,
 					       df.fil                        as jp_dok_fd_fil,
 					       fo.k_fagomrade                as fagomrade_fagomrade,
 					       fo.dekode                     as fagomrade_dekode,

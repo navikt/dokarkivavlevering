@@ -24,6 +24,7 @@ import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 import static no.nav.dokarkivavlevering.avlevering.AvleveringSakBerikerMapper.AUTOMATISK_JOBB;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.INNGAAENDE;
@@ -147,14 +148,15 @@ public class SaksmappeMapper {
 	}
 
 	private Dokumentobjekt mapDokumentobjekt(FilDetaljer filDetaljer, String tema, String journalpostId) {
+		String filformat = filDetaljer.getFiltype().equals("PDFA") ? "PDF" : filDetaljer.getFiltype();
 		Dokumentobjekt dokumentobjekt = new Dokumentobjekt();
 		dokumentobjekt.setSystemID(AvleveringUtils.generateSystemID());
 		dokumentobjekt.setVersjonsnummer(toBigInteger(1));
 		dokumentobjekt.setVariantformat("Arkivformat");
-		dokumentobjekt.setFormat("PDF/A");
+		dokumentobjekt.setFormat(filformat);
 		dokumentobjekt.setOpprettetDato(filDetaljer.getDatoOpprettet());
 		dokumentobjekt.setOpprettetAv(resolveOpprettetAv(filDetaljer));
-		dokumentobjekt.setReferanseDokumentfil("DOKUMENTER/" + tema + "/" + journalpostId + "_" + filDetaljer.getFilUuid() + ".pdf");
+		dokumentobjekt.setReferanseDokumentfil("DOKUMENTER/%s/%s_%s.%s".formatted(tema, journalpostId, filDetaljer.getFilUuid(), filformat));
 		dokumentobjekt.setSjekksum(filDetaljer.getSha256hashBeriket());
 		dokumentobjekt.setSjekksumAlgoritme("SHA-256");
 		dokumentobjekt.setFilstoerrelse(toBigInteger(filDetaljer.getFilstorrelseBeriket()));
