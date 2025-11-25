@@ -14,15 +14,23 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.INNGAAENDE;
+import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.UTGAAENDE;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.getYear;
-import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.isNav;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.mapKorrespondansepartType;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.temaNavnDecode;
 import static org.apache.camel.converter.ObjectConverter.toBigInteger;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Component
 @Profile("genererAvlevering")
 public class OffentligJournalRegistreringMapper {
+
+	private static final String TEMA_PER = "PER";
+	private static final String UTL_ORG = "UTL_ORG";
+	private static final String HPRNR = "HPRNR";
+	private static final String NOTAT = "N";
 
 	private final JournaldatoMapper journaldatoMapper;
 
@@ -32,7 +40,7 @@ public class OffentligJournalRegistreringMapper {
 
 	public Journalregistrering map(Sak sak, Journalpost fraJournalpost) {
 		Journalregistrering registrering = new Journalregistrering();
-		registrering.setJournalpost(mapJournalPost(fraJournalpost));
+		registrering.setJournalpost(mapJournalpost(fraJournalpost, sak.getTema()));
 		registrering.setKlasse(mapKlasse(sak.getTema()));
 		registrering.setSaksmappe(mapSaksmappe(sak));
 		return registrering;
@@ -54,7 +62,7 @@ public class OffentligJournalRegistreringMapper {
 		return mappe;
 	}
 
-	private no.arkivverket.standarder.noark5.offentligjournal.Journalpost mapJournalPost(Journalpost fraJournalpost) {
+	private no.arkivverket.standarder.noark5.offentligjournal.Journalpost mapJournalpost(Journalpost fraJournalpost, String tema) {
 		final LocalDateTime journaldato = journaldatoMapper.mapJournaldato(fraJournalpost);
 		no.arkivverket.standarder.noark5.offentligjournal.Journalpost tilJournalpost = new no.arkivverket.standarder.noark5.offentligjournal.Journalpost();
 		tilJournalpost.setSystemID(mapSystemID(fraJournalpost.getUuid()));
@@ -63,30 +71,33 @@ public class OffentligJournalRegistreringMapper {
 		tilJournalpost.setJournalpostnummer(toBigInteger(fraJournalpost.getId()));
 		tilJournalpost.setOffentligTittel(fraJournalpost.getInnhold());
 		tilJournalpost.setJournaldato(journaldato.toLocalDate());
-		tilJournalpost.getKorrespondanseparts().add(mapKorrespondansepart(fraJournalpost));
-		tilJournalpost.setSkjermingshjemmel("Offentleglova § 13");
 
-		if (isNav(fraJournalpost.getType())) {
-			if ("I".equalsIgnoreCase(fraJournalpost.getType())) {
-				tilJournalpost.setSkjermingMetadata("Skjerming navn avsender");
-			} else {
-				tilJournalpost.setSkjermingMetadata("Skjerming navn mottaker");
-			}
+		if (!NOTAT.equalsIgnoreCase(fraJournalpost.getType())) {
+			tilJournalpost.getKorrespondanseparts().add(mapKorrespondansepart(fraJournalpost, tema));
+			tilJournalpost.setSkjermingMetadata(mapSkjermingMetadata(fraJournalpost, tema));
+			tilJournalpost.setSkjermingshjemmel(mapSkjermingshjemmel(fraJournalpost, tema));
 		}
-
 		if (fraJournalpost.getDatoDokument() != null) {
 			tilJournalpost.setDokumentetsDato(fraJournalpost.getDatoDokument().toLocalDate());
 		}
 		return tilJournalpost;
 	}
 
-	private Korrespondansepart mapKorrespondansepart(Journalpost journalpost) {
+	private Korrespondansepart mapKorrespondansepart(Journalpost journalpost, String sakTema) {
 		Korrespondansepart part = new Korrespondansepart();
 		part.setKorrespondanseparttype(mapKorrespondansepartType(journalpost.getType()));
-		if (isNav(journalpost.getType())) {
+
+		if (TEMA_PER.equals(sakTema)) {
 			part.setKorrespondansepartNavn("****");
+		} else if (!isBlank(journalpost.getOffentligJournalAvsenderMottaker())) {
+			part.setKorrespondansepartNavn(journalpost.getAvsenderMottaker());
+		} else if (!isBlank(journalpost.getAvsenderMottakerId()) && isIdLength_3_8_9_13(journalpost.getAvsenderMottakerId())) {
+			part.setKorrespondansepartNavn(journalpost.getAvsenderMottaker());
+		} else if (HPRNR.equalsIgnoreCase(journalpost.getAvsenderMottakerIdType()) ||
+				UTL_ORG.equalsIgnoreCase(journalpost.getAvsenderMottakerIdType())) {
+			part.setKorrespondansepartNavn(journalpost.getAvsenderMottaker());
 		} else {
-			part.setKorrespondansepartNavn("NAV");
+			part.setKorrespondansepartNavn("****");
 		}
 		return part;
 	}
@@ -95,5 +106,48 @@ public class OffentligJournalRegistreringMapper {
 		SystemID systemID = new SystemID();
 		systemID.setValue(value.toString());
 		return systemID;
+	}
+
+	private String mapSkjermingMetadata(Journalpost journalpost, String sakTema) {
+		if (INNGAAENDE.equalsIgnoreCase(journalpost.getType())) {
+			if (TEMA_PER.equals(sakTema)) {
+				return "Skjerming navn avsender";
+			}
+			return skalSkjermes(journalpost) ? "Skjerming navn avsender" : null;
+
+		} else if (UTGAAENDE.equalsIgnoreCase(journalpost.getType())) {
+			if (TEMA_PER.equals(sakTema)) {
+				return "Skjerming navn mottaker";
+			}
+			return skalSkjermes(journalpost) ? "Skjerming navn mottaker" : null;
+		} else {
+			return null;
+		}
+	}
+
+	private String mapSkjermingshjemmel(Journalpost journalpost, String sakTema) {
+		if (TEMA_PER.equals(sakTema)) {
+			return "Offl. § 13 1. ledd, jf fvl § 13 1. ledd nr. 2 / NAV-loven § 7";
+		}
+		return skalSkjermes(journalpost) ? "Offl. § 13 1. ledd, jf fvl § 13 1. ledd nr. 1 / NAV-loven § 7" : null;
+	}
+
+	private boolean skalSkjermes(Journalpost journalpost) {
+		if (isNotBlank(journalpost.getOffentligJournalAvsenderMottaker())) {
+			return false;
+		} else if (isNotBlank(journalpost.getAvsenderMottakerId()) && isIdLength_3_8_9_13(journalpost.getAvsenderMottakerId())) {
+			return false;
+		} else if (HPRNR.equalsIgnoreCase(journalpost.getAvsenderMottakerIdType()) ||
+				UTL_ORG.equalsIgnoreCase(journalpost.getAvsenderMottakerIdType())) {
+			return false;
+		}
+		return true;
+	}
+
+	private boolean isIdLength_3_8_9_13(String avsenderMottakerId) {
+		return switch (avsenderMottakerId.length()) {
+			case 3, 8, 9, 13 -> true;
+			default -> false;
+		};
 	}
 }
