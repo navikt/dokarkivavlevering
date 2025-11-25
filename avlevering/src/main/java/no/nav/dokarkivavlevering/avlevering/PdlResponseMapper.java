@@ -60,13 +60,13 @@ public class PdlResponseMapper {
 
 	private static String folkeregisterIdentifikator(PdlHentPersonBolkResponse.PdlPerson person){
 		if (isNull(person)) {
-			return "Mangler data om folkeregisteridentifikator, person er null";
+			return UKJENT_PERSON;
 		}
 		return person.getFolkeregisteridentifikator().stream()
 				.map(PdlHentPersonBolkResponse.PdlFolkeregisteridentifikator::getIdentifikasjonsnummer)
 				.filter(Objects::nonNull)
 				.findFirst()
-				.orElse("Mangler data om folkeregisteridentifikator, har ingen identifikasjonsnummer");
+				.orElse(UKJENT_PERSON);
 
 	}
 
