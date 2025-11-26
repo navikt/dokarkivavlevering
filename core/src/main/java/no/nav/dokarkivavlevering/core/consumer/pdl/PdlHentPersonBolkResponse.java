@@ -54,7 +54,7 @@ public class PdlHentPersonBolkResponse {
 	}
 
 	@Data
-	static class PdlFolkeregisteridentifikator {
+	public static class PdlFolkeregisteridentifikator {
 		@ToString.Exclude
 		private String identifikasjonsnummer;
 	}

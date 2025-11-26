@@ -68,7 +68,7 @@ public class SaksmappeMapper {
 	private Part mapPart(Sak sak) {
 		Part part = new Part();
 		part.setPartRolle("Bruker");
-		part.setPartID(sak.getBruker().getId());
+		part.setPartID(sak.getBrukerMedNavnedata().getId());
 		part.setPartNavn(sak.getBrukerMedNavnedata().getFulltnavn(sak.getOpprettetTidspunkt().atZone(ZoneId.of("Europe/Oslo"))));
 		return part;
 	}

@@ -16,6 +16,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.Objects.isNull;
 import static no.nav.dokarkivavlevering.avlevering.domain.Bruker.UKJENT_PERSON;
 
 public class PdlResponseMapper {
@@ -29,7 +30,7 @@ public class PdlResponseMapper {
 	}
 
 	private static BrukerMedNavnedata toBrukerMedNavnedata(PdlHentPersonBolkResponse.PdlHentPersonBolk personbolk) {
-		return new BrukerMedNavnedata(personbolk.getIdent(), getNavnMedGyldighet(personbolk));
+		return new BrukerMedNavnedata(folkeregisterIdentifikator(personbolk.getPerson()), getNavnMedGyldighet(personbolk));
 	}
 
 	private static List<NavnMedGyldighet> getNavnMedGyldighet(PdlHentPersonBolkResponse.PdlHentPersonBolk personbolk) {
@@ -55,6 +56,18 @@ public class PdlResponseMapper {
 			return null;
 		}
 		return LocalDateTime.from(DateTimeFormatter.ISO_DATE_TIME.parse(tidspunkt)).atZone(OSLO);
+	}
+
+	private static String folkeregisterIdentifikator(PdlHentPersonBolkResponse.PdlPerson person){
+		if (isNull(person)) {
+			return UKJENT_PERSON;
+		}
+		return person.getFolkeregisteridentifikator().stream()
+				.map(PdlHentPersonBolkResponse.PdlFolkeregisteridentifikator::getIdentifikasjonsnummer)
+				.filter(Objects::nonNull)
+				.findFirst()
+				.orElse(UKJENT_PERSON);
+
 	}
 
 	private static String fulltnavn(PdlHentPersonBolkResponse.PdlNavn pdlNavn) {
