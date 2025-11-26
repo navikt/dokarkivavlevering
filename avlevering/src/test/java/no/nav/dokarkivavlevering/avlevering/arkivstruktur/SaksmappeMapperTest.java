@@ -160,13 +160,40 @@ class SaksmappeMapperTest {
 		Arguments.of("AXML", "AXML")
 				);
 	}
+
+	@ParameterizedTest
+	@MethodSource
+	void shouldMapJorunalstatusWithDecode(String journalstatus, String decode){
+		final Sak sak = generateSak().toBuilder().jp(Collections.singletonList(
+						generateJournalpost(UTGAAENDE).toBuilder()
+								.opprettetAv(null)
+								.opprettetAvNavn(null)
+								.opprettetAvBeriketNavn(null)
+								.status(journalstatus)
+								.build()))
+				.build();
+
+		final Saksmappe saksmappe = saksmappeMapper.map(sak);
+		var journalpost = (no.arkivverket.standarder.noark5.arkivstruktur.Journalpost) saksmappe.getRegistrerings().getFirst();
+
+		assertEquals(journalpost.getJournalstatus(), decode);
+	}
+
+	public static Stream<Arguments> shouldMapJorunalstatusWithDecode() {
+		return Stream.of(
+				Arguments.of("J", "Journalført"),
+				Arguments.of("FS", "Ferdig og klar for sentral utskrift"),
+				Arguments.of("FL", "Ferdig og klar for lokal utskrift"),
+				Arguments.of("E", "Ekspedert")
+		);
+	}
+
 	public static String getFileExtension(String fileName) {
 		int dotIndex = fileName.lastIndexOf('.');
 		if (dotIndex > 0 && dotIndex < fileName.length() - 1) {
-			// Ensure there's a character after the dot and it's not the first character
 			return fileName.substring(dotIndex + 1);
 		}
-		return ""; // No extension found or invalid format
+		return "";
 	}
 
 	private void assertPart(Part part) {
