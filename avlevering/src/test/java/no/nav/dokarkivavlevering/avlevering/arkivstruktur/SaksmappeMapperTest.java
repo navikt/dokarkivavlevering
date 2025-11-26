@@ -188,9 +188,25 @@ class SaksmappeMapperTest {
 		);
 	}
 
-	@Test
-	void shouldMapAdministrativEnhet(){
+	@ParameterizedTest
+	@MethodSource
+	void shouldMapAdministrativEnhetFromSakAdministrativEnhet(String administrativEnhet, String administrativEnhetTema, String resultat){
+		final Sak sak = generateSak().toBuilder()
+				.administrativ_enhet(administrativEnhet)
+				.administrativ_enhet_tema(administrativEnhetTema)
+				.build();
 
+		final Saksmappe saksmappe = saksmappeMapper.map(sak);
+		assertEquals(saksmappe.getAdministrativEnhet(), resultat);
+	}
+
+	private static Stream<Arguments> shouldMapAdministrativEnhetFromSakAdministrativEnhet() {
+		return Stream.of(
+				Arguments.of("Nav Arbeid- og ytelser", null, "Nav Arbeid- og ytelser"),
+				Arguments.of(null, "Nav Arbeid- og ytelser", "Nav Arbeid- og ytelser"),
+				Arguments.of(null, null, "Ukjent"),
+				Arguments.of("Nav Arbeid- og ytelser", "Annen Administrativ Enhet", "Nav Arbeid- og ytelser")
+		);
 	}
 
 	public static String getFileExtension(String fileName) {
