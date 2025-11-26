@@ -53,7 +53,7 @@ class SaksmappeMapperTest {
 		assertEquals(saksmappe.getSaksaar().toString(), "2019");
 		assertEquals(saksmappe.getSakssekvensnummer().toString(), "1234567011");
 		assertEquals(saksmappe.getSaksdato(), toLocalDateTime("2019-10-28 11:41:36").toLocalDate());
-		assertEquals(saksmappe.getAdministrativEnhet(), "NAV Kontroll");
+		assertEquals(saksmappe.getAdministrativEnhet(), "Ukjent");
 		assertEquals(saksmappe.getSaksansvarlig(), "Bjarne Betjent");
 		assertEquals(saksmappe.getSaksstatus(), "Under behandling");
 		assertThat(saksmappe.getSystemID().getValue()).isNotEmpty();
@@ -186,6 +186,11 @@ class SaksmappeMapperTest {
 				Arguments.of("FL", "Ferdig og klar for lokal utskrift"),
 				Arguments.of("E", "Ekspedert")
 		);
+	}
+
+	@Test
+	void shouldMapAdministrativEnhet(){
+
 	}
 
 	public static String getFileExtension(String fileName) {

@@ -70,7 +70,10 @@ public class SaksmappeMapper {
 		if(sak.getAdministrativ_enhet() != null && !sak.getAdministrativ_enhet().isBlank()) {
 			return sak.getAdministrativ_enhet();
 		}
-		return getAdministrativEnhetFromTema((sak.getTema()));
+		if(sak.getAdministrativ_enhet_tema() != null && !sak.getAdministrativ_enhet_tema().isBlank()) {
+			return sak.getAdministrativ_enhet_tema();
+		}
+		return "Ukjent";
 	}
 
 	private Part mapPart(Sak sak) {

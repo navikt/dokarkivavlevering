@@ -156,7 +156,7 @@ public class AvleveringRouteITest {
 	}
 
 	private static Sak newSakWithId(long id, Tema tema) {
-		return new Sak(id, tema.getTemakode(),null, "ITest","Integrasjonstest", LocalDateTime.now(),
+		return new Sak(id, tema.getTemakode(),null, null, "ITest","Integrasjonstest", LocalDateTime.now(),
 				getFagomrade(tema),
 				new Bruker("Z123456", "Testesen"), BrukerMedNavnedata.ukjentPerson("01125498765"),
 				List.of(generateJournalpost(id)));

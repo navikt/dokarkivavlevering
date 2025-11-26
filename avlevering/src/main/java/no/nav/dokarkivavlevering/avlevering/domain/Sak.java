@@ -17,6 +17,7 @@ public class Sak implements MedOpprettetAv {
 	Long id;
 	String tema;
 	String administrativ_enhet;
+	String administrativ_enhet_tema;
 	@ToString.Exclude
 	String opprettetAv;
 	@ToString.Exclude
