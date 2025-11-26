@@ -15,6 +15,9 @@ import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import no.nav.dokarkivavlevering.avlevering.domain.NavnMedGyldighet;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
@@ -23,6 +26,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static no.nav.dokarkivavlevering.avlevering.testUtils.TestUtils.toLocalDateTime;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.INNGAAENDE;
@@ -31,6 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SaksmappeMapperTest {
 
@@ -116,6 +121,52 @@ class SaksmappeMapperTest {
 		final Saksmappe saksmappe = saksmappeMapper.map(sak);
 		final Registrering registrering = saksmappe.getRegistrerings().get(0);
 		assertThat(registrering.getOpprettetAv()).isEqualTo(Bruker.UKJENT_PERSON);
+	}
+
+	@ParameterizedTest
+	@MethodSource
+	void shouldMapFileExtensionCorrect(String fileType, String forventetResultat) {
+		final Sak sak = generateSak().toBuilder().jp(Collections.singletonList(
+				generateJournalpost(UTGAAENDE).toBuilder()
+						.opprettetAv(null)
+						.opprettetAvNavn(null)
+						.opprettetAvBeriketNavn(null)
+						.dok(Collections.singletonList(
+								generateDokumentInfo().toBuilder()
+										.fd(List.of(generateFilDetaljer().toBuilder()
+												.filtype(fileType)
+												.build()))
+										.build()))
+						.build()))
+				.build();
+
+		final Saksmappe saksmappe = saksmappeMapper.map(sak);
+		var dokObjekt = saksmappe.getRegistrerings().getFirst().getDokumentbeskrivelses().getFirst().getDokumentobjekts().getFirst();
+		assertEquals(dokObjekt.getFormat(), forventetResultat);
+		assertTrue(getFileExtension(dokObjekt.getReferanseDokumentfil()).equalsIgnoreCase(forventetResultat));
+
+	}
+
+	public static Stream<Arguments> shouldMapFileExtensionCorrect() {
+		return Stream.of(
+		Arguments.of("PDFA", "PDF"),
+		Arguments.of("PDF", "PDF"),
+		Arguments.of("JPEG", "JPEG"),
+		Arguments.of("TIFF", "TIFF"),
+		Arguments.of("JSON", "JSON"),
+		Arguments.of("XLSX", "XLSX"),
+		Arguments.of("RTF", "RTF"),
+		Arguments.of("XML", "XML"),
+		Arguments.of("AXML", "AXML")
+				);
+	}
+	public static String getFileExtension(String fileName) {
+		int dotIndex = fileName.lastIndexOf('.');
+		if (dotIndex > 0 && dotIndex < fileName.length() - 1) {
+			// Ensure there's a character after the dot and it's not the first character
+			return fileName.substring(dotIndex + 1);
+		}
+		return ""; // No extension found or invalid format
 	}
 
 	private void assertPart(Part part) {
