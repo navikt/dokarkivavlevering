@@ -14,22 +14,22 @@ public enum Tema {
 	TRK("TRK", "Trekkhåndtering", false, "", "NAV Økonomi Stønad", false),
 	FUL("FUL", "Fullmakt", false, "Ikke fagsystem", "Alle enheter", false),
 	GEN("GEN", "Generell", false, "Ikke fagsystem", "Alle enheter", false),
-	MED("MED", "Medlemskap", true, "", "NAV Medlemskap og avgift", false),
-	UFM("UFM", "Unntak fra medlemskap", true, "", "NAV Medlemskap og avgift", false),
+	MED("MED", "Medlemskap", false, "", "NAV Medlemskap og avgift", false),
+	UFM("UFM", "Unntak fra medlemskap", false, "", "NAV Medlemskap og avgift", false),
 	TRY("TRY", "Trygdeavgift", false, "", "NAV Medlemskap og avgift", false),
 	SER("SER", "Serviceklager", false, "Ikke fagsystem", "Alle enheter", false),
-	RVE("RVE", "Rettferdsvederlag", true, "Ikke fagsystem", "NAV Arbeids- og velferdsdirektoratet, Arbeids- og tjenesteavdelingen", false),
+	RVE("RVE", "Rettferdsvederlag", false, "Ikke fagsystem", "NAV Arbeids- og velferdsdirektoratet, Arbeids- og tjenesteavdelingen", false),
 	VEN("VEN", "Ventelønn", false, "", "NAV arbeid og ytelser Kristiania", false),
 	RPO("RPO", "Retting av personopplysninger", false, "Ikke fagsystem", "NAV Klageinstans", false),
-	OPP("OPP", "Oppfølging", true, "Arena", "Brukers NAV-kontor*", false),
-	SAP("SAP", "Sanksjon person", true, "Arena", "Brukers NAV-kontor* og NAV Arbeid og ytelser", false),
+	OPP("OPP", "Oppfølging", false, "Arena", "Brukers NAV-kontor*", false),
+	SAP("SAP", "Sanksjon person", false, "Arena", "Brukers NAV-kontor* og NAV Arbeid og ytelser", false),
 	SYM("SYM", "Sykmeldinger", false, "Infotrygd", "Brukers NAV-kontor*", false),
 	OPA("OPA", "Oppfølging arbeidsgiver", false, "Arena", "NAV-kontor og NAV Arbeidslivssenter", false),
 	REK("REK", "Rekruttering og stilling", false, "", "NAV-kontor", false),
 	AAR("AAR", "Aa-registeret", false, "", "NAV registerforvaltning", false),
 	PER("PER", "Permittering og masseoppsigelser", false, "", "NAV-kontor", false),
 	SAA("SAA", "Sanksjon arbeidsgiver", false, "", "NAV registerforvaltning", false),
-	IAR("IAR", "Inkluderende arbeidsliv", true, "", "NAV Arbeidslivssentre", false);
+	IAR("IAR", "Inkluderende arbeidsliv", false, "", "NAV Arbeidslivssentre", false);
 	private final String temakode;
 	private final String temanavn;
 	private final boolean avlevDokumenter;
