@@ -192,8 +192,8 @@ class SaksmappeMapperTest {
 	@MethodSource
 	void shouldMapAdministrativEnhetFromSakAdministrativEnhet(String administrativEnhet, String administrativEnhetTema, String resultat){
 		final Sak sak = generateSak().toBuilder()
-				.administrativ_enhet(administrativEnhet)
-				.administrativ_enhet_tema(administrativEnhetTema)
+				.administrativEnhet(administrativEnhet)
+				.administrativEnhetTema(administrativEnhetTema)
 				.build();
 
 		final Saksmappe saksmappe = saksmappeMapper.map(sak);
