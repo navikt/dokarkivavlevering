@@ -39,7 +39,8 @@ public class SqlQueries {
 					           when sa.aktoerid is null
 					               then sa.orgnr
 					           else sa.aktoerid end      as bruker_id,
-					
+					       sa.administrativ_enhet		 as administrativ_enhet,
+					       ae.enhet_navn                 as administrativ_enhet_tema,
 					       j.journalpost_id              as jp_id,
 					       j.k_journalpost_t             as jp_type,
 					       j.k_journal_s                 as jp_status,
@@ -71,6 +72,7 @@ public class SqlQueries {
 					       f.fil_uuid                    as jp_dok_fd_filuuid,
 					       f.dato_opprettet              as jp_dok_fd_datoopprettet,
 					       f.opprettet_av                as jp_dok_fd_opprettetav,
+					       f.k_fil_t                     as jp_dok_fd_filtype,
 					       df.fil                        as jp_dok_fd_fil,
 					       fo.k_fagomrade                as fagomrade_fagomrade,
 					       fo.dekode                     as fagomrade_dekode,
@@ -105,6 +107,7 @@ public class SqlQueries {
 					         left join t_aksjonslogg ald on ald.journalpost_id = j.journalpost_id and ald.dokument_info_id = d.dokument_info_id
 					         left join t_arkiv_element_endring aeed on ald.aksjonslogg_id = aeed.aksjonslogg_id
 					         left join t_k_offentlig_journal_avsender_mottaker ojam on lower(trim(j.avsend_mottaker)) = lower(trim(ojam.k_offentlig_journal_avsender_mottaker))
+					         left outer join t_administrativ_enhet ae on (ae.tema = sa.tema and ae.dato_fom <= sa.opprettet_tidspunkt and ae.dato_tom >= sa.opprettet_tidspunkt)
 					where s.sak_id in (:sakIds)
 					  and j.k_journal_s in ('J', 'FS', 'FL', 'E')
 					  and (j.dato_opprettet between :startdato and :sluttdato)

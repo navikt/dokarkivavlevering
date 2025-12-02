@@ -15,6 +15,9 @@ import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import no.nav.dokarkivavlevering.avlevering.domain.NavnMedGyldighet;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
@@ -23,6 +26,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static no.nav.dokarkivavlevering.avlevering.testUtils.TestUtils.toLocalDateTime;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.INNGAAENDE;
@@ -31,6 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SaksmappeMapperTest {
 
@@ -48,7 +53,7 @@ class SaksmappeMapperTest {
 		assertEquals(saksmappe.getSaksaar().toString(), "2019");
 		assertEquals(saksmappe.getSakssekvensnummer().toString(), "1234567011");
 		assertEquals(saksmappe.getSaksdato(), toLocalDateTime("2019-10-28 11:41:36").toLocalDate());
-		assertEquals(saksmappe.getAdministrativEnhet(), "NAV Kontroll");
+		assertEquals(saksmappe.getAdministrativEnhet(), "Ukjent");
 		assertEquals(saksmappe.getSaksansvarlig(), "Bjarne Betjent");
 		assertEquals(saksmappe.getSaksstatus(), "Under behandling");
 		assertThat(saksmappe.getSystemID().getValue()).isNotEmpty();
@@ -118,6 +123,100 @@ class SaksmappeMapperTest {
 		assertThat(registrering.getOpprettetAv()).isEqualTo(Bruker.UKJENT_PERSON);
 	}
 
+	@ParameterizedTest
+	@MethodSource
+	void shouldMapFileExtensionCorrect(String fileType, String forventetResultat) {
+		final Sak sak = generateSak().toBuilder().jp(Collections.singletonList(
+				generateJournalpost(UTGAAENDE).toBuilder()
+						.opprettetAv(null)
+						.opprettetAvNavn(null)
+						.opprettetAvBeriketNavn(null)
+						.dok(Collections.singletonList(
+								generateDokumentInfo().toBuilder()
+										.fd(List.of(generateFilDetaljer().toBuilder()
+												.filtype(fileType)
+												.build()))
+										.build()))
+						.build()))
+				.build();
+
+		final Saksmappe saksmappe = saksmappeMapper.map(sak);
+		var dokObjekt = saksmappe.getRegistrerings().getFirst().getDokumentbeskrivelses().getFirst().getDokumentobjekts().getFirst();
+		assertEquals(dokObjekt.getFormat(), forventetResultat);
+		assertTrue(getFileExtension(dokObjekt.getReferanseDokumentfil()).equalsIgnoreCase(forventetResultat));
+
+	}
+
+	public static Stream<Arguments> shouldMapFileExtensionCorrect() {
+		return Stream.of(
+		Arguments.of("PDFA", "PDF"),
+		Arguments.of("PDF", "PDF"),
+		Arguments.of("JPEG", "JPEG"),
+		Arguments.of("TIFF", "TIFF"),
+		Arguments.of("JSON", "JSON"),
+		Arguments.of("XLSX", "XLSX"),
+		Arguments.of("RTF", "RTF"),
+		Arguments.of("XML", "XML"),
+		Arguments.of("AXML", "AXML")
+				);
+	}
+
+	@ParameterizedTest
+	@MethodSource
+	void shouldMapJorunalstatusWithDecode(String journalstatus, String decode){
+		final Sak sak = generateSak().toBuilder().jp(Collections.singletonList(
+						generateJournalpost(UTGAAENDE).toBuilder()
+								.opprettetAv(null)
+								.opprettetAvNavn(null)
+								.opprettetAvBeriketNavn(null)
+								.status(journalstatus)
+								.build()))
+				.build();
+
+		final Saksmappe saksmappe = saksmappeMapper.map(sak);
+		var journalpost = (no.arkivverket.standarder.noark5.arkivstruktur.Journalpost) saksmappe.getRegistrerings().getFirst();
+
+		assertEquals(journalpost.getJournalstatus(), decode);
+	}
+
+	public static Stream<Arguments> shouldMapJorunalstatusWithDecode() {
+		return Stream.of(
+				Arguments.of("J", "Journalført"),
+				Arguments.of("FS", "Ferdig og klar for sentral utskrift"),
+				Arguments.of("FL", "Ferdig og klar for lokal utskrift"),
+				Arguments.of("E", "Ekspedert")
+		);
+	}
+
+	@ParameterizedTest
+	@MethodSource
+	void shouldMapAdministrativEnhetFromSakAdministrativEnhet(String administrativEnhet, String administrativEnhetTema, String resultat){
+		final Sak sak = generateSak().toBuilder()
+				.administrativEnhet(administrativEnhet)
+				.administrativEnhetTema(administrativEnhetTema)
+				.build();
+
+		final Saksmappe saksmappe = saksmappeMapper.map(sak);
+		assertEquals(saksmappe.getAdministrativEnhet(), resultat);
+	}
+
+	private static Stream<Arguments> shouldMapAdministrativEnhetFromSakAdministrativEnhet() {
+		return Stream.of(
+				Arguments.of("Nav Arbeid- og ytelser", null, "Nav Arbeid- og ytelser"),
+				Arguments.of(null, "Nav Arbeid- og ytelser", "Nav Arbeid- og ytelser"),
+				Arguments.of(null, null, "Ukjent"),
+				Arguments.of("Nav Arbeid- og ytelser", "Annen Administrativ Enhet", "Nav Arbeid- og ytelser")
+		);
+	}
+
+	public static String getFileExtension(String fileName) {
+		int dotIndex = fileName.lastIndexOf('.');
+		if (dotIndex > 0 && dotIndex < fileName.length() - 1) {
+			return fileName.substring(dotIndex + 1);
+		}
+		return "";
+	}
+
 	private void assertPart(Part part) {
 		assertEquals(part.getPartID(), "12345678911");
 		assertEquals(part.getPartNavn(), "Frank");
@@ -129,7 +228,7 @@ class SaksmappeMapperTest {
 		assertEquals(registrering.getJournalsekvensnummer().toString(), "453637481");
 		assertEquals(registrering.getJournalpostnummer().toString(), "453637481");
 		assertEquals(registrering.getJournalposttype(), "Utgående dokument");
-		assertEquals(registrering.getJournalstatus(), "Arkivert");
+		assertEquals(registrering.getJournalstatus(), "Ferdig og klar for sentral utskrift");
 		assertEquals(registrering.getJournaldato(), toLocalDateTime("2020-11-10 16:04:43").toLocalDate());
 		assertEquals(registrering.getDokumentetsDato(), toLocalDateTime("2020-11-10 16:05:43").toLocalDate());
 		assertThat(registrering.getSystemID().getValue()).isNotEmpty();
@@ -148,7 +247,7 @@ class SaksmappeMapperTest {
 		assertFalse(dokObjekt.getSystemID().getValue().isEmpty());
 		assertEquals(dokObjekt.getVersjonsnummer(), toBigInteger(1));
 		assertEquals(dokObjekt.getVariantformat(), "Arkivformat");
-		assertEquals(dokObjekt.getFormat(), "PDF/A");
+		assertEquals(dokObjekt.getFormat(), "PDF");
 		assertThat(dokObjekt.getOpprettetDato()).isEqualToIgnoringNanos(toLocalDateTime("2020-11-10 16:04:43"));
 		assertEquals(dokObjekt.getOpprettetAv(), "Automatisk jobb");
 		assertEquals(dokObjekt.getReferanseDokumentfil(), "DOKUMENTER/KTR/453637481_55c39cdb-f052-4f4e-a9a5-900b455ca915.pdf");
@@ -249,6 +348,7 @@ class SaksmappeMapperTest {
 		return FilDetaljer.builder()
 				.id((long) 539876247)
 				.filUuid("55c39cdb-f052-4f4e-a9a5-900b455ca915")
+				.filtype("PDF")
 				.fil(FIL.getBytes())
 				.filstorrelseBeriket(FIL.length())
 				.sha256hashBeriket("a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e")

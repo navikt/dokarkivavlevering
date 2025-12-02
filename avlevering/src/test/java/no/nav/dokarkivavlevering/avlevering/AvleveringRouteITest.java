@@ -156,7 +156,7 @@ public class AvleveringRouteITest {
 	}
 
 	private static Sak newSakWithId(long id, Tema tema) {
-		return new Sak(id, tema.getTemakode(), "ITest", "Integrasjonstest", LocalDateTime.now(),
+		return new Sak(id, tema.getTemakode(),null, null, "ITest","Integrasjonstest", LocalDateTime.now(),
 				getFagomrade(tema),
 				new Bruker("Z123456", "Testesen"), BrukerMedNavnedata.ukjentPerson("01125498765"),
 				List.of(generateJournalpost(id)));
@@ -224,6 +224,7 @@ public class AvleveringRouteITest {
 		return FilDetaljer.builder()
 				.id(id + 30_000)
 				.filUuid("55c39cdb-f052-4f4e-a9a5-900b455ca915")
+				.filtype("PDF")
 				.fil("<html></html>".getBytes())
 				.filstorrelseBeriket("<html></html>".length())
 				.sha256hashBeriket("a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e")

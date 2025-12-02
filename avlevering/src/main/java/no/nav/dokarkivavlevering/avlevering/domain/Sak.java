@@ -16,6 +16,8 @@ public class Sak implements MedOpprettetAv {
 	UUID uuid = UUID.randomUUID();
 	Long id;
 	String tema;
+	String administrativEnhet;
+	String administrativEnhetTema;
 	@ToString.Exclude
 	String opprettetAv;
 	@ToString.Exclude
