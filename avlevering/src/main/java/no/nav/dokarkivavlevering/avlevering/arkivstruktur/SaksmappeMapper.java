@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
+import static com.nimbusds.oauth2.sdk.util.StringUtils.isNotBlank;
 import static no.nav.dokarkivavlevering.avlevering.AvleveringSakBerikerMapper.AUTOMATISK_JOBB;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.INNGAAENDE;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.UTGAAENDE;
@@ -67,11 +68,11 @@ public class SaksmappeMapper {
 	}
 
 	private String getAdministrativEnhet(Sak sak) {
-		if(sak.getAdministrativ_enhet() != null && !sak.getAdministrativ_enhet().isBlank()) {
-			return sak.getAdministrativ_enhet();
+		if(sak.getAdministrativEnhet() != null && isNotBlank(sak.getAdministrativEnhet())) {
+			return sak.getAdministrativEnhet();
 		}
-		if(sak.getAdministrativ_enhet_tema() != null && !sak.getAdministrativ_enhet_tema().isBlank()) {
-			return sak.getAdministrativ_enhet_tema();
+		if(sak.getAdministrativEnhetTema() != null && isNotBlank(sak.getAdministrativEnhetTema())) {
+			return sak.getAdministrativEnhetTema();
 		}
 		return "Ukjent";
 	}
@@ -169,20 +170,23 @@ public class SaksmappeMapper {
 	}
 
 	private Dokumentobjekt mapDokumentobjekt(FilDetaljer filDetaljer, String tema, String journalpostId) {
-		String filformat = filDetaljer.getFiltype().equals("PDFA") ? "PDF" : filDetaljer.getFiltype();
 		Dokumentobjekt dokumentobjekt = new Dokumentobjekt();
 		dokumentobjekt.setSystemID(AvleveringUtils.generateSystemID());
 		dokumentobjekt.setVersjonsnummer(toBigInteger(1));
 		dokumentobjekt.setVariantformat("Arkivformat");
-		dokumentobjekt.setFormat(filformat);
+		dokumentobjekt.setFormat(getFilFormat(filDetaljer.getFiltype()));
 		dokumentobjekt.setOpprettetDato(filDetaljer.getDatoOpprettet());
 		dokumentobjekt.setOpprettetAv(resolveOpprettetAv(filDetaljer));
-		dokumentobjekt.setReferanseDokumentfil("DOKUMENTER/%s/%s_%s.%s".formatted(tema, journalpostId, filDetaljer.getFilUuid(), filformat.toLowerCase()));
+		dokumentobjekt.setReferanseDokumentfil("DOKUMENTER/%s/%s_%s.%s".formatted(tema, journalpostId, filDetaljer.getFilUuid(), getFilFormat(filDetaljer.getFiltype()).toLowerCase()));
 		dokumentobjekt.setSjekksum(filDetaljer.getSha256hashBeriket());
 		dokumentobjekt.setSjekksumAlgoritme("SHA-256");
 		dokumentobjekt.setFilstoerrelse(toBigInteger(filDetaljer.getFilstorrelseBeriket()));
 
 		return dokumentobjekt;
+	}
+
+	private String getFilFormat(String filtype){
+		return "PDFA".equals(filtype) ? "PDF" : filtype;
 	}
 
 	private String getSaksAnsvarlig(List<Journalpost> journalposter) {
