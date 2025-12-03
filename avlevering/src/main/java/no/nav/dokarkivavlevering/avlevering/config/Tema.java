@@ -6,9 +6,9 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings("java:S1192")
 public enum Tema {
-	ERS("ERS", "Erstatning", true, "", "Nav Klageinstans", false),
-	SAK("SAK", "Saksomkostninger", true, "", "NAV Klageinstans", false),
-	KTR("KTR", "Kontroll", true, "Ikke fagsystem", "NAV Kontroll", false),
+	ERS("ERS", "Erstatning", false, "", "Nav Klageinstans", false),
+	SAK("SAK", "Saksomkostninger", false, "", "NAV Klageinstans", false),
+	KTR("KTR", "Kontroll", false, "Ikke fagsystem", "NAV Kontroll", false),
 	AGR("AGR", "Ajourhold grunnopplysninger", false, "Ikke fagsystem", "NAV Økonomi Stønad", false),
 	STO("STO", "Regnskap/Utbetaling", false, "Ikke fagsystem", "NAV Økonomi Stønad", false),
 	TRK("TRK", "Trekkhåndtering", false, "", "NAV Økonomi Stønad", false),
