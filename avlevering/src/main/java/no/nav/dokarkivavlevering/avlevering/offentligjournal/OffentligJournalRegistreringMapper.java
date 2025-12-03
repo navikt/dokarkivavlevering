@@ -71,9 +71,9 @@ public class OffentligJournalRegistreringMapper {
 		tilJournalpost.setJournalpostnummer(toBigInteger(fraJournalpost.getId()));
 		tilJournalpost.setOffentligTittel(fraJournalpost.getInnhold());
 		tilJournalpost.setJournaldato(journaldato.toLocalDate());
+		tilJournalpost.getKorrespondanseparts().add(mapKorrespondansepart(fraJournalpost, tema));
 
 		if (!NOTAT.equalsIgnoreCase(fraJournalpost.getType())) {
-			tilJournalpost.getKorrespondanseparts().add(mapKorrespondansepart(fraJournalpost, tema));
 			tilJournalpost.setSkjermingMetadata(mapSkjermingMetadata(fraJournalpost, tema));
 			tilJournalpost.setSkjermingshjemmel(mapSkjermingshjemmel(fraJournalpost, tema));
 		}
