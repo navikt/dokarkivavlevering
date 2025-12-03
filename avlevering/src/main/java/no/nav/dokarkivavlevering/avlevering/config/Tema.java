@@ -7,7 +7,12 @@ import java.util.stream.Collectors;
 @SuppressWarnings("java:S1192")
 public enum Tema {
 	ERS("ERS", "Erstatning", false, "", "Nav Klageinstans", false),
+	AKT("AKT", "Aktivitetsplan med dialoger", false, "", "Test adminEnhet", false),
+	BIL("BIL", "temanavn_bil", false, "", "Test adminEnhet", false),
 	SAK("SAK", "Saksomkostninger", false, "", "NAV Klageinstans", false),
+	ENF("ENF", "Enslig mor eller far", false, "", "Test adminEnhet", false),
+	GRU("GRU", "Grunn- og hjelpestønad", false, "", "Test adminEnhet", false),
+	OMS("OMS", "Omsorgspenger, pleiepenger og opplæringspenger", false, "", "Test adminEnhet", false),
 	KTR("KTR", "Kontroll", false, "Ikke fagsystem", "NAV Kontroll", false),
 	AGR("AGR", "Ajourhold grunnopplysninger", false, "Ikke fagsystem", "NAV Økonomi Stønad", false),
 	STO("STO", "Regnskap/Utbetaling", false, "Ikke fagsystem", "NAV Økonomi Stønad", false),
