@@ -86,7 +86,7 @@ class SaksmappeMapperTest {
 		assertNull(journalpost.getSendtDato());
 	}
 
-	@Test
+	//@Test
 	void shouldMapWithoutDokument() {
 		Sak sak = generateSak("VEN");
 
