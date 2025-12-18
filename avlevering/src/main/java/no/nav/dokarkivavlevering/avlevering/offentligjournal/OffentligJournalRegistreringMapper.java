@@ -14,8 +14,9 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.INNGAAENDE;
-import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.UTGAAENDE;
+import static no.nav.dokarkivavlevering.avlevering.arkivstruktur.JournalpostType.I;
+import static no.nav.dokarkivavlevering.avlevering.arkivstruktur.JournalpostType.N;
+import static no.nav.dokarkivavlevering.avlevering.arkivstruktur.JournalpostType.U;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.getYear;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.mapKorrespondansepartType;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.temaNavnDecode;
@@ -30,7 +31,6 @@ public class OffentligJournalRegistreringMapper {
 	private static final String TEMA_PER = "PER";
 	private static final String UTL_ORG = "UTL_ORG";
 	private static final String HPRNR = "HPRNR";
-	private static final String NOTAT = "N";
 
 	private final JournaldatoMapper journaldatoMapper;
 
@@ -73,7 +73,7 @@ public class OffentligJournalRegistreringMapper {
 		tilJournalpost.setJournaldato(journaldato.toLocalDate());
 		tilJournalpost.getKorrespondanseparts().add(mapKorrespondansepart(fraJournalpost, tema));
 
-		if (!NOTAT.equalsIgnoreCase(fraJournalpost.getType())) {
+		if (!N.name().equalsIgnoreCase(fraJournalpost.getType())) {
 			tilJournalpost.setSkjermingMetadata(mapSkjermingMetadata(fraJournalpost, tema));
 			tilJournalpost.setSkjermingshjemmel(mapSkjermingshjemmel(fraJournalpost, tema));
 		}
@@ -109,13 +109,13 @@ public class OffentligJournalRegistreringMapper {
 	}
 
 	private String mapSkjermingMetadata(Journalpost journalpost, String sakTema) {
-		if (INNGAAENDE.equalsIgnoreCase(journalpost.getType())) {
+		if (I.name().equalsIgnoreCase(journalpost.getType())) {
 			if (TEMA_PER.equals(sakTema)) {
 				return "Skjerming navn avsender";
 			}
 			return skalSkjermes(journalpost) ? "Skjerming navn avsender" : null;
 
-		} else if (UTGAAENDE.equalsIgnoreCase(journalpost.getType())) {
+		} else if (U.name().equalsIgnoreCase(journalpost.getType())) {
 			if (TEMA_PER.equals(sakTema)) {
 				return "Skjerming navn mottaker";
 			}

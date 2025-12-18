@@ -7,8 +7,6 @@ import no.arkivverket.standarder.noark5.arkivstruktur.Part;
 import no.arkivverket.standarder.noark5.arkivstruktur.Registrering;
 import no.arkivverket.standarder.noark5.arkivstruktur.Saksmappe;
 import no.nav.dokarkivavlevering.avlevering.common.JournaldatoMapper;
-import no.nav.dokarkivavlevering.avlevering.config.Tema;
-import no.nav.dokarkivavlevering.avlevering.domain.Bruker;
 import no.nav.dokarkivavlevering.avlevering.domain.DokumentInfo;
 import no.nav.dokarkivavlevering.avlevering.domain.FilDetaljer;
 import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
@@ -21,15 +19,12 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Comparator;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Objects;
 
 import static com.nimbusds.oauth2.sdk.util.StringUtils.isNotBlank;
 import static no.nav.dokarkivavlevering.avlevering.AvleveringSakBerikerMapper.AUTOMATISK_JOBB;
-import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.INNGAAENDE;
-import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.UTGAAENDE;
+import static no.nav.dokarkivavlevering.avlevering.arkivstruktur.JournalpostType.I;
+import static no.nav.dokarkivavlevering.avlevering.arkivstruktur.JournalpostType.U;
+import static no.nav.dokarkivavlevering.avlevering.arkivstruktur.JournalpostType.valueOf;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.getYear;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.isTemaAvleverMedDokumenter;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.temaNavnDecode;
@@ -41,6 +36,9 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 public class SaksmappeMapper {
 
 	public static final String DOKUMENT_STATUS_FERDIGSTILT = "FERDIGSTILT";
+	public static final String KOLON = ":";
+	public static final String UKJENT = "Ukjent";
+
 	private final JournaldatoMapper journaldatoMapper;
 
 	public SaksmappeMapper(JournaldatoMapper journaldatoMapper) {
@@ -59,7 +57,7 @@ public class SaksmappeMapper {
 		mappe.setSakssekvensnummer(toBigInteger(sak.getId()));
 		mappe.setSaksdato(sak.getOpprettetTidspunkt().toLocalDate());
 		mappe.setAdministrativEnhet(getAdministrativEnhet(sak));
-		mappe.setSaksansvarlig(getSaksAnsvarlig(sak.getJp()));
+		mappe.setSaksansvarlig(getSaksAnsvarlig(sak));
 		mappe.setSaksstatus("Under behandling");
 		for (Journalpost journalpost : sak.getJp()) {
 			mappe.getRegistrerings().add(mapRegistrering(journalpost, sak.getTema()));
@@ -68,13 +66,13 @@ public class SaksmappeMapper {
 	}
 
 	private String getAdministrativEnhet(Sak sak) {
-		if(sak.getAdministrativEnhet() != null && isNotBlank(sak.getAdministrativEnhet())) {
+		if (sak.getAdministrativEnhet() != null && isNotBlank(sak.getAdministrativEnhet())) {
 			return sak.getAdministrativEnhet();
 		}
-		if(sak.getAdministrativEnhetTema() != null && isNotBlank(sak.getAdministrativEnhetTema())) {
+		if (sak.getAdministrativEnhetTema() != null && isNotBlank(sak.getAdministrativEnhetTema())) {
 			return sak.getAdministrativEnhetTema();
 		}
-		return "Ukjent";
+		return UKJENT;
 	}
 
 	private Part mapPart(Sak sak) {
@@ -103,16 +101,15 @@ public class SaksmappeMapper {
 		registrering.setJournalstatus("Arkivert");
 		registrering.setJournalstatus(mapJournalstatus(journalpost.getStatus()));
 
-		//Skal kun settes hvis det ikke er et notat.
-		if (!"N".equals(journalpost.getType())) {
-			registrering.getKorrespondanseparts().add(mapKorrespondansePart(journalpost));
-		}
+		//Korrespondansepart skal inkluderes uansett journalposttype, også for notater
+		registrering.getKorrespondanseparts().add(mapKorrespondansePart(journalpost));
+
 		//Skal kun settes om journalpost.getDatoDokument() != null
 		if (journalpost.getDatoDokument() != null) {
 			registrering.setDokumentetsDato(journalpost.getDatoDokument().toLocalDate());
 		}
 		//Skal kun settes om journalpost.getDatoMottatt() != null && journalpostType == "I"
-		if (INNGAAENDE.equals(journalpost.getType()) && journalpost.getDatoMottatt() != null) {
+		if (I.name().equals(journalpost.getType()) && journalpost.getDatoMottatt() != null) {
 			registrering.setMottattDato(journalpost.getDatoMottatt());
 		}
 		for (DokumentInfo dokumentInfo : journalpost.getDok()) {
@@ -123,7 +120,7 @@ public class SaksmappeMapper {
 	}
 
 	private String mapJournalstatus(String journalpostStatus) {
-		return switch(journalpostStatus) {
+		return switch (journalpostStatus) {
 			case "J" -> "Journalført";
 			case "FS" -> "Ferdig og klar for sentral utskrift";
 			case "FL" -> "Ferdig og klar for lokal utskrift";
@@ -135,7 +132,7 @@ public class SaksmappeMapper {
 	private Korrespondansepart mapKorrespondansePart(Journalpost journalpost) {
 		Korrespondansepart korrespondansepart = new Korrespondansepart();
 		korrespondansepart.setKorrespondanseparttype(mapKorrespondanseParttype(journalpost.getType()));
-		korrespondansepart.setKorrespondansepartNavn(journalpost.getAvsenderMottaker());
+		korrespondansepart.setKorrespondansepartNavn(isBlank(journalpost.getAvsenderMottaker()) ? "Ingen" : journalpost.getAvsenderMottaker());
 		korrespondansepart.setSaksbehandler(resolveOpprettetAvNavn(journalpost));
 		return korrespondansepart;
 	}
@@ -185,28 +182,31 @@ public class SaksmappeMapper {
 		return dokumentobjekt;
 	}
 
-	private String getFilFormat(String filtype){
+	private String getFilFormat(String filtype) {
 		return "PDFA".equals(filtype) ? "PDF" : filtype;
 	}
 
-	private String getSaksAnsvarlig(List<Journalpost> journalposter) {
-		Journalpost journalpost = journalposter.stream().min(Comparator.comparing(Journalpost::getId)).orElseThrow(NoSuchElementException::new);
-		if (isBlank(journalpost.getEndretAv())) {
-			return Bruker.UKJENT_PERSON;
+	private String getSaksAnsvarlig(Sak sak) {
+		if (isNotBlank(sak.getAdministrativEnhet())) {
+			return sak.getAdministrativEnhet();
 		}
-		return journalpost.getEndretAvBeriketNavn();
+		if (isNotBlank(sak.getAdministrativEnhetTema())) {
+			return sak.getAdministrativEnhetTema();
+		}
+
+		return UKJENT;
 	}
 
 	private String determineJournalPostType(String journalpostType) {
-		return switch (journalpostType) {
-			case UTGAAENDE -> "Utgående dokument";
-			case INNGAAENDE -> "Inngående dokument";
+		return switch (valueOf(journalpostType)) {
+			case U -> "Utgående dokument";
+			case I -> "Inngående dokument";
 			default -> "Organinternt dokument uten oppfølging";
 		};
 	}
 
 	private LocalDateTime determineSendtDato(Journalpost journalpost, LocalDateTime journaldato) {
-		if (!UTGAAENDE.equals(journalpost.getType())) {
+		if (!U.name().equals(journalpost.getType())) {
 			return null;
 		}
 
@@ -223,26 +223,31 @@ public class SaksmappeMapper {
 	}
 
 	private String mapKorrespondanseParttype(String journalpostType) {
-		return INNGAAENDE.equalsIgnoreCase(journalpostType) ? "Avsender" : "Mottaker";
-	}
-
-	private String getAdministrativEnhetFromTema(String tema) {
-		return Tema.valueOf(tema).getAdminEnhet();
+		return switch (valueOf(journalpostType)) {
+			case I -> "Avsender";
+			case U -> "Mottaker";
+			case N -> "Intern mottaker";
+		};
 	}
 
 	private static String resolveOpprettetAvNavn(MedOpprettetAvNavn aktoer) {
 		if (aktoer.getOpprettetAvNavn() != null) {
+			if (aktoer.getOpprettetAvNavn().contains(KOLON)) {
+				return AUTOMATISK_JOBB;
+			}
 			return aktoer.getOpprettetAvNavn();
 		}
 		return resolveOpprettetAv(aktoer);
 	}
 
 	private static String resolveOpprettetAv(MedOpprettetAv aktoer) {
-		if (aktoer.getOpprettetAv() == null && aktoer.getOpprettetAvBeriketNavn() == null) {
-			return "Ukjent";
+		if (isBlank(aktoer.getOpprettetAv()) && isBlank(aktoer.getOpprettetAvBeriketNavn())) {
+			return UKJENT;
 		}
-		if (erSystembruker(aktoer.getOpprettetAv())) {
-			return "Automatisk jobb";
+		if (isNotBlank(aktoer.getOpprettetAv())) {
+			if (aktoer.getOpprettetAv().contains(KOLON) || erSystembruker(aktoer.getOpprettetAv())) {
+				return AUTOMATISK_JOBB;
+			}
 		}
 		return aktoer.getOpprettetAvBeriketNavn();
 	}

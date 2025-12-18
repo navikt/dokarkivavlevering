@@ -1,6 +1,7 @@
 package no.nav.dokarkivavlevering.avlevering.utils;
 
 import no.arkivverket.standarder.noark5.arkivstruktur.SystemID;
+import no.nav.dokarkivavlevering.avlevering.arkivstruktur.JournalpostType;
 import no.nav.dokarkivavlevering.avlevering.config.Tema;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -11,6 +12,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.UUID;
 
+import static no.nav.dokarkivavlevering.avlevering.arkivstruktur.JournalpostType.I;
+import static no.nav.dokarkivavlevering.avlevering.arkivstruktur.JournalpostType.U;
 import static no.nav.dokarkivavlevering.avlevering.config.Tema.AGR;
 import static no.nav.dokarkivavlevering.avlevering.config.Tema.ERS;
 import static no.nav.dokarkivavlevering.avlevering.config.Tema.IAR;
@@ -23,8 +26,6 @@ import static no.nav.dokarkivavlevering.avlevering.config.Tema.SAP;
 @Profile("genererAvlevering")
 public class AvleveringUtils {
 
-	public static final String UTGAAENDE = "U";
-	public static final String INNGAAENDE = "I";
 	public static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
 	private static final Map<String, String> fagomradeBeskrivelseLookup = Map.of(
@@ -42,12 +43,16 @@ public class AvleveringUtils {
 	}
 
 	public static boolean isNav(String journalpostType) {
-		return INNGAAENDE.equalsIgnoreCase(journalpostType) | UTGAAENDE.equalsIgnoreCase(journalpostType);
+		return I.name().equalsIgnoreCase(journalpostType) || U.name().equalsIgnoreCase(journalpostType);
 	}
 
 	public static String mapKorrespondansepartType(String journalpostType) {
-		return INNGAAENDE.equalsIgnoreCase(journalpostType) ? "Avsender" :
-				UTGAAENDE.equalsIgnoreCase(journalpostType) ? "Mottaker" : "Intern avsender";
+		JournalpostType type = JournalpostType.valueOf(journalpostType);
+		return switch (type) {
+			case I -> "Avsender";
+			case U -> "Mottaker";
+			default -> "Intern avsender";
+		};
 	}
 
 	public static int getYear(LocalDateTime date) {

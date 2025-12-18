@@ -6,13 +6,13 @@ import com.aspose.pdf.License;
 import com.aspose.pdf.PdfFormat;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avlevering.AvleveringProperties;
-import no.nav.dokarkivavlevering.core.DokarkivavleveringProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -28,7 +28,7 @@ public class AsposeService {
 	private static final License lic = new License();
 
 	@Autowired
-	public AsposeService(AvleveringProperties avleveringProperties) throws Exception {
+	public AsposeService(AvleveringProperties avleveringProperties){
 		lic.setLicense(new ByteArrayInputStream(avleveringProperties.getAsposeLicense().getBytes(StandardCharsets.UTF_8)));
 	}
 
@@ -47,9 +47,12 @@ public class AsposeService {
 	}
 
 	public byte[] doConvertToPDFA(byte[] inputPdf, long dokumentInfoId) {
-		try (Document doc = new Document(inputPdf)) {
-			ByteArrayOutputStream logStream = new ByteArrayOutputStream();
-			ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		try (
+				InputStream inputStream = new ByteArrayInputStream(inputPdf);
+				ByteArrayOutputStream logStream = new ByteArrayOutputStream();
+				ByteArrayOutputStream stream = new ByteArrayOutputStream()
+		) {
+			Document doc = new Document(inputStream);
 			doc.convert(logStream, PdfFormat.PDF_A_1A, ConvertErrorAction.Delete);
 			doc.save(stream);
 			return stream.toByteArray();
