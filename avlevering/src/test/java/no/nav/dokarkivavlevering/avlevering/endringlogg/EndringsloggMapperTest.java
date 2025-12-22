@@ -4,10 +4,14 @@ import no.arkivverket.standarder.noark5.endringslogg.Endring;
 import no.nav.dokarkivavlevering.avlevering.domain.Arkivendring;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -73,8 +77,19 @@ class EndringsloggMapperTest {
 		softly.assertAll();
 	}
 
-	@Test
-	void shouldMapIngenVerdiWhenFraVerdiIsNull() {
+	static Stream<Arguments> shouldMapIngenVerdiWhenFraVerdiIs() {
+		return Stream.of(
+				Arguments.arguments((String) null),
+				Arguments.arguments("null"),
+				Arguments.arguments("  "),
+				Arguments.arguments(" NULL "),
+				Arguments.arguments("")
+		);
+	}
+
+	@ParameterizedTest
+	@MethodSource
+	void shouldMapIngenVerdiWhenFraVerdiIs(String fraVerdi) {
 		LocalDateTime date = LocalDateTime.now();
 		UUID uuid = UUID.randomUUID();
 
@@ -84,7 +99,7 @@ class EndringsloggMapperTest {
 				.tidspunkt(date)
 				.utfoertAv("B000000")
 				.utfoertAvBeriketNavn("JonBlund")
-				.fraVerdi(null)
+				.fraVerdi(fraVerdi)
 				.tilVerdi("1234")
 				.build();
 

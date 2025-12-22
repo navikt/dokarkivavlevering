@@ -18,6 +18,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 public class EndringsloggMapper {
 
 	private static final String JOURNALPOST_JOURNALPOSTSTATUS = "Journalpost.journalpostStatus";
+	private static final String SELVE_ORDET_NULL = "null";
 
 	public Optional<Endring> map(Arkivendring arkivendring, UUID uuid) {
 		boolean endringIsJournalstatus = JOURNALPOST_JOURNALPOSTSTATUS.equals(arkivendring.getElement());
@@ -42,7 +43,7 @@ public class EndringsloggMapper {
 	}
 
 	private String mapVerdi(String verdi, boolean isJournalstatusEndring) {
-		if (isBlank(verdi)) {
+		if (isBlank(verdi) || SELVE_ORDET_NULL.equalsIgnoreCase(verdi.trim())) {
 			return INGEN_VERDI;
 		} else if (isJournalstatusEndring) {
 			return JournalpostStatus.valueOf(verdi).statusDecode;
