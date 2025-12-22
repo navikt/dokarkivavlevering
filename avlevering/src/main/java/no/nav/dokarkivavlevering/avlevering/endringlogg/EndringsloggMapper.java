@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static no.nav.dokarkivavlevering.avlevering.domain.Arkivendring.INGEN_VERDI;
+import static no.nav.dokarkivavlevering.avlevering.endringlogg.ReferanseMetadataMapper.mapArkivElementToReferanseMetadata;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Slf4j
@@ -33,7 +34,7 @@ public class EndringsloggMapper {
 		} else {
 			Endring endring = new Endring();
 			endring.setReferanseArkivenhet(uuid.toString());
-			endring.setReferanseMetadata(arkivendring.getElement());
+			endring.setReferanseMetadata(mapArkivElementToReferanseMetadata(arkivendring.getElement()));
 			endring.setEndretDato(arkivendring.getTidspunkt());
 			endring.setEndretAv(arkivendring.getUtfoertAvBeriketNavn());
 			endring.setTidligereVerdi(tidligereVerdi);

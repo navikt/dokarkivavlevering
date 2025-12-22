@@ -40,7 +40,7 @@ class EndringsloggMapperTest {
 
 		SoftAssertions softly = new SoftAssertions();
 		softly.assertThat(endring.getReferanseArkivenhet()).isEqualTo(uuid.toString());
-		softly.assertThat(endring.getReferanseMetadata()).isEqualTo("Saksrelasjon.sakId");
+		softly.assertThat(endring.getReferanseMetadata()).isEqualTo("M003");
 		softly.assertThat(endring.getEndretDato()).isEqualTo(arkivendring.getTidspunkt());
 		softly.assertThat(endring.getEndretAv()).isEqualTo("JonBlund");
 		softly.assertThat(endring.getTidligereVerdi()).isEqualTo("123");
@@ -69,7 +69,7 @@ class EndringsloggMapperTest {
 
 		SoftAssertions softly = new SoftAssertions();
 		softly.assertThat(endring.getReferanseArkivenhet()).isEqualTo(uuid.toString());
-		softly.assertThat(endring.getReferanseMetadata()).isEqualTo("Journalpost.journalpostStatus");
+		softly.assertThat(endring.getReferanseMetadata()).isEqualTo("M053");
 		softly.assertThat(endring.getEndretDato()).isEqualTo(arkivendring.getTidspunkt());
 		softly.assertThat(endring.getEndretAv()).isEqualTo("JonBlund");
 		softly.assertThat(endring.getTidligereVerdi()).isEqualTo("JOURNALFØRT");
