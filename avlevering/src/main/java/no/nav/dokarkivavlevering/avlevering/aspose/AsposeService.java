@@ -28,15 +28,14 @@ public class AsposeService {
 	private static final License lic = new License();
 
 	@Autowired
-	public AsposeService(AvleveringProperties avleveringProperties){
+	public AsposeService(AvleveringProperties avleveringProperties) throws Exception {
 		lic.setLicense(new ByteArrayInputStream(avleveringProperties.getAsposeLicense().getBytes(StandardCharsets.UTF_8)));
 	}
 
 	public byte[] convertToPDFA(byte[] inputPdf, long dokumentInfoId) {
-
 		ExecutorService executorService = Executors.newSingleThreadExecutor();
-		Future<byte[]> task = executorService.submit(() -> doConvertToPDFA(inputPdf, dokumentInfoId));
 		try {
+			Future<byte[]> task = executorService.submit(() -> doConvertToPDFA(inputPdf, dokumentInfoId));
 			return task.get(15, SECONDS);
 		} catch (Exception e) {
 			log.error("Timet ut under konvertering av dokumentInfoId={}. Feilmelding:{}. Returnerer input-pdf.", dokumentInfoId, e.getMessage());
@@ -52,10 +51,11 @@ public class AsposeService {
 				ByteArrayOutputStream logStream = new ByteArrayOutputStream();
 				ByteArrayOutputStream stream = new ByteArrayOutputStream()
 		) {
-			Document doc = new Document(inputStream);
-			doc.convert(logStream, PdfFormat.PDF_A_1A, ConvertErrorAction.Delete);
-			doc.save(stream);
-			return stream.toByteArray();
+			try (Document doc = new Document(inputStream)) {
+				doc.convert(logStream, PdfFormat.PDF_A_1A, ConvertErrorAction.Delete);
+				doc.save(stream);
+				return stream.toByteArray();
+			}
 		} catch (Exception e) {
 			log.warn("Klarte ikke konvertere dokumentInfoId={}. Feilmelding:{}. Returnerer input-pdf", dokumentInfoId, e.getMessage());
 			return inputPdf;

@@ -57,7 +57,7 @@ public class SaksmappeMapper {
 		mappe.setSakssekvensnummer(toBigInteger(sak.getId()));
 		mappe.setSaksdato(sak.getOpprettetTidspunkt().toLocalDate());
 		mappe.setAdministrativEnhet(getAdministrativEnhet(sak));
-		mappe.setSaksansvarlig(getSaksAnsvarlig(sak));
+		mappe.setSaksansvarlig(getSaksansvarlig(sak));
 		mappe.setSaksstatus("Under behandling");
 		for (Journalpost journalpost : sak.getJp()) {
 			mappe.getRegistrerings().add(mapRegistrering(journalpost, sak.getTema()));
@@ -186,14 +186,13 @@ public class SaksmappeMapper {
 		return "PDFA".equals(filtype) ? "PDF" : filtype;
 	}
 
-	private String getSaksAnsvarlig(Sak sak) {
+	private String getSaksansvarlig(Sak sak) {
 		if (isNotBlank(sak.getAdministrativEnhet())) {
 			return sak.getAdministrativEnhet();
 		}
 		if (isNotBlank(sak.getAdministrativEnhetTema())) {
 			return sak.getAdministrativEnhetTema();
 		}
-
 		return UKJENT;
 	}
 
