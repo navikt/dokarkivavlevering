@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static no.nav.dokarkivavlevering.avlevering.domain.Arkivendring.INGEN_VERDI;
@@ -20,13 +21,15 @@ public class EndringsloggMapper {
 
 	private static final String JOURNALPOST_JOURNALPOSTSTATUS = "Journalpost.journalpostStatus";
 	private static final String SELVE_ORDET_NULL = "null";
+	private static final Set<String> SKAL_IKKE_AVLEVERES_ENDRINGSLOGG = Set.of("N/A");
 
 	public Optional<Endring> map(Arkivendring arkivendring, UUID uuid) {
 		boolean endringIsJournalstatus = JOURNALPOST_JOURNALPOSTSTATUS.equals(arkivendring.getElement());
+		String referanseMetadata = mapArkivElementToReferanseMetadata(arkivendring.getElement());
 		String tidligereVerdi = mapVerdi(arkivendring.getFraVerdi(), endringIsJournalstatus);
 		String nyVerdi = mapVerdi(arkivendring.getTilVerdi(), endringIsJournalstatus);
 
-		if (INGEN_VERDI.equals(tidligereVerdi) && INGEN_VERDI.equals(nyVerdi)) {
+		if (INGEN_VERDI.equals(tidligereVerdi) && INGEN_VERDI.equals(nyVerdi) || SKAL_IKKE_AVLEVERES_ENDRINGSLOGG.contains(referanseMetadata)) {
 			return Optional.empty();
 		} else if (uuid == null && isBlank(arkivendring.getElement())) {
 			log.warn("arkivendring er null og kan ikke mappe endringslogg");
@@ -34,7 +37,7 @@ public class EndringsloggMapper {
 		} else {
 			Endring endring = new Endring();
 			endring.setReferanseArkivenhet(uuid.toString());
-			endring.setReferanseMetadata(mapArkivElementToReferanseMetadata(arkivendring.getElement()));
+			endring.setReferanseMetadata(referanseMetadata);
 			endring.setEndretDato(arkivendring.getTidspunkt());
 			endring.setEndretAv(arkivendring.getUtfoertAvBeriketNavn());
 			endring.setTidligereVerdi(tidligereVerdi);
@@ -47,7 +50,11 @@ public class EndringsloggMapper {
 		if (isBlank(verdi) || SELVE_ORDET_NULL.equalsIgnoreCase(verdi.trim())) {
 			return INGEN_VERDI;
 		} else if (isJournalstatusEndring) {
-			return JournalpostStatus.valueOf(verdi).statusDecode;
+			try {
+				return JournalpostStatus.valueOf(verdi).statusDecode;
+			} catch (IllegalArgumentException e) {
+				return "Ukjent status: " + verdi;
+			}
 		} else {
 			return verdi;
 		}
