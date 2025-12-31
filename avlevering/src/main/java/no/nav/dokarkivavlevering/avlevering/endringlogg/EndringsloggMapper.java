@@ -3,6 +3,7 @@ package no.nav.dokarkivavlevering.avlevering.endringlogg;
 import lombok.extern.slf4j.Slf4j;
 import no.arkivverket.standarder.noark5.endringslogg.Endring;
 import no.nav.dokarkivavlevering.avlevering.domain.Arkivendring;
+import no.nav.dokarkivavlevering.core.exception.DokarkivavleveringFunctionalException;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -11,6 +12,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static no.nav.dokarkivavlevering.avlevering.domain.Arkivendring.INGEN_VERDI;
+import static no.nav.dokarkivavlevering.avlevering.endringlogg.ReferanseMetadataMapper.INGEN_GYLDIG_MAPPING;
 import static no.nav.dokarkivavlevering.avlevering.endringlogg.ReferanseMetadataMapper.mapArkivElementToReferanseMetadata;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -21,7 +23,7 @@ public class EndringsloggMapper {
 
 	private static final String JOURNALPOST_JOURNALPOSTSTATUS = "Journalpost.journalpostStatus";
 	private static final String SELVE_ORDET_NULL = "null";
-	private static final Set<String> SKAL_IKKE_AVLEVERES_ENDRINGSLOGG = Set.of("N/A");
+	private static final Set<String> SKAL_IKKE_AVLEVERES_ENDRINGSLOGG = Set.of(INGEN_GYLDIG_MAPPING);
 
 	public Optional<Endring> map(Arkivendring arkivendring, UUID uuid) {
 		boolean endringIsJournalstatus = JOURNALPOST_JOURNALPOSTSTATUS.equals(arkivendring.getElement());
@@ -53,34 +55,11 @@ public class EndringsloggMapper {
 			try {
 				return JournalpostStatus.valueOf(verdi).statusDecode;
 			} catch (IllegalArgumentException e) {
-				return "Ukjent status: " + verdi;
+				throw new DokarkivavleveringFunctionalException("Mapping til Journalpoststatus feilet: Ukjent status: " + verdi);
 			}
 		} else {
 			return verdi;
 		}
 	}
 
-	private enum JournalpostStatus {
-		J("J", "JOURNALFØRT"),
-		M("M", "MOTTATT"),
-		U("U", "UTGAAR"),
-		D("D", "UNDER_ARBEID"),
-		R("R", "RESERVERT"),
-		FS("FS", "FERDIGSTILT"),
-		FL("FL", "FERDIGSTILT"),
-		E("E", "EKSPEDERT"),
-		A("A", "AVBRUTT"),
-		MO("MO", "MOTTATT"),
-		UB("UB", "UKJENT_BRUKER"),
-		OD("OD", "OPPLASTING_DOKUMENT");
-
-		public final String statusCode;
-		public final String statusDecode;
-
-		JournalpostStatus(String statusCode, String statusDecode) {
-			this.statusCode = statusCode;
-			this.statusDecode = statusDecode;
-		}
-
-	}
 }

@@ -1,6 +1,9 @@
 package no.nav.dokarkivavlevering.avlevering.endringlogg;
 
 public class ReferanseMetadataMapper {
+
+	public static final String INGEN_GYLDIG_MAPPING = "N/A";
+
 	public static String mapArkivElementToReferanseMetadata(String arkivElement) {
 		return switch (arkivElement) {
 			case "Journalpost.innhold", "DokumentInfo.tittel" -> "M020";
@@ -12,7 +15,7 @@ public class ReferanseMetadataMapper {
 			case "DokumentInfo.dokumentInfoId" -> "M007";
 			case "Journalpost.fagomrade" -> "M002";
 			case "Journalpost.avsend_mottaker" -> "M400";
-			case null, default -> "N/A";
+			case null, default -> INGEN_GYLDIG_MAPPING;
 		};
 	}
 }

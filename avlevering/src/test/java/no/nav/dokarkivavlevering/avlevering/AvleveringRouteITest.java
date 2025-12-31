@@ -12,6 +12,7 @@ import no.nav.dokarkivavlevering.avlevering.domain.Fagomrade;
 import no.nav.dokarkivavlevering.avlevering.domain.FilDetaljer;
 import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
+import no.nav.dokarkivavlevering.avlevering.endringlogg.JournalpostStatus;
 import no.nav.dokarkivavlevering.avlevering.loependejournal.AvleveringLoependeJournalRoute;
 import no.nav.dokarkivavlevering.avlevering.offentligjournal.AvleveringOffentligJournalRoute;
 import no.nav.dokarkivavlevering.avlevering.repository.AvleveringRepository;
@@ -232,8 +233,8 @@ public class AvleveringRouteITest {
 				.tidspunkt(toLocalDateTime("2020-11-10 16:05:43.35"))
 				.utfoertAv("srvdeluxe")
 				.utfoertAvBeriketNavn("deluxe IT system")
-				.fraVerdi("1")
-				.tilVerdi("2")
+				.fraVerdi(JournalpostStatus.M.statusCode)
+				.tilVerdi(JournalpostStatus.J.statusCode)
 				.build();
 	}
 
