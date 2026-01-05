@@ -1,11 +1,23 @@
 package no.nav.dokarkivavlevering.avlevering.endringlogg;
 
+import no.nav.dokarkivavlevering.avlevering.domain.Arkivendring;
+
 public class ReferanseMetadataMapper {
 
-	public static final String INGEN_GYLDIG_MAPPING = "N/A";
+	public static String mapArkivElementToReferanseMetadata(Arkivendring arkivendring) {
+		var mappedArkivElement = mapArkivElementToReferanseMetadataInternal(arkivendring);
+		if (mappedArkivElement == null) {
+			throw new IllegalArgumentException();
+		}
+		return mappedArkivElement;
+	}
 
-	public static String mapArkivElementToReferanseMetadata(String arkivElement) {
-		return switch (arkivElement) {
+	public static boolean arkivElementSkalIkkeAvleveres(Arkivendring arkivendring) {
+		return mapArkivElementToReferanseMetadataInternal(arkivendring) == null;
+	}
+
+	private static String mapArkivElementToReferanseMetadataInternal(Arkivendring arkivendring) {
+		return switch (arkivendring.getElement()) {
 			case "Journalpost.innhold", "DokumentInfo.tittel" -> "M020";
 			case "Journalpost.journalpostId" -> "M004";
 			case "Saksrelasjon.sakId" -> "M003";
@@ -15,7 +27,7 @@ public class ReferanseMetadataMapper {
 			case "DokumentInfo.dokumentInfoId" -> "M007";
 			case "Journalpost.fagomrade" -> "M002";
 			case "Journalpost.avsend_mottaker" -> "M400";
-			case null, default -> INGEN_GYLDIG_MAPPING;
+			case null, default -> null;
 		};
 	}
 }

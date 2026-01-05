@@ -8,11 +8,10 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import static no.nav.dokarkivavlevering.avlevering.domain.Arkivendring.INGEN_VERDI;
-import static no.nav.dokarkivavlevering.avlevering.endringlogg.ReferanseMetadataMapper.INGEN_GYLDIG_MAPPING;
+import static no.nav.dokarkivavlevering.avlevering.endringlogg.ReferanseMetadataMapper.arkivElementSkalIkkeAvleveres;
 import static no.nav.dokarkivavlevering.avlevering.endringlogg.ReferanseMetadataMapper.mapArkivElementToReferanseMetadata;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -23,15 +22,13 @@ public class EndringsloggMapper {
 
 	private static final String JOURNALPOST_JOURNALPOSTSTATUS = "Journalpost.journalpostStatus";
 	private static final String SELVE_ORDET_NULL = "null";
-	private static final Set<String> SKAL_IKKE_AVLEVERES_ENDRINGSLOGG = Set.of(INGEN_GYLDIG_MAPPING);
 
 	public Optional<Endring> map(Arkivendring arkivendring, UUID uuid) {
 		boolean endringIsJournalstatus = JOURNALPOST_JOURNALPOSTSTATUS.equals(arkivendring.getElement());
-		String referanseMetadata = mapArkivElementToReferanseMetadata(arkivendring.getElement());
 		String tidligereVerdi = mapVerdi(arkivendring.getFraVerdi(), endringIsJournalstatus);
 		String nyVerdi = mapVerdi(arkivendring.getTilVerdi(), endringIsJournalstatus);
 
-		if (INGEN_VERDI.equals(tidligereVerdi) && INGEN_VERDI.equals(nyVerdi) || SKAL_IKKE_AVLEVERES_ENDRINGSLOGG.contains(referanseMetadata)) {
+		if (INGEN_VERDI.equals(tidligereVerdi) && INGEN_VERDI.equals(nyVerdi) || arkivElementSkalIkkeAvleveres(arkivendring)) {
 			return Optional.empty();
 		} else if (uuid == null && isBlank(arkivendring.getElement())) {
 			log.warn("arkivendring er null og kan ikke mappe endringslogg");
@@ -39,7 +36,7 @@ public class EndringsloggMapper {
 		} else {
 			Endring endring = new Endring();
 			endring.setReferanseArkivenhet(uuid.toString());
-			endring.setReferanseMetadata(referanseMetadata);
+			endring.setReferanseMetadata(mapArkivElementToReferanseMetadata(arkivendring));
 			endring.setEndretDato(arkivendring.getTidspunkt());
 			endring.setEndretAv(arkivendring.getUtfoertAvBeriketNavn());
 			endring.setTidligereVerdi(tidligereVerdi);
