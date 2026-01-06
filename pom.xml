@@ -41,6 +41,13 @@
 		<maven-toolchains-plugin.version>3.2.0</maven-toolchains-plugin.version>
 	</properties>
 
+	<repositories>
+		<repository>
+			<id>aspose</id>
+			<url>https://repository.aspose.com/repo</url>
+		</repository>
+	</repositories>
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
