@@ -4,7 +4,6 @@ import no.nav.dokarkivavlevering.avlevering.arkivuttrekk.AvleveringArkivuttrekkR
 import no.nav.dokarkivavlevering.avlevering.aspose.AsposeService;
 import no.nav.dokarkivavlevering.avlevering.config.Tema;
 import no.nav.dokarkivavlevering.avlevering.consumer.ereg.EregConsumer;
-import no.nav.dokarkivavlevering.core.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokarkivavlevering.avlevering.domain.Arkivendring;
 import no.nav.dokarkivavlevering.avlevering.domain.Bruker;
 import no.nav.dokarkivavlevering.avlevering.domain.BrukerMedNavnedata;
@@ -13,12 +12,13 @@ import no.nav.dokarkivavlevering.avlevering.domain.Fagomrade;
 import no.nav.dokarkivavlevering.avlevering.domain.FilDetaljer;
 import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
-import no.nav.dokarkivavlevering.avlevering.endringlogg.AvleveringEndringsloggRoute;
+import no.nav.dokarkivavlevering.avlevering.endringlogg.JournalpostStatus;
 import no.nav.dokarkivavlevering.avlevering.loependejournal.AvleveringLoependeJournalRoute;
 import no.nav.dokarkivavlevering.avlevering.offentligjournal.AvleveringOffentligJournalRoute;
 import no.nav.dokarkivavlevering.avlevering.repository.AvleveringRepository;
 import no.nav.dokarkivavlevering.avlevering.sftp.AvleveringSFTPRoute;
 import no.nav.dokarkivavlevering.core.DokarkivavleveringProperties;
+import no.nav.dokarkivavlevering.core.consumer.pdl.PdlGraphQLConsumer;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
@@ -29,7 +29,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -40,11 +39,14 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 
 import static no.nav.dokarkivavlevering.avlevering.testUtils.TestUtils.toLocalDateTime;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
@@ -56,6 +58,25 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(classes = DokarkivavleveringProperties.class)
 public class AvleveringRouteITest {
 
+	private static final Set<String> VALID_REFERANSE_METADATA_CODES = Set.of(
+			"M002", "M003", "M004", "M007", "M020", "M053", "M601", "M217", "M400");
+
+	private static final List<String> ARKIVENDRING_NAMES = List.of(
+			"Sak.applikasjon",
+			"Saksrelasjon.sakId",
+			"Saksrelasjon.fagsystem",
+			"DokumentInfo.dokumentInfoId",
+			"JournalpostDokumentInfoRelasjon.tilknyttetJournalpostSom",
+			"Journalpost.avsend_mottak_id",
+			"Journalpost.avsend_mottak_id_type",
+			"Journalpost.avsend_mottaker",
+			"Journalpost.fagomrade",
+			"Journalpost.innhold",
+			"Journalpost.journalfEnhet",
+			"Journalpost.journalfoertAvNavn",
+			"Journalpost.journalpostId",
+			"Journalpost.journalpostStatus"
+	);
 	private static final int ANTALL_SAKER = 15;
 	private static final Tema TEMA = Tema.MED;
 
@@ -96,6 +117,7 @@ public class AvleveringRouteITest {
 		// wire inn sftp-mock i alle routes vi er innom så vi ikke prøver å koble til en sftp som ikke finnes
 		// NB: alle meldingene ender i sftpMock over, men om vi ikke gjør dette blir det bare krøll
 		mockEndpointAndSkipAt("send_dokument", AvleveringSFTPRoute.SFTP);
+		mockEndpointAndSkipAt("flett_endringslogg", AvleveringSFTPRoute.SFTP);
 
 		List<Long> sakIder = LongStream.iterate(1, i -> i + 1).limit(ANTALL_SAKER).boxed().toList();
 		List<Long> page1 = sakIder.subList(0, 10);
@@ -116,11 +138,10 @@ public class AvleveringRouteITest {
 			// mock ut andre routes enn den vi tester
 			mockEndpointAndSkipAt("start_avlevering", AvleveringStatiskRoute.AVLEVERING_STATIC);
 			mockEndpointAndSkipAt("start_avlevering", AvleveringLoependeJournalRoute.GENERER_LOEPENDEJOURNAL);
-			mockEndpointAndSkipAt("start_avlevering", AvleveringEndringsloggRoute.GENERER_ENDRINGSLOGG);
 			mockEndpointAndSkipAt("start_avlevering", AvleveringOffentligJournalRoute.GENERER_OFFENTLIGJOURNAL);
 			mockEndpointAndSkipAt("start_avlevering", AvleveringArkivuttrekkRoute.GENERER_ARKIVUTTREKK);
 
-			sftpMock.expectedMessageCount(forventetAntallPDFDokumenter + 1);
+			sftpMock.expectedMessageCount(forventetAntallPDFDokumenter + 1 + 1);
 
 			template.sendBody("direct:start_avlevering", null);
 			sftpMock.assertIsSatisfied();
@@ -132,8 +153,9 @@ public class AvleveringRouteITest {
 		}
 	}
 
-	private void assertAntallJournalposterIArkivstruktur(int forventetAntallJournalposter) {
-		for (int i = 0; i < forventetAntallJournalposter + 1; ++i) {
+	private void assertAntallJournalposterIArkivstruktur(int forventetAntallJournalposter) throws IOException {
+		boolean arkivstrukturOk = false, endringsloggOk = false;
+		for (int i = 0; i < forventetAntallJournalposter + 2; ++i) {
 			Exchange message = sftpMock.assertExchangeReceived(i);
 			String filnavn = (String) message.getMessage().getHeader(AvleveringSFTPRoute.HEADER_FILNAVN, "");
 
@@ -143,11 +165,26 @@ public class AvleveringRouteITest {
 					var content = new String(fileContent.readAllBytes());
 					var antall = Pattern.compile("<journalsekvensnummer").matcher(content).results().count();
 					assertThat(antall).isEqualTo(forventetAntallJournalposter);
-				} catch (IOException e) {
-					throw new RuntimeException(e);
 				}
+				arkivstrukturOk = true;
+			}
+
+			if (Pattern.compile("endring.*\\.xml").matcher(filnavn).matches()) {
+				var body = message.getIn().getBody(File.class);
+				try (var fileContent = new FileInputStream(body)) {
+					var content = new String(fileContent.readAllBytes());
+
+					for (String referanseMetadataCode : VALID_REFERANSE_METADATA_CODES) {
+						assertThat(content.contains("<referanseMetadata>" + referanseMetadataCode))
+								.withFailMessage("Expected at least one entry with referanseMetadata " + referanseMetadataCode)
+								.isTrue();
+					}
+				}
+				endringsloggOk = true;
 			}
 		}
+		assertTrue(arkivstrukturOk, "Arkivstruktur has not been checked");
+		assertTrue(endringsloggOk, "Endringslogg has not been checked");
 	}
 
 	private MockEndpoint mockEndpointAndSkipAt(String routeId, String endpointUri) throws Exception {
@@ -156,7 +193,7 @@ public class AvleveringRouteITest {
 	}
 
 	private static Sak newSakWithId(long id, Tema tema) {
-		return new Sak(id, tema.getTemakode(),null, null, "ITest","Integrasjonstest", LocalDateTime.now(),
+		return new Sak(id, tema.getTemakode(), null, null, "ITest", "Integrasjonstest", LocalDateTime.now(),
 				getFagomrade(tema),
 				new Bruker("Z123456", "Testesen"), BrukerMedNavnedata.ukjentPerson("01125498765"),
 				List.of(generateJournalpost(id)));
@@ -185,19 +222,19 @@ public class AvleveringRouteITest {
 				.endretAv("srvmelosys")
 				.endretAvBeriketNavn("Bjarne Betjent")
 				.dok(List.of(generateDokumentInfo(id)))
-				.ae(List.of(generateArkivendring(id)))
+				.ae(IntStream.range(0, ARKIVENDRING_NAMES.size()).mapToObj(idd -> generateArkivendring(idd, ARKIVENDRING_NAMES.get(idd))).toList())
 				.build();
 	}
 
-	private static Arkivendring generateArkivendring(long id) {
+	private static Arkivendring generateArkivendring(long id, String elementName) {
 		return Arkivendring.builder()
 				.id(id + 100_000)
-				.element("uhhh")
+				.element(elementName)
 				.tidspunkt(toLocalDateTime("2020-11-10 16:05:43.35"))
 				.utfoertAv("srvdeluxe")
 				.utfoertAvBeriketNavn("deluxe IT system")
-				.fraVerdi("1")
-				.tilVerdi("2")
+				.fraVerdi(JournalpostStatus.M.statusCode)
+				.tilVerdi(JournalpostStatus.J.statusCode)
 				.build();
 	}
 
@@ -216,7 +253,7 @@ public class AvleveringRouteITest {
 				.opprettetAv("srvmelosys")
 				.opprettetAvBeriketNavn("Automatisk jobb")
 				.fd(List.of(generateFilDetaljer(dokumentInfoId)))
-				.ae(List.of(generateArkivendring(dokumentInfoId)))
+				.ae(List.of(generateArkivendring(dokumentInfoId, "DokumentInfo.tittel")))
 				.build();
 	}
 
