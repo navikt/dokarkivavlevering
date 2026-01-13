@@ -29,7 +29,8 @@ public enum Tema {
 	AAR("AAR", "Aa-registeret", false, "", "NAV registerforvaltning", false),
 	PER("PER", "Permittering og masseoppsigelser", false, "", "NAV-kontor", false),
 	SAA("SAA", "Sanksjon arbeidsgiver", false, "", "NAV registerforvaltning", false),
-	IAR("IAR", "Inkluderende arbeidsliv", true, "", "NAV Arbeidslivssentre", false);
+	IAR("IAR", "Inkluderende arbeidsliv", true, "", "NAV Arbeidslivssentre", false),
+	BIL("BIL", "Bil", true, "", "Nav Hjelpemiddelsentral", false);
 	private final String temakode;
 	private final String temanavn;
 	private final boolean avlevDokumenter;
