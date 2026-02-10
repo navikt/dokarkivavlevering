@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.getHoveddokumentTittel;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.getYear;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.isNav;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.mapKorrespondansepartType;
@@ -61,7 +62,7 @@ public class JournalRegistreringMapper {
 		tilJournalpost.setJournalaar(toBigInteger(getYear(journaldato)));
 		tilJournalpost.setJournalsekvensnummer(toBigInteger(fraJournalpost.getId()));
 		tilJournalpost.setJournalpostnummer(toBigInteger(fraJournalpost.getId()));
-		tilJournalpost.setTittel(fraJournalpost.getInnhold());
+		tilJournalpost.setTittel(getHoveddokumentTittel(fraJournalpost));
 		tilJournalpost.setJournaldato(journaldato.toLocalDate());
 		tilJournalpost.getKorrespondanseparts().add(mapKorrespondansepart(fraJournalpost));
 

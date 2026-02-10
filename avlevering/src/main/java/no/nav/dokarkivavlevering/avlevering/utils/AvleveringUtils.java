@@ -3,6 +3,8 @@ package no.nav.dokarkivavlevering.avlevering.utils;
 import no.arkivverket.standarder.noark5.arkivstruktur.SystemID;
 import no.nav.dokarkivavlevering.avlevering.arkivstruktur.JournalpostType;
 import no.nav.dokarkivavlevering.avlevering.config.Tema;
+import no.nav.dokarkivavlevering.avlevering.domain.DokumentInfo;
+import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -10,6 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import static no.nav.dokarkivavlevering.avlevering.arkivstruktur.JournalpostType.I;
@@ -86,5 +89,12 @@ public class AvleveringUtils {
 		SystemID systemID = new SystemID();
 		systemID.setValue(value);
 		return systemID;
+	}
+
+	public static String getHoveddokumentTittel(Journalpost fraJournalpost) {
+		final Optional<DokumentInfo> hoveddokument = fraJournalpost.getDok()
+				.stream().filter(d -> "HOVEDDOKUMENT".equals(d.getRelTilknyttetSom()))
+				.findFirst();
+		return hoveddokument.map(DokumentInfo::getTittel).orElse(null);
 	}
 }
