@@ -6,6 +6,7 @@ import lombok.Value;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Value
@@ -41,4 +42,11 @@ public class Journalpost implements MedOpprettetAvNavn {
 	String endretAvBeriketNavn;
 	List<DokumentInfo> dok;
 	List<Arkivendring> ae;
+
+	public String getHoveddokumentTittel() {
+		final Optional<DokumentInfo> hoveddokument = dok.stream()
+				.filter(d -> "HOVEDDOKUMENT".equals(d.getRelTilknyttetSom()))
+				.findFirst();
+		return hoveddokument.map(DokumentInfo::getTittel).orElse(null);
+	}
 }

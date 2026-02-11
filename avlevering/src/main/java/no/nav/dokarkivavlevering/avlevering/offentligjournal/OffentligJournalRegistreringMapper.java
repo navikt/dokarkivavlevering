@@ -6,20 +6,17 @@ import no.arkivverket.standarder.noark5.offentligjournal.Korrespondansepart;
 import no.arkivverket.standarder.noark5.offentligjournal.Saksmappe;
 import no.arkivverket.standarder.noark5.offentligjournal.SystemID;
 import no.nav.dokarkivavlevering.avlevering.common.JournaldatoMapper;
-import no.nav.dokarkivavlevering.avlevering.domain.DokumentInfo;
 import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.UUID;
 
 import static no.nav.dokarkivavlevering.avlevering.arkivstruktur.JournalpostType.I;
 import static no.nav.dokarkivavlevering.avlevering.arkivstruktur.JournalpostType.N;
 import static no.nav.dokarkivavlevering.avlevering.arkivstruktur.JournalpostType.U;
-import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.getHoveddokumentTittel;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.getYear;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.mapKorrespondansepartType;
 import static no.nav.dokarkivavlevering.avlevering.utils.AvleveringUtils.temaNavnDecode;
@@ -72,7 +69,7 @@ public class OffentligJournalRegistreringMapper {
 		tilJournalpost.setJournalaar(toBigInteger(getYear(journaldato)));
 		tilJournalpost.setJournalsekvensnummer(toBigInteger(fraJournalpost.getId()));
 		tilJournalpost.setJournalpostnummer(toBigInteger(fraJournalpost.getId()));
-		tilJournalpost.setOffentligTittel(getHoveddokumentTittel(fraJournalpost));
+		tilJournalpost.setOffentligTittel(fraJournalpost.getHoveddokumentTittel());
 		tilJournalpost.setJournaldato(journaldato.toLocalDate());
 		tilJournalpost.getKorrespondanseparts().add(mapKorrespondansepart(fraJournalpost, tema));
 

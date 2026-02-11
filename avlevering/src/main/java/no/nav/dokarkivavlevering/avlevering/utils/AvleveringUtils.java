@@ -90,11 +90,4 @@ public class AvleveringUtils {
 		systemID.setValue(value);
 		return systemID;
 	}
-
-	public static String getHoveddokumentTittel(Journalpost fraJournalpost) {
-		final Optional<DokumentInfo> hoveddokument = fraJournalpost.getDok()
-				.stream().filter(d -> "HOVEDDOKUMENT".equals(d.getRelTilknyttetSom()))
-				.findFirst();
-		return hoveddokument.map(DokumentInfo::getTittel).orElse(null);
-	}
 }
