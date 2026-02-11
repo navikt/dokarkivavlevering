@@ -69,7 +69,7 @@ public class OffentligJournalRegistreringMapper {
 		tilJournalpost.setJournalaar(toBigInteger(getYear(journaldato)));
 		tilJournalpost.setJournalsekvensnummer(toBigInteger(fraJournalpost.getId()));
 		tilJournalpost.setJournalpostnummer(toBigInteger(fraJournalpost.getId()));
-		tilJournalpost.setOffentligTittel(fraJournalpost.getInnhold());
+		tilJournalpost.setOffentligTittel(fraJournalpost.getHoveddokumentTittel());
 		tilJournalpost.setJournaldato(journaldato.toLocalDate());
 		tilJournalpost.getKorrespondanseparts().add(mapKorrespondansepart(fraJournalpost, tema));
 

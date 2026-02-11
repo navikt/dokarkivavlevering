@@ -38,7 +38,7 @@ class LoependeJournalRegistreringMapperTest {
 	private void assertJournalpost(no.arkivverket.standarder.noark5.loependejournal.Journalpost jp) throws Exception {
 		assertThat(jp.getSystemID().getValue()).isNotEmpty();
 		assertEquals(jp.getJournalaar(), toBigInteger(2020));
-		assertEquals(jp.getTittel(), "Legg til ny institusjon");
+		assertEquals(jp.getTittel(), "Legg til ny institusjon - Hoveddokument");
 		assertEquals(jp.getJournalsekvensnummer(), toBigInteger(453637481));
 		assertEquals(jp.getJournalpostnummer(), toBigInteger(453637481));
 		assertEquals(jp.getJournaldato(), toLocalDateTime("2020-11-10 16:04:43").toLocalDate());
@@ -96,7 +96,7 @@ class LoependeJournalRegistreringMapperTest {
 				.relOpprettetAv("srvmelosys")
 				.relOpprettetAvBeriketNavn("Automatisk Jobb")
 				.status("FERDIGSTILT")
-				.tittel("Legg til ny institusjon")
+				.tittel("Legg til ny institusjon - Hoveddokument")
 				.datoOpprettet(toLocalDateTime("2020-11-10 16:04:43.342"))
 				.opprettetAv("srvmelosys")
 				.opprettetAvBeriketNavn("Automatisk Jobb")

@@ -150,7 +150,7 @@ class OffentligJournalRegistreringMapperTest {
 		assertEquals(jp.getJournalaar(), toBigInteger(2020));
 		assertEquals(jp.getJournalsekvensnummer(), toBigInteger(453637481));
 		assertEquals(jp.getJournalpostnummer(), toBigInteger(453637481));
-		assertEquals(jp.getOffentligTittel(), "Legg til ny institusjon");
+		assertEquals(jp.getOffentligTittel(), "Legg til ny institusjon - Hoveddokument");
 		assertEquals(jp.getJournaldato(), TestUtils.toLocalDateTime("2020-11-10 16:04:43").toLocalDate());
 		assertEquals(jp.getDokumentetsDato(), TestUtils.toLocalDateTime("2020-11-10 16:05:43").toLocalDate());
 	}
@@ -218,7 +218,7 @@ class OffentligJournalRegistreringMapperTest {
 				.relOpprettetAv("srvmelosys")
 				.relOpprettetAvBeriketNavn("Automatisk Jobb")
 				.status("FERDIGSTILT")
-				.tittel("Legg til ny institusjon")
+				.tittel("Legg til ny institusjon - Hoveddokument")
 				.datoOpprettet(toLocalDateTime("2020-11-10 16:04:43.342"))
 				.opprettetAv("srvmelosys")
 				.opprettetAvBeriketNavn("Automatisk Jobb")

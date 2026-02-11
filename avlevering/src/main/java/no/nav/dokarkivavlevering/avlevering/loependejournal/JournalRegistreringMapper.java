@@ -61,7 +61,7 @@ public class JournalRegistreringMapper {
 		tilJournalpost.setJournalaar(toBigInteger(getYear(journaldato)));
 		tilJournalpost.setJournalsekvensnummer(toBigInteger(fraJournalpost.getId()));
 		tilJournalpost.setJournalpostnummer(toBigInteger(fraJournalpost.getId()));
-		tilJournalpost.setTittel(fraJournalpost.getInnhold());
+		tilJournalpost.setTittel(fraJournalpost.getHoveddokumentTittel());
 		tilJournalpost.setJournaldato(journaldato.toLocalDate());
 		tilJournalpost.getKorrespondanseparts().add(mapKorrespondansepart(fraJournalpost));
 
