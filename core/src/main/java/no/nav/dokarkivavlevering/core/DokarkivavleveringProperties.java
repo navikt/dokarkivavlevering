@@ -13,13 +13,13 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties("dokarkivavlevering")
 public class DokarkivavleveringProperties {
 
+	@Valid
 	private final Endpoints endpoints = new Endpoints();
 
 	@Valid
 	private final Activedirectory activedirectory = new Activedirectory();
 
 	@Data
-	@Validated
 	public static class Activedirectory {
 		@NotEmpty
 		private String basedn;
@@ -29,20 +29,21 @@ public class DokarkivavleveringProperties {
 	int batchsize;
 
 	@Data
-	@Validated
 	public static class Endpoints {
+		@Valid
 		@NotNull
 		private AzureEndpoint pdl;
 
-		@NotEmpty
+		@Valid
+		@NotNull
 		private Endpoint ereg;
 
-		@NotEmpty
+		@Valid
+		@NotNull
 		private Endpoint datavarehus;
 	}
 
 	@Data
-	@Validated
 	public static class AzureEndpoint {
 		/**
 		 * Url til tjeneste som har azure autorisasjon
@@ -57,7 +58,6 @@ public class DokarkivavleveringProperties {
 	}
 
 	@Data
-	@Validated
 	public static class Endpoint {
 		@NotEmpty
 		private String url;

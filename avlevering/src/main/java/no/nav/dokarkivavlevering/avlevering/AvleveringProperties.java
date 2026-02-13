@@ -1,5 +1,6 @@
 package no.nav.dokarkivavlevering.avlevering;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -24,17 +25,18 @@ public class AvleveringProperties {
 
 	@NotEmpty
 	String tema;
+
+	@Valid
 	@NotNull
 	private final Periode periode = new Periode();
 
 	@Data
 	public static class Periode {
-		@NotEmpty
+		@NotNull
 		private LocalDate startdato;
-		@NotEmpty
+
+		@NotNull
 		private LocalDate sluttdato;
 	}
 
-
 }
-
