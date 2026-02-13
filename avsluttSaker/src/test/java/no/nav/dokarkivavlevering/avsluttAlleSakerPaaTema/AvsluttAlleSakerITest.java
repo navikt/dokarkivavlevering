@@ -63,6 +63,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 	@BeforeEach
 	public void setupAvsluttSakRequiredProperties() {
 		when(avsluttSakPropertiesMock.getReferanse()).thenReturn("MMA-1337");
+		stubDvh("response.json");
 	}
 
 	@Test

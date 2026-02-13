@@ -2,14 +2,12 @@ package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema;
 
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.domain.Journalpost;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.AvsluttSakRepository;
-import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.services.AdministrativEnhetService;
 import no.nav.dokarkivavlevering.config.ApplicationTestConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -23,11 +21,8 @@ import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakReposit
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.utils.SakRepositoryTestUtils.generateSakParams;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
-@SpringBootTest(
-		classes = ApplicationTestConfig.class,
-		webEnvironment = RANDOM_PORT)
+@SpringBootTest(classes = ApplicationTestConfig.class)
 @ActiveProfiles(profiles = {"avsluttSaker", "itest"})
 public class AvsluttSakRepositoryTest {
 
@@ -40,9 +35,6 @@ public class AvsluttSakRepositoryTest {
 
 	@Autowired
 	protected AvsluttSakRepository avsluttSakRepository;
-
-	@MockitoBean
-	AdministrativEnhetService administrativEnhetService;
 
 	@Autowired
 	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
