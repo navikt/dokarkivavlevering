@@ -21,7 +21,7 @@ class AvsluttSakUtilsTest {
 	private static final String APPLIKASJON_MED_FAGSAKNR = "AO01";
 
 	@Test
-	void skalIkkeGruppereSakerMedAktoerIdUtenFagsaknr() {
+	void skalGruppereSakerMedSammeAktoerIdUtenFagsaknr() {
 		List<Arbeidssak> arbeidssakerUtenFagsaknr = List.of(
 			lagArbeidssakMedAktoerId(1L, AKTOERID_1, APPLIKASJON_UTEN_FAGSAKNR, null),
 			lagArbeidssakMedAktoerId(2L, AKTOERID_1, APPLIKASJON_UTEN_FAGSAKNR, null),
@@ -30,9 +30,9 @@ class AvsluttSakUtilsTest {
 
 		List<List<Arbeidssak>> grupperteArbeidssaker = grupperArbeidssakerPerAktoerId(arbeidssakerUtenFagsaknr);
 
-		assertThat(grupperteArbeidssaker).hasSize(3)
-				.extracting(List::size)
-				.containsOnly(1);
+		assertThat(grupperteArbeidssaker).hasSize(2)
+				.map(list -> list.stream().map(Arbeidssak::getSakId).toList())
+				.containsExactlyInAnyOrder(List.of(1L, 2L), List.of(3L));
 	}
 
 	@Test
@@ -54,24 +54,43 @@ class AvsluttSakUtilsTest {
 
 		List<List<Arbeidssak>> grupperteArbeidssaker = grupperArbeidssakerPerAktoerId(arbeidssaker);
 
-		assertThat(grupperteArbeidssaker).hasSize(9)
-				.extracting(List::size)
-				.containsAll(List.of(1, 1, 1, 1, 1, 1, 1, 2, 3));
+		assertThat(grupperteArbeidssaker).hasSize(8)
+				.map(list -> list.stream().map(Arbeidssak::getSakId).toList())
+				.containsExactlyInAnyOrder(
+						List.of(1L), List.of(2L, 6L), List.of(3L), List.of(4L, 10L, 11L), List.of(5L), List.of(7L, 9L), List.of(8L), List.of(12L)
+				);
 	}
 
 	@Test
-	void skalIkkeGruppereSakerMedOrgnrUtenFagsaknr() {
+	void skalGruppereSakerUtenFagsaknrOgApplikasjonHverForSeg() {
+		List<Arbeidssak> arbeidssaker = List.of(
+				lagArbeidssakMedAktoerId(1L, AKTOERID_1, null, null),
+				lagArbeidssakMedAktoerId(2L, AKTOERID_2, null, null),
+				lagArbeidssakMedAktoerId(3L, AKTOERID_1, null, null)
+		);
+
+		List<List<Arbeidssak>> grupperteArbeidssaker = grupperArbeidssakerPerAktoerId(arbeidssaker);
+
+		assertThat(grupperteArbeidssaker).hasSize(3)
+				.map(list -> list.stream().map(Arbeidssak::getSakId).toList())
+				.containsExactlyInAnyOrder(
+						List.of(1L), List.of(2L), List.of(3L)
+				);
+	}
+
+	@Test
+	void skalGruppereSakerMedSammeOrgnrUtenFagsaknrForAktoerId() {
 		List<Arbeidssak> arbeidssakerUtenFagsaknr = List.of(
 				lagArbeidssakMedOrgnr(1L, ORGNR_1, APPLIKASJON_UTEN_FAGSAKNR, null),
 				lagArbeidssakMedOrgnr(2L, ORGNR_1, APPLIKASJON_UTEN_FAGSAKNR, null),
-				lagArbeidssakMedOrgnr(3L, ORGNR_1, APPLIKASJON_UTEN_FAGSAKNR, null)
+				lagArbeidssakMedOrgnr(3L, ORGNR_1, null, null)
 		);
 
 		List<List<Arbeidssak>> grupperteArbeidssaker = grupperArbeidssakerPerOrgnr(arbeidssakerUtenFagsaknr);
 
-		assertThat(grupperteArbeidssaker).hasSize(3)
-				.extracting(List::size)
-				.containsOnly(1);
+		assertThat(grupperteArbeidssaker).hasSize(2)
+				.map(list -> list.stream().map(Arbeidssak::getSakId).toList())
+				.containsExactlyInAnyOrder(List.of(1L, 2L), List.of(3L));
 	}
 
 	@Test
@@ -93,9 +112,28 @@ class AvsluttSakUtilsTest {
 
 		List<List<Arbeidssak>> grupperteArbeidssaker = grupperArbeidssakerPerOrgnr(arbeidssaker);
 
-		assertThat(grupperteArbeidssaker).hasSize(9)
-				.extracting(List::size)
-				.containsAll(List.of(1, 1, 1, 1, 1, 1, 1, 2, 3));
+		assertThat(grupperteArbeidssaker).hasSize(8)
+				.map(list -> list.stream().map(Arbeidssak::getSakId).toList())
+				.containsExactlyInAnyOrder(
+						List.of(1L), List.of(2L, 6L), List.of(3L), List.of(4L, 10L, 11L), List.of(5L), List.of(7L, 9L), List.of(8L), List.of(12L)
+				);
+	}
+
+	@Test
+	void skalGruppereSakerUtenFagsaknrOgApplikasjonHverForSegForOrg() {
+		List<Arbeidssak> arbeidssaker = List.of(
+				lagArbeidssakMedOrgnr(1L, ORGNR_1, null, null),
+				lagArbeidssakMedOrgnr(2L, ORGNR_2, null, null),
+				lagArbeidssakMedOrgnr(3L, ORGNR_1, null, null)
+		);
+
+		List<List<Arbeidssak>> grupperteArbeidssaker = grupperArbeidssakerPerAktoerId(arbeidssaker);
+
+		assertThat(grupperteArbeidssaker).hasSize(3)
+				.map(list -> list.stream().map(Arbeidssak::getSakId).toList())
+				.containsExactlyInAnyOrder(
+						List.of(1L), List.of(2L), List.of(3L)
+				);
 	}
 
 	private Arbeidssak lagArbeidssakMedAktoerId(Long sakId, String aktoerId, String applikasjon, String fagsaknr) {
@@ -107,12 +145,12 @@ class AvsluttSakUtilsTest {
 				.build();
 	}
 
-	private Arbeidssak lagArbeidssakMedOrgnr(Long sakId, String ornr, String applikasjon, String fagsaknr) {
+	private Arbeidssak lagArbeidssakMedOrgnr(Long sakId, String orgnr, String applikasjon, String fagsaknr) {
 		return Arbeidssak.builder()
 				.sakId(sakId)
 				.applikasjon(applikasjon)
 				.fagsaknr(fagsaknr)
-				.orgnr(ornr)
+				.orgnr(orgnr)
 				.build();
 	}
 
