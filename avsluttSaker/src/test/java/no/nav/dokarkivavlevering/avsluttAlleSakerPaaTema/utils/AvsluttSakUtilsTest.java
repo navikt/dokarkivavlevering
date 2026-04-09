@@ -127,7 +127,7 @@ class AvsluttSakUtilsTest {
 				lagArbeidssakMedOrgnr(3L, ORGNR_1, null, null)
 		);
 
-		List<List<Arbeidssak>> grupperteArbeidssaker = grupperArbeidssakerPerAktoerId(arbeidssaker);
+		List<List<Arbeidssak>> grupperteArbeidssaker = grupperArbeidssakerPerOrgnr(arbeidssaker);
 
 		assertThat(grupperteArbeidssaker).hasSize(3)
 				.map(list -> list.stream().map(Arbeidssak::getSakId).toList())
