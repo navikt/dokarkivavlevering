@@ -16,7 +16,7 @@ public class AvsluttSakUtils {
 	}
 
 	public static List<List<Arbeidssak>> grupperArbeidssakerPerAktoerId(List<Arbeidssak> arbeidssaker) {
-		List<Arbeidssak> arbeidssakerUtenFagsakNr = getArbeidssakerUtenFagsakNr(arbeidssaker);
+		Collection<List<Arbeidssak>> arbeidssakerUtenFagsakNr = getArbeidssakerUtenFagsakNrForAktoerId(arbeidssaker);
 
 		Collection<List<Arbeidssak>> arbeidssakerMedFagsaknr = arbeidssaker.stream()
 				.filter(arbeidssak -> arbeidssak.getFagsaknr() != null)
@@ -28,14 +28,13 @@ public class AvsluttSakUtils {
 				.values();
 
 		ArrayList<List<Arbeidssak>> grupperteArbeidssakerPerAktoerId = new ArrayList<>();
-		arbeidssakerUtenFagsakNr.forEach(arbeidssak -> grupperteArbeidssakerPerAktoerId.add(List.of(arbeidssak)));
+		grupperteArbeidssakerPerAktoerId.addAll(arbeidssakerUtenFagsakNr);
 		grupperteArbeidssakerPerAktoerId.addAll(arbeidssakerMedFagsaknr);
 		return grupperteArbeidssakerPerAktoerId;
 	}
 
-
 	public static List<List<Arbeidssak>> grupperArbeidssakerPerOrgnr(List<Arbeidssak> arbeidssaker) {
-		List<Arbeidssak> arbeidssakerUtenFagsakNr = getArbeidssakerUtenFagsakNr(arbeidssaker);
+		Collection<List<Arbeidssak>> arbeidssakerUtenFagsakNr = getArbeidssakerUtenFagsakNrForOrgNr(arbeidssaker);
 
 		Collection<List<Arbeidssak>> arbeidssakermedFagsaknr = arbeidssaker.stream()
 				.filter(arbeidssak -> arbeidssak.getFagsaknr() != null)
@@ -47,14 +46,54 @@ public class AvsluttSakUtils {
 				.values();
 
 		ArrayList<List<Arbeidssak>> grupperteArbeidssakerPerOrgnr = new ArrayList<>();
-		arbeidssakerUtenFagsakNr.forEach(arbeidssak -> grupperteArbeidssakerPerOrgnr.add(List.of(arbeidssak)));
+		grupperteArbeidssakerPerOrgnr.addAll(arbeidssakerUtenFagsakNr);
 		grupperteArbeidssakerPerOrgnr.addAll(arbeidssakermedFagsaknr);
 		return grupperteArbeidssakerPerOrgnr;
 	}
 
-	private static List<Arbeidssak> getArbeidssakerUtenFagsakNr(List<Arbeidssak> arbeidssaker) {
-		return arbeidssaker.stream()
+	private static Collection<List<Arbeidssak>> getArbeidssakerUtenFagsakNrForAktoerId(List<Arbeidssak> arbeidssaker) {
+		var grupperteArbeidssakerPerAktoerId = new ArrayList<List<Arbeidssak>>();
+
+		// Arbeidssaker uten både fagsaknr og applikasjon blir gruppert i hver sine arkivsaker
+		var arbeidssakerUtenApplikasjon = arbeidssaker.stream()
 				.filter(arbeidssak -> arbeidssak.getFagsaknr() == null)
+				.filter(arbeidssak -> arbeidssak.getApplikasjon() == null)
 				.toList();
+		arbeidssakerUtenApplikasjon.forEach(arbeidssak -> grupperteArbeidssakerPerAktoerId.add(List.of(arbeidssak)));
+
+		var arbeidssakerMedApplikasjon =  arbeidssaker.stream()
+				.filter(arbeidssak -> arbeidssak.getFagsaknr() == null)
+				.filter(arbeidssak -> arbeidssak.getApplikasjon() != null)
+				.collect(Collectors.groupingBy(arbeidssak -> List.of(
+						arbeidssak.getAktoerId(),
+						arbeidssak.getApplikasjon()
+				)))
+				.values();
+		grupperteArbeidssakerPerAktoerId.addAll(arbeidssakerMedApplikasjon);
+
+		return grupperteArbeidssakerPerAktoerId;
+	}
+
+	private static Collection<List<Arbeidssak>> getArbeidssakerUtenFagsakNrForOrgNr(List<Arbeidssak> arbeidssaker) {
+		var grupperteArbeidssakerPerOrgnr = new ArrayList<List<Arbeidssak>>();
+
+		// Arbeidssaker uten både fagsaknr og applikasjon blir gruppert i hver sine arkivsaker
+		var arbeidssakerUtenApplikasjon = arbeidssaker.stream()
+				.filter(arbeidssak -> arbeidssak.getFagsaknr() == null)
+				.filter(arbeidssak -> arbeidssak.getApplikasjon() == null)
+				.toList();
+		arbeidssakerUtenApplikasjon.forEach(arbeidssak -> grupperteArbeidssakerPerOrgnr.add(List.of(arbeidssak)));
+
+		var arbeidssakerMedApplikasjon = arbeidssaker.stream()
+				.filter(arbeidssak -> arbeidssak.getFagsaknr() == null)
+				.filter(arbeidssak -> arbeidssak.getApplikasjon() != null)
+				.collect(Collectors.groupingBy(arbeidssak -> List.of(
+						arbeidssak.getOrgnr(),
+						arbeidssak.getApplikasjon()
+				)))
+				.values();
+		grupperteArbeidssakerPerOrgnr.addAll(arbeidssakerMedApplikasjon);
+
+		return grupperteArbeidssakerPerOrgnr;
 	}
 }
