@@ -20,9 +20,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class DatavarehusConsumer {
 
 	private final RestClient restClient;
-	private static final String QUERY = """
+	private static final String DVH_QUERY = """
 			{"mapping_node_type":{"$or":[{"$eq":"ARENAENHET"},{"$eq":"INFOENHET"},{"$eq":"NORGENHET"}]}}
 			""";
+	private static final int MAX_ANTALL_ENHETER_SOM_SKAL_HENTES = 100_000; // Per 7. mai 2026 er det 12676 administrative enheter
 
 	public DatavarehusConsumer(DokarkivavleveringProperties dokarkivavleveringProperties,
 							   RestClient.Builder restClientBuilder) {
@@ -36,11 +37,12 @@ public class DatavarehusConsumer {
 	public DatavarehusResponse hentAlleAdministrativeEnheter() {
 		return restClient.get()
 				.uri(uriBuilder -> UriComponentsBuilder.fromUri(uriBuilder.build())
-						.queryParam("q", QUERY)
+						.queryParam("q", DVH_QUERY)
+						.queryParam("limit", MAX_ANTALL_ENHETER_SOM_SKAL_HENTES)
 						.build()
 						.toUri())
 				.retrieve()
-				.onStatus(HttpStatusCode::isError, (req, res) -> {
+				.onStatus(HttpStatusCode::isError, (_, res) -> {
 					if (res.getStatusCode().is4xxClientError()) {
 						throw new DokarkivavleveringFunctionalException(format("Funksjonell feil ved henting av henting av navn for administrativ fra DVH. Feilmelding=%s", res.getStatusText()));
 					}
