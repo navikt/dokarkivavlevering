@@ -33,7 +33,7 @@
 		<guava.version>33.5.0-jre</guava.version>
 
 		<!-- aspose-pdf kan ikke oppdateres til en versjon > 23.5 (på grunn av lisens) -->
-		<aspose-pdf.version>23.5</aspose-pdf.version>
+		<aspose-pdf.version>26.4</aspose-pdf.version>
 
 		<spring-cloud-starter-contract-stub-runner.version>4.3.0</spring-cloud-starter-contract-stub-runner.version>
 
