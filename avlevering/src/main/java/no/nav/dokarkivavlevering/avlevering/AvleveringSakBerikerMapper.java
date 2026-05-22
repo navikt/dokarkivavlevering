@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
+import static no.nav.dokarkivavlevering.avlevering.domain.BrukerMedNavnedata.ukjentOrganisasjon;
+import static no.nav.dokarkivavlevering.avlevering.domain.BrukerMedNavnedata.ukjentPerson;
+
 @Component
 @Profile("genererAvlevering")
 public class AvleveringSakBerikerMapper {
@@ -27,22 +30,22 @@ public class AvleveringSakBerikerMapper {
 
 	Sak berikMedDokumenter(Sak sak, Map<String, String> navAnsatteNavn,
 						   Map<String, BrukerMedNavnedata> pdlHentIdenterBolks,
-						   Map<String, BrukerMedNavnedata> eregOrganisasjonBolk) {
-		return berikMedSpesifisertOperasjonForDokument(sak, navAnsatteNavn, pdlHentIdenterBolks, eregOrganisasjonBolk, this::berikMedFil);
+						   Map<String, BrukerMedNavnedata> mapMellomOrgnrOgOrgnavn) {
+		return berikMedSpesifisertOperasjonForDokument(sak, navAnsatteNavn, pdlHentIdenterBolks, mapMellomOrgnrOgOrgnavn, this::berikMedFil);
 	}
 
 	Sak berikUtenDokument(Sak sak, Map<String, String> navAnsatteNavn,
 						  Map<String, BrukerMedNavnedata> pdlHentIdenterBolks,
-						  Map<String, BrukerMedNavnedata> eregOrganisasjonBolk) {
-		return berikMedSpesifisertOperasjonForDokument(sak, navAnsatteNavn, pdlHentIdenterBolks, eregOrganisasjonBolk, (__, ___) -> null);
+						  Map<String, BrukerMedNavnedata> mapMellomOrgnrOgOrgnavn) {
+		return berikMedSpesifisertOperasjonForDokument(sak, navAnsatteNavn, pdlHentIdenterBolks, mapMellomOrgnrOgOrgnavn, (__, ___) -> null);
 	}
 
 	private Sak berikMedSpesifisertOperasjonForDokument(Sak sak, Map<String, String> navAnsatteNavn,
 														Map<String, BrukerMedNavnedata> pdlHentIdenterBolks,
-														Map<String, BrukerMedNavnedata> eregOrganisasjonBolk,
+														Map<String, BrukerMedNavnedata> mapMellomOrgnrOgOrgnavn,
 														BiFunction<Map<String,String>,DokumentInfo,List<FilDetaljer>> berikDokumentOperasjon) {
 		return sak.toBuilder()
-				.brukerMedNavnedata(mapBruker(sak.getBruker(), pdlHentIdenterBolks, eregOrganisasjonBolk))
+				.brukerMedNavnedata(mapBruker(sak.getBruker(), pdlHentIdenterBolks, mapMellomOrgnrOgOrgnavn))
 				.opprettetAvBeriketNavn(utledNavn(sak.getOpprettetAv(), navAnsatteNavn))
 				.jp(sak.getJp().stream().map(journalpost -> journalpost.toBuilder()
 						.opprettetAvBeriketNavn(utledNavn(journalpost.getOpprettetAv(), navAnsatteNavn))
@@ -82,12 +85,13 @@ public class AvleveringSakBerikerMapper {
 				.toList();
 	}
 
-	private BrukerMedNavnedata mapBruker(Bruker bruker, Map<String, BrukerMedNavnedata> pdlHentIdenterBolks, Map<String, BrukerMedNavnedata> eregOrganisasjonBolk) {
-		final String brukerId = bruker.getId();
+	private BrukerMedNavnedata mapBruker(Bruker bruker, Map<String, BrukerMedNavnedata> pdlHentIdenterBolks, Map<String, BrukerMedNavnedata> mapMellomOrgnrOgOrgnavn) {
+		String brukerId = bruker.getId();
+
 		if (bruker.isPerson()) {
-			return pdlHentIdenterBolks.getOrDefault(brukerId, BrukerMedNavnedata.ukjentPerson(brukerId));
+			return pdlHentIdenterBolks.getOrDefault(brukerId, ukjentPerson(brukerId));
 		} else {
-			return eregOrganisasjonBolk.getOrDefault(brukerId, BrukerMedNavnedata.ukjentOrganisasjon(brukerId));
+			return mapMellomOrgnrOgOrgnavn.getOrDefault(brukerId, ukjentOrganisasjon(brukerId));
 		}
 	}
 

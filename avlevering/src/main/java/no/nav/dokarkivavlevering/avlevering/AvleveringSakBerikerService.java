@@ -77,14 +77,14 @@ public class AvleveringSakBerikerService {
 							.filter(s -> s.getBruker().isOrganisasjon())
 							.map(s -> s.getBruker().getId())
 							.collect(Collectors.toSet());
-					final Map<String, BrukerMedNavnedata> eregOrganisasjonBolk = eregService.hentOrganisasjonBrukere(unikeOrgnr);
+					Map<String, BrukerMedNavnedata> mapMellomOrgnrOgOrgnavn = eregService.lagMapMellomOrgnrOgOrgnavn(unikeOrgnr);
 					if (avleverDokumenter) {
 						return saks.stream()
-								.map(sak -> avleveringSakBerikerMapper.berikMedDokumenter(sak, navAnsatteNavn, pdlHentIdenterBolks, eregOrganisasjonBolk))
+								.map(sak -> avleveringSakBerikerMapper.berikMedDokumenter(sak, navAnsatteNavn, pdlHentIdenterBolks, mapMellomOrgnrOgOrgnavn))
 								.collect(Collectors.toList());
 					} else {
 						return saks.stream()
-								.map(sak -> avleveringSakBerikerMapper.berikUtenDokument(sak, navAnsatteNavn, pdlHentIdenterBolks, eregOrganisasjonBolk))
+								.map(sak -> avleveringSakBerikerMapper.berikUtenDokument(sak, navAnsatteNavn, pdlHentIdenterBolks, mapMellomOrgnrOgOrgnavn))
 								.collect(Collectors.toList());
 					}
 				})

@@ -1,0 +1,29 @@
+{
+  "organisasjonsnummer": "321654987",
+  "navn": {
+    "sammensattnavn": "ANDERS ANDERSENS ELEKTROVERKSTE D",
+    "navnelinje1": "ANDERS ANDERSENS ELEKTROVERKSTE",
+    "navnelinje2": "D",
+    "bruksperiode": {
+      "fom": "2014-02-22T08:11:41.2"
+    },
+    "gyldighetsperiode": {
+      "fom": "1991-02-20"
+    }
+  },
+  "enhetstype": "AS",
+  "adresse": {
+    "type": "Forretningsadresse",
+    "postnummer": "0689",
+    "poststed": "OSLO",
+    "landkode": "NO",
+    "kommunenummer": "1837",
+    "bruksperiode": {
+      "fom": "2014-02-22T10:39:44.102"
+    },
+    "gyldighetsperiode": {
+      "fom": "1991-02-20"
+    }
+  },
+  "opphoersdato": "1999-03-10"
+}

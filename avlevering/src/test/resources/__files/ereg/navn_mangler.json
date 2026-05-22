@@ -1,0 +1,18 @@
+{
+  "organisasjonsnummer": "111222333",
+  "enhetstype": "AS",
+  "adresse": {
+    "type": "Forretningsadresse",
+    "postnummer": "0689",
+    "poststed": "OSLO",
+    "landkode": "NO",
+    "kommunenummer": "1837",
+    "bruksperiode": {
+      "fom": "2014-02-22T10:39:44.102"
+    },
+    "gyldighetsperiode": {
+      "fom": "1991-02-20"
+    }
+  },
+  "opphoersdato": "1999-03-10"
+}

@@ -6,7 +6,4 @@ public class EregFunctionalException extends RuntimeException{
 		super(message);
 	}
 
-	public EregFunctionalException(String message, Throwable cause) {
-		super(message, cause);
-	}
 }
