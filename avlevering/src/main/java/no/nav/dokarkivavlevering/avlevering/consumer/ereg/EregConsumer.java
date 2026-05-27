@@ -6,6 +6,9 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClient.RequestHeadersSpec.ConvertibleClientHttpResponse;
+
+import java.io.IOException;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
@@ -39,21 +42,7 @@ public class EregConsumer {
 
 		EregResponse response = restClient.get()
 				.uri("/{orgnr}/noekkelinfo", orgnr)
-				.exchange((_, res) -> {
-					if (NOT_FOUND.isSameCodeAs(res.getStatusCode())) {
-						return null;
-					}
-
-					if (res.getStatusCode().is4xxClientError()) {
-						throw new EregFunctionalException("Funksjonell feil ved kall mot Ereg for organisasjonsnummer=%s. status=%s".formatted(orgnr, res.getStatusCode()));
-					}
-
-					if (res.getStatusCode().is5xxServerError()) {
-						throw new EregTechnicalException("Teknisk feil ved kall mot Ereg for organisasjonsnummer=%s. status=%s".formatted(orgnr, res.getStatusCode()));
-					}
-
-					return res.bodyTo(EregResponse.class);
-				});
+				.exchange((_, res) -> handterRespons(orgnr, res));
 
 		if (response == null) {
 			return FALLBACK_ORGANISASJON_IKKE_FUNNET;
@@ -66,6 +55,22 @@ public class EregConsumer {
 
 	private static boolean orgnrHarUgyldigFormat(String orgnr) {
 		return !(isNotBlank(orgnr) && orgnr.matches("^\\d{9}$"));
+	}
+
+	private static EregResponse handterRespons(String orgnr, ConvertibleClientHttpResponse res) throws IOException {
+		if (NOT_FOUND.isSameCodeAs(res.getStatusCode())) {
+			return null;
+		}
+
+		if (res.getStatusCode().is4xxClientError()) {
+			throw new EregFunctionalException("Funksjonell feil ved kall mot Ereg for organisasjonsnummer=%s. status=%s".formatted(orgnr, res.getStatusCode()));
+		}
+
+		if (res.getStatusCode().is5xxServerError()) {
+			throw new EregTechnicalException("Teknisk feil ved kall mot Ereg for organisasjonsnummer=%s. status=%s".formatted(orgnr, res.getStatusCode()));
+		}
+
+		return res.bodyTo(EregResponse.class);
 	}
 
 }
