@@ -46,7 +46,7 @@ public class EregConsumer {
 
 		if (response == null) {
 			return FALLBACK_ORGANISASJON_IKKE_FUNNET;
-		} else if (response.navn() == null) {
+		} else if (response.navn() == null || response.navn().sammensattnavn() == null) {
 			return FALLBACK_ORGANISASJON_MANGLER_NAVN;
 		}
 
