@@ -10,12 +10,14 @@ import static java.util.Collections.singletonList;
 
 @Value
 public class BrukerMedNavnedata {
+
 	public static final String UKJENT_PERSON = "Ukjent";
 	public static final String UKJENT_ORGANISASJON = "Ukjent organisasjon";
+
 	@ToString.Exclude
-	private final String id;
+	String id;
 	@ToString.Exclude
-	private final List<NavnMedGyldighet> navn;
+	List<NavnMedGyldighet> navn;
 
 	public static BrukerMedNavnedata ukjentOrganisasjon(final String id) {
 		return new BrukerMedNavnedata(id, singletonList(new SimpleNavn(UKJENT_ORGANISASJON)));

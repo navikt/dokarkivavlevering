@@ -7,9 +7,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toMap;
 
 @Component
 @Profile("genererAvlevering")
@@ -21,11 +21,13 @@ public class EregService {
 		this.eregConsumer = eregConsumer;
 	}
 
-	public Map<String, BrukerMedNavnedata> hentOrganisasjonBrukere(final Set<String> organisasjonsnummer) {
+	// TODO: Bruke endepunktet /v2/organisasjon/hentOrganisasjoner for å hente alle navnene på én gang?
+	public Map<String, BrukerMedNavnedata> lagMapMellomOrgnrOgOrgnavn(Set<String> organisasjonsnummer) {
 		return organisasjonsnummer.stream()
 				.map(orgnr -> {
-					final String navn = eregConsumer.hentNavn(orgnr);
-					return new BrukerMedNavnedata(orgnr, singletonList(new SimpleNavn(navn)));
-				}).collect(Collectors.toMap(BrukerMedNavnedata::getId, bruker -> bruker));
+					String organisasjonsnavn = eregConsumer.hentOrganisasjonsnavn(orgnr);
+					return new BrukerMedNavnedata(orgnr, singletonList(new SimpleNavn(organisasjonsnavn)));
+				})
+				.collect(toMap(BrukerMedNavnedata::getId, bruker -> bruker));
 	}
 }
