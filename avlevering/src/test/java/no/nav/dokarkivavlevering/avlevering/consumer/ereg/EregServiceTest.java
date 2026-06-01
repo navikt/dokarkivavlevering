@@ -35,7 +35,7 @@ class EregServiceTest {
 	@BeforeEach
 	void setUp(WireMockRuntimeInfo wireMockInfo) {
 		var endpoint = new DokarkivavleveringProperties.Endpoint();
-		endpoint.setUrl(wireMockInfo.getHttpBaseUrl());
+		endpoint.setUrl(wireMockInfo.getHttpBaseUrl().concat("/ereg"));
 
 		var properties = new DokarkivavleveringProperties();
 		properties.getEndpoints().setEreg(endpoint);
@@ -43,6 +43,7 @@ class EregServiceTest {
 		eregConsumer = new EregConsumer(RestClient.builder(), properties);
 	}
 
+	private static final String EREG_URL = "/ereg/%s/noekkelinfo";
 	private static final String GYLDIG_ORG_NR = "321654987";
 	private static final String GYLDIG_ORGANISASJONSNAVN = "ANDERS ANDERSENS ELEKTROVERKSTE D";
 	private static final String ORG_NR_SOM_IKKE_EKSISTERER = "987654321";
@@ -114,7 +115,7 @@ class EregServiceTest {
 	}
 
 	private static void stubEreg() {
-		stubFor(get(urlEqualTo("/%s/noekkelinfo".formatted(GYLDIG_ORG_NR)))
+		stubFor(get(urlEqualTo(EREG_URL.formatted(GYLDIG_ORG_NR)))
 				.willReturn(aResponse()
 						.withStatus(OK.value())
 						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
@@ -122,7 +123,7 @@ class EregServiceTest {
 	}
 
 	private static void stubEregNavnMangler() {
-		stubFor(get(urlEqualTo("/%s/noekkelinfo".formatted(ORG_SOM_MANGLER_NAVN)))
+		stubFor(get(urlEqualTo(EREG_URL.formatted(ORG_SOM_MANGLER_NAVN)))
 				.willReturn(aResponse()
 						.withStatus(OK.value())
 						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
@@ -130,7 +131,7 @@ class EregServiceTest {
 	}
 
 	private static void stubEregSammensattnavnMangler() {
-		stubFor(get(urlEqualTo("/%s/noekkelinfo".formatted(ORG_SOM_MANGLER_SAMMENSATTNAVN)))
+		stubFor(get(urlEqualTo(EREG_URL.formatted(ORG_SOM_MANGLER_SAMMENSATTNAVN)))
 				.willReturn(aResponse()
 						.withStatus(OK.value())
 						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
@@ -138,13 +139,13 @@ class EregServiceTest {
 	}
 
 	private static void stubEregNotFound() {
-		stubFor(get(urlEqualTo("/%s/noekkelinfo".formatted(ORG_NR_SOM_IKKE_EKSISTERER)))
+		stubFor(get(urlEqualTo(EREG_URL.formatted(ORG_NR_SOM_IKKE_EKSISTERER)))
 				.willReturn(aResponse()
 						.withStatus(NOT_FOUND.value())));
 	}
 
 	private static void stubEreg(HttpStatus httpStatus) {
-		stubFor(get(urlEqualTo("/%s/noekkelinfo".formatted(ORG_NR_SOM_GIR_4XX_ELLER_5XX)))
+		stubFor(get(urlEqualTo(EREG_URL.formatted(ORG_NR_SOM_GIR_4XX_ELLER_5XX)))
 				.willReturn(aResponse()
 						.withStatus(httpStatus.value())));
 	}

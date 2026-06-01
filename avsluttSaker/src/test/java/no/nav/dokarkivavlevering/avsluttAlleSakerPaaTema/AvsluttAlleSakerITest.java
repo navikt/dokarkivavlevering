@@ -3,6 +3,7 @@ package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.entities.Arbeidssak;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.services.AvsluttAlleSakerService;
 import no.nav.dokarkivavlevering.config.AbstractITest;
+import no.nav.dokarkivavlevering.core.consumer.nais.exception.TomBodyTexasException;
 import no.nav.dokarkivavlevering.core.consumer.pdl.exception.PdlFunctionalException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -68,7 +69,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 
 	@Test
 	public void skalAvslutteSaker() {
-		stubAzure();
+		stubTexas();
 		stubPdl("hentIdenterBolk.json");
 		arbeidssakRepository.save(lagSakForAktoer(SAK_MED_LUKKET_JOURNALPOST1, FNR));
 		arbeidssakRepository.save(lagSakForOrganisasjon(SAK_MED_LUKKET_JOURNALPOST2, ORGNR));
@@ -92,7 +93,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 
 	@Test
 	public void skalAvslutteSakerMedAvsluttetDato() {
-		stubAzure();
+		stubTexas();
 		stubPdl("hentIdenterBolk.json");
 		when(avsluttSakPropertiesMock.getAvsluttetDato()).thenReturn(AVSLUTTET_DATO);
 
@@ -118,7 +119,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 
 	@Test
 	public void skalAvslutteSakerMedFagsaknr() {
-		stubAzure();
+		stubTexas();
 		stubPdl("hentIdenterBolk.json");
 		when(avsluttSakPropertiesMock.getAvsluttetDato()).thenReturn(AVSLUTTET_DATO);
 
@@ -144,7 +145,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 
 	@Test
 	public void skalAvslutteSakerMedAdministrativEnhet() {
-		stubAzure();
+		stubTexas();
 		stubPdl("hentIdenterBolk.json");
 		when(avsluttSakPropertiesMock.getAdministrativEnhet()).thenReturn(ADMINISTRATIV_ENHET);
 
@@ -170,7 +171,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 
 	@Test
 	public void skalIkkeAvslutteSakerUtenAdministrativEnhet() {
-		stubAzure();
+		stubTexas();
 		stubPdl("hentIdenterBolk.json");
 
 		arbeidssakRepository.save(lagSakForAktoer(SAK_UTEN_DVH_ADMINISTRATIV_ENHET, FNR));
@@ -192,7 +193,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 
 	@Test
 	public void skalOppdatereStatusTilPdlFantIkkeNyAktoerId() {
-		stubAzure();
+		stubTexas();
 		stubPdl("hentIdenterBolkSomInneholderNotFound.json");
 		arbeidssakRepository.save(lagSakForAktoer(SAK_MED_LUKKET_JOURNALPOST1, "1234567891123"));
 		commitAndBeginNewTransaction();
@@ -204,7 +205,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 
 	@Test
 	public void skalOppdatereAktoerIdOgAvslutteSak() {
-		stubAzure();
+		stubTexas();
 		stubPdl("hentIdenterBolk.json");
 		when(avsluttSakPropertiesMock.getAdministrativEnhet()).thenReturn(ADMINISTRATIV_ENHET);
 
@@ -242,18 +243,37 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 	}
 
 	@Test
-	public void skalKastePdlFunctionalException() {
-		stubAzure();
+	public void skalKasteTomBodyTexasExceptionOgAvslutteJobben() {
+		stubTexasTomBody();
+		populerSakRepository();
+
+		assertThatExceptionOfType(TomBodyTexasException.class)
+				.isThrownBy(() -> avsluttAlleSakerService.avsluttAlleSaker());
+
+		List<Arbeidssak> arbeidssaker = arbeidssakRepository.findSaksBySakIdIn(List.of(123L, 234L, 999L));
+		assertThat(arbeidssaker)
+				.extracting(Arbeidssak::getArbeidsstatus)
+				.containsOnlyNulls();
+	}
+
+	@Test
+	public void skalKastePdlFunctionalExceptionOgAvslutteJobben() {
+		stubTexas();
 		stubPdl("validationError.json");
 		populerSakRepository();
 
 		assertThatExceptionOfType(PdlFunctionalException.class)
 				.isThrownBy(() -> avsluttAlleSakerService.avsluttAlleSaker());
+
+		List<Arbeidssak> arbeidssaker = arbeidssakRepository.findSaksBySakIdIn(List.of(123L, 234L, 999L));
+		assertThat(arbeidssaker)
+				.extracting(Arbeidssak::getArbeidsstatus)
+				.containsOnlyNulls();
 	}
 
 	@Test
 	public void skalFeileBehandlingAvArkivsakMedAapenJournalpost() {
-		stubAzure();
+		stubTexas();
 		stubPdl("hentIdenterBolk.json");
 		arbeidssakRepository.save(lagSakForAktoer(SAK_MED_AAPEN_JOURNALPOST, "1234567891234"));
 		commitAndBeginNewTransaction();
@@ -269,7 +289,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 
 	@Test
 	public void skalFeileBehandlingAvArkivsakUtenJournalfoerendeEnhet() {
-		stubAzure();
+		stubTexas();
 		stubPdl("hentIdenterBolk.json");
 		arbeidssakRepository.save(lagSakForAktoer(SAK_UTEN_JOURNALFOERENDE_ENHET_JOURNALPOST, "1234567891234"));
 		commitAndBeginNewTransaction();
@@ -285,7 +305,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 
 	@Test
 	public void skalAvbryteSakerForTomArkivsak() {
-		stubAzure();
+		stubTexas();
 		stubPdl("hentIdenterBolk.json");
 		arbeidssakRepository.save(lagSakForAktoer(SAK_UTEN_FERDIGSTILT_JOURNALPOST, "1234567891234"));
 		commitAndBeginNewTransaction();
@@ -304,7 +324,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 
 	@Test
 	public void skalAvbryteSakerForArkivsakUtenSaksrelasjoner() {
-		stubAzure();
+		stubTexas();
 		stubPdl("hentIdenterBolk.json");
 		arbeidssakRepository.save(lagSakForAktoer(SAK_UTEN_SAKSRELASJONER_ID, "1234567891234"));
 		final MapSqlParameterSource sakIdParameterSource = new MapSqlParameterSource().addValue("sakId", SAK_UTEN_SAKSRELASJONER_ID);
