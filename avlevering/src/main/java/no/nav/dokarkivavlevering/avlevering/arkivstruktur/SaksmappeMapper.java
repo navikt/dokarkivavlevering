@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
-import static com.nimbusds.oauth2.sdk.util.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static no.nav.dokarkivavlevering.avlevering.AvleveringSakBerikerMapper.AUTOMATISK_JOBB;
 import static no.nav.dokarkivavlevering.avlevering.arkivstruktur.JournalpostType.I;
 import static no.nav.dokarkivavlevering.avlevering.arkivstruktur.JournalpostType.U;

@@ -11,14 +11,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.transaction.TestTransaction;
-import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static com.github.tomakehurst.wiremock.core.Options.DYNAMIC_PORT;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -42,9 +40,6 @@ public abstract class AbstractITest {
 	protected ArbeidssakRepository arbeidssakRepository;
 
 	@Autowired
-	public WebTestClient webTestClient;
-
-	@Autowired
 	protected EntityManager entityManager;
 
 	@BeforeEach
@@ -62,16 +57,24 @@ public abstract class AbstractITest {
 		TestTransaction.start();
 	}
 
-	protected static void stubAzure() {
-		stubFor(post("/azure_token")
+	protected static void stubTexas() {
+		stubFor(post("/nais-texas")
 				.willReturn(aResponse()
 						.withStatus(OK.value())
 						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-						.withBodyFile("azure/token_response.json")));
+						.withBodyFile("texas/texas-happy.json")));
+	}
+
+	protected static void stubTexasTomBody() {
+		stubFor(post("/nais-texas")
+				.willReturn(aResponse()
+						.withStatus(OK.value())
+						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBodyFile("texas/tom-body.json")));
 	}
 
 	protected static void stubPdl(String filename) {
-		stubFor(post(urlEqualTo("/pdl"))
+		stubFor(post("/pdl")
 				.willReturn(aResponse()
 						.withStatus(OK.value())
 						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)

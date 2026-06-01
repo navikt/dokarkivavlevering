@@ -6,58 +6,50 @@ import no.nav.dokarkivavlevering.core.consumer.pdl.HentIdenterBolkResponse.HentI
 import no.nav.dokarkivavlevering.core.consumer.pdl.exception.PdlFunctionalException;
 import no.nav.dokarkivavlevering.core.consumer.pdl.exception.PdlTechnicalException;
 import no.nav.dokarkivavlevering.core.consumer.pdl.exception.PersonIkkeFunnetException;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
+import org.springframework.web.client.RestClient;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import static java.lang.String.format;
-import static no.nav.dokarkivavlevering.core.azure.AzureProperties.CLIENT_REGISTRATION_PDL;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.security.oauth2.client.web.reactive.function.client.ServerOAuth2AuthorizedClientExchangeFilterFunction.clientRegistrationId;
+import static no.nav.dokarkivavlevering.core.consumer.nais.NaisTexasRequestInterceptor.TARGET_SCOPE;
 
-/**
- * https://navikt.github.io/pdl
- */
 @Slf4j
 @Component
 public class PdlGraphQLConsumer {
-	private static final String HEADER_NAV_CALL_ID = "Nav-Call-Id";
+
 	// https://behandlingskatalog.nais.adeo.no/process/purpose/ARKIVPLEIE/756fd557-b95e-4b20-9de9-6179fb8317e6
 	private static final String ARKIVPLEIE_BEHANDLINGSNUMMER = "B524";
-	private static final String PERSON_IKKE_FUNNET_CODE = "not_found";
 	private static final String HEADER_BEHANDLINGSNUMMER = "behandlingsnummer";
+	private static final String PERSON_IKKE_FUNNET_CODE = "not_found";
 
-	private final WebClient webClient;
-	private final DokarkivavleveringProperties dokarkivavleveringProperties;
+	private final RestClient restClient;
+	private final String targetScope;
 
-	public PdlGraphQLConsumer(WebClient webClient,
-							  DokarkivavleveringProperties dokarkivAvleveringProperties) {
-		this.dokarkivavleveringProperties = dokarkivAvleveringProperties;
-		this.webClient = webClient.mutate()
-				.defaultHeaders(headers -> {
-					headers.setContentType(APPLICATION_JSON);
-					headers.set(HEADER_BEHANDLINGSNUMMER, ARKIVPLEIE_BEHANDLINGSNUMMER);
-					headers.set(HEADER_NAV_CALL_ID, UUID.randomUUID().toString());
-				})
+	public PdlGraphQLConsumer(RestClient restClientTexas,
+	                          DokarkivavleveringProperties dokarkivAvleveringProperties) {
+		this.restClient = restClientTexas.mutate()
+				.baseUrl(dokarkivAvleveringProperties.getEndpoints().getPdl().getUrl())
+				.defaultHeader(HEADER_BEHANDLINGSNUMMER, ARKIVPLEIE_BEHANDLINGSNUMMER)
+				.defaultStatusHandler(HttpStatusCode::isError, (_, res) -> handleError(res))
 				.build();
+		this.targetScope = dokarkivAvleveringProperties.getEndpoints().getPdl().getScope();
 	}
 
 	@Retryable(retryFor = PdlTechnicalException.class)
 	public List<PdlHentPersonBolkResponse.PdlHentPersonBolk> hentPersonBolk(Set<String> aktoerIds) {
-		PdlHentPersonBolkResponse pdlResponse = webClient.post()
-				.uri(dokarkivavleveringProperties.getEndpoints().getPdl().getUrl())
-				.attributes(clientRegistrationId(CLIENT_REGISTRATION_PDL))
-				.bodyValue(mapHentPersonBolk(aktoerIds))
+		PdlHentPersonBolkResponse pdlResponse = restClient.post()
+				.attribute(TARGET_SCOPE, targetScope)
+				.body(mapHentPersonBolk(aktoerIds))
 				.retrieve()
-				.bodyToMono(PdlHentPersonBolkResponse.class)
-				.onErrorMap(this::mapError)
-				.block();
+				.body(PdlHentPersonBolkResponse.class);
 
 		if (pdlResponse.getErrors() == null || pdlResponse.getErrors().isEmpty()) {
 			return pdlResponse.getData().getHentPersonBolk();
@@ -71,14 +63,11 @@ public class PdlGraphQLConsumer {
 
 	@Retryable(retryFor = PdlTechnicalException.class)
 	public List<HentIdenterBolk> hentGjeldendeAktoerIder(Set<String> aktoerIds) {
-		HentIdenterBolkResponse pdlResponse = webClient.post()
-				.uri(dokarkivavleveringProperties.getEndpoints().getPdl().getUrl())
-				.attributes(clientRegistrationId(CLIENT_REGISTRATION_PDL))
-				.bodyValue(mapHentGjeldendeAktoerIdForBolk(aktoerIds))
+		HentIdenterBolkResponse pdlResponse = restClient.post()
+				.attribute(TARGET_SCOPE, targetScope)
+				.body(mapHentGjeldendeAktoerIdForBolk(aktoerIds))
 				.retrieve()
-				.bodyToMono(HentIdenterBolkResponse.class)
-				.onErrorMap(this::mapError)
-				.block();
+				.body(HentIdenterBolkResponse.class);
 
 		if (pdlResponse.getErrors() == null || pdlResponse.getErrors().isEmpty()) {
 			log.info("hentGjeldendeAktoerIder har hentet svar fra PDL OK");
@@ -88,15 +77,16 @@ public class PdlGraphQLConsumer {
 		}
 	}
 
-	private Throwable mapError(Throwable error) {
-		if (error instanceof WebClientResponseException response && response.getStatusCode().is4xxClientError()) {
-			return new PdlFunctionalException(
+	private void handleError(ClientHttpResponse response) throws IOException {
+		String body = new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8);
+		if (response.getStatusCode().is4xxClientError()) {
+			throw new PdlFunctionalException(
 					format("Kall mot pdl feilet funksjonelt med statuskode=%s Feilmelding=%s",
-							response.getStatusCode(),
-							response.getMessage()),
-					error);
+							response.getStatusCode(), body));
 		} else {
-			return new PdlTechnicalException(error.getMessage(), error);
+			throw new PdlTechnicalException(
+					format("Kall mot pdl feilet teknisk med statuskode=%s Feilmelding=%s",
+							response.getStatusCode(), body), null);
 		}
 	}
 
