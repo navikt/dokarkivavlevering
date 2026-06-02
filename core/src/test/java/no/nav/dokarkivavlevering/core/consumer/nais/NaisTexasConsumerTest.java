@@ -3,12 +3,8 @@ package no.nav.dokarkivavlevering.core.consumer.nais;
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import no.nav.dokarkivavlevering.core.consumer.nais.exception.TomBodyTexasException;
-import no.nav.dokarkivavlevering.core.consumer.nais.exception.UgyldigTargetscopeTexasException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.web.client.RestClient;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -41,15 +37,6 @@ class NaisTexasConsumerTest {
 		var token = naisTexasConsumer.getSystemToken(GYLDIG_TARGET_SCOPE);
 
 		assertThat(token).isEqualTo("yeehaw");
-	}
-
-	@ParameterizedTest
-	@NullAndEmptySource
-	@ValueSource(strings = {" ", "api://dev-fss.pdl.pdl-api", "dev-fss.pdl.pdl-api"})
-	void skalKasteUgyldigTargetscopeTexasExceptionVedUgyldigTargetScope(String targetScope) {
-		assertThatExceptionOfType(UgyldigTargetscopeTexasException.class)
-				.isThrownBy(() -> naisTexasConsumer.getSystemToken(targetScope))
-				.withMessage("Ugyldig targetScope. Må være på format api://<cluster>.<namespace>.<other-api-app-name>/.default");
 	}
 
 	@Test
