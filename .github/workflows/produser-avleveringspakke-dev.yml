@@ -32,7 +32,7 @@ jobs:
       id-token: write
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.2
       - name: Deploy job to NAIS dev-fss
         uses: nais/deploy/actions/deploy@v2
         env:
