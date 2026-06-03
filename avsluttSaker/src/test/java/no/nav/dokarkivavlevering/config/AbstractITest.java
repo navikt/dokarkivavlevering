@@ -2,6 +2,7 @@ package no.nav.dokarkivavlevering.config;
 
 import jakarta.persistence.EntityManager;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.config.RepositoryConfig;
+import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.AdministrativEnhetJdbcRepository;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.ArbeidssakRepository;
 import no.nav.dokarkivavlevering.core.CoreConfig;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,6 +41,9 @@ public abstract class AbstractITest {
 
 	@Autowired
 	protected ArbeidssakRepository arbeidssakRepository;
+
+	@Autowired
+	protected AdministrativEnhetJdbcRepository administrativEnhetJdbcRepository;
 
 	@Autowired
 	public WebTestClient webTestClient;

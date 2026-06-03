@@ -6,6 +6,7 @@ import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.consumers.DatavarehusRe
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.domain.Arkivsak;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.domain.Journalpost;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.exeptions.KanIkkeBehandleArkivsakException;
+import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.AdministrativEnhetJdbcRepository;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +27,7 @@ public class AdministrativEnhetService {
 
 	private Map<String, List<AdministrativEnhet>> administrativEnhetMap;
 	private final DatavarehusConsumer datavarehusConsumer;
+	private final AdministrativEnhetJdbcRepository administrativEnhetJdbcRepository;
 
 	public static final String APPLIKASJON_INFOTRYGD = "IT01";
 	public static final String APPLIKASJON_ARENA = "AO01";
@@ -33,8 +35,9 @@ public class AdministrativEnhetService {
 	public static final String KONTORTYPE_INFOTRYGD = "INFOENHET";
 	public static final String KONTORTYPE_ARENA = "ARENAENHET";
 
-	public AdministrativEnhetService(DatavarehusConsumer datavarehusConsumer) {
+	public AdministrativEnhetService(DatavarehusConsumer datavarehusConsumer, AdministrativEnhetJdbcRepository administrativEnhetJdbcRepository) {
 		this.datavarehusConsumer = datavarehusConsumer;
+		this.administrativEnhetJdbcRepository = administrativEnhetJdbcRepository;
 	}
 
 	public void populerAdministrativEnhetMap() {
@@ -47,7 +50,7 @@ public class AdministrativEnhetService {
 
 	public String hentHistoriskNavnForAdministrativEnhet(Journalpost eldsteJournalpost, Arkivsak arkivsak) {
 		Optional<String> administrativEnhetOptional = finnHistoriskKontornavnForAdministrativEnhet(
-				eldsteJournalpost.getJournalfoerendeEnhet(), eldsteJournalpost.getJournaldato(), arkivsak.getApplikasjon());
+				eldsteJournalpost, arkivsak.getApplikasjon(), arkivsak.getTema());
 
 		if (administrativEnhetOptional.isEmpty()) {
 			oppdaterArbeidsstatusForArkivsak(arkivsak, FEIL_INGEN_ADMINISTRATIV_ENHET_FUNNET_FOR_ARKIVSAK);
@@ -56,7 +59,14 @@ public class AdministrativEnhetService {
 		return administrativEnhetOptional.get();
 	}
 
-	private Optional<String> finnHistoriskKontornavnForAdministrativEnhet(String journalfoerendeEnhet, LocalDate journalfoertDato, String applikasjon) {
+	private Optional<String> finnHistoriskKontornavnForAdministrativEnhet(Journalpost eldsteJournalpost, String applikasjon, String tema) {
+		return finnHistoriskKontornavnForAdministrativEnhetFraDvh(
+				eldsteJournalpost.getJournalfoerendeEnhet(), eldsteJournalpost.getJournaldato(), applikasjon)
+				.or(() -> Optional.ofNullable(
+						administrativEnhetJdbcRepository.hentNavnForAdministrativEnhet(tema, eldsteJournalpost.getJournaldato())));
+	}
+
+	private Optional<String> finnHistoriskKontornavnForAdministrativEnhetFraDvh(String journalfoerendeEnhet, LocalDate journalfoertDato, String applikasjon) {
 
 		List<AdministrativEnhet> kontorer = administrativEnhetMap.get(journalfoerendeEnhet);
 		if (kontorer == null) {

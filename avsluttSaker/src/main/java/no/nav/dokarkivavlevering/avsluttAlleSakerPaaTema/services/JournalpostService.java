@@ -37,30 +37,43 @@ public class JournalpostService {
 	}
 
 	public Journalpost finnEldsteJournalpostForArkivsak(Arkivsak arkivsak) {
-		Optional<Journalpost> eldsteJournalpostOptional = finnEldsteJournalpost(arkivsak);
-		if (eldsteJournalpostOptional.isEmpty()) {
-			oppdaterArbeidsstatusForArkivsak(arkivsak, FEIL_INGEN_JPER_I_GYLDIG_STATUS_MED_JFR_ENHET);
-			throw new KanIkkeBehandleArkivsakException(format("Fant ingen journalposter i gyldig status med journalforendeEnhet for saksIder=%s. Kan ikke bestemme administrativEnhet.", arkivsak.getArbeidssaksIder()));
+		Optional<Journalpost> eldsteJournalpostOptional = finnEldsteGyldigeJournalpostForArkivsak(arkivsak);
+		if (eldsteJournalpostOptional.isPresent()) {
+			return eldsteJournalpostOptional.get();
 		}
-		return eldsteJournalpostOptional.get();
+
+		oppdaterArbeidsstatusForArkivsak(arkivsak, FEIL_INGEN_JPER_I_GYLDIG_STATUS_MED_JFR_ENHET);
+		throw new KanIkkeBehandleArkivsakException(format("Fant ingen journalposter i gyldig status med journalforendeEnhet for saksIder=%s. Kan ikke bestemme administrativEnhet.", arkivsak.getArbeidssaksIder()));
 	}
 
-	private Optional<Journalpost> finnEldsteJournalpost(Arkivsak arkivsak) {
+	private Optional<Journalpost> finnEldsteGyldigeJournalpostForArkivsak(Arkivsak arkivsak) {
+		return finnEldsteJournalpostIkkeMaskinell(arkivsak)
+				.or(() -> finnEldsteJournalpostMaskinell(arkivsak));
+	}
+
+	private Optional<Journalpost> finnEldsteJournalpostMaskinell(Arkivsak arkivsak) {
+		List<Journalpost> filtrerteJournalposter = arkivsak.journalposter().stream()
+				.filter(journalpost -> LUKKEDE_JOURNALSTATUSER.contains(journalpost.getJournalstatus()))
+				.filter(journalpost -> !journalpost.isErFeilregistrert())
+				.toList();
+
+		return filtrerteJournalposter.stream()
+				.min(Comparator.comparing(Journalpost::getJournaldato));
+	}
+
+	private Optional<Journalpost> finnEldsteJournalpostIkkeMaskinell(Arkivsak arkivsak) {
 		List<Journalpost> filtrerteJournalposter = arkivsak.journalposter().stream()
 				.filter(journalpost -> LUKKEDE_JOURNALSTATUSER.contains(journalpost.getJournalstatus()))
 				.filter(journalpost -> !journalpost.isErFeilregistrert())
 				.filter(journalpost -> !isEmpty(inputAdministrativEnhet) || harGyldigJournalfoerendeEnhet(journalpost))
 				.toList();
 
-		if (filtrerteJournalposter.isEmpty()) {
-			return Optional.empty();
-		}
 		return filtrerteJournalposter.stream()
 				.min(Comparator.comparing(Journalpost::getJournaldato));
 	}
 
-	private boolean harGyldigJournalfoerendeEnhet(Journalpost journalpost){
+	private boolean harGyldigJournalfoerendeEnhet(Journalpost journalpost) {
 		return (!isEmpty(journalpost.getJournalfoerendeEnhet())
-						&& !MASKINELL_JOURNALFOERENDE_ENHET.equals(journalpost.getJournalfoerendeEnhet()));
+				&& !MASKINELL_JOURNALFOERENDE_ENHET.equals(journalpost.getJournalfoerendeEnhet()));
 	}
 }

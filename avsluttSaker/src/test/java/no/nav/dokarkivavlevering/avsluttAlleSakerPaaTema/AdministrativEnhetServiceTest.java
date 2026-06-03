@@ -3,6 +3,7 @@ package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.consumers.DatavarehusConsumer;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.consumers.DatavarehusResponse;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.consumers.DatavarehusResponse.AdministrativEnhet;
+import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.AdministrativEnhetJdbcRepository;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.domain.Arkivsak;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.domain.Journalpost;
 import no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.entities.Arbeidssak;
@@ -24,6 +25,7 @@ import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.services.Adminis
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.services.AdministrativEnhetService.KONTORTYPE_NORG;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,6 +34,9 @@ class AdministrativEnhetServiceTest {
 	@Mock
 	private DatavarehusConsumer datavarehusConsumermock;
 
+	@Mock
+	private AdministrativEnhetJdbcRepository administrativEnhetJdbcRepository;
+
 	@InjectMocks
 	AdministrativEnhetService administrativEnhetService;
 
@@ -39,6 +44,7 @@ class AdministrativEnhetServiceTest {
 	private static final String KONTORNAVN_OSLO = "OSLO";
 	private static final String KONTORNAVN_KRISTIANIA = "KRISTIANIA";
 	private static final String APPLIKASJON_GOSYS = "FS22";
+	private static final String TEMA_PENSJON = "PEN";
 	private static final LocalDate GYLDIG_FRA = LocalDate.of(2020, 1, 1);
 	private static final LocalDate GYLDIG_TIL = GYLDIG_FRA.plusYears(2);
 
@@ -138,6 +144,35 @@ class AdministrativEnhetServiceTest {
 				.withMessageContaining("Fant ingen administrativ enhet for arkivsak");
 	}
 
+	@Test
+	public void skalReturnereKontornavnFraJdbcNaarDvhIkkeFinnerAdministrativEnhet() {
+		when(datavarehusConsumermock.hentAlleAdministrativeEnheter()).thenReturn(
+				new DatavarehusResponse(List.of(createAdministrativEnhet("9999", KONTORTYPE_NORG, KONTORNAVN_KRISTIANIA, GYLDIG_FRA, GYLDIG_TIL))));
+		when(administrativEnhetJdbcRepository.hentNavnForAdministrativEnhet(TEMA_PENSJON, GYLDIG_FRA)).thenReturn(KONTORNAVN_OSLO);
+		administrativEnhetService.populerAdministrativEnhetMap();
+		Journalpost journalpost = lagJournalpost();
+		Arkivsak arkivsak = lagArkivsakMedApplikasjonOgTema(APPLIKASJON_GOSYS, TEMA_PENSJON);
+
+		String administrativEnhet = administrativEnhetService.hentHistoriskNavnForAdministrativEnhet(journalpost, arkivsak);
+		assertThat(administrativEnhet).isEqualTo(KONTORNAVN_OSLO);
+		verify(administrativEnhetJdbcRepository).hentNavnForAdministrativEnhet(TEMA_PENSJON, GYLDIG_FRA);
+	}
+
+	@Test
+	public void skalKasteFeilNaarVerkenDvhEllerJdbcHarKontornavn() {
+		when(datavarehusConsumermock.hentAlleAdministrativeEnheter()).thenReturn(
+				new DatavarehusResponse(List.of(createAdministrativEnhet("9999", KONTORTYPE_NORG, KONTORNAVN_KRISTIANIA, GYLDIG_FRA, GYLDIG_TIL))));
+		when(administrativEnhetJdbcRepository.hentNavnForAdministrativEnhet(TEMA_PENSJON, GYLDIG_FRA)).thenReturn(null);
+		administrativEnhetService.populerAdministrativEnhetMap();
+		Journalpost journalpost = lagJournalpost();
+		Arkivsak arkivsak = lagArkivsakMedApplikasjonOgTema(APPLIKASJON_GOSYS, TEMA_PENSJON);
+
+		assertThatExceptionOfType(KanIkkeBehandleArkivsakException.class)
+				.isThrownBy(() -> administrativEnhetService.hentHistoriskNavnForAdministrativEnhet(journalpost, arkivsak))
+				.withMessageContaining("Fant ingen administrativ enhet for arkivsak");
+		verify(administrativEnhetJdbcRepository).hentNavnForAdministrativEnhet(TEMA_PENSJON, GYLDIG_FRA);
+	}
+
 	private AdministrativEnhet createDefaultAdministrativEnhet() {
 		return createAdministrativEnhet(JFR_ENHET, KONTORTYPE_NORG, KONTORNAVN_OSLO, GYLDIG_FRA, GYLDIG_TIL);
 	}
@@ -160,8 +195,13 @@ class AdministrativEnhetServiceTest {
 	}
 
 	private Arkivsak lagArkivsakMedApplikasjon(String applikasjon) {
+		return lagArkivsakMedApplikasjonOgTema(applikasjon, null);
+	}
+
+	private Arkivsak lagArkivsakMedApplikasjonOgTema(String applikasjon, String tema) {
 		Arbeidssak arbeidssak = new Arbeidssak();
 		arbeidssak.setApplikasjon(applikasjon);
+		arbeidssak.setTema(tema);
 		List<Arbeidssak> arbeidssaker = List.of(arbeidssak);
 
 		return new Arkivsak(arbeidssaker, null);

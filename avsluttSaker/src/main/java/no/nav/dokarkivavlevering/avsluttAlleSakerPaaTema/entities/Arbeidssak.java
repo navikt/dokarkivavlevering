@@ -18,7 +18,7 @@ import static jakarta.persistence.EnumType.STRING;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "MMA_8141")
+@Table(name = "MMA_8625")
 public class Arbeidssak {
 
 	@Id
@@ -43,4 +43,7 @@ public class Arbeidssak {
 	@Column
 	@Enumerated(STRING)
 	Arbeidsstatus arbeidsstatus;
+
+	@Column
+	String tema;
 }
