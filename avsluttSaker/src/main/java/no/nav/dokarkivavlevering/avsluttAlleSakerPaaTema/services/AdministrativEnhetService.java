@@ -60,8 +60,7 @@ public class AdministrativEnhetService {
 	}
 
 	private Optional<String> finnHistoriskKontornavnForAdministrativEnhet(Journalpost eldsteJournalpost, String applikasjon, String tema) {
-		return finnHistoriskKontornavnForAdministrativEnhetFraDvh(
-				eldsteJournalpost.getJournalfoerendeEnhet(), eldsteJournalpost.getJournaldato(), applikasjon)
+		return finnHistoriskKontornavnForAdministrativEnhetFraDvh(eldsteJournalpost.getJournalfoerendeEnhet(), eldsteJournalpost.getJournaldato(), applikasjon)
 				.or(() -> Optional.ofNullable(
 						administrativEnhetJdbcRepository.hentNavnForAdministrativEnhet(tema, eldsteJournalpost.getJournaldato())));
 	}

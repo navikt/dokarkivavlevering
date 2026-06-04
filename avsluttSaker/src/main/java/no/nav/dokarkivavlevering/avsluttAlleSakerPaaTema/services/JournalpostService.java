@@ -47,33 +47,34 @@ public class JournalpostService {
 	}
 
 	private Optional<Journalpost> finnEldsteGyldigeJournalpostForArkivsak(Arkivsak arkivsak) {
-		return finnEldsteJournalpostIkkeMaskinell(arkivsak)
-				.or(() -> finnEldsteJournalpostMaskinell(arkivsak));
-	}
-
-	private Optional<Journalpost> finnEldsteJournalpostMaskinell(Arkivsak arkivsak) {
 		List<Journalpost> filtrerteJournalposter = arkivsak.journalposter().stream()
 				.filter(journalpost -> LUKKEDE_JOURNALSTATUSER.contains(journalpost.getJournalstatus()))
 				.filter(journalpost -> !journalpost.isErFeilregistrert())
 				.toList();
 
+		return finnEldsteJournalpostIkkeMaskinell(filtrerteJournalposter)
+				.or(() -> finnEldsteJournalpostMaskinell(filtrerteJournalposter));
+	}
+
+	private Optional<Journalpost> finnEldsteJournalpostIkkeMaskinell(List<Journalpost> filtrerteJournalposter) {
 		return filtrerteJournalposter.stream()
+				.filter(journalpost -> !isEmpty(inputAdministrativEnhet) || harJournalfEnhetUlikMaskinell(journalpost))
 				.min(Comparator.comparing(Journalpost::getJournaldato));
 	}
 
-	private Optional<Journalpost> finnEldsteJournalpostIkkeMaskinell(Arkivsak arkivsak) {
-		List<Journalpost> filtrerteJournalposter = arkivsak.journalposter().stream()
-				.filter(journalpost -> LUKKEDE_JOURNALSTATUSER.contains(journalpost.getJournalstatus()))
-				.filter(journalpost -> !journalpost.isErFeilregistrert())
-				.filter(journalpost -> !isEmpty(inputAdministrativEnhet) || harGyldigJournalfoerendeEnhet(journalpost))
-				.toList();
-
+	private Optional<Journalpost> finnEldsteJournalpostMaskinell(List<Journalpost> filtrerteJournalposter) {
 		return filtrerteJournalposter.stream()
+				.filter(this::harJournalfEnhetLikMaskinell)
 				.min(Comparator.comparing(Journalpost::getJournaldato));
 	}
 
-	private boolean harGyldigJournalfoerendeEnhet(Journalpost journalpost) {
+	private boolean harJournalfEnhetUlikMaskinell(Journalpost journalpost) {
 		return (!isEmpty(journalpost.getJournalfoerendeEnhet())
 				&& !MASKINELL_JOURNALFOERENDE_ENHET.equals(journalpost.getJournalfoerendeEnhet()));
+	}
+
+	private boolean harJournalfEnhetLikMaskinell(Journalpost journalpost) {
+		return (!isEmpty(journalpost.getJournalfoerendeEnhet())
+				&& MASKINELL_JOURNALFOERENDE_ENHET.equals(journalpost.getJournalfoerendeEnhet()));
 	}
 }
