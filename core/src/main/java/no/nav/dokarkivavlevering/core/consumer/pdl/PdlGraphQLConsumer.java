@@ -8,7 +8,7 @@ import no.nav.dokarkivavlevering.core.consumer.pdl.exception.PdlTechnicalExcepti
 import no.nav.dokarkivavlevering.core.consumer.pdl.exception.PersonIkkeFunnetException;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.retry.annotation.Retryable;
+import org.springframework.resilience.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
@@ -43,7 +43,7 @@ public class PdlGraphQLConsumer {
 		this.targetScope = dokarkivAvleveringProperties.getEndpoints().getPdl().getScope();
 	}
 
-	@Retryable(retryFor = PdlTechnicalException.class)
+	@Retryable(includes = PdlTechnicalException.class)
 	public List<PdlHentPersonBolkResponse.PdlHentPersonBolk> hentPersonBolk(Set<String> aktoerIds) {
 		PdlHentPersonBolkResponse pdlResponse = restClient.post()
 				.attribute(TARGET_SCOPE, targetScope)
@@ -61,7 +61,7 @@ public class PdlGraphQLConsumer {
 		}
 	}
 
-	@Retryable(retryFor = PdlTechnicalException.class)
+	@Retryable(includes = PdlTechnicalException.class)
 	public List<HentIdenterBolk> hentGjeldendeAktoerIder(Set<String> aktoerIds) {
 		HentIdenterBolkResponse pdlResponse = restClient.post()
 				.attribute(TARGET_SCOPE, targetScope)

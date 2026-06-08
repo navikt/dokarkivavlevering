@@ -5,7 +5,7 @@ import no.nav.dokarkivavlevering.core.exception.DokarkivavleveringFunctionalExce
 import no.nav.dokarkivavlevering.core.exception.DokarkivavleveringTechnicalException;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.retry.annotation.Retryable;
+import org.springframework.resilience.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
@@ -33,7 +33,7 @@ public class DatavarehusConsumer {
 				.build();
 	}
 
-	@Retryable(retryFor = {DokarkivavleveringTechnicalException.class, RestClientException.class})
+	@Retryable(includes = {DokarkivavleveringTechnicalException.class, RestClientException.class})
 	public DatavarehusResponse hentAlleAdministrativeEnheter() {
 		return restClient.get()
 				.uri(uriBuilder -> UriComponentsBuilder.fromUri(uriBuilder.build())
