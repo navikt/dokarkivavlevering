@@ -5,9 +5,6 @@ import lombok.ToString;
 
 import java.time.ZoneId;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Data
 public class PdlHentPersonBolkResponse {
@@ -43,14 +40,9 @@ public class PdlHentPersonBolkResponse {
 		private String mellomnavn;
 		@ToString.Exclude
 		private String etternavn;
-		private PdlFolkeregistermetadata pdlFolkeregistermetadata;
-		private PdlNavnMetadata metadata;
 
-		String fulltnavn() {
-			return Stream.of(fornavn, mellomnavn, etternavn)
-					.filter(Objects::nonNull)
-					.collect(Collectors.joining(" "));
-		}
+		private PdlFolkeregistermetadata folkeregistermetadata;
+		private PdlNavnMetadata metadata;
 	}
 
 	@Data

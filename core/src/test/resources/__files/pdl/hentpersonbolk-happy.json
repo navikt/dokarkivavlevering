@@ -1,0 +1,68 @@
+{
+  "data": {
+    "hentPersonBolk": [
+      {
+        "ident": "17629124853",
+        "person": {
+          "folkeregisteridentifikator": [],
+          "navn": [
+            {
+              "fornavn": "FORNUFTIG",
+              "mellomnavn": null,
+              "etternavn": "ALKOVE",
+              "folkeregistermetadata": null,
+              "metadata": {
+                "opplysningsId": "0c5b46b1-49a8-4828-9e05-b649abbe4423",
+                "historisk": false
+              }
+            }
+          ]
+        },
+        "code": "ok"
+      },
+      {
+        "ident": "45457208085",
+        "person": {
+          "folkeregisteridentifikator": [
+            {
+              "identifikasjonsnummer": "45457208085"
+            }
+          ],
+          "navn": [
+            {
+              "fornavn": "UTGÅTT",
+              "mellomnavn": null,
+              "etternavn": "GANG",
+              "folkeregistermetadata": {
+                "gyldighetstidspunkt": "1972-05-05T00:00",
+                "opphoerstidspunkt": null,
+                "sekvens": null
+              },
+              "metadata": {
+                "opplysningsId": "4cda3ac3-66b9-4bb5-97e7-781cf679132a",
+                "historisk": false
+              }
+            }
+          ]
+        },
+        "code": "ok"
+      }
+    ]
+  },
+  "extensions": {
+    "warnings": [
+      {
+        "query": "hentPersonBolk",
+        "id": "tilgangsstyring",
+        "code": "mangler_opplysninger_i_katalog",
+        "message": "Behandling mangler opplysningstyper",
+        "details": {
+          "missing": [
+            "FOLKEREGISTERIDENTIFIKATOR_V1",
+            "NAVN_V1"
+          ]
+        }
+      }
+    ]
+  }
+}

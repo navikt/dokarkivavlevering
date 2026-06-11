@@ -3,6 +3,7 @@ package no.nav.dokarkivavlevering.core.consumer.pdl;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.core.DokarkivavleveringProperties;
 import no.nav.dokarkivavlevering.core.consumer.pdl.HentIdenterBolkResponse.HentIdenterBolk;
+import no.nav.dokarkivavlevering.core.consumer.pdl.PdlHentPersonBolkResponse.PdlHentPersonBolk;
 import no.nav.dokarkivavlevering.core.consumer.pdl.exception.PdlFunctionalException;
 import no.nav.dokarkivavlevering.core.consumer.pdl.exception.PdlTechnicalException;
 import no.nav.dokarkivavlevering.core.consumer.pdl.exception.PersonIkkeFunnetException;
@@ -44,7 +45,7 @@ public class PdlGraphQLConsumer {
 	}
 
 	@Retryable(includes = PdlTechnicalException.class)
-	public List<PdlHentPersonBolkResponse.PdlHentPersonBolk> hentPersonBolk(Set<String> aktoerIds) {
+	public List<PdlHentPersonBolk> hentPersonBolk(Set<String> aktoerIds) {
 		PdlHentPersonBolkResponse pdlResponse = restClient.post()
 				.attribute(TARGET_SCOPE, targetScope)
 				.body(mapHentPersonBolk(aktoerIds))
@@ -95,7 +96,7 @@ public class PdlGraphQLConsumer {
 		variables.put("identer", aktoerIds);
 		return PdlRequest.builder()
 				.query("""
-						query hentIdenterBolk($identer: [ID!]!) {
+						query hentPersonBolk($identer: [ID!]!) {
 						  hentPersonBolk(identer: $identer) {
 							ident
 							person {

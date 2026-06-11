@@ -1,0 +1,49 @@
+{
+  "data": {
+    "hentPersonBolk": [
+      {
+        "ident": "45457208085",
+        "person": {
+          "folkeregisteridentifikator": [
+            {
+              "identifikasjonsnummer": "45457208085"
+            }
+          ],
+          "navn": [
+            {
+              "fornavn": "UTGÅTT",
+              "mellomnavn": null,
+              "etternavn": "GANG",
+              "folkeregistermetadata": {
+                "gyldighetstidspunkt": "1972-05-05T00:00",
+                "opphoerstidspunkt": null,
+                "sekvens": null
+              },
+              "metadata": {
+                "opplysningsId": "4cda3ac3-66b9-4bb5-97e7-781cf679132a",
+                "historisk": null
+              }
+            }
+          ]
+        },
+        "code": "ok"
+      }
+    ]
+  },
+  "extensions": {
+    "warnings": [
+      {
+        "query": "hentPersonBolk",
+        "id": "tilgangsstyring",
+        "code": "mangler_opplysninger_i_katalog",
+        "message": "Behandling mangler opplysningstyper",
+        "details": {
+          "missing": [
+            "FOLKEREGISTERIDENTIFIKATOR_V1",
+            "NAVN_V1"
+          ]
+        }
+      }
+    ]
+  }
+}
