@@ -65,6 +65,16 @@ spec:
     - name: SPRING_PROFILES_ACTIVE
       value: "{{profile}}"
   webproxy: true
+  observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java
+      destinations:
+        - id: "elastic-apm"
+    logging:
+      destinations:
+        - id: elastic
+        - id: loki
   azure:
     application:
       enabled: true
