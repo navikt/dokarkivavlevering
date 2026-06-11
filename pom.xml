@@ -12,7 +12,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.8</version>
+		<version>4.0.6</version>
 	</parent>
 
 	<modules>
@@ -26,8 +26,8 @@
 	<properties>
 		<java.version>25</java.version>
 
-		<camel.version>4.16.0</camel.version>
-		<logstash-logback-encoder.version>8.1</logstash-logback-encoder.version>
+		<camel.version>4.20.0</camel.version>
+		<logstash-logback-encoder.version>9.0</logstash-logback-encoder.version>
 		<simpleflatmapper.version>8.2.3</simpleflatmapper.version>
 		<commons-io.version>2.21.0</commons-io.version>
 		<guava.version>33.5.0-jre</guava.version>
@@ -35,7 +35,7 @@
 		<!-- aspose-pdf kan ikke oppdateres til en versjon > 23.5 (på grunn av lisens) -->
 		<aspose-pdf.version>23.5</aspose-pdf.version>
 
-		<spring-cloud-starter-contract-stub-runner.version>4.3.0</spring-cloud-starter-contract-stub-runner.version>
+		<wiremock-spring-boot.version>4.2.1</wiremock-spring-boot.version>
 
 		<hisrc-higherjaxb40-maven-plugin.version>2.2.1</hisrc-higherjaxb40-maven-plugin.version>
 		<maven-toolchains-plugin.version>3.2.0</maven-toolchains-plugin.version>
@@ -78,7 +78,7 @@
 
 			<dependency>
 				<groupId>org.apache.camel.springboot</groupId>
-				<artifactId>camel-spring-boot-dependencies</artifactId>
+				<artifactId>camel-spring-boot-bom</artifactId>
 				<version>${camel.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
@@ -110,9 +110,9 @@
 			</dependency>
 
 			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-starter-contract-stub-runner</artifactId>
-				<version>${spring-cloud-starter-contract-stub-runner.version}</version>
+				<groupId>org.wiremock.integrations</groupId>
+				<artifactId>wiremock-spring-boot</artifactId>
+				<version>${wiremock-spring-boot.version}</version>
 				<scope>test</scope>
 			</dependency>
 		</dependencies>

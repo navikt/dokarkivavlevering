@@ -3,7 +3,7 @@ package no.nav.dokarkivavlevering.avlevering.consumer.ereg;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.core.DokarkivavleveringProperties;
 import org.springframework.context.annotation.Profile;
-import org.springframework.retry.annotation.Retryable;
+import org.springframework.resilience.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.RequestHeadersSpec.ConvertibleClientHttpResponse;
@@ -34,7 +34,7 @@ public class EregConsumer {
 				.build();
 	}
 
-	@Retryable(retryFor = EregTechnicalException.class)
+	@Retryable(includes = EregTechnicalException.class)
 	public String hentOrganisasjonsnavn(String orgnr) {
 		if (orgnrHarUgyldigFormat(orgnr)) {
 			return FALLBACK_ORGNR_HAR_FEIL_FORMAT;

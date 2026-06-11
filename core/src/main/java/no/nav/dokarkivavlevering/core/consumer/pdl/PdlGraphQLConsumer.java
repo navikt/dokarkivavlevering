@@ -3,12 +3,13 @@ package no.nav.dokarkivavlevering.core.consumer.pdl;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.core.DokarkivavleveringProperties;
 import no.nav.dokarkivavlevering.core.consumer.pdl.HentIdenterBolkResponse.HentIdenterBolk;
+import no.nav.dokarkivavlevering.core.consumer.pdl.PdlHentPersonBolkResponse.PdlHentPersonBolk;
 import no.nav.dokarkivavlevering.core.consumer.pdl.exception.PdlFunctionalException;
 import no.nav.dokarkivavlevering.core.consumer.pdl.exception.PdlTechnicalException;
 import no.nav.dokarkivavlevering.core.consumer.pdl.exception.PersonIkkeFunnetException;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.retry.annotation.Retryable;
+import org.springframework.resilience.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
@@ -43,8 +44,8 @@ public class PdlGraphQLConsumer {
 		this.targetScope = dokarkivAvleveringProperties.getEndpoints().getPdl().getScope();
 	}
 
-	@Retryable(retryFor = PdlTechnicalException.class)
-	public List<PdlHentPersonBolkResponse.PdlHentPersonBolk> hentPersonBolk(Set<String> aktoerIds) {
+	@Retryable(includes = PdlTechnicalException.class)
+	public List<PdlHentPersonBolk> hentPersonBolk(Set<String> aktoerIds) {
 		PdlHentPersonBolkResponse pdlResponse = restClient.post()
 				.attribute(TARGET_SCOPE, targetScope)
 				.body(mapHentPersonBolk(aktoerIds))
@@ -61,7 +62,7 @@ public class PdlGraphQLConsumer {
 		}
 	}
 
-	@Retryable(retryFor = PdlTechnicalException.class)
+	@Retryable(includes = PdlTechnicalException.class)
 	public List<HentIdenterBolk> hentGjeldendeAktoerIder(Set<String> aktoerIds) {
 		HentIdenterBolkResponse pdlResponse = restClient.post()
 				.attribute(TARGET_SCOPE, targetScope)
@@ -95,7 +96,7 @@ public class PdlGraphQLConsumer {
 		variables.put("identer", aktoerIds);
 		return PdlRequest.builder()
 				.query("""
-						query hentIdenterBolk($identer: [ID!]!) {
+						query hentPersonBolk($identer: [ID!]!) {
 						  hentPersonBolk(identer: $identer) {
 							ident
 							person {

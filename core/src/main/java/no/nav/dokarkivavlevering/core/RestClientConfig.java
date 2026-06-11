@@ -22,7 +22,6 @@ public class RestClientConfig {
 	@Bean
 	RestClient restClientTexas(RestClient.Builder restClientBuilder, NaisTexasConsumer naisTexasConsumer) {
 		return restClientBuilder
-				.requestFactory(jdkClientHttpRequestFactory())
 				.requestInterceptor(new NaisTexasRequestInterceptor(naisTexasConsumer))
 				.build();
 	}
