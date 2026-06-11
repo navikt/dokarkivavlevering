@@ -3,6 +3,7 @@ package no.nav.dokarkivavlevering.core;
 import no.nav.dokarkivavlevering.core.consumer.nais.NaisTexasConsumer;
 import no.nav.dokarkivavlevering.core.consumer.nais.NaisTexasRequestInterceptor;
 import org.springframework.boot.http.client.ClientHttpRequestFactoryBuilder;
+import org.springframework.boot.restclient.autoconfigure.RestClientBuilderConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
@@ -14,8 +15,8 @@ import java.time.Duration;
 public class RestClientConfig {
 
 	@Bean
-	RestClient.Builder restClientBuilder() {
-		return RestClient.builder()
+	RestClient.Builder restClientBuilder(RestClientBuilderConfigurer restClientBuilderConfigurer) {
+		return restClientBuilderConfigurer.configure(RestClient.builder())
 				.requestFactory(jdkClientHttpRequestFactory());
 	}
 
