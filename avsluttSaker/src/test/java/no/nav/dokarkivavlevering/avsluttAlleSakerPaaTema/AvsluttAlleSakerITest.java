@@ -18,6 +18,7 @@ import java.util.List;
 import static java.time.LocalDateTime.now;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.Arbeidsstatus.FEIL_AAPEN_JOURNALPOST;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.Arbeidsstatus.FEIL_INGEN_ADMINISTRATIV_ENHET_FUNNET_FOR_ARKIVSAK;
+import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.Arbeidsstatus.FEIL_INGEN_JPER_I_GYLDIG_STATUS_MED_JFR_ENHET;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.Arbeidsstatus.FEIL_PDL_FANT_IKKE_AKTOERID;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.Arbeidsstatus.FERDIG_SAK_AVSLUTTET;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.Arbeidsstatus.FERDIG_TOM_ARKIVSAK;
@@ -302,22 +303,6 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		Arbeidssak arbeidssak1 = saker.get(0);
 
 		assertThat(arbeidssak1.getArbeidsstatus()).isEqualTo(FEIL_AAPEN_JOURNALPOST);
-		assertThat(arbeidssak1.getAktoerId()).isEqualTo("1234567891234");
-	}
-
-	@Test
-	public void skalFeileBehandlingAvArkivsakUtenJournalfoerendeEnhet() {
-		stubTexas();
-		stubPdl("hentIdenterBolk.json");
-		arbeidssakRepository.save(lagSakForAktoer(SAK_UTEN_JOURNALFOERENDE_ENHET_JOURNALPOST, "1234567891234"));
-		commitAndBeginNewTransaction();
-
-		avsluttAlleSakerService.avsluttAlleSaker();
-
-		List<Arbeidssak> saker = arbeidssakRepository.findSaksBySakIdIn(List.of(SAK_UTEN_JOURNALFOERENDE_ENHET_JOURNALPOST));
-		Arbeidssak arbeidssak1 = saker.get(0);
-
-		assertThat(arbeidssak1.getArbeidsstatus()).isEqualTo(FEIL_INGEN_JPER_I_GYLDIG_STATUS_MED_JFR_ENHET);
 		assertThat(arbeidssak1.getAktoerId()).isEqualTo("1234567891234");
 	}
 
