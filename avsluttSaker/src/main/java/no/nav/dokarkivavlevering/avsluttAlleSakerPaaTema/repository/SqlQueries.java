@@ -42,4 +42,12 @@ public class SqlQueries {
 			where id in (:sakIds)
 			""";
 
+	public static final String HENT_NAVN_FOR_ADMINISTRATIV_ENHET = """
+			select enhet_navn
+			from joark.t_administrativ_enhet
+			where tema = :fagomraade
+			and dato_fom <= :opprettet_tidspunkt
+			and dato_tom >= :opprettet_tidspunkt
+			""";
+
 }

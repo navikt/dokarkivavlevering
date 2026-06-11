@@ -35,6 +35,17 @@ VALUES (7898, '0', 123456);
 insert into joark.t_saksrelasjon(sak_id, feilregistrert, journalpost_id)
 VALUES (7899, '0', 123456);
 
+create table joark.t_administrativ_enhet
+(
+    tema                  VARCHAR2(20) not null,
+    enhet_navn            VARCHAR2(100),
+    dato_fom              DATE,
+    dato_tom              DATE
+);
+
+insert into joark.t_administrativ_enhet(tema, enhet_navn, dato_fom, dato_tom)
+VALUES ('FAR', 'FAR - FRA DATABASE', DATEADD('YEAR', -2000, CURRENT_DATE), DATEADD('YEAR', 10, CURRENT_DATE));
+
 create table joark.t_journalpost
 (
     journalpost_id NUMBER(11, 0) not null,
@@ -60,7 +71,7 @@ insert into joark.t_journalpost(journalpost_id, k_journal_s, journalf_enhet, dat
 VALUES ('456789', 'FS', '5678', '2025-02-13T14:45', '2025-02-13T15:00');
 
 insert into joark.t_journalpost(journalpost_id, k_journal_s, journalf_enhet, dato_opprettet, dato_journal)
-VALUES ('5678910', 'FS', '', '2025-02-13T14:45', '2025-02-13T15:00');
+VALUES ('5678910', 'FS', '9999', '2025-02-13T14:45', '2025-02-13T15:00');
 
 insert into joark.t_journalpost(journalpost_id, k_journal_s, journalf_enhet, dato_opprettet, dato_journal)
 VALUES ('67891011', 'FL', '1111', '2025-01-01T13:30', '2025-01-02T13:30');
@@ -96,7 +107,7 @@ insert into joark.sak(ID)
 VALUES (456);
 
 insert into joark.sak(ID)
-VALUES (568);
+VALUES (567);
 
 insert into joark.sak(ID)
 VALUES (678);

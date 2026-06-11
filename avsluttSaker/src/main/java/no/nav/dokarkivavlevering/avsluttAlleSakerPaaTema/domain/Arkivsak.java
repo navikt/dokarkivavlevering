@@ -18,6 +18,10 @@ public record Arkivsak(
 		return arbeidssaker.get(0).getApplikasjon();
 	}
 
+	public String getTema(){
+		return arbeidssaker.get(0).getTema();
+	}
+
 	@Override
 	public String toString() {
 		if (arbeidssaker.size() < 2) {

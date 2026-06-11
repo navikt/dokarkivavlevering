@@ -9,20 +9,22 @@ CREATE TABLE <ARBEIDSTABELL> (
     aktoerid VARCHAR2(40),
     orgnr VARCHAR2(9),
     k_sak_status VARCHAR2(40),
-    arbeidsstatus VARCHAR2(255)
+    arbeidsstatus VARCHAR2(255),
+    tema varchar(20)
 );
 ```
 
 ### Populering av arbeidstabell
 ```
-INSERT INTO <ARBEIDSTABELL> (id, applikasjon, fagsaknr, aktoerid, orgnr, k_sak_status)
+INSERT INTO <ARBEIDSTABELL> (id, applikasjon, fagsaknr, aktoerid, orgnr, k_sak_status, tema)
 SELECT 
     id,
     applikasjon,
     fagsaknr,
     aktoerid,
     orgnr,
-    k_sak_status
+    k_sak_status,
+    tema
 FROM joark.sak
 WHERE tema = '<TEMA>'
 AND k_sak_status is null or k_sak_status = 'AAPEN';

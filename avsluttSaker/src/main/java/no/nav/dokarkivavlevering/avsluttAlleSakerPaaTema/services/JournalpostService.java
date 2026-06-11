@@ -37,30 +37,44 @@ public class JournalpostService {
 	}
 
 	public Journalpost finnEldsteJournalpostForArkivsak(Arkivsak arkivsak) {
-		Optional<Journalpost> eldsteJournalpostOptional = finnEldsteJournalpost(arkivsak);
-		if (eldsteJournalpostOptional.isEmpty()) {
-			oppdaterArbeidsstatusForArkivsak(arkivsak, FEIL_INGEN_JPER_I_GYLDIG_STATUS_MED_JFR_ENHET);
-			throw new KanIkkeBehandleArkivsakException(format("Fant ingen journalposter i gyldig status med journalforendeEnhet for saksIder=%s. Kan ikke bestemme administrativEnhet.", arkivsak.getArbeidssaksIder()));
+		Optional<Journalpost> eldsteJournalpostOptional = finnEldsteGyldigeJournalpostForArkivsak(arkivsak);
+		if (eldsteJournalpostOptional.isPresent()) {
+			return eldsteJournalpostOptional.get();
 		}
-		return eldsteJournalpostOptional.get();
+
+		oppdaterArbeidsstatusForArkivsak(arkivsak, FEIL_INGEN_JPER_I_GYLDIG_STATUS_MED_JFR_ENHET);
+		throw new KanIkkeBehandleArkivsakException(format("Fant ingen journalposter i gyldig status med journalforendeEnhet for saksIder=%s. Kan ikke bestemme administrativEnhet.", arkivsak.getArbeidssaksIder()));
 	}
 
-	private Optional<Journalpost> finnEldsteJournalpost(Arkivsak arkivsak) {
+	private Optional<Journalpost> finnEldsteGyldigeJournalpostForArkivsak(Arkivsak arkivsak) {
 		List<Journalpost> filtrerteJournalposter = arkivsak.journalposter().stream()
 				.filter(journalpost -> LUKKEDE_JOURNALSTATUSER.contains(journalpost.getJournalstatus()))
 				.filter(journalpost -> !journalpost.isErFeilregistrert())
-				.filter(journalpost -> !isEmpty(inputAdministrativEnhet) || harGyldigJournalfoerendeEnhet(journalpost))
 				.toList();
 
-		if (filtrerteJournalposter.isEmpty()) {
-			return Optional.empty();
-		}
+		return finnEldsteJournalpostIkkeMaskinell(filtrerteJournalposter)
+				.or(() -> finnEldsteJournalpostMaskinell(filtrerteJournalposter));
+	}
+
+	private Optional<Journalpost> finnEldsteJournalpostIkkeMaskinell(List<Journalpost> filtrerteJournalposter) {
 		return filtrerteJournalposter.stream()
+				.filter(journalpost -> !isEmpty(inputAdministrativEnhet) || harJournalfEnhetUlikMaskinell(journalpost))
 				.min(Comparator.comparing(Journalpost::getJournaldato));
 	}
 
-	private boolean harGyldigJournalfoerendeEnhet(Journalpost journalpost){
+	private Optional<Journalpost> finnEldsteJournalpostMaskinell(List<Journalpost> filtrerteJournalposter) {
+		return filtrerteJournalposter.stream()
+				.filter(this::harJournalfEnhetLikMaskinell)
+				.min(Comparator.comparing(Journalpost::getJournaldato));
+	}
+
+	private boolean harJournalfEnhetUlikMaskinell(Journalpost journalpost) {
 		return (!isEmpty(journalpost.getJournalfoerendeEnhet())
-						&& !MASKINELL_JOURNALFOERENDE_ENHET.equals(journalpost.getJournalfoerendeEnhet()));
+				&& !MASKINELL_JOURNALFOERENDE_ENHET.equals(journalpost.getJournalfoerendeEnhet()));
+	}
+
+	private boolean harJournalfEnhetLikMaskinell(Journalpost journalpost) {
+		return (!isEmpty(journalpost.getJournalfoerendeEnhet())
+				&& MASKINELL_JOURNALFOERENDE_ENHET.equals(journalpost.getJournalfoerendeEnhet()));
 	}
 }

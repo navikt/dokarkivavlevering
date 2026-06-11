@@ -46,7 +46,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 	private static final long SAK_MED_LUKKET_JOURNALPOST2 = 234L;
 	private static final long SAK_MED_AAPEN_JOURNALPOST = 345L;
 	private static final long SAK_UTEN_FERDIGSTILT_JOURNALPOST = 456L;
-	private static final long SAK_UTEN_JOURNALFOERENDE_ENHET_JOURNALPOST = 567L;
+	private static final long SAK_MED_MASKINELL_JORNALPOST = 567L;
 	private static final long SAK_UTEN_DVH_ADMINISTRATIV_ENHET = 678L;
 	private static final long SAK_MED_FAGSAKNR1 = 7898L;
 	private static final long SAK_MED_FAGSAKNR2 = 7899L;
@@ -89,6 +89,25 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		List<Sak> saker = namedParameterJdbcTemplate.query("select * from joark.sak where id in (:sakIds);", generateSakParams(List.of(123L, 234L)), new SakRowMapper());
 		assertAvsluttetSak(saker.get(0), "Nav Lindesnes", JOURNALPOST1_OPPRETTETDATO, now());
 		assertAvsluttetSak(saker.get(1), "Nav Buskerud", JOURNALPOST2_OPPRETTETDATO, now());
+	}
+
+	@Test
+	public void skalBrukeFallbackIDatabaseForAdminEnhet() {
+		stubTexas();
+		stubPdl("hentIdenterBolk.json");
+		arbeidssakRepository.save(lagSakForAktoer(SAK_MED_MASKINELL_JORNALPOST, "1234567891234", "FAR"));
+		commitAndBeginNewTransaction();
+
+		avsluttAlleSakerService.avsluttAlleSaker();
+
+		List<Arbeidssak> saker = arbeidssakRepository.findSaksBySakIdIn(List.of(SAK_MED_MASKINELL_JORNALPOST));
+		Arbeidssak arbeidssak1 = saker.get(0);
+
+		assertThat(arbeidssak1.getArbeidsstatus()).isEqualTo(FERDIG_SAK_AVSLUTTET);
+		assertThat(arbeidssak1.getAktoerId()).isEqualTo("1234567891234");
+
+		Sak sak = namedParameterJdbcTemplate.query("select * from joark.sak where id in (:sakIds);", generateSakParams(List.of(SAK_MED_MASKINELL_JORNALPOST)), new SakRowMapper()).getFirst();
+		assertAvsluttetSak(sak, "FAR - FRA DATABASE", JOURNALPOST2_OPPRETTETDATO, now());
 	}
 
 	@Test
@@ -288,22 +307,6 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 	}
 
 	@Test
-	public void skalFeileBehandlingAvArkivsakUtenJournalfoerendeEnhet() {
-		stubTexas();
-		stubPdl("hentIdenterBolk.json");
-		arbeidssakRepository.save(lagSakForAktoer(SAK_UTEN_JOURNALFOERENDE_ENHET_JOURNALPOST, "1234567891234"));
-		commitAndBeginNewTransaction();
-
-		avsluttAlleSakerService.avsluttAlleSaker();
-
-		List<Arbeidssak> saker = arbeidssakRepository.findSaksBySakIdIn(List.of(SAK_UTEN_JOURNALFOERENDE_ENHET_JOURNALPOST));
-		Arbeidssak arbeidssak1 = saker.get(0);
-
-		assertThat(arbeidssak1.getArbeidsstatus()).isEqualTo(FEIL_INGEN_JPER_I_GYLDIG_STATUS_MED_JFR_ENHET);
-		assertThat(arbeidssak1.getAktoerId()).isEqualTo("1234567891234");
-	}
-
-	@Test
 	public void skalAvbryteSakerForTomArkivsak() {
 		stubTexas();
 		stubPdl("hentIdenterBolk.json");
@@ -353,13 +356,14 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		commitAndBeginNewTransaction();
 	}
 
-	private Arbeidssak lagSakForAktoer(Long sakId, String aktoerId, String fagsakNr) {
+	private Arbeidssak lagSakForAktoer(Long sakId, String aktoerId, String fagsakNr, String tema) {
 		return Arbeidssak.builder()
 				.sakId(sakId)
 				.applikasjon("FS22")
 				.fagsaknr(fagsakNr)
 				.aktoerId(aktoerId)
 				.orgnr(null)
+				.tema(tema)
 				.build();
 	}
 
@@ -374,7 +378,11 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 	}
 
 	private Arbeidssak lagSakForAktoer(Long sakId, String aktoerId) {
-		return lagSakForAktoer(sakId, aktoerId, null);
+		return lagSakForAktoer(sakId, aktoerId, null, "BID");
+	}
+
+	private Arbeidssak lagSakForAktoer(Long sakId, String aktoerId, String tema) {
+		return lagSakForAktoer(sakId, aktoerId, null, tema);
 	}
 
 	private Arbeidssak lagSakForOrganisasjon(Long sakId, String orgnr) {
