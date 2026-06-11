@@ -4,6 +4,8 @@ import no.nav.dokarkivavlevering.avlevering.domain.BrukerMedNavnedata;
 import no.nav.dokarkivavlevering.avlevering.domain.NavnMedGyldighet;
 import no.nav.dokarkivavlevering.avlevering.domain.SimpleNavn;
 import no.nav.dokarkivavlevering.core.consumer.pdl.PdlHentPersonBolkResponse;
+import no.nav.dokarkivavlevering.core.consumer.pdl.PdlHentPersonBolkResponse.PdlFolkeregistermetadata;
+import no.nav.dokarkivavlevering.core.consumer.pdl.PdlHentPersonBolkResponse.PdlNavn;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -40,13 +42,17 @@ public class PdlResponseMapper {
 		return personbolk.getPerson().getNavn().stream().map(PdlResponseMapper::toNavnMedGyldighet).toList();
 	}
 
-	private static NavnMedGyldighet toNavnMedGyldighet(PdlHentPersonBolkResponse.PdlNavn pdlNavn) {
-		PdlHentPersonBolkResponse.PdlFolkeregistermetadata folkeregistermetadata = pdlNavn.getPdlFolkeregistermetadata();
+	private static NavnMedGyldighet toNavnMedGyldighet(PdlNavn pdlNavn) {
+		PdlFolkeregistermetadata folkeregistermetadata = pdlNavn.getFolkeregistermetadata();
 		if (folkeregistermetadata == null) {
 			return new SimpleNavn(fulltnavn(pdlNavn));
 		}
-		return new NavnMedGyldighet(parseZonedDateTime(folkeregistermetadata.getGyldighetstidspunkt()),
-				parseZonedDateTime(folkeregistermetadata.getOpphoerstidspunkt()), fulltnavn(pdlNavn));
+
+		return new NavnMedGyldighet(
+				parseZonedDateTime(folkeregistermetadata.getGyldighetstidspunkt()),
+				parseZonedDateTime(folkeregistermetadata.getOpphoerstidspunkt()),
+				fulltnavn(pdlNavn)
+		);
 	}
 
 	private static final ZoneId OSLO = ZoneId.of("Europe/Oslo");
@@ -70,7 +76,7 @@ public class PdlResponseMapper {
 
 	}
 
-	private static String fulltnavn(PdlHentPersonBolkResponse.PdlNavn pdlNavn) {
+	private static String fulltnavn(PdlNavn pdlNavn) {
 		return Stream.of(pdlNavn.getFornavn(), pdlNavn.getMellomnavn(), pdlNavn.getEtternavn())
 				.filter(Objects::nonNull)
 				.collect(Collectors.joining(" "));

@@ -13,7 +13,7 @@ public interface ArbeidssakRepository extends JpaRepository<Arbeidssak, Long> {
 	@Query("""
 			select arbeidssak.sakId from Arbeidssak arbeidssak
 			where arbeidssak.arbeidsstatus is null
-			and (arbeidssak.status is null or arbeidssak.status = "AAPEN")
+			and (arbeidssak.status is null or arbeidssak.status = 'AAPEN')
 			and arbeidssak.aktoerId is not null
 			order by arbeidssak.sakId asc
 			""")
