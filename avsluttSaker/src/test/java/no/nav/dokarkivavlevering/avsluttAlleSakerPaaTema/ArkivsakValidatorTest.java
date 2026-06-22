@@ -38,7 +38,7 @@ class ArkivsakValidatorTest {
 	}
 
 	@ParameterizedTest
-	@ValueSource(strings = {"M", "MO", "OD", "R", "D"})
+	@ValueSource(strings = {"M", "MO", "OD", "D"})
 	void skalFinneArkivsakMedAapenJournalpost(String journalstatus) {
 		List<Journalpost> journalposter = List.of(
 				lagJournalpost(journalstatus, false)
@@ -50,7 +50,7 @@ class ArkivsakValidatorTest {
 	}
 
 	@ParameterizedTest
-	@ValueSource(strings = {"FL", "E", "J", "FS"})
+	@ValueSource(strings = {"FL", "E", "J", "FS", "R"})
 	void skalFinneFerdigstilteJournalposter(String journalstatus) {
 		List<Journalpost> journalposter = List.of(
 				lagJournalpost(journalstatus, false)
@@ -76,7 +76,6 @@ class ArkivsakValidatorTest {
 				lagJournalpost("M", false),
 				lagJournalpost("MO", false),
 				lagJournalpost("OD", false),
-				lagJournalpost("R", false),
 				lagJournalpost("D", false)
 		);
 
