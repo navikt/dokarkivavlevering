@@ -7,8 +7,8 @@ import java.util.Set;
 
 public class ArkivsakValidator {
 
-	private static final Set<String> AAPNE_JOURNALSTATUSER = Set.of("M", "MO", "OD", "R", "D");
-	public static final Set<String> LUKKEDE_JOURNALSTATUSER = Set.of("FL", "FS", "E", "J");
+	private static final Set<String> AAPNE_JOURNALSTATUSER = Set.of("M", "MO", "OD", "D");
+	public static final Set<String> LUKKEDE_JOURNALSTATUSER = Set.of("FL", "FS", "E", "J", "R");
 
 	// hvis det finnes noen journalposter knyttet til arkivsak med status M, MO, OD, R eller D og som ikke er feilregistrert så skriv feilmelding til logg (kan ikke avslutte arkivsak med åpne journalposter) og gå til neste arkivsak
 	public static boolean harArkivsakEnAapenJournalpost(List<Journalpost> journalposter) {
