@@ -27,7 +27,7 @@ public interface ArbeidssakRepository extends JpaRepository<Arbeidssak, Long> {
 	@Query("""
 			select distinct(arbeidssak.aktoerId) from Arbeidssak arbeidssak
 			where arbeidssak.aktoerId is not null
-			and arbeidssak.arbeidsstatus = 'HENTET_FRA_PDL'
+			and arbeidssak.arbeidsstatus = 'HENTET_FRA_PDL' or arbeidssak.arbeidsstatus = 'FEIL_AAPEN_JOURNALPOST'
 			order by arbeidssak.aktoerId asc
 			""")
 	List<String> hentOppdaterteAktoerIder();
@@ -35,7 +35,7 @@ public interface ArbeidssakRepository extends JpaRepository<Arbeidssak, Long> {
 	@Query("""
 			select distinct(arbeidssak.orgnr) from Arbeidssak arbeidssak
 			where arbeidssak.orgnr is not null
-			and arbeidssak.arbeidsstatus is null
+			and arbeidssak.arbeidsstatus is null  or arbeidssak.arbeidsstatus = 'FEIL_AAPEN_JOURNALPOST'
 			order by arbeidssak.orgnr asc
 			""")
 	List<String> hentOrgnrs();

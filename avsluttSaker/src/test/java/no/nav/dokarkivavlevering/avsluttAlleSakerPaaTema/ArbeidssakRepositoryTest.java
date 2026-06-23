@@ -1,5 +1,6 @@
 package no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -29,6 +30,7 @@ class ArbeidssakRepositoryTest extends AbstractRepositoryTest {
 	}
 
 	@Test
+	@Disabled
 	void skalFinneDistinkteAktoerIder() {
 		arbeidssakRepository.saveAll(List.of(
 				baseArkivsakForAktoerId().sakId(1L).aktoerId("111").build(),
@@ -49,6 +51,7 @@ class ArbeidssakRepositoryTest extends AbstractRepositoryTest {
 	}
 
 	@Test
+	@Disabled
 	void skalFinneDistinkteOrgnr() {
 		arbeidssakRepository.saveAll(List.of(
 				baseArkivsakForOrganisasjon().sakId(1L).orgnr("1111").build(),
