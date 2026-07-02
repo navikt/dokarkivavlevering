@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Journalpost {
-
+	private static final String JOURNALPOSTSTATUS_RESERVERT = "R";
 	private LocalDateTime opprettetdato;
 
 	private LocalDate journaldato;
@@ -29,6 +29,6 @@ public class Journalpost {
 	 * @return opprettetdato hvis journalstatus er "R", ellers journaldato
 	 */
 	public LocalDate getJournalDatoOrOpprettetDato() {
-		return "R".equals(journalstatus) ? getOpprettetdato().toLocalDate() : getJournaldato();
+		return JOURNALPOSTSTATUS_RESERVERT.equals(journalstatus) ? getOpprettetdato().toLocalDate() : getJournaldato();
 	}
 }
