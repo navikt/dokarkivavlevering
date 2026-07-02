@@ -18,6 +18,9 @@ insert into joark.t_saksrelasjon(sak_id, feilregistrert, journalpost_id)
 VALUES (234, '0', 234567);
 
 insert into joark.t_saksrelasjon(sak_id, feilregistrert, journalpost_id)
+VALUES (3456, '0', 3456789);
+
+insert into joark.t_saksrelasjon(sak_id, feilregistrert, journalpost_id)
 VALUES (345, '0', 345678);
 
 insert into joark.t_saksrelasjon(sak_id, feilregistrert, journalpost_id)
@@ -64,11 +67,14 @@ VALUES ('123457', 'E', '1234', '2025-01-01T13:30', '2025-01-02T13:30');
 insert into joark.t_journalpost(journalpost_id, k_journal_s, journalf_enhet, dato_opprettet, dato_journal)
 VALUES ('234567', 'FS', '5678', '2025-02-13T14:45', '2025-02-13T15:00');
 
-insert into joark.t_journalpost(journalpost_id, k_journal_s, journalf_enhet, dato_opprettet, dato_journal)
-VALUES ('345678', 'M', '5678', '2025-02-13T14:45', '2025-02-13T15:00');
+insert into joark.t_journalpost(journalpost_id, k_journal_s, journalf_enhet, dato_opprettet)
+VALUES ('345678', 'M', '5678', '2025-02-13T14:45');
+
+insert into joark.t_journalpost(journalpost_id, k_journal_s, journalf_enhet, dato_opprettet)
+VALUES ('3456789', 'R', '5678', '2025-02-13T17:30');
 
 insert into joark.t_journalpost(journalpost_id, k_journal_s, journalf_enhet, dato_opprettet, dato_journal)
-VALUES ('456789', 'FS', '5678', '2025-02-13T14:45', '2025-02-13T15:00');
+VALUES ('456789', 'FS', '5678', '2025-02-13T1:45', '2025-02-13T15:00');
 
 insert into joark.t_journalpost(journalpost_id, k_journal_s, journalf_enhet, dato_opprettet, dato_journal)
 VALUES ('5678910', 'FS', '9999', '2025-02-13T14:45', '2025-02-13T15:00');
@@ -102,6 +108,9 @@ VALUES (234);
 
 insert into joark.sak(ID)
 VALUES (345);
+
+insert into joark.sak(ID)
+VALUES (3456);
 
 insert into joark.sak(ID)
 VALUES (456);

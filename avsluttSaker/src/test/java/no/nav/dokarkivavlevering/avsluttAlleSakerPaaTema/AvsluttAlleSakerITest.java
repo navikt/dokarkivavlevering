@@ -14,6 +14,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static java.time.LocalDateTime.now;
 import static no.nav.dokarkivavlevering.avsluttAlleSakerPaaTema.repository.Arbeidsstatus.FEIL_AAPEN_JOURNALPOST;
@@ -44,6 +47,7 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 
 	private static final long SAK_MED_LUKKET_JOURNALPOST1 = 123L;
 	private static final long SAK_MED_LUKKET_JOURNALPOST2 = 234L;
+	private static final long SAK_MED_LUKKET_JOURNALPOST_R = 3456L;
 	private static final long SAK_MED_AAPEN_JOURNALPOST = 345L;
 	private static final long SAK_UTEN_FERDIGSTILT_JOURNALPOST = 456L;
 	private static final long SAK_MED_MASKINELL_JORNALPOST = 567L;
@@ -72,23 +76,30 @@ public class AvsluttAlleSakerITest extends AbstractITest {
 		stubTexas();
 		stubPdl("hentIdenterBolk.json");
 		arbeidssakRepository.save(lagSakForAktoer(SAK_MED_LUKKET_JOURNALPOST1, FNR));
+		arbeidssakRepository.save(lagSakForAktoer(SAK_MED_LUKKET_JOURNALPOST_R, FNR));
 		arbeidssakRepository.save(lagSakForOrganisasjon(SAK_MED_LUKKET_JOURNALPOST2, ORGNR));
 		commitAndBeginNewTransaction();
 
 		avsluttAlleSakerService.avsluttAlleSaker();
 
-		List<Arbeidssak> arbeidssaker = arbeidssakRepository.findSaksBySakIdIn(List.of(SAK_MED_LUKKET_JOURNALPOST1, SAK_MED_LUKKET_JOURNALPOST2));
+		List<Arbeidssak> arbeidssaker = arbeidssakRepository.findSaksBySakIdIn(List.of(SAK_MED_LUKKET_JOURNALPOST1, SAK_MED_LUKKET_JOURNALPOST2, SAK_MED_LUKKET_JOURNALPOST_R));
 		Arbeidssak arbeidssak1 = arbeidssaker.get(0);
 		Arbeidssak arbeidssak2 = arbeidssaker.get(1);
+		Arbeidssak arbeidssak3 = arbeidssaker.get(2);
 
 		assertThat(arbeidssak1.getArbeidsstatus()).isEqualTo(FERDIG_SAK_AVSLUTTET);
 		assertThat(arbeidssak1.getAktoerId()).isEqualTo(FNR);
+		assertThat(arbeidssak3.getArbeidsstatus()).isEqualTo(FERDIG_SAK_AVSLUTTET);
+		assertThat(arbeidssak3.getAktoerId()).isEqualTo(FNR);
 		assertThat(arbeidssak2.getArbeidsstatus()).isEqualTo(FERDIG_SAK_AVSLUTTET);
 		assertThat(arbeidssak2.getOrgnr()).isEqualTo(ORGNR);
 
-		List<Sak> saker = namedParameterJdbcTemplate.query("select * from joark.sak where id in (:sakIds);", generateSakParams(List.of(123L, 234L)), new SakRowMapper());
-		assertAvsluttetSak(saker.get(0), "Nav Lindesnes", JOURNALPOST1_OPPRETTETDATO, now());
-		assertAvsluttetSak(saker.get(1), "Nav Buskerud", JOURNALPOST2_OPPRETTETDATO, now());
+		List<Sak> saker = namedParameterJdbcTemplate.query("select * from joark.sak where id in (:sakIds);", generateSakParams(List.of(123L, 234L, 3456L)), new SakRowMapper());
+		Map<Long, Sak> sakerPerId = saker.stream()
+				.collect(Collectors.toMap(Sak::id, Function.identity()));
+		assertAvsluttetSak(sakerPerId.get(SAK_MED_LUKKET_JOURNALPOST1), "Nav Lindesnes", JOURNALPOST1_OPPRETTETDATO, now());
+		assertAvsluttetSak(sakerPerId.get(SAK_MED_LUKKET_JOURNALPOST_R), "Nav Lindesnes", JOURNALPOST1_OPPRETTETDATO, now());
+		assertAvsluttetSak(sakerPerId.get(SAK_MED_LUKKET_JOURNALPOST2), "Nav Buskerud", JOURNALPOST2_OPPRETTETDATO, now());
 	}
 
 	@Test

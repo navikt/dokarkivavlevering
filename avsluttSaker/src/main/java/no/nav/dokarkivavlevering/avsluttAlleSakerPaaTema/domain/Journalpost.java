@@ -24,4 +24,11 @@ public class Journalpost {
 
 	private boolean erFeilregistrert;
 
+	//Journalposter i status R har ikke journaldato, returnerer derfor opprettetDato for disse og journaldato for resten
+	/**
+	 * @return opprettetdato hvis journalstatus er "R", ellers journaldato
+	 */
+	public LocalDate getJournalDatoOrOpprettetDato() {
+		return "R".equals(journalstatus) ? getOpprettetdato().toLocalDate() : getJournaldato();
+	}
 }
