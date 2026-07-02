@@ -59,13 +59,13 @@ public class JournalpostService {
 	private Optional<Journalpost> finnEldsteJournalpostIkkeMaskinell(List<Journalpost> filtrerteJournalposter) {
 		return filtrerteJournalposter.stream()
 				.filter(journalpost -> !isEmpty(inputAdministrativEnhet) || harJournalfEnhetUlikMaskinell(journalpost))
-				.min(Comparator.comparing(Journalpost::getJournaldato));
+				.min(Comparator.comparing(Journalpost::getJournalDatoOrOpprettetDato));
 	}
 
 	private Optional<Journalpost> finnEldsteJournalpostMaskinell(List<Journalpost> filtrerteJournalposter) {
 		return filtrerteJournalposter.stream()
 				.filter(this::harJournalfEnhetLikMaskinell)
-				.min(Comparator.comparing(Journalpost::getJournaldato));
+				.min(Comparator.comparing(Journalpost::getJournalDatoOrOpprettetDato));
 	}
 
 	private boolean harJournalfEnhetUlikMaskinell(Journalpost journalpost) {
