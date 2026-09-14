@@ -122,7 +122,7 @@ public class SaksmappeMapper {
 	private String mapJournalstatus(String journalpostStatus) {
 		return switch (journalpostStatus) {
 			case "J" -> "Journalført";
-			case "FS" -> "Ferdig og klar for sentral utskrift";
+			case "FS" -> "Ferdig og klar for sentral distribusjon";
 			case "FL" -> "Ferdig og klar for lokal utskrift";
 			case "E" -> "Ekspedert";
 			default -> "Journalposten har ingen gyldig status";

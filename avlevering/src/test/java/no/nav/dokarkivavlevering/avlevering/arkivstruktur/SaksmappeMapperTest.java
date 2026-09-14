@@ -184,7 +184,7 @@ class SaksmappeMapperTest {
 	public static Stream<Arguments> shouldMapJorunalstatusWithDecode() {
 		return Stream.of(
 				Arguments.of("J", "Journalført"),
-				Arguments.of("FS", "Ferdig og klar for sentral utskrift"),
+				Arguments.of("FS", "Ferdig og klar for sentral distribusjon"),
 				Arguments.of("FL", "Ferdig og klar for lokal utskrift"),
 				Arguments.of("E", "Ekspedert")
 		);
@@ -263,7 +263,7 @@ class SaksmappeMapperTest {
 		assertEquals("453637481", registrering.getJournalsekvensnummer().toString());
 		assertEquals("453637481", registrering.getJournalpostnummer().toString());
 		assertEquals("Utgående dokument", registrering.getJournalposttype());
-		assertEquals("Ferdig og klar for sentral utskrift", registrering.getJournalstatus());
+		assertEquals("Ferdig og klar for sentral distribusjon", registrering.getJournalstatus());
 		assertEquals(registrering.getJournaldato(), toLocalDateTime("2020-11-10 16:04:43").toLocalDate());
 		assertEquals(registrering.getDokumentetsDato(), toLocalDateTime("2020-11-10 16:05:43").toLocalDate());
 		assertThat(registrering.getSystemID().getValue()).isNotEmpty();
