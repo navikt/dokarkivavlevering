@@ -3,13 +3,11 @@ package no.nav.dokarkivavlevering.avlevering;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avlevering.arkivstruktur.AvleveringArkivstrukturRoute;
 import no.nav.dokarkivavlevering.avlevering.arkivuttrekk.AvleveringArkivuttrekkRoute;
-import no.nav.dokarkivavlevering.avlevering.config.Tema;
 import no.nav.dokarkivavlevering.avlevering.domain.StartSluttDato;
 import no.nav.dokarkivavlevering.avlevering.endringlogg.AvleveringEndringsloggRoute;
 import no.nav.dokarkivavlevering.avlevering.loependejournal.AvleveringLoependeJournalRoute;
 import no.nav.dokarkivavlevering.avlevering.offentligjournal.AvleveringOffentligJournalRoute;
 import no.nav.dokarkivavlevering.avlevering.repository.AvleveringRepository;
-import no.nav.dokarkivavlevering.core.DokarkivavleveringProperties;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.Processor;
@@ -75,8 +73,8 @@ public class AvleveringRoute extends RouteBuilder {
 				.log(LoggingLevel.INFO, log, "Konfigurasjon=" + avleveringProperties)
 				.process(exchange -> {
 					final StartSluttDato startSluttDato = avleveringRepository.findStartOgSluttdato(avleveringProperties.getTema());
-					exchange.setProperty(PROPERTY_STARTDATO, startSluttDato.getStartdato());
-					exchange.setProperty(PROPERTY_SLUTTDATO, startSluttDato.getSluttdato());
+					exchange.setProperty(PROPERTY_STARTDATO, startSluttDato.startdato());
+					exchange.setProperty(PROPERTY_SLUTTDATO, startSluttDato.sluttdato());
 				})
 				.setBody(constant(avleveringProperties.getTema()))
 				.split(body())

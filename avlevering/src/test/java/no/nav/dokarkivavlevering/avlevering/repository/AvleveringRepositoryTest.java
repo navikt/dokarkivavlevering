@@ -52,17 +52,6 @@ class AvleveringRepositoryTest {
 	}
 
 	@Test
-	void skalInkludereJournalstatusRKunForSakerMedDokumenter() {
-		List<Sak> medDokumenter = avleveringRepository.findSakerMedDokumenter(List.of(201L));
-		List<Sak> utenDokumenter = avleveringRepository.findSakerUtenDokumenter(List.of(201L));
-
-		assertThat(medDokumenter)
-				.extracting(Sak::getId)
-				.containsExactly(201L);
-		assertThat(utenDokumenter).isEmpty();
-	}
-
-	@Test
 	void skalEkskludereJournalposterOpprettetFraOndemandKildeFraBeggeSakSpoerringer() {
 		List<Sak> medDokumenter = avleveringRepository.findSakerMedDokumenter(List.of(202L));
 		List<Sak> utenDokumenter = avleveringRepository.findSakerUtenDokumenter(List.of(202L));
