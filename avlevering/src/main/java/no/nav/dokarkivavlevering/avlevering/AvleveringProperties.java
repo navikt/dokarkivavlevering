@@ -1,16 +1,12 @@
 package no.nav.dokarkivavlevering.avlevering;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.ToString;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Profile;
 import org.springframework.validation.annotation.Validated;
-
-import java.time.LocalDate;
 
 @Data
 @Validated
@@ -25,18 +21,5 @@ public class AvleveringProperties {
 
 	@NotEmpty
 	String tema;
-
-	@Valid
-	@NotNull
-	private final Periode periode = new Periode();
-
-	@Data
-	public static class Periode {
-		@NotNull
-		private LocalDate startdato;
-
-		@NotNull
-		private LocalDate sluttdato;
-	}
 
 }
