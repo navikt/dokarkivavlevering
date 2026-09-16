@@ -2,12 +2,6 @@ name: Produser avleveringspakke [prod-fss]
 on:
   workflow_dispatch:
     inputs:
-      periodeStart:
-        description: 'Periode start (f.o.m) for avlevering. YYYY-MM-DD'
-        required: true
-      periodeSlutt:
-        description: 'Periode slutt (t.o.m) for avlevering. YYYY-MM-DD'
-        required: true
       tema:
         description: 'Tema for avlevering'
         required: true
@@ -39,7 +33,7 @@ jobs:
           PRINT_PAYLOAD: true
           CLUSTER: prod-fss
           RESOURCE: nais/naiserator.yaml
-          VAR: image=${{needs.build.outputs.image}},profile=genererAvlevering,periodestart=${{github.event.inputs.periodeStart}},periodeslutt=${{github.event.inputs.periodeSlutt}},tema=${{github.event.inputs.tema}}
+          VAR: image=${{needs.build.outputs.image}},profile=genererAvlevering,tema=${{github.event.inputs.tema}}
           VARS: nais/prod-config.json
           WAIT: true
           TIMEOUT: 3h
