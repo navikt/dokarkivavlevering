@@ -25,9 +25,10 @@ public class SqlQueries {
 			            sak sa
 			        WHERE
 			            sa.tema = :tema
+			            AND sa.k_kassasjon_status in( 'BEVARINGSTID_PASSERT', 'BEVARINGSTID_PASSERT_DOK_KASSASJON_BESTILT', 'BEVARINGSTID_PASSERT_DOK_KASSERT')
 			)
-			    AND j.k_journal_s IN ( 'J', 'FS', 'FL', 'E' )
-			    AND j.dato_opprettet BETWEEN :startdato and :sluttdato
+			    AND j.k_journal_s IN ('J', 'FS', 'FL', 'E', 'R')
+			    AND j.opprettet_kilde_navn not in('ondemandtojoark', 'srvondemandtojoark', 'teamdokumenthandtering:arenaondemandtojo', 'teamdokumenthandtering:ondemandtojoark')
 			""";
 
 	static final String FINN_SAKER_SQL = """
@@ -109,8 +110,8 @@ public class SqlQueries {
 					         left join t_k_offentlig_journal_avsender_mottaker ojam on lower(trim(j.avsend_mottaker)) = lower(trim(ojam.k_offentlig_journal_avsender_mottaker))
 					         left outer join t_administrativ_enhet ae on (ae.tema = sa.tema and ae.dato_fom <= sa.opprettet_tidspunkt and ae.dato_tom >= sa.opprettet_tidspunkt)
 					where s.sak_id in (:sakIds)
-					  and j.k_journal_s in ('J', 'FS', 'FL', 'E')
-					  and (j.dato_opprettet between :startdato and :sluttdato)
+					  and j.k_journal_s in ('J', 'FS', 'FL', 'E', 'R')
+			    	  and j.opprettet_kilde_navn not in('ondemandtojoark', 'srvondemandtojoark', 'teamdokumenthandtering:arenaondemandtojo', 'teamdokumenthandtering:ondemandtojoark')
 					  and (d.k_dokument_s is null or d.k_dokument_s = 'FERDIGSTILT')
 					  and f.k_variant_format = 'ARKIV'
 					order by sa.id desc, j.journalpost_id, r.k_tilkn_jp_som, r.dokument_info_id, f.fil_detaljer_id, aeej.arkiv_element_endring_id,
@@ -191,11 +192,30 @@ public class SqlQueries {
 					         left join t_arkiv_element_endring aeed on ald.aksjonslogg_id = aeed.aksjonslogg_id
 					         left join t_k_offentlig_journal_avsender_mottaker ojam on lower(trim(j.avsend_mottaker)) = lower(trim(ojam.k_offentlig_journal_avsender_mottaker))
 					where s.sak_id in (:sakIds)
-					  and j.k_journal_s in ('J', 'FS', 'FL', 'E')
-					  and (j.dato_opprettet between :startdato and :sluttdato)
+					  and j.k_journal_s in ('J', 'FS', 'FL', 'E', 'R')
+			    	  and j.opprettet_kilde_navn not in('ondemandtojoark', 'srvondemandtojoark', 'teamdokumenthandtering:arenaondemandtojo', 'teamdokumenthandtering:ondemandtojoark')
 					  and (d.k_dokument_s is null or d.k_dokument_s = 'FERDIGSTILT')
 					  and f.k_variant_format = 'ARKIV'
 					order by sa.id desc, j.journalpost_id, r.k_tilkn_jp_som, r.dokument_info_id, f.fil_detaljer_id, aeej.arkiv_element_endring_id,
 					         alj.tidspunkt, aeed.arkiv_element_endring_id, aeed.tidspunkt
 					         """;
-}
+
+	static final String FINN_START_SLUTT_DATO_SQL = """
+			SELECT /*+ PARALLEL */ MIN(j.dato_journal) AS startdato, MAX(j.dato_journal) AS sluttdato
+			from t_saksrelasjon s
+			join t_journalpost j on s.journalpost_id = j.journalpost_id
+			where s.k_fagsystem = 'FS22' and ( s.feilregistrert IS NULL OR s.feilregistrert = '0' )
+			and s.sak_id in(
+			        SELECT
+			            sa.id
+			        FROM
+			            sak sa
+			        WHERE
+			            sa.tema = :tema
+			            AND sa.k_kassasjon_status in( 'BEVARINGSTID_PASSERT', 'BEVARINGSTID_PASSERT_DOK_KASSASJON_BESTILT', 'BEVARINGSTID_PASSERT_DOK_KASSERT')
+			)
+			    AND j.k_journal_s IN ('J', 'FS', 'FL', 'E', 'R')
+			    AND j.opprettet_kilde_navn not in('ondemandtojoark', 'srvondemandtojoark', 'teamdokumenthandtering:arenaondemandtojo', 'teamdokumenthandtering:ondemandtojoark')
+			""";
+
+	}
