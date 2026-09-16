@@ -26,7 +26,7 @@
 	<properties>
 		<java.version>25</java.version>
 
-		<camel.version>4.20.0</camel.version>
+		<camel.version>4.22.0</camel.version>
 		<logstash-logback-encoder.version>9.0</logstash-logback-encoder.version>
 		<simpleflatmapper.version>8.2.3</simpleflatmapper.version>
 		<commons-io.version>2.22.0</commons-io.version>
