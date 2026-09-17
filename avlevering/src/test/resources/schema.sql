@@ -161,13 +161,6 @@ insert into t_saksrelasjon(sak_id, journalpost_id, k_fagsystem, feilregistrert) 
 insert into t_journalpost(journalpost_id, k_journal_s, dato_opprettet, opprettet_kilde_navn)
 values (1003, 'FS', '2020-10-02T10:00:00', 'ondemandtojoark');
 
--- sak 104: skal treffes selv om dato_opprettet ligger langt utenfor avlevering.periode -
--- datofilteret er fjernet fra FINN_SAKID_SQL, så gammel kode ville forkastet denne
-insert into sak(id, tema, k_kassasjon_status) values (104, 'MED', 'BEVARINGSTID_PASSERT');
-insert into t_saksrelasjon(sak_id, journalpost_id, k_fagsystem, feilregistrert) values (104, 1004, 'FS22', '0');
-insert into t_journalpost(journalpost_id, k_journal_s, dato_opprettet, opprettet_kilde_navn)
-values (1004, 'FS', '2010-01-01T10:00:00', 'srvdokgenerering');
-
 -- sak 111-113: skal IKKE treffes - dekker de resterende ekskluderte kildene
 insert into sak(id, tema, k_kassasjon_status) values (111, 'MED', 'BEVARINGSTID_PASSERT');
 insert into t_saksrelasjon(sak_id, journalpost_id, k_fagsystem, feilregistrert) values (111, 1011, 'FS22', '0');
@@ -184,6 +177,12 @@ insert into t_saksrelasjon(sak_id, journalpost_id, k_fagsystem, feilregistrert) 
 insert into t_journalpost(journalpost_id, k_journal_s, dato_opprettet, opprettet_kilde_navn)
 values (1013, 'FS', '2020-10-02T10:00:00', 'teamdokumenthandtering:ondemandtojoark');
 
+-- sak 105: skal IKKE treffes - journalstatus er ikke blant de tillatte (J, FS, FL, E, R)
+insert into sak(id, tema, k_kassasjon_status) values (105, 'MED', 'BEVARINGSTID_PASSERT');
+insert into t_saksrelasjon(sak_id, journalpost_id, k_fagsystem, feilregistrert) values (105, 1005, 'FS22', '0');
+insert into t_journalpost(journalpost_id, k_journal_s, dato_opprettet, opprettet_kilde_navn)
+values (1005, 'X', '2020-10-02T10:00:00', 'srvdokgenerering');
+
 -- sak 121-122: skal treffes - dekker de resterende gyldige kassasjonsstatusene
 insert into sak(id, tema, k_kassasjon_status) values (121, 'MED', 'BEVARINGSTID_PASSERT_DOK_KASSASJON_BESTILT');
 insert into t_saksrelasjon(sak_id, journalpost_id, k_fagsystem, feilregistrert) values (121, 1021, 'FS22', '0');
@@ -196,24 +195,27 @@ insert into t_journalpost(journalpost_id, k_journal_s, dato_opprettet, opprettet
 values (1022, 'FS', '2020-10-02T10:00:00', 'srvdokgenerering');
 
 -- ===================================================================================
+-- Data for FINN_START_SLUTT_DATO_SQL (AvleveringRepository.findStartOgSluttdato)
+-- ===================================================================================
+
+-- sak 131: to journalposter som teller med - dato_journal 2019-06-15 er tidligst (startdato),
+-- dato_journal 2021-03-10 er senest (sluttdato). Ingen andre journalposter i datasettet har
+-- dato_journal satt, så disse to alene definerer forventet start-/sluttdato for tema MED.
+insert into sak(id, tema, k_kassasjon_status) values (131, 'MED', 'BEVARINGSTID_PASSERT');
+insert into t_saksrelasjon(sak_id, journalpost_id, k_fagsystem, feilregistrert) values (131, 1031, 'FS22', '0');
+insert into t_journalpost(journalpost_id, k_journal_s, dato_journal, dato_opprettet, opprettet_kilde_navn)
+values (1031, 'FS', '2019-06-15T08:00:00', '2020-10-02T10:00:00', 'srvdokgenerering');
+
+insert into t_saksrelasjon(sak_id, journalpost_id, k_fagsystem, feilregistrert) values (131, 1032, 'FS22', '0');
+insert into t_journalpost(journalpost_id, k_journal_s, dato_journal, dato_opprettet, opprettet_kilde_navn)
+values (1032, 'FS', '2021-03-10T14:00:00', '2020-10-02T10:00:00', 'srvdokgenerering');
+
+-- ===================================================================================
 -- Data for FINN_SAKER_SQL / FINN_SAKER_UTEN_DOKUMENTER_SQL
 -- (AvleveringRepository.findSakerMedDokumenter / findSakerUtenDokumenter)
 -- ===================================================================================
 
--- sak 201: journalstatus 'R' - skal kun være med i "med dokumenter"-spørringen
-insert into sak(id, tema, opprettet_tidspunkt, opprettet_av, aktoerid) values (201, 'MED', '2020-10-02T10:00:00', 'testbruker', '11111111111');
-insert into t_saksrelasjon(sak_id, journalpost_id) values (201, 2001);
-insert into t_journalpost(journalpost_id, k_journal_s, dato_opprettet, opprettet_kilde_navn)
-values (2001, 'R', '2020-10-02T10:00:00', 'srvdokgenerering');
-insert into t_jp_dok_info_rel(journalpost_id, dokument_info_id, k_tilkn_jp_som, dato_opprettet, opprettet_av)
-values (2001, 3001, 'HOVEDDOKUMENT', '2020-10-02T10:00:00', 'testbruker');
-insert into t_dokument_info(dokument_info_id, opprettet_av, k_kategori_t, k_dokument_s, tittel, dato_opprettet)
-values (3001, 'testbruker', 'N', 'FERDIGSTILT', 'Tittel 201', '2020-10-02T10:00:00');
-insert into t_fil_detaljer(fil_detaljer_id, dokument_info_id, fil_uuid, dato_opprettet, opprettet_av, k_variant_format)
-values (4001, 3001, 'uuid-201', '2020-10-02T10:00:00', 'testbruker', 'ARKIV');
-insert into t_dokument_fil(fil_uuid, fil) values ('uuid-201', null);
-
--- sak 202: opprettet fra en ondemand-kilde - skal ekskluderes fra begge spørringene
+-- sak 202: opprettet fra en ondemand-kilde - skal ikke dukke opp
 insert into sak(id, tema, opprettet_tidspunkt, opprettet_av, aktoerid) values (202, 'MED', '2020-10-02T10:00:00', 'testbruker', '22222222222');
 insert into t_saksrelasjon(sak_id, journalpost_id) values (202, 2002);
 insert into t_journalpost(journalpost_id, k_journal_s, dato_opprettet, opprettet_kilde_navn)
@@ -239,23 +241,9 @@ insert into t_fil_detaljer(fil_detaljer_id, dokument_info_id, fil_uuid, dato_opp
 values (4003, 3003, 'uuid-203', '2020-10-02T10:00:00', 'testbruker', 'ARKIV');
 insert into t_dokument_fil(fil_uuid, fil) values ('uuid-203', null);
 
--- sak 204: dato_opprettet langt utenfor avlevering.periode - datofilteret er fjernet
--- fra både FINN_SAKER_SQL og FINN_SAKER_UTEN_DOKUMENTER_SQL, så saken skal være med
--- i begge spørringene selv om den ligger utenfor perioden
-insert into sak(id, tema, opprettet_tidspunkt, opprettet_av, aktoerid) values (204, 'MED', '2010-01-01T10:00:00', 'testbruker', '44444444444');
-insert into t_saksrelasjon(sak_id, journalpost_id) values (204, 2004);
-insert into t_journalpost(journalpost_id, k_journal_s, dato_opprettet, opprettet_kilde_navn)
-values (2004, 'FS', '2010-01-01T10:00:00', 'srvdokgenerering');
-insert into t_jp_dok_info_rel(journalpost_id, dokument_info_id, k_tilkn_jp_som, dato_opprettet, opprettet_av)
-values (2004, 3004, 'HOVEDDOKUMENT', '2010-01-01T10:00:00', 'testbruker');
-insert into t_dokument_info(dokument_info_id, opprettet_av, k_kategori_t, k_dokument_s, tittel, dato_opprettet)
-values (3004, 'testbruker', 'N', 'FERDIGSTILT', 'Tittel 204', '2010-01-01T10:00:00');
-insert into t_fil_detaljer(fil_detaljer_id, dokument_info_id, fil_uuid, dato_opprettet, opprettet_av, k_variant_format)
-values (4004, 3004, 'uuid-204', '2010-01-01T10:00:00', 'testbruker', 'ARKIV');
-insert into t_dokument_fil(fil_uuid, fil) values ('uuid-204', null);
-
--- sak 205: har to journalposter - en fra en tillatt kilde og en fra en ekskludert
--- ondemand-kilde. Kun journalposten med tillatt kilde skal hentes ut for saken.
+-- sak 205: har tre journalposter - en som oppfyller alle filtre, en fra en ekskludert
+-- ondemand-kilde, og en der dokumentet ikke er FERDIGSTILT. Kun journalposten som
+-- oppfyller alle filtrene (2005) skal hentes ut for saken.
 insert into sak(id, tema, opprettet_tidspunkt, opprettet_av, aktoerid) values (205, 'MED', '2020-10-02T10:00:00', 'testbruker', '55555555555');
 
 insert into t_saksrelasjon(sak_id, journalpost_id) values (205, 2005);
@@ -279,3 +267,14 @@ values (3006, 'testbruker', 'N', 'FERDIGSTILT', 'Tittel 205 - dårlig kilde', '2
 insert into t_fil_detaljer(fil_detaljer_id, dokument_info_id, fil_uuid, dato_opprettet, opprettet_av, k_variant_format)
 values (4006, 3006, 'uuid-206', '2020-10-02T10:00:00', 'testbruker', 'ARKIV');
 insert into t_dokument_fil(fil_uuid, fil) values ('uuid-206', null);
+
+insert into t_saksrelasjon(sak_id, journalpost_id) values (205, 2007);
+insert into t_journalpost(journalpost_id, k_journal_s, dato_opprettet, opprettet_kilde_navn)
+values (2007, 'FS', '2020-10-02T10:00:00', 'srvdokgenerering');
+insert into t_jp_dok_info_rel(journalpost_id, dokument_info_id, k_tilkn_jp_som, dato_opprettet, opprettet_av)
+values (2007, 3007, 'HOVEDDOKUMENT', '2020-10-02T10:00:00', 'testbruker');
+insert into t_dokument_info(dokument_info_id, opprettet_av, k_kategori_t, k_dokument_s, tittel, dato_opprettet)
+values (3007, 'testbruker', 'N', 'UNDER_ARBEID', 'Tittel 205 - dokument ikke ferdigstilt', '2020-10-02T10:00:00');
+insert into t_fil_detaljer(fil_detaljer_id, dokument_info_id, fil_uuid, dato_opprettet, opprettet_av, k_variant_format)
+values (4007, 3007, 'uuid-207', '2020-10-02T10:00:00', 'testbruker', 'ARKIV');
+insert into t_dokument_fil(fil_uuid, fil) values ('uuid-207', null);
