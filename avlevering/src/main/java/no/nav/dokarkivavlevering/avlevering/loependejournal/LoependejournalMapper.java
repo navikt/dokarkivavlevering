@@ -35,6 +35,4 @@ public class LoependejournalMapper {
 		arkivskaper.setArkivskaperNavn("Arbeids- og velferdsetaten");
 		return arkivskaper;
 	}
-
 }
-
