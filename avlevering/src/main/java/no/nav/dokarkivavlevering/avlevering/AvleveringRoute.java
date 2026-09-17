@@ -3,10 +3,11 @@ package no.nav.dokarkivavlevering.avlevering;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivavlevering.avlevering.arkivstruktur.AvleveringArkivstrukturRoute;
 import no.nav.dokarkivavlevering.avlevering.arkivuttrekk.AvleveringArkivuttrekkRoute;
+import no.nav.dokarkivavlevering.avlevering.domain.StartSluttDato;
 import no.nav.dokarkivavlevering.avlevering.endringlogg.AvleveringEndringsloggRoute;
 import no.nav.dokarkivavlevering.avlevering.loependejournal.AvleveringLoependeJournalRoute;
 import no.nav.dokarkivavlevering.avlevering.offentligjournal.AvleveringOffentligJournalRoute;
-import no.nav.dokarkivavlevering.core.DokarkivavleveringProperties;
+import no.nav.dokarkivavlevering.avlevering.repository.AvleveringRepository;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.Processor;
@@ -32,14 +33,19 @@ public class AvleveringRoute extends RouteBuilder {
 
 	public static final String PROPERTY_AVLEVERING_ID = "AvleveringId";
 	public static final String PROPERTY_TEMA = "AvleveringTema";
+	public static final String PROPERTY_STARTDATO = "AvleveringStartdato";
+	public static final String PROPERTY_SLUTTDATO = "AvleveringSluttdato";
 	public static final String SHUTDOWN = "direct:shutdown";
 
 	private final ApplicationContext springContext;
 	private final AvleveringProperties avleveringProperties;
+	private final AvleveringRepository avleveringRepository;
 
 	public AvleveringRoute(AvleveringProperties avleveringProperties,
+						   AvleveringRepository avleveringRepository,
 						   ApplicationContext springContext) {
 		this.avleveringProperties = avleveringProperties;
+		this.avleveringRepository = avleveringRepository;
 		this.springContext = springContext;
 	}
 
@@ -65,6 +71,11 @@ public class AvleveringRoute extends RouteBuilder {
 				.setProperty(PROPERTY_AVLEVERING_ID, constant(AVLEVERING_ID_VALUE))
 				.log(LoggingLevel.INFO, log, "Dokarkivavlevering starter avlevering=${exchangeProperty.AvleveringId}.")
 				.log(LoggingLevel.INFO, log, "Konfigurasjon=" + avleveringProperties)
+				.process(exchange -> {
+					final StartSluttDato startSluttDato = avleveringRepository.findStartOgSluttdato(avleveringProperties.getTema());
+					exchange.setProperty(PROPERTY_STARTDATO, startSluttDato.startdato());
+					exchange.setProperty(PROPERTY_SLUTTDATO, startSluttDato.sluttdato());
+				})
 				.setBody(constant(avleveringProperties.getTema()))
 				.split(body())
 				.setProperty(PROPERTY_TEMA, body())

@@ -1,9 +1,9 @@
 package no.nav.dokarkivavlevering.avlevering.arkivuttrekk;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.dokarkivavlevering.avlevering.AvleveringProperties;
 import no.nav.dokarkivavlevering.core.DokarkivavleveringProperties;
 import no.nav.dokarkivavlevering.core.exception.DokarkivavleveringFunctionalException;
+import org.apache.camel.Exchange;
 import org.apache.camel.Handler;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
@@ -16,10 +16,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.Objects;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static no.nav.dokarkivavlevering.avlevering.AvleveringRoute.AVLEVERING_ID_VALUE;
+import static no.nav.dokarkivavlevering.avlevering.AvleveringRoute.PROPERTY_SLUTTDATO;
 import static org.apache.commons.io.FileUtils.readFileToByteArray;
 
 @Slf4j
@@ -45,14 +47,8 @@ public class ArkivuttrekkMapper {
 	private static final String OFFENTLIGJOURNAL_ANTALL_JOURNALREGISTRERING = "$OFFENTLIGJOURNAL_ANTALL_JOURNALREGISTRERING$";
 	private static final String FILOMRAADE_WORK = "/tmp/";
 
-	private final AvleveringProperties avleveringProperties;
-
-	public ArkivuttrekkMapper(AvleveringProperties avleveringProperties) {
-		this.avleveringProperties = avleveringProperties;
-	}
-
 	@Handler
-	public String insertValues() throws Exception {
+	public String insertValues(Exchange exchange) throws Exception {
 		final InputStream resourceInputStream = this.getClass().getClassLoader().getResourceAsStream("arkivuttrekk/arkivuttrekk_template.xml");
 
 		if (resourceInputStream == null) {
@@ -60,7 +56,7 @@ public class ArkivuttrekkMapper {
 		}
 
 		return IOUtils.toString(resourceInputStream, UTF_8)
-				.replace(AVLEVERING_SLUTTDATO, avleveringProperties.getPeriode().getSluttdato().toString())
+				.replace(AVLEVERING_SLUTTDATO, exchange.getProperty(PROPERTY_SLUTTDATO, LocalDate.class).toString())
 				.replace(AVLEVERING_ANTALLDOKUMENTER, countElements("arkivstruktur.xml", "dokumentobjekt")) // FIXME: Er dette en grei nok måte å sjekke dette på ?
 				.replace(METADATAKATALOG_XSD_SJEKKSUM, generateSHA256("metadatakatalog.xsd"))
 				.replace(ARKIVSTRUKTUR_XML_SJEKKSUM, generateSHA256("arkivstruktur.xml"))

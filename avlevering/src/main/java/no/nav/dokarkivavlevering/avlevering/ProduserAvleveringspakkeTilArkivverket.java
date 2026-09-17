@@ -24,22 +24,11 @@ public class ProduserAvleveringspakkeTilArkivverket {
 
 	@Scheduled(initialDelay = 1000)
 	public void execute() {
-		log.info("produserAvleveringspakkeTilArkivverket skal produsere avleveringspakke til Arkivverket for tema={} med periodeStart={} og periodeSlutt={}",
-				avleveringProperties.getTema(), avleveringProperties.getPeriode().getStartdato(), avleveringProperties.getPeriode().getSluttdato());
-		validerPåkrevdeProduserAvleveringspakkeTilArkivverketPropertiesErSatt();
-		producerTemplate.send("direct:start_intermediate", exchange -> exchange.getIn().setBody("Start avlevering"));
-	}
-
-
-	private void validerPåkrevdeProduserAvleveringspakkeTilArkivverketPropertiesErSatt() {
-		if (isNull(avleveringProperties.getPeriode().getStartdato())) {
-			throw new MissingPropertiesException("Startdato er null");
-		}
-		if (isNull(avleveringProperties.getPeriode().getSluttdato())) {
-			throw new MissingPropertiesException("Sluttdato er null");
-		}
 		if (isNull(avleveringProperties.getTema())) {
-			throw new MissingPropertiesException("Tema er null");
+			throw new MissingPropertiesException("Kan ikke generere avlevering uten at tema er satt! Tema == null :(");
 		}
+		log.info("produserAvleveringspakkeTilArkivverket skal produsere avleveringspakke til Arkivverket for tema={}",
+				avleveringProperties.getTema());
+		producerTemplate.send("direct:start_intermediate", exchange -> exchange.getIn().setBody("Start avlevering"));
 	}
 }

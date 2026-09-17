@@ -1,5 +1,6 @@
 package no.nav.dokarkivavlevering.avlevering;
 
+import net.bytebuddy.asm.Advice;
 import no.nav.dokarkivavlevering.avlevering.arkivuttrekk.AvleveringArkivuttrekkRoute;
 import no.nav.dokarkivavlevering.avlevering.aspose.AsposeService;
 import no.nav.dokarkivavlevering.avlevering.config.Tema;
@@ -12,6 +13,7 @@ import no.nav.dokarkivavlevering.avlevering.domain.Fagomrade;
 import no.nav.dokarkivavlevering.avlevering.domain.FilDetaljer;
 import no.nav.dokarkivavlevering.avlevering.domain.Journalpost;
 import no.nav.dokarkivavlevering.avlevering.domain.Sak;
+import no.nav.dokarkivavlevering.avlevering.domain.StartSluttDato;
 import no.nav.dokarkivavlevering.avlevering.endringlogg.JournalpostStatus;
 import no.nav.dokarkivavlevering.avlevering.loependejournal.AvleveringLoependeJournalRoute;
 import no.nav.dokarkivavlevering.avlevering.offentligjournal.AvleveringOffentligJournalRoute;
@@ -37,6 +39,7 @@ import javax.sql.DataSource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -127,6 +130,7 @@ public class AvleveringRouteITest {
 		when(avleveringRepositoryMock.findSakIds(any())).thenReturn(sakIder);
 		when(avleveringRepositoryMock.findSakerMedDokumenter(eq(page1))).thenReturn(page1.stream().map(id -> newSakWithId(id, TEMA)).toList());
 		when(avleveringRepositoryMock.findSakerMedDokumenter(eq(page2))).thenReturn(page2.stream().map(id -> newSakWithId(id, TEMA)).toList());
+		when(avleveringRepositoryMock.findStartOgSluttdato(any())).thenReturn(new StartSluttDato(LocalDate.of(2020, 10, 1), LocalDate.of(2025, 10, 1)));
 		when(asposeServiceMock.convertToPDFA(any(), anyLong())).thenReturn("%PDF-1.5\n%âãÏÓ\n1 0 obj".getBytes());
 	}
 
@@ -210,6 +214,7 @@ public class AvleveringRouteITest {
 				.status("FS")
 				.innhold("Legg til ny institusjon")
 				.avsenderMottaker("Bruker Brukersen")
+				.datoJournal(toLocalDateTime("2020-11-10 16:05:43.332"))
 				.datoMottatt(null)
 				.datoDokument(toLocalDateTime("2020-11-10 16:05:43.332"))
 				.datoJournal(toLocalDateTime("2020-11-10 16:04:43.35"))
