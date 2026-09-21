@@ -19,6 +19,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.List;
 
+import static no.nav.dokarkivavlevering.avlevering.AvleveringRoute.PROPERTY_SLUTTDATO;
+import static no.nav.dokarkivavlevering.avlevering.AvleveringRoute.PROPERTY_STARTDATO;
+
 @Component
 @Profile("genererAvlevering")
 public class AvleveringLoependeJournalRoute extends RouteBuilder {
@@ -38,11 +41,9 @@ public class AvleveringLoependeJournalRoute extends RouteBuilder {
 	}
 
 	private final LoependeJournalregistreringService loependeJournalregistreringService;
-	private final LoependejournalMapper loependejournalMapper;
 
-	public AvleveringLoependeJournalRoute(LoependeJournalregistreringService loependeJournalregistreringService, LoependejournalMapper loependejournalMapper) {
+	public AvleveringLoependeJournalRoute(LoependeJournalregistreringService loependeJournalregistreringService) {
 		this.loependeJournalregistreringService = loependeJournalregistreringService;
-		this.loependejournalMapper = loependejournalMapper;
 	}
 
 	@Override
@@ -58,7 +59,7 @@ public class AvleveringLoependeJournalRoute extends RouteBuilder {
 		from(OPPRETT_LOEPENDEJOURNAL_PRE)
 				.routeId("opprett_loependeJournal_pre")
 				.log(LoggingLevel.INFO, log, "loependejournal_pre")
-				.bean(loependejournalMapper)
+				.bean(LoependejournalMapper.class, "map(${exchangeProperty." + PROPERTY_STARTDATO + "}, ${exchangeProperty." + PROPERTY_SLUTTDATO + "})")
 				.marshal(marshalJaxbFormat())
 				.setHeader(Exchange.FILE_NAME, simple("${exchangeProperty.AvleveringId}/pre_loependeJournal.xml"))
 				.to("file://{{dokarkivavlevering.filomraade.work}}?fileExist=Override")
