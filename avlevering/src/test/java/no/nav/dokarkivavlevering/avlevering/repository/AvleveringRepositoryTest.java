@@ -19,12 +19,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles(profiles = {"genererAvlevering", "itest"})
 class AvleveringRepositoryTest {
 
-	private static Long FEIL_KASSASJONSSTATUS = 102L;
-	private static Long FEIL_ONDEMAND = 103L;
-	private static Long FEIL_ONDEMAND2 = 111L;
-	private static Long FEIL_ONDEMAND3 = 112L;
-	private static Long FEIL_ONDEMAND4 = 113L;
-	private static Long FEIL_JOURNALSTATUS = 105L;
+	private static long FEIL_KASSASJONSSTATUS = 102L;
+	private static long FEIL_ONDEMAND = 103L;
+	private static long FEIL_ONDEMAND2 = 111L;
+	private static long FEIL_ONDEMAND3 = 112L;
+	private static long FEIL_ONDEMAND4 = 113L;
+	private static long FEIL_JOURNALSTATUS = 105L;
 
 	@Autowired
 	private AvleveringRepository avleveringRepository;

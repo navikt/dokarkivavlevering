@@ -27,7 +27,7 @@ public class SqlQueries {
 			            sa.tema = :tema
 			            AND sa.k_kassasjon_status in( 'BEVARINGSTID_PASSERT', 'BEVARINGSTID_PASSERT_DOK_KASSASJON_BESTILT', 'BEVARINGSTID_PASSERT_DOK_KASSERT')
 			)
-			    AND j.k_journal_s IN ('J', 'FS', 'FL', 'E', 'R')
+			    AND j.k_journal_s IN ('J', 'FS', 'FL', 'E')
 			    AND j.opprettet_kilde_navn not in('ondemandtojoark', 'srvondemandtojoark', 'teamdokumenthandtering:arenaondemandtojo', 'teamdokumenthandtering:ondemandtojoark')
 			""";
 
@@ -110,7 +110,7 @@ public class SqlQueries {
 					         left join t_k_offentlig_journal_avsender_mottaker ojam on lower(trim(j.avsend_mottaker)) = lower(trim(ojam.k_offentlig_journal_avsender_mottaker))
 					         left outer join t_administrativ_enhet ae on (ae.tema = sa.tema and ae.dato_fom <= sa.opprettet_tidspunkt and ae.dato_tom >= sa.opprettet_tidspunkt)
 					where s.sak_id in (:sakIds)
-					  and j.k_journal_s in ('J', 'FS', 'FL', 'E', 'R')
+					  and j.k_journal_s in ('J', 'FS', 'FL', 'E')
 			    	  and j.opprettet_kilde_navn not in('ondemandtojoark', 'srvondemandtojoark', 'teamdokumenthandtering:arenaondemandtojo', 'teamdokumenthandtering:ondemandtojoark')
 					  and (d.k_dokument_s is null or d.k_dokument_s = 'FERDIGSTILT')
 					  and f.k_variant_format = 'ARKIV'
@@ -192,7 +192,7 @@ public class SqlQueries {
 					         left join t_arkiv_element_endring aeed on ald.aksjonslogg_id = aeed.aksjonslogg_id
 					         left join t_k_offentlig_journal_avsender_mottaker ojam on lower(trim(j.avsend_mottaker)) = lower(trim(ojam.k_offentlig_journal_avsender_mottaker))
 					where s.sak_id in (:sakIds)
-					  and j.k_journal_s in ('J', 'FS', 'FL', 'E', 'R')
+					  and j.k_journal_s in ('J', 'FS', 'FL', 'E')
 			    	  and j.opprettet_kilde_navn not in('ondemandtojoark', 'srvondemandtojoark', 'teamdokumenthandtering:arenaondemandtojo', 'teamdokumenthandtering:ondemandtojoark')
 					  and (d.k_dokument_s is null or d.k_dokument_s = 'FERDIGSTILT')
 					  and f.k_variant_format = 'ARKIV'
@@ -214,7 +214,7 @@ public class SqlQueries {
 			            sa.tema = :tema
 			            AND sa.k_kassasjon_status in( 'BEVARINGSTID_PASSERT', 'BEVARINGSTID_PASSERT_DOK_KASSASJON_BESTILT', 'BEVARINGSTID_PASSERT_DOK_KASSERT')
 			)
-			    AND j.k_journal_s IN ('J', 'FS', 'FL', 'E', 'R')
+			    AND j.k_journal_s IN ('J', 'FS', 'FL', 'E')
 			    AND j.opprettet_kilde_navn not in('ondemandtojoark', 'srvondemandtojoark', 'teamdokumenthandtering:arenaondemandtojo', 'teamdokumenthandtering:ondemandtojoark')
 			""";
 
