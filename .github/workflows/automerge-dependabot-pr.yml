@@ -17,4 +17,3 @@ jobs:
     secrets: inherit
     with:
       deploy-and-draft-release: false
-      use-app-token: false
